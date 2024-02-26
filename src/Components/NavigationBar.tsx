@@ -1,4 +1,4 @@
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 import AppBar from "@mui/material/AppBar";
@@ -22,11 +22,12 @@ export default function NavigationBar() {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const [login, setLogin] = useState(false);
+  const navigate = useNavigate();
 
   const handleOpenNavMenu = (event: any) => {
     setAnchorElNav(event.currentTarget);
   };
-  const handleOpenUserMenu = (event:any ) => {
+  const handleOpenUserMenu = (event: any) => {
     setAnchorElUser(event.currentTarget);
   };
 
@@ -38,13 +39,14 @@ export default function NavigationBar() {
     setAnchorElUser(null);
   };
 
-  function handleLogoutLogin(setting:any) {
+  function handleLogoutLogin(setting: any) {
     handleCloseUserMenu();
-    
+
     if (setting === "Logout" && login == true) {
       setLogin(false);
     } else if (setting === "Login" && login == false) {
       setLogin(true);
+      navigate("/login");
     }
   }
 
@@ -64,23 +66,22 @@ export default function NavigationBar() {
     ));
   }
 
-  function getPage(page: any){
+  function getPage(page: any) {
     switch (page) {
-      case 'Home':
-        return '/';
-      case 'Events':
-        return '/events';
-      case 'Contact':
-        return '/contact';
+      case "Home":
+        return "/";
+      case "Events":
+        return "/events";
+      case "Contact":
+        return "/contact";
       default:
-        return '/';
+        return "/";
+    }
   }
-}
-
 
   return (
     <>
-      <AppBar position="static" sx={{backgroundColor: '#404040'}}>
+      <AppBar position="static" sx={{ backgroundColor: "#404040" }}>
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             <Typography
@@ -132,7 +133,9 @@ export default function NavigationBar() {
               >
                 {pages.map((page) => (
                   <MenuItem key={page} onClick={handleCloseNavMenu}>
-                    <Link to={getPage(page)} style={{ textDecoration: 'none' }}>{page}</Link>
+                    <Link to={getPage(page)} style={{ textDecoration: "none" }}>
+                      {page}
+                    </Link>
                     <Typography textAlign="center"></Typography>
                   </MenuItem>
                 ))}
@@ -157,16 +160,21 @@ export default function NavigationBar() {
             >
               LOGO
             </Typography>
-            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page) => (
-              <Link key={page} to={getPage(page)} onClick={handleCloseNavMenu} style={{ textDecoration: 'none' }}>
-                <Button sx={{ my: 2, color: "white", display: "block" }}>
-                  {page}
-                </Button>
-              </Link>
-            ))}
-          </Box>
-          
+            <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+              {pages.map((page) => (
+                <Link
+                  key={page}
+                  to={getPage(page)}
+                  onClick={handleCloseNavMenu}
+                  style={{ textDecoration: "none" }}
+                >
+                  <Button sx={{ my: 2, color: "white", display: "block" }}>
+                    {page}
+                  </Button>
+                </Link>
+              ))}
+            </Box>
+
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
