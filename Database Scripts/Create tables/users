@@ -1,0 +1,14 @@
+CREATE TABLE users (
+userID SERIAL primary KEY,
+userName VARCHAR(200) NOT NULL,
+userEmail VARCHAR(100) NOT NULL,
+userPhone VARCHAR(15),
+userAdmin BOOLEAN DEFAULT false,
+userPassword VARCHAR(200) NOT NULL,
+userAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
+);
+
+INSERT INTO users (userName, userEmail, userPhone, userPassword) 
+VALUES ('teste', 'teste@teste.teste', '910128912', 'testePassword');
+
+select * from users

@@ -3,10 +3,9 @@ const cors = require("cors");
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-//--Funções importadas--//
+const { Pool } = require('pg');
+require('dotenv').config();
 
-
-//--Funções importadas--//
 
 const app = express();
 const PORT = process.env.PORT;
@@ -17,6 +16,36 @@ app.options('*', cors())
 app.use(express());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+
+const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
+
+const pool = new Pool({
+    host: PGHOST,
+    database: PGDATABASE,
+    username: PGUSER,
+    password: PGPASSWORD,
+    port: 5432,
+    ssl: {
+      require: true,
+    },
+  });
+
+/*
+async function getPgVersion() {
+    try{
+        const queryText = 'Select * from users';
+        const { rows } = await pool.query(queryText);
+        console.log(rows[0]);
+        return (rows);
+    }
+   catch(error){
+    console.log(error);
+   }
+}
+
+getPgVersion();
+*/
 
 //-----------EndPoints-------------//
 
@@ -48,11 +77,6 @@ app.post("/signUp", async (req, res) => {
 });
 
 
-//---------------------Teste----------------------------//
-
-//---------------------Teste----------------------------//
-
-//Fica no final do código
 app.use(express.static('public'));
 app.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`);
