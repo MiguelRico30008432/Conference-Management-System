@@ -3,49 +3,16 @@ const cors = require("cors");
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const { Pool } = require('pg');
-require('dotenv').config();
-
+const db = require("./database");
+const mail = require("./emails")
 
 const app = express();
 const PORT = process.env.PORT;
-const secret = process.env.SECRET;
 
 app.use(cors());
 app.options('*', cors())
-app.use(express());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-
-const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
-
-const pool = new Pool({
-    host: PGHOST,
-    database: PGDATABASE,
-    username: PGUSER,
-    password: PGPASSWORD,
-    port: 5432,
-    ssl: {
-      require: true,
-    },
-  });
-
-/*
-async function getPgVersion() {
-    try{
-        const queryText = 'Select * from users';
-        const { rows } = await pool.query(queryText);
-        console.log(rows[0]);
-        return (rows);
-    }
-   catch(error){
-    console.log(error);
-   }
-}
-
-getPgVersion();
-*/
 
 //-----------EndPoints-------------//
 
@@ -55,7 +22,7 @@ app.post("/signUp", async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
-    //const findUserName = await findOneResult("users", { username: username });
+    const findUserName = await db.fetchData("users", { username: username });
 
     if (findUserName == null) {
         try {
@@ -65,10 +32,10 @@ app.post("/signUp", async (req, res) => {
             //await insertLinesOnDatabase("users", newUser);
 
             //sendEmail(email);
-            return res.status(201).send({ msg:""});
+            return res.status(201).send({ msg: "" });
         } catch (error) {
             console.error("Erro ao criar o utilizador: " + error);
-            return res.status(500).send({ msg:'Erro interno de servidor'});
+            return res.status(500).send({ msg: 'Erro interno de servidor' });
         }
     } else {
         console.log("Utilizador já existe");
