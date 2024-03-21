@@ -28,7 +28,7 @@ import MDBox from "components/MDBox";
 
 // Material Dashboard 2 React example components
 import Sidenav from "examples/Sidenav";
-import Configurator from "examples/Configurator";
+import NavBarSettings from "OurComponents/navBars/NavBarSettings";
 
 // Material Dashboard 2 React themes
 import theme from "assets/theme";
@@ -160,14 +160,14 @@ export default function App() {
               onMouseEnter={handleOnMouseEnter}
               onMouseLeave={handleOnMouseLeave}
             />
-            <Configurator />
+            <NavBarSettings />
             {configsButton}
           </>
         )}
-        {layout === "vr" && <Configurator />}
+        {layout === "vr" && <NavBarSettings />}
         <Routes>
           {getRoutes(routes)}
-          <Route path="*" element={<Navigate to="/dashboard" />} />
+          <Route path="*" element={<Navigate to="/HomePage" />} />
         </Routes>
       </ThemeProvider>
     </CacheProvider>
@@ -184,14 +184,14 @@ export default function App() {
             onMouseEnter={handleOnMouseEnter}
             onMouseLeave={handleOnMouseLeave}
           />
-          <Configurator />
+          <NavBarSettings />
           {configsButton}
         </>
       )}
-      {layout === "vr" && <Configurator />}
+      {layout === "vr" && <NavBarSettings />}
       <Routes>
         {getRoutes(routes)}
-        <Route path="*" element={<Navigate to="/dashboard" />} />
+        <Route path="*" element={<Navigate to="/HomePage" />} />
       </Routes>
     </ThemeProvider>
   );

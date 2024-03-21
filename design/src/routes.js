@@ -44,12 +44,21 @@ import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
-import TestPage from "pages/testPage";
+import ExemplePage from "pages/ExemplePage";
+import HomePage from "pages/HomePage";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
 
 const routes = [
+  {
+    type: "collapse",
+    name: "Home Page",
+    key: "Home Page",
+    icon: <Icon fontSize="small">dashboard</Icon>,
+    route: "/HomePage",
+    component: <HomePage />,
+  },
   {
     type: "collapse",
     name: "Dashboard",
@@ -116,11 +125,11 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Nova página",
-    key: "testPage",
+    name: "Página de Exemplo",
+    key: "ExemplePage",
     icon: <Icon fontSize="small">assignment</Icon>,
-    route: "/testPage",
-    component: <TestPage />,
+    route: "/ExemplePage",
+    component: <ExemplePage />,
   }
 ];
 
