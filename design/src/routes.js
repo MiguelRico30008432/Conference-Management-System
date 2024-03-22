@@ -47,6 +47,7 @@ import SignUp from "layouts/authentication/sign-up";
 import ExemplePage from "pages/ExemplePage";
 import HomePage from "pages/HomePage";
 import PageNotFound from "pages/PageNotFound";
+import SignInPage from "pages/signInPage";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -122,13 +123,13 @@ const routes = [
     icon: <Icon fontSize="small">login</Icon>,
     route: "/authentication/sign-in",
     component: <SignIn />,
-    display: true
+    display: false
   },
   {
     type: "collapse",
     name: "Sign Up",
     key: "sign-up",
-    icon: <Icon fontSize="small">assignment</Icon>,
+    icon: <Icon fontSize="small">logout</Icon>,
     route: "/authentication/sign-up",
     component: <SignUp />,
     display: true
@@ -140,6 +141,15 @@ const routes = [
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/ExemplePage",
     component: <ExemplePage />,
+    display: true
+  },
+  {
+    type: "collapse",
+    name: "Sign In",
+    key: "SignInPage",
+    icon: <Icon fontSize="small">login</Icon>,
+    route: "/Signin",
+    component: <SignInPage />,
     display: true
   },
   {

@@ -20,6 +20,7 @@ import MDInput from "components/MDInput";
 // Material Dashboard 2 React example components
 import Breadcrumbs from "examples/Breadcrumbs";
 import NotificationItem from "examples/Items/NotificationItem";
+import MDTypography from "components/MDTypography";
 
 // Custom styles for DashboardNavbar
 import {
@@ -130,9 +131,13 @@ export default function UpperNavBar({ absolute, light, isMini }) {
                 sx={navbarMobileMenu}
                 onClick={handleMiniSidenav}
               >
-                <Icon sx={iconsStyle} fontSize="medium">
+               
+                <Icon sx={iconsStyle} fontSize="medium"> 
                   {miniSidenav ? "menu_open" : "menu"}
                 </Icon>
+                <MDTypography variant="body2" color="text">
+                  Menu
+                  </MDTypography>
               </IconButton>
               {renderMenu()}
             </MDBox>
