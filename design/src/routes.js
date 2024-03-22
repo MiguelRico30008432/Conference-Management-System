@@ -46,6 +46,7 @@ import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import ExemplePage from "pages/ExemplePage";
 import HomePage from "pages/HomePage";
+import PageNotFound from "pages/PageNotFound";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -58,6 +59,7 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/HomePage",
     component: <HomePage />,
+    display: true
   },
   {
     type: "collapse",
@@ -66,6 +68,7 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
+    display: false
   },
   {
     type: "collapse",
@@ -74,6 +77,7 @@ const routes = [
     icon: <Icon fontSize="small">table_view</Icon>,
     route: "/tables",
     component: <Tables />,
+    display: false
   },
   {
     type: "collapse",
@@ -82,6 +86,7 @@ const routes = [
     icon: <Icon fontSize="small">receipt_long</Icon>,
     route: "/billing",
     component: <Billing />,
+    display: false
   },
   {
     type: "collapse",
@@ -90,6 +95,7 @@ const routes = [
     icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
     route: "/rtl",
     component: <RTL />,
+    display: false
   },
   {
     type: "collapse",
@@ -98,6 +104,7 @@ const routes = [
     icon: <Icon fontSize="small">notifications</Icon>,
     route: "/notifications",
     component: <Notifications />,
+    display: false
   },
   {
     type: "collapse",
@@ -106,6 +113,7 @@ const routes = [
     icon: <Icon fontSize="small">person</Icon>,
     route: "/profile",
     component: <Profile />,
+    display: false
   },
   {
     type: "collapse",
@@ -114,6 +122,7 @@ const routes = [
     icon: <Icon fontSize="small">login</Icon>,
     route: "/authentication/sign-in",
     component: <SignIn />,
+    display: true
   },
   {
     type: "collapse",
@@ -122,6 +131,7 @@ const routes = [
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/authentication/sign-up",
     component: <SignUp />,
+    display: true
   },
   {
     type: "collapse",
@@ -130,7 +140,17 @@ const routes = [
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/ExemplePage",
     component: <ExemplePage />,
-  }
+    display: true
+  },
+  {
+    type: "collapse",
+    name: "404",
+    key: "404",
+    icon: <Icon fontSize="small">assignment</Icon>,
+    route: "/PageNotFound",
+    component: <PageNotFound />,
+    display: false
+  },
 ];
 
 export default routes;

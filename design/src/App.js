@@ -167,7 +167,8 @@ export default function App() {
         {layout === "vr" && <NavBarSettings />}
         <Routes>
           {getRoutes(routes)}
-          <Route path="*" element={<Navigate to="/HomePage" />} />
+          <Route path="*" element={<Navigate to="/PageNotFound" />} />
+          <Route index element={<Navigate to="/HomePage" />} />
         </Routes>
       </ThemeProvider>
     </CacheProvider>
@@ -191,7 +192,8 @@ export default function App() {
       {layout === "vr" && <NavBarSettings />}
       <Routes>
         {getRoutes(routes)}
-        <Route path="*" element={<Navigate to="/HomePage" />} />
+        <Route path="*" element={<Navigate to="/PageNotFound" />} />
+        <Route index element={<Navigate to="/HomePage" />} />
       </Routes>
     </ThemeProvider>
   );
