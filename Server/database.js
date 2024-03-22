@@ -32,7 +32,9 @@ async function teste() {
 
 async function fetchData( table, collum, comparisonValue){
     try{
-        const {rows} = await pool.query('Select * from ')
+        const queryText = `SELECT * FROM ${table} WHERE ${collum} = $1`;
+        const result = await pool.query(queryText, [comparisonValue]);
+        return result.rows;
     }catch(err){
         log.addLog(err);
     }
