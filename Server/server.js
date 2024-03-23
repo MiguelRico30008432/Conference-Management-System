@@ -16,7 +16,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //-----------Zona de Testes-------------//
-//db.deleteData("users", "username", "Bernardo")
+//const value = {useremail: "apos "}
+//const collum = {userid: "6"}
+//db.updateData("users", value, collum)
 //-----------Zona de Testes-------------//
 
 //Notas:
