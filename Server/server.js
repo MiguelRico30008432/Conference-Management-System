@@ -16,10 +16,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //-----------Zona de Testes-------------//
-
-db.fetchData("users", "username", "Bernardo");
-
+//db.deleteData("users", "username", "Bernardo")
 //-----------Zona de Testes-------------//
+
+//Notas:
+// -> Ao intoduzir uma campo manualmente pode-se reeplicar linhas. Recriar a tabela dos user e dar set up de campos como unique
 
 //-----------EndPoints-------------//
 

@@ -14,21 +14,6 @@ const pool = new Pool({
         require: true,
     },
 });
-/*
-async function teste() {
-    console.log("entrei no teste");
-    try {
-        const queryText = 'Select * from users';
-        const { rows } = await pool.query(queryText);
-        console.log(rows[0]);
-        return (rows);
-    }
-    catch (error) {
-        console.log(error);
-    }
-    console.log("sai do teste");
-}
-*/
 
 async function fetchData(table, collum, comparisonValue){ // utilizada para qualquer tipo de search onde recebe o nome da tabela, da coluna e do parametro de comparação
     try{
@@ -37,7 +22,7 @@ async function fetchData(table, collum, comparisonValue){ // utilizada para qual
         console.log(result.rows);
         return result.rows;
     }catch(err){
-        log.addLog(err, "fetchData");
+        log.addLog(err, "database", "fetchData");
     }
 }// testado para a tabela users
 
@@ -49,11 +34,23 @@ async function addData(table, entryParameters){ //utilizada para inserir dados e
         await pool.query(queryText, values);
         return;
     }catch(err){
-        log.addLog(err, "addData");
+        log.addLog(err, "database", "addData");
     }
 } //testado para a tabela users
+
+async function deleteData(table, collum, comparisonValue){
+    try{
+        const queryText = `DELETE FROM ${table} WHERE ${collum} = $1`;
+        await pool.query(queryText, [comparisonValue]);
+        return;
+    }catch(err){
+        console.log("deu erro");
+        log.addLog(err, "database", "deleteData");
+    }
+} // testado para a tabela users
 
 module.exports = {
     fetchData,
     addData,
+    deleteData,
 }
