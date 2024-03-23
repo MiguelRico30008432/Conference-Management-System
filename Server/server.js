@@ -4,7 +4,8 @@ const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const db = require("./database");
-const mail = require("./emails")
+const mail = require("./emails");
+const log = require("./logs/logsManagement");
 
 const app = express();
 const PORT = process.env.PORT;
@@ -14,25 +15,31 @@ app.options('*', cors())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+//-----------Zona de Testes-------------//
+
+db.fetchData("users", "username", "Bernardo");
+
+//-----------Zona de Testes-------------//
+
 //-----------EndPoints-------------//
 
 //SignUp
 app.post("/signUp", async (req, res) => {
-    const email = req.body.email;
     const username = req.body.username;
     const password = req.body.password;
+    const email = req.body.email;
+    const phone = req.body.phone;
 
-    const findUserName = await db.fetchData("users", { username: username });
+    const findUserName = await db.fetchData("users", "username", username);
 
     if (findUserName == null) {
         try {
             const hashedPassword = await bcrypt.hash(password, 10);
-            const newUser = { username: username, password: hashedPassword, admin: 0, email: email };
-            console.log(newUser);
-            //await insertLinesOnDatabase("users", newUser);
+            const newUser = { username: username, useremail: email, userphone: phone, userpassword: hashedPassword};
+            db.addData("users", newUser);
 
             //sendEmail(email);
-            return res.status(201).send({ msg: "" });
+            return res.status(201).send({ msg: "Utilizador criado com sucesso"});
         } catch (error) {
             console.error("Erro ao criar o utilizador: " + error);
             return res.status(500).send({ msg: 'Erro interno de servidor' });
@@ -42,7 +49,6 @@ app.post("/signUp", async (req, res) => {
         return res.status(409).send({ msg: 'Utilizador já existe' });
     }
 });
-
 
 app.use(express.static('public'));
 app.listen(PORT, () => {
