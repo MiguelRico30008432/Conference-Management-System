@@ -36,18 +36,12 @@ Coded by www.creative-tim.com
 */
 
 // Material Dashboard 2 React layouts
-import Dashboard from "layouts/dashboard";
-import Tables from "layouts/tables";
-import Billing from "layouts/billing";
-import RTL from "layouts/rtl";
-import Notifications from "layouts/notifications";
-import Profile from "layouts/profile";
-import SignIn from "layouts/authentication/sign-in";
-import SignUp from "layouts/authentication/sign-up";
+
 import ExemplePage from "pages/ExemplePage";
 import HomePage from "pages/HomePage";
 import PageNotFound from "pages/PageNotFound";
 import SignInPage from "pages/signInPage";
+import SignUpPage from "pages/SignUpPage";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -63,6 +57,56 @@ const routes = [
     display: true
   },
   {
+    type: "collapse",
+    name: "Página de Exemplo",
+    key: "ExemplePage",
+    icon: <Icon fontSize="small">assignment</Icon>,
+    route: "/ExemplePage",
+    component: <ExemplePage />,
+    display: true
+  },
+  {
+    type: "collapse",
+    name: "Sign In",
+    key: "SignInPage",
+    icon: <Icon fontSize="small">login</Icon>,
+    route: "/Signin",
+    component: <SignInPage />,
+    display: true
+  },
+  {
+    type: "collapse",
+    name: "Sign Up",
+    key: "sign-up",
+    icon: <Icon fontSize="small">logout</Icon>,
+    route: "/signup",
+    component: <SignUpPage />,
+    display: true
+  },
+  {
+    type: "collapse",
+    name: "404",
+    key: "404",
+    icon: <Icon fontSize="small">assignment</Icon>,
+    route: "/PageNotFound",
+    component: <PageNotFound />,
+    display: false
+  },
+];
+
+export default routes;
+
+
+/*  old menu
+import Dashboard from "layouts/dashboard";
+import Tables from "layouts/tables";
+import Billing from "layouts/billing";
+import RTL from "layouts/rtl";
+import Notifications from "layouts/notifications";
+import Profile from "layouts/profile";
+import SignIn from "layouts/authentication/sign-in";
+import SignUp from "layouts/authentication/sign-up";
+{
     type: "collapse",
     name: "Dashboard",
     key: "dashboard",
@@ -132,35 +176,5 @@ const routes = [
     icon: <Icon fontSize="small">logout</Icon>,
     route: "/authentication/sign-up",
     component: <SignUp />,
-    display: true
-  },
-  {
-    type: "collapse",
-    name: "Página de Exemplo",
-    key: "ExemplePage",
-    icon: <Icon fontSize="small">assignment</Icon>,
-    route: "/ExemplePage",
-    component: <ExemplePage />,
-    display: true
-  },
-  {
-    type: "collapse",
-    name: "Sign In",
-    key: "SignInPage",
-    icon: <Icon fontSize="small">login</Icon>,
-    route: "/Signin",
-    component: <SignInPage />,
-    display: true
-  },
-  {
-    type: "collapse",
-    name: "404",
-    key: "404",
-    icon: <Icon fontSize="small">assignment</Icon>,
-    route: "/PageNotFound",
-    component: <PageNotFound />,
     display: false
-  },
-];
-
-export default routes;
+  }, */

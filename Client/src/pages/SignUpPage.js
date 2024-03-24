@@ -1,16 +1,24 @@
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import Footer from "OurComponents/footer/Footer";
-import UpperNavBar from "OurComponents/navBars/UpperNavBar";
+/**
+=========================================================
+* Material Dashboard 2 React - v2.2.0
+=========================================================
 
+* Product Page: https://www.creative-tim.com/product/material-dashboard-react
+* Copyright 2023 Creative Tim (https://www.creative-tim.com)
 
-import { useState } from "react";
+Coded by www.creative-tim.com
+
+ =========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+*/
 
 // react-router-dom components
 import { Link } from "react-router-dom";
 
 // @mui material components
 import Card from "@mui/material/Card";
-import Switch from "@mui/material/Switch";
+import Checkbox from "@mui/material/Checkbox";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -18,14 +26,11 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 
+// Authentication layout components
 import SignInAndOutLayout from "OurLayouts/SignInAndOutLayout";
-import bgImage from "assets/images/conference_signin.jpeg";
+import bgImage from "assets/images/conference_signup.jpg";
 
-export default function SignInPage() {
-  const [rememberMe, setRememberMe] = useState(false);
-
-  const handleSetRememberMe = () => setRememberMe(!rememberMe);
-
+export default function SignUpPage() {
   return (
     <SignInAndOutLayout image={bgImage}>
       <Card>
@@ -33,37 +38,32 @@ export default function SignInPage() {
           variant="gradient"
           bgColor="info"
           borderRadius="lg"
-          coloredShadow="info"
+          coloredShadow="success"
           mx={2}
           mt={-3}
-          p={2}
+          p={3}
           mb={1}
           textAlign="center"
         >
           <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
-            Sign in
-          </MDTypography>      
+            Join us today
+          </MDTypography>
+          <MDTypography display="block" variant="button" color="white" my={1}>
+            Enter your email and password to register
+          </MDTypography>
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
           <MDBox component="form" role="form">
             <MDBox mb={2}>
-              <MDInput type="email" label="Email" fullWidth />
+              <MDInput type="text" label="Name" variant="standard" fullWidth />
             </MDBox>
             <MDBox mb={2}>
-              <MDInput type="password" label="Password" fullWidth />
+              <MDInput type="email" label="Email" variant="standard" fullWidth />
             </MDBox>
-            <MDBox display="flex" alignItems="center" ml={-1}>
-              <Switch checked={rememberMe} onChange={handleSetRememberMe} />
-              <MDTypography
-                variant="button"
-                fontWeight="regular"
-                color="text"
-                onClick={handleSetRememberMe}
-                sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
-              >
-                &nbsp;&nbsp;Remember me
-              </MDTypography>
+            <MDBox mb={2}>
+              <MDInput type="password" label="Password" variant="standard" fullWidth />
             </MDBox>
+           
             <MDBox mt={4} mb={1}>
               <MDButton variant="gradient" color="info" fullWidth>
                 sign in
@@ -71,16 +71,16 @@ export default function SignInPage() {
             </MDBox>
             <MDBox mt={3} mb={1} textAlign="center">
               <MDTypography variant="button" color="text">
-                Don&apos;t have an account?{" "}
+                Already have an account?{" "}
                 <MDTypography
                   component={Link}
-                  to="/authentication/sign-up"
+                  to="/authentication/sign-in"
                   variant="button"
                   color="info"
                   fontWeight="medium"
                   textGradient
                 >
-                  Sign up
+                  Sign In
                 </MDTypography>
               </MDTypography>
             </MDBox>
