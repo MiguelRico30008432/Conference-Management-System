@@ -74,7 +74,7 @@ export default function SignUpPage() {
                 Already have an account?{" "}
                 <MDTypography
                   component={Link}
-                  to="/authentication/sign-in"
+                  to="/signin"
                   variant="button"
                   color="info"
                   fontWeight="medium"
