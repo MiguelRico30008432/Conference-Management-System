@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const db = require("./database");
 const mail = require("./emails");
 const log = require("./logs/logsManagement");
+const ver = require("./verifications");
 
 const app = express();
 const PORT = process.env.PORT;
@@ -21,8 +22,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //db.updateData("users", value, collum)
 //-----------Zona de Testes-------------//
 
-//Notas:
-// -> Ao intoduzir uma campo manualmente pode-se reeplicar linhas. Recriar a tabela dos user e dar set up de campos como unique
 
 //-----------EndPoints-------------//
 
