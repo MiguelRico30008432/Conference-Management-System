@@ -1,3 +1,0 @@
-{"originFile":"database.js","time":"2024-03-23 15:41:38","function":"deleteData","mensagem":{"length":92,"name":"error","severity":"ERROR","code":"42601","position":"1","file":"scan.l","line":"1241","routine":"scanner_yyerror"}}
-{"originFile":"database.js","time":"2024-03-23 15:42:31","function":"deleteData","mensagem":{"length":92,"name":"error","severity":"ERROR","code":"42601","position":"1","file":"scan.l","line":"1241","routine":"scanner_yyerror"}}
-{"originFile":"database.js","time":"2024-03-23 15:43:07","function":"deleteData","mensagem":{"length":92,"name":"error","severity":"ERROR","code":"42601","position":"1","file":"scan.l","line":"1241","routine":"scanner_yyerror"}}
