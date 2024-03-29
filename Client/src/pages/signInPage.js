@@ -1,30 +1,65 @@
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import Footer from "OurComponents/footer/Footer";
-import UpperNavBar from "OurComponents/navBars/UpperNavBar";
-
-
-import { useState } from "react";
-
 // react-router-dom components
 import { Link } from "react-router-dom";
-
-// @mui material components
-import Card from "@mui/material/Card";
-import Switch from "@mui/material/Switch";
+import { useState } from "react";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 
+//Layout Component
 import SignInAndOutLayout from "OurLayouts/SignInAndOutLayout";
-import bgImage from "assets/images/conference_signin.jpeg";
+import bgImage from "assets/images/conference_signup.jpg";
+
+// @mui material components
+import * as React from "react";
+import Card from "@mui/material/Card";
+import CssBaseline from "@mui/material/CssBaseline";
+import TextField from "@mui/material/TextField";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import Alert from "@mui/material/Alert";
+
 
 export default function SignInPage() {
+  const [emailAlert,setEmailAlert] = useState(null);
+  const [passwordAlert,setpasswordAlert] = useState(null);
+
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const data = new FormData(event.currentTarget);
+    const formData = Object.fromEntries(data.entries());
+    const {email, password } = formData;
+    
+    if(inputsAreValidated(email, password)){
+      await makeRequest();
+    }
+
+  };
+
+  async function makeRequest(){
+    const test = {name: "teste"}
+    const answer = await fetch("http://localhost:8003/teste", {
+      method: "POST",
+      body: JSON.stringify({test}),
+      headers: {
+              "Content-type": "application/json; charset=UTF-8",
+      },
+  });
+  }
+
+  const inputsAreValidated = (email, password) => {
+    setEmailAlert(email === "" ? <Alert severity="error">You must insert your Email!</Alert> : null);
+    setpasswordAlert(password === "" ? <Alert severity="error">You must insert your Password!</Alert> : null);
+  
+    return email && password;
+  }
 
   return (
     <SignInAndOutLayout image={bgImage}>
@@ -33,59 +68,81 @@ export default function SignInPage() {
           variant="gradient"
           bgColor="info"
           borderRadius="lg"
-          coloredShadow="info"
+          coloredShadow="success"
           mx={2}
           mt={-3}
-          p={2}
+          p={3}
           mb={1}
           textAlign="center"
         >
           <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
             Sign in
-          </MDTypography>      
+          </MDTypography>
         </MDBox>
-        <MDBox pt={4} pb={3} px={3}>
-          <MDBox component="form" role="form">
-            <MDBox mb={2}>
-              <MDInput type="email" label="Email" fullWidth />
-            </MDBox>
-            <MDBox mb={2}>
-              <MDInput type="password" label="Password" fullWidth />
-            </MDBox>
-            <MDBox display="flex" alignItems="center" ml={-1}>
-              <Switch checked={rememberMe} onChange={handleSetRememberMe} />
-              <MDTypography
-                variant="button"
-                fontWeight="regular"
-                color="text"
-                onClick={handleSetRememberMe}
-                sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
+        <Container component="main" maxWidth="xs">
+          <CssBaseline />
+          <Box
+            sx={{
+              mt: 2,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <Box component="form" noValidate onSubmit={handleSubmit}>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <TextField
+                    autoComplete="given-name"
+                    name="email"
+                    required
+                    fullWidth
+                    id="email"
+                    label="Email"
+                    autoFocus
+                  />
+                  {emailAlert}
+                </Grid>
+                <Grid item xs={12}>
+                <TextField
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type="password"
+                    id="password"
+                    autoComplete="new-password"
+                  />
+                  {passwordAlert}
+                </Grid>
+              </Grid>
+              <MDButton
+                type="submit"
+                variant="gradient"
+                color="info"
+                fullWidth
+                sx={{ mt: 2 }}
               >
-                &nbsp;&nbsp;Remember me
-              </MDTypography>
-            </MDBox>
-            <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth>
-                sign in
+                sign Up
               </MDButton>
-            </MDBox>
-            <MDBox mt={3} mb={1} textAlign="center">
-              <MDTypography variant="button" color="text">
-                Don&apos;t have an account?{" "}
-                <MDTypography
-                  component={Link}
-                  to="/signup"
-                  variant="button"
-                  color="info"
-                  fontWeight="medium"
-                  textGradient
-                >
-                  Sign up
+              <MDBox mt={3} mb={1} textAlign="center">
+                <MDTypography variant="button" color="text">
+                  Already have an account?{" "}
+                  <MDTypography
+                    component={Link}
+                    to="/signin"
+                    variant="button"
+                    color="info"
+                    fontWeight="medium"
+                    textGradient
+                  >
+                    Sign In
+                  </MDTypography>
                 </MDTypography>
-              </MDTypography>
-            </MDBox>
-          </MDBox>
-        </MDBox>
+              </MDBox>
+            </Box>
+          </Box>
+        </Container>
       </Card>
     </SignInAndOutLayout>
   );

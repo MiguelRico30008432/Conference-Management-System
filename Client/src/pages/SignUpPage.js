@@ -29,7 +29,7 @@ export default function SignUpPage() {
   const [phoneAlert,setPhoneAlert] = useState(null);
   const [passwordAlert,setPasswordAlert] = useState(null);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     const data = new FormData(event.currentTarget);
@@ -37,16 +37,16 @@ export default function SignUpPage() {
     const { firstName, lastName, email, phone, password } = formData;
     
     if(inputsAreValidated(firstName, lastName, email, phone, password)){
-      makeRequest();
+      await makeRequest();
     }
 
   };
 
   async function makeRequest(){
-    const searchEvent = {name: "teste"}
-    const answer = await makeRequest("http://localhost:8003/searchForEvents", {
+    const test = {name: "teste"}
+    const answer = await fetch("http://localhost:8003/teste", {
       method: "POST",
-      body: JSON.stringify({searchEvent}),
+      body: JSON.stringify({test}),
       headers: {
               "Content-type": "application/json; charset=UTF-8",
       },
