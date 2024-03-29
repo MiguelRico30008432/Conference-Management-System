@@ -1,5 +1,6 @@
 // react-router-dom components
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -11,31 +12,61 @@ import SignInAndOutLayout from "OurLayouts/SignInAndOutLayout";
 import bgImage from "assets/images/conference_signup.jpg";
 
 // @mui material components
-import * as React from 'react';
+import * as React from "react";
 import Card from "@mui/material/Card";
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
+import CssBaseline from "@mui/material/CssBaseline";
+import TextField from "@mui/material/TextField";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import Alert from "@mui/material/Alert";
 
 
 export default function SignUpPage() {
+  const [firstNameAlert,setFirstNameAlert] = useState(null);
+  const [lastNameAlert,setLastNameAlert] = useState(null);
+  const [emailAlert,setEmailAlert] = useState(null);
+  const [phoneAlert,setPhoneAlert] = useState(null);
+  const [passwordAlert,setPasswordAlert] = useState(null);
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
 
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-      name: data.get('firstName'),
-    });
+    const data = new FormData(event.currentTarget);
+    const formData = Object.fromEntries(data.entries());
+    const { firstName, lastName, email, phone, password } = formData;
+    
+    if(inputsAreValidated(firstName, lastName, email, phone, password)){
+      makeRequest();
+    }
+
   };
+
+  async function makeRequest(){
+    const searchEvent = {name: "teste"}
+    const answer = await makeRequest("http://localhost:8003/searchForEvents", {
+      method: "POST",
+      body: JSON.stringify({searchEvent}),
+      headers: {
+              "Content-type": "application/json; charset=UTF-8",
+      },
+  });
+  }
+  
+
+  const inputsAreValidated = (firstName, lastName, email, phone, password) => {
+    setFirstNameAlert(firstName === "" ? <Alert severity="error">You must insert your first Name!</Alert> : null);
+    setLastNameAlert(lastName === "" ? <Alert severity="error">You must insert your last Name!</Alert> : null);
+    setEmailAlert(email === "" ? <Alert severity="error">You must insert your email!</Alert> : null);
+    setPhoneAlert(phone === "" ? <Alert severity="error">You must insert your phone!</Alert> : null);
+    setPasswordAlert(password === "" ? <Alert severity="error">You must insert your password!</Alert> : null);
+
+    return firstName && lastName && email && phone && password;
+  }
 
   return (
     <SignInAndOutLayout image={bgImage}>
-      <Card>     
+      <Card>
         <MDBox
           variant="gradient"
           bgColor="info"
@@ -54,14 +85,14 @@ export default function SignUpPage() {
             Enter the following data in order to complete your registration!
           </MDTypography>
         </MDBox>
-          <Container component="main" maxWidth="xs">
+        <Container component="main" maxWidth="xs">
           <CssBaseline />
           <Box
             sx={{
               mt: 2,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
             }}
           >
             <Box component="form" noValidate onSubmit={handleSubmit}>
@@ -76,6 +107,7 @@ export default function SignUpPage() {
                     label="First Name"
                     autoFocus
                   />
+                  {firstNameAlert}
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
@@ -86,6 +118,7 @@ export default function SignUpPage() {
                     name="lastName"
                     autoComplete="family-name"
                   />
+                  {lastNameAlert}
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
@@ -96,6 +129,7 @@ export default function SignUpPage() {
                     name="email"
                     autoComplete="email"
                   />
+                   {emailAlert}
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
@@ -105,6 +139,7 @@ export default function SignUpPage() {
                     label="Phone Number"
                     name="phone"
                   />
+                  {phoneAlert}
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
@@ -116,6 +151,7 @@ export default function SignUpPage() {
                     id="password"
                     autoComplete="new-password"
                   />
+                  {passwordAlert}
                 </Grid>
                 <Grid item xs={8}>
                   <TextField
@@ -125,25 +161,31 @@ export default function SignUpPage() {
                     name="code"
                   />
                 </Grid>
-              </Grid>        
-              <MDButton type="submit" variant="gradient" color="info" fullWidth  sx={{mt: 2}}>
+              </Grid>
+              <MDButton
+                type="submit"
+                variant="gradient"
+                color="info"
+                fullWidth
+                sx={{ mt: 2 }}
+              >
                 sign Up
               </MDButton>
               <MDBox mt={3} mb={1} textAlign="center">
-              <MDTypography variant="button" color="text">
-                Already have an account?{" "}
-                <MDTypography
-                  component={Link}
-                  to="/signin"
-                  variant="button"
-                  color="info"
-                  fontWeight="medium"
-                  textGradient
-                >
-                  Sign In
+                <MDTypography variant="button" color="text">
+                  Already have an account?{" "}
+                  <MDTypography
+                    component={Link}
+                    to="/signin"
+                    variant="button"
+                    color="info"
+                    fontWeight="medium"
+                    textGradient
+                  >
+                    Sign In
+                  </MDTypography>
                 </MDTypography>
-              </MDTypography>
-            </MDBox>
+              </MDBox>
             </Box>
           </Box>
         </Container>
