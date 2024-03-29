@@ -1,17 +1,3 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
 
 // prop-types is a library for typechecking of props
 import PropTypes from "prop-types";
@@ -26,7 +12,6 @@ import MDBox from "components/MDBox";
 // Material Dashboard 2 React example components
 import SignInOutNavBar from "OurComponents/navBars/SignInOutNavBar";
 import PageLayout from "examples/LayoutContainers/PageLayout";
-import Footer from "OurComponents/footer/Footer";
 
 export default function SignInAndOutLayout({ coverHeight, image, children }) {
   return (
@@ -41,7 +26,7 @@ export default function SignInAndOutLayout({ coverHeight, image, children }) {
         mx={2}
         my={2}
         pt={6}
-        pb={28}
+        pb={10}
         sx={{
           backgroundImage: ({ functions: { linearGradient, rgba }, palette: { gradients } }) =>
             image &&
@@ -61,7 +46,6 @@ export default function SignInAndOutLayout({ coverHeight, image, children }) {
           </Grid>
         </Grid>
       </MDBox>
-      <Footer/>
     </PageLayout>
   );
 }

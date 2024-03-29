@@ -1,39 +1,41 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
 // react-router-dom components
 import { Link } from "react-router-dom";
-
-// @mui material components
-import Card from "@mui/material/Card";
-import Checkbox from "@mui/material/Checkbox";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 
-// Authentication layout components
+//Layout Component
 import SignInAndOutLayout from "OurLayouts/SignInAndOutLayout";
 import bgImage from "assets/images/conference_signup.jpg";
 
+// @mui material components
+import * as React from 'react';
+import Card from "@mui/material/Card";
+import CssBaseline from '@mui/material/CssBaseline';
+import TextField from '@mui/material/TextField';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+
+
 export default function SignUpPage() {
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+
+    console.log({
+      email: data.get('email'),
+      password: data.get('password'),
+      name: data.get('firstName'),
+    });
+  };
+
   return (
     <SignInAndOutLayout image={bgImage}>
-      <Card>
+      <Card>     
         <MDBox
           variant="gradient"
           bgColor="info"
@@ -49,27 +51,86 @@ export default function SignUpPage() {
             Join us today
           </MDTypography>
           <MDTypography display="block" variant="button" color="white" my={1}>
-            Enter your email and password to register
+            Enter the following data in order to complete your registration!
           </MDTypography>
         </MDBox>
-        <MDBox pt={4} pb={3} px={3}>
-          <MDBox component="form" role="form">
-            <MDBox mb={2}>
-              <MDInput type="text" label="Name" variant="standard" fullWidth />
-            </MDBox>
-            <MDBox mb={2}>
-              <MDInput type="email" label="Email" variant="standard" fullWidth />
-            </MDBox>
-            <MDBox mb={2}>
-              <MDInput type="password" label="Password" variant="standard" fullWidth />
-            </MDBox>
-           
-            <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth>
-                sign in
+          <Container component="main" maxWidth="xs">
+          <CssBaseline />
+          <Box
+            sx={{
+              mt: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <Box component="form" noValidate onSubmit={handleSubmit}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    autoComplete="given-name"
+                    name="firstName"
+                    required
+                    fullWidth
+                    id="firstName"
+                    label="First Name"
+                    autoFocus
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    required
+                    fullWidth
+                    id="lastName"
+                    label="Last Name"
+                    name="lastName"
+                    autoComplete="family-name"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    autoComplete="email"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    id="phone"
+                    label="Phone Number"
+                    name="phone"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type="password"
+                    id="password"
+                    autoComplete="new-password"
+                  />
+                </Grid>
+                <Grid item xs={8}>
+                  <TextField
+                    required
+                    fullWidth
+                    id="code"
+                    label="Intivation Code"
+                    name="code"
+                  />
+                </Grid>
+              </Grid>        
+              <MDButton type="submit" variant="gradient" color="info" fullWidth  sx={{mt: 2}}>
+                sign Up
               </MDButton>
-            </MDBox>
-            <MDBox mt={3} mb={1} textAlign="center">
+              <MDBox mt={3} mb={1} textAlign="center">
               <MDTypography variant="button" color="text">
                 Already have an account?{" "}
                 <MDTypography
@@ -84,8 +145,9 @@ export default function SignUpPage() {
                 </MDTypography>
               </MDTypography>
             </MDBox>
-          </MDBox>
-        </MDBox>
+            </Box>
+          </Box>
+        </Container>
       </Card>
     </SignInAndOutLayout>
   );
