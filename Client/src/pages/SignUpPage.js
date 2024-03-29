@@ -37,16 +37,16 @@ export default function SignUpPage() {
     const { firstName, lastName, email, phone, password } = formData;
     
     if(inputsAreValidated(firstName, lastName, email, phone, password)){
-      await makeRequest();
+      await makeRequest(firstName, lastName, email, phone, password);
     }
 
   };
 
-  async function makeRequest(){
-    const test = {name: "teste"}
-    const answer = await fetch("http://localhost:8003/teste", {
+  async function makeRequest(firstName, lastName, email, phone, password){
+
+    const answer = await fetch("http://localhost:8003/signUp", {
       method: "POST",
-      body: JSON.stringify({test}),
+      body: JSON.stringify({firstName: firstName, lastName: lastName, email: email, phone: phone, password: password}),
       headers: {
               "Content-type": "application/json; charset=UTF-8",
       },

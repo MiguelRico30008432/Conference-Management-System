@@ -38,16 +38,14 @@ export default function SignInPage() {
     const {email, password } = formData;
     
     if(inputsAreValidated(email, password)){
-      await makeRequest();
+      await makeRequest(email, password);
     }
-
   };
 
-  async function makeRequest(){
-    const test = {name: "teste"}
-    const answer = await fetch("http://localhost:8003/teste", {
+  async function makeRequest(email, password){
+    const answer = await fetch("http://localhost:8003/signIn", {
       method: "POST",
-      body: JSON.stringify({test}),
+      body: JSON.stringify({email: email, password: password}),
       headers: {
               "Content-type": "application/json; charset=UTF-8",
       },
