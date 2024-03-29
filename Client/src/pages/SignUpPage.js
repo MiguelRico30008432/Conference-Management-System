@@ -119,7 +119,6 @@ export default function SignUpPage() {
                 </Grid>
                 <Grid item xs={8}>
                   <TextField
-                    required
                     fullWidth
                     id="code"
                     label="Intivation Code"
