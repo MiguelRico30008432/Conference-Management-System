@@ -1,0 +1,118 @@
+Table Users
+
+CREATE TABLE users (
+    userID SERIAL primary KEY,
+    userName VARCHAR(200) NOT NULL,
+    userEmail VARCHAR(100) NOT NULL,
+    userPhone VARCHAR(15),
+    userAdmin BOOLEAN DEFAULT false,
+    userPassword VARCHAR(200) NOT NULL,
+    userAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
+);
+
+INSERT INTO users (userName, userEmail, userPhone, userPassword) 
+VALUES ('teste', 'teste@teste.teste', '910128912', 'testePassword');
+
+select * from users
+___________________________________________________________________________________________________________
+Table confAreas
+
+CREATE TABLE confAreas (
+    confAreaID SERIAL primary KEY,
+    confAreaName VARCHAR(200) NOT NULL
+);
+___________________________________________________________________________________________________________
+Table Conferências
+
+
+CREATE TABLE conferences (
+    conferenceID SERIAL primary KEY,
+    conferenceName VARCHAR(200) NOT NULL,
+    conferenceStartDate DATE,
+    conferenceEndDate DATE,
+    conferenceStartSubmission DATE,
+    conferenceEndSubmission DATE,
+    conferenceStartReview DATE,
+    conferenceEndReview DATE,
+    conferenceStartBidding DATE,
+    conferenceEndBidding DATE,
+    conferenceType INT,
+    conferenceArea INT,
+    FOREIGN KEY (conferenceArea) REFERENCES confAreas(confAreaID),
+    conferenceMaxReviewers INT,
+    conferenceMinReviewers INT,
+    conferenceMaxSubmissions INT,
+    conferenceCode VARCHAR(200)
+);
+___________________________________________________________________________________________________________
+Table Submissions
+
+CREATE TABLE submissions(
+    submissionID SERIAL primary KEY,
+    confID INT,
+    FOREIGN KEY (confID) REFERENCES conferences(conferenceID),
+    submissionAccepted BOOLEAN DEFAULT false
+);
+
+___________________________________________________________________________________________________________
+Table userRoles
+
+CREATE TABLE userRoles(
+    userRoleID SERIAL primary KEY,
+    userID INT,
+    FOREIGN KEY (userID) REFERENCES users(userID),
+    userRole VARCHAR(200),
+    confID INT,
+    FOREIGN KEY (confID) REFERENCES conferences(conferenceID)
+);
+___________________________________________________________________________________________________________
+Table userSpecialty
+
+CREATE TABLE userRoles(
+    userRoleID SERIAL primary KEY,
+    userID INT,
+    FOREIGN KEY (userID) REFERENCES users(userID),
+    userRole VARCHAR(200),
+    confID INT,
+    FOREIGN KEY (confID) REFERENCES conferences(conferenceID)
+);
+___________________________________________________________________________________________________________
+Table Reviews
+
+CREATE TABLE reviews(
+    reviewID SERIAL primary KEY,
+    submissionID INT,
+    FOREIGN KEY (submissionID) REFERENCES submissions(submissionID),
+    reviewGrade INT,
+    userID INT,
+    FOREIGN KEY (userID) REFERENCES users(userID),
+    reviewConfidant INT,
+    reviewText VARCHAR(200)
+);
+___________________________________________________________________________________________________________
+Table Files
+
+CREATE TABLE files(
+    fileID SERIAL primary KEY,
+    fileName VARCHAR(200),
+    submissionID INT,
+    FOREIGN KEY (submissionID) REFERENCES submissions(submissionID),
+);
+
+___________________________________________________________________________________________________________
+Table Authors
+
+CREATE TABLE authors(
+    authorID SERIAL primary KEY,
+    userID INT,
+    FOREIGN KEY (userID) REFERENCES users(userID),
+    submissionID INT,
+    FOREIGN KEY (submissionID) REFERENCES submissions(submissionID)
+);
+___________________________________________________________________________________________________________
+Table Areas
+
+CREATE TABLE areas(
+    areaID SERIAL primary KEY,
+    areaName VARCHAR(200)
+);
