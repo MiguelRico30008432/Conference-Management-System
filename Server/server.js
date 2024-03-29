@@ -56,3 +56,21 @@ app.use(express.static('public'));
 app.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`);
 });
+
+
+//Send mail
+app.post("/sendMail", async (req, res) => {
+    try{
+        mail.sendEmail(req.mail, req.subject, req.content);
+        return res.status(200).send({ msg: ''});
+    }catch(error)
+    {
+        return res.status(500).send({ msg: 'Internal Server Error' });
+    }
+   
+});
+
+app.use(express.static('public'));
+app.listen(PORT, () => {
+    console.log(`Server is running on ${PORT}`);
+});
