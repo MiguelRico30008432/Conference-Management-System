@@ -1,5 +1,5 @@
 // react-router-dom components
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 // Material Dashboard 2 React components
@@ -9,7 +9,7 @@ import MDButton from "components/MDButton";
 
 //Layout Component
 import SignInAndOutLayout from "OurLayouts/SignInAndOutLayout";
-import bgImage from "assets/images/conference_signup.jpg";
+import bgImage from "assets/images/conference_signin.jpeg";
 
 // @mui material components
 import * as React from "react";
@@ -21,45 +21,59 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Alert from "@mui/material/Alert";
 
-
 export default function SignInPage() {
-  const [emailAlert,setEmailAlert] = useState(null);
-  const [passwordAlert,setpasswordAlert] = useState(null);
+  const navigate = useNavigate();
 
-  const [rememberMe, setRememberMe] = useState(false);
-
-  const handleSetRememberMe = () => setRememberMe(!rememberMe);
+  const [emailAlert, setEmailAlert] = useState(null);
+  const [passwordAlert, setpasswordAlert] = useState(null);
+  const [ErrorOnLogin, setErrorOnLogin] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     const data = new FormData(event.currentTarget);
     const formData = Object.fromEntries(data.entries());
-    const {email, password } = formData;
-    
-    if(inputsAreValidated(email, password)){
-      await makeRequest(email, password);
+    const { email, password } = formData;
+
+    if (inputsAreValidated(email, password)) {
+      await login(email, password);
     }
   };
 
-  async function makeRequest(email, password){
-    const answer = await fetch("http://localhost:8003/signIn", {
-      method: "POST",
-      body: JSON.stringify({email: email, password: password}),
-      headers: {
-              "Content-type": "application/json; charset=UTF-8",
-      },
-  });
-  }
+  const login = async (email, password) => {
+    try {
+      const response = await fetch("http://localhost:8003/signIn", {
+        method: "POST",
+        body: JSON.stringify({ email: email, password: password }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      });
+
+      if (response.status != 200) {
+        setErrorOnLogin(true);
+      }
+    } catch (error) {
+      setErrorOnLogin(true);
+    }
+  };
 
   const inputsAreValidated = (email, password) => {
-    setEmailAlert(email === "" ? <Alert severity="error">You must insert your Email!</Alert> : null);
-    setpasswordAlert(password === "" ? <Alert severity="error">You must insert your Password!</Alert> : null);
-  
-    return email && password;
-  }
+    setEmailAlert(
+      email === "" ? (
+        <Alert severity="error">You must insert your Email!</Alert>
+      ) : null
+    );
+    setpasswordAlert(
+      password === "" ? (
+        <Alert severity="error">You must insert your Password!</Alert>
+      ) : null
+    );
 
-  return (
+    return email && password;
+  };
+
+  return !ErrorOnLogin ? (
     <SignInAndOutLayout image={bgImage}>
       <Card>
         <MDBox
@@ -102,7 +116,7 @@ export default function SignInPage() {
                   {emailAlert}
                 </Grid>
                 <Grid item xs={12}>
-                <TextField
+                  <TextField
                     required
                     fullWidth
                     name="password"
@@ -139,6 +153,54 @@ export default function SignInPage() {
                 </MDTypography>
               </MDBox>
             </Box>
+          </Box>
+        </Container>
+      </Card>
+    </SignInAndOutLayout>
+  ) : (
+    <SignInAndOutLayout image={bgImage}>
+      <Card>
+        <MDBox
+          variant="gradient"
+          bgColor="error"
+          borderRadius="lg"
+          coloredShadow="success"
+          mx={3}
+          mt={-3}
+          p={3}
+          mb={1}
+          textAlign="center"
+        >
+          <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
+            Oh no... Something went bad...
+          </MDTypography>
+        </MDBox>
+        <Container component="main" maxWidth="xs">
+          <Box
+            sx={{
+              mt: 2,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <MDTypography
+              variant="h10"
+              fontWeight="medium"
+              color="grey"
+              textAlign="center"
+              mt={1}
+            >
+              There was an error during the Sign In. Please come back later.
+            </MDTypography>
+            <MDButton
+              variant="gradient"
+              color="info"
+              sx={{ mt: 2, mb: 2 }}
+              onClick={() => navigate("/")}
+            >
+              Return to Home Page
+            </MDButton>
           </Box>
         </Container>
       </Card>

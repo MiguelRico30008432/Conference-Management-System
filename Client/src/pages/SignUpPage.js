@@ -1,5 +1,5 @@
 // react-router-dom components
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 // Material Dashboard 2 React components
@@ -21,13 +21,14 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Alert from "@mui/material/Alert";
 
-
 export default function SignUpPage() {
-  const [firstNameAlert,setFirstNameAlert] = useState(null);
-  const [lastNameAlert,setLastNameAlert] = useState(null);
-  const [emailAlert,setEmailAlert] = useState(null);
-  const [phoneAlert,setPhoneAlert] = useState(null);
-  const [passwordAlert,setPasswordAlert] = useState(null);
+  const navigate = useNavigate();
+  const [firstNameAlert, setFirstNameAlert] = useState(null);
+  const [lastNameAlert, setLastNameAlert] = useState(null);
+  const [emailAlert, setEmailAlert] = useState(null);
+  const [phoneAlert, setPhoneAlert] = useState(null);
+  const [passwordAlert, setPasswordAlert] = useState(null);
+  const [ErrorOnLogin, setErrorOnLogin] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -35,36 +36,66 @@ export default function SignUpPage() {
     const data = new FormData(event.currentTarget);
     const formData = Object.fromEntries(data.entries());
     const { firstName, lastName, email, phone, password } = formData;
-    
-    if(inputsAreValidated(firstName, lastName, email, phone, password)){
-      await makeRequest(firstName, lastName, email, phone, password);
-    }
 
+    if (inputsAreValidated(firstName, lastName, email, phone, password)) {
+      await signup(firstName, lastName, email, phone, password);
+    }
   };
 
-  async function makeRequest(firstName, lastName, email, phone, password){
-
-    const answer = await fetch("http://localhost:8003/signUp", {
-      method: "POST",
-      body: JSON.stringify({firstName: firstName, lastName: lastName, email: email, phone: phone, password: password}),
-      headers: {
-              "Content-type": "application/json; charset=UTF-8",
-      },
-  });
+  async function signup(firstName, lastName, email, phone, password) {
+    try {
+      const response = await fetch("http://localhost:8003/signUp", {
+        method: "POST",
+        body: JSON.stringify({
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          phone: phone,
+          password: password,
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      });
+      if (response.status != 200) {
+        setErrorOnLogin(true);
+      }
+    } catch (error) {
+      setErrorOnLogin(true);
+    }
   }
-  
 
   const inputsAreValidated = (firstName, lastName, email, phone, password) => {
-    setFirstNameAlert(firstName === "" ? <Alert severity="error">You must insert your first Name!</Alert> : null);
-    setLastNameAlert(lastName === "" ? <Alert severity="error">You must insert your last Name!</Alert> : null);
-    setEmailAlert(email === "" ? <Alert severity="error">You must insert your email!</Alert> : null);
-    setPhoneAlert(phone === "" ? <Alert severity="error">You must insert your phone!</Alert> : null);
-    setPasswordAlert(password === "" ? <Alert severity="error">You must insert your password!</Alert> : null);
+    setFirstNameAlert(
+      firstName === "" ? (
+        <Alert severity="error">You must insert your first Name!</Alert>
+      ) : null
+    );
+    setLastNameAlert(
+      lastName === "" ? (
+        <Alert severity="error">You must insert your last Name!</Alert>
+      ) : null
+    );
+    setEmailAlert(
+      email === "" ? (
+        <Alert severity="error">You must insert your email!</Alert>
+      ) : null
+    );
+    setPhoneAlert(
+      phone === "" ? (
+        <Alert severity="error">You must insert your phone!</Alert>
+      ) : null
+    );
+    setPasswordAlert(
+      password === "" ? (
+        <Alert severity="error">You must insert your password!</Alert>
+      ) : null
+    );
 
     return firstName && lastName && email && phone && password;
-  }
+  };
 
-  return (
+  return !ErrorOnLogin ? (
     <SignInAndOutLayout image={bgImage}>
       <Card>
         <MDBox
@@ -129,7 +160,7 @@ export default function SignUpPage() {
                     name="email"
                     autoComplete="email"
                   />
-                   {emailAlert}
+                  {emailAlert}
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
@@ -187,6 +218,54 @@ export default function SignUpPage() {
                 </MDTypography>
               </MDBox>
             </Box>
+          </Box>
+        </Container>
+      </Card>
+    </SignInAndOutLayout>
+  ) : (
+    <SignInAndOutLayout image={bgImage}>
+      <Card>
+        <MDBox
+          variant="gradient"
+          bgColor="error"
+          borderRadius="lg"
+          coloredShadow="success"
+          mx={3}
+          mt={-3}
+          p={3}
+          mb={1}
+          textAlign="center"
+        >
+          <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
+            Oh no... Something went bad...
+          </MDTypography>
+        </MDBox>
+        <Container component="main" maxWidth="xs">
+          <Box
+            sx={{
+              mt: 2,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <MDTypography
+              variant="h10"
+              fontWeight="medium"
+              color="grey"
+              textAlign="center"
+              mt={1}
+            >
+              There was an error during the Sign Up. Please come back later.
+            </MDTypography>
+            <MDButton
+              variant="gradient"
+              color="info"
+              sx={{ mt: 2, mb: 2 }}
+              onClick={() => navigate("/")}
+            >
+              Return to Home Page
+            </MDButton>
           </Box>
         </Container>
       </Card>

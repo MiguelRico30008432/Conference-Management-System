@@ -7,7 +7,7 @@ export default function PageNotFound() {
   return (
     <DashboardLayout>
       <h1>404: Page Not Found</h1>
-      <h2>:\ Ups... Something went wrong...</h2>
+      <h2>:\ Oops... Something went wrong...</h2>
     </DashboardLayout>
   );
 }
