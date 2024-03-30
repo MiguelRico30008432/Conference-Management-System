@@ -1,27 +1,59 @@
 const express = require("express");
-const cors = require("cors");
 const bodyParser = require('body-parser');
 const passport = require("passport");
 const cookieParser = require('cookie-parser');
+const session = require('express-session');
 const bcrypt = require('bcrypt');
 const db = require("./database");
 const mail = require("./emails");
 const log = require("./logs/logsManagement");
 const ver = require("./verifications");
+require('./passportStrategies/localStratagy');
 
 const app = express();
 const PORT = process.env.PORT;
+const SECRET = process.env.SECRET;
 
-//app.use(cors());
-//app.options('*', cors())
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(cookieParser(SECRET));
+app.use(session({
+    secret: SECRET,
+    saveUninitialized: false,
+    resave: false,
+    cookie: {
+        maxAge: 60000 * 60 * 3,
+    }
+}))
 
-//app.use(passport.initialize());
-//app.use(passport.session());
+app.use(passport.initialize());
+app.use(passport.session());
 
 //-----------Zona de Testes-------------//
+app.get("/", (request, response) => {
+    request.session.visited = true;
+    response.status(201);
+});
+
+app.post("/api/auth", passport.authenticate("local"), (request, response) => {
+    response.send(200);
+});
+
+app.get("/api/auth/status", (request, response) => {
+    console.log("auth/status");
+    console.log(request.user);
+    console.log(request.session);
+    response.send(200);
+});
+
+app.post("/api/auth/logout", (request, response)=>{
+    if (!request.user) return response.sendStatus(400);
+
+    request.logout((err)=>{
+        if (err) return response.sendStatus(400);
+        response.send(200);
+    });
+});
 
 //-----------Zona de Testes-------------//
 
@@ -46,8 +78,6 @@ app.post("/login", async function(req, res) {
         }
 
         if (result) {
-            res.cookie('username', username, { maxAge: 900000, httpOnly: true });
-            res.cookie('useradmin', findUser[0].useradmin, { maxAge: 900000, httpOnly: true });
             return res.status(201).send("Login efetuado com sucesso");
         } else {
             return res.status(401).send('Credenciais inválidas');
