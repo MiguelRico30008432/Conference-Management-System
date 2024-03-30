@@ -30,10 +30,21 @@ app.use(passport.session());
 app.use(routes);
 
 //-----------Zona de Testes-------------//
+function ensureAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next(); // User is authenticated, proceed to the next middleware/route handler
+    } else {
+        // User is not authenticated, respond with a 401 Unauthorized status code
+        return res.status(401).send('User is not authenticated');
+    }
+}
+
+
+
 app.get("/", (request, response) => {
     request.session.visited = true;
     console.log(request.cookies);
-    return response.sendStatus(201);
+    return response.sendStatus(200);
 });
 
 
@@ -41,21 +52,21 @@ app.post("/api/auth", passport.authenticate("local"), (request, response) => {
     response.send(200);
 });
 
-app.get("/api/auth/status", (request, response) => {
-    console.log("auth/status");
-    console.log(request.user);
-    console.log(request.session);
-    response.send(200);
+app.get("/api/auth/status", ensureAuthenticated, (req, res) => {
+    //console.log("auth/status");
+    console.log(req.user);
+    //console.log(req.session);
+    res.send(200); 
 });
 
-app.post("/api/auth/logout", (request, response)=>{
-    if (!request.user) return response.sendStatus(400);
+app.post("/api/auth/logout", ensureAuthenticated, (request, response)=>{
 
     request.logout((err)=>{
         if (err) return response.sendStatus(400);
         response.send(200);
     });
 });
+
 
 //-----------Zona de Testes-------------//
 app.use(express.static('public'));
