@@ -1,7 +1,7 @@
 const passport = require('passport');
 const Strategy = require('passport-local');
 const bcrypt = require('bcrypt');
-const db = require("E:/Fork/finalProject/Server/database");
+const db = require("../utility/database");
 
 passport.serializeUser((user, done) =>{
     done(null, user.userid);
@@ -35,7 +35,6 @@ module.exports = passport.use(
             }
             
             bcrypt.compare(password, findUser[0].userpassword, function(err, result) {
-                console.log(result);
                 if (result == true){ 
                     done(null, findUser[0]);
                 } else {

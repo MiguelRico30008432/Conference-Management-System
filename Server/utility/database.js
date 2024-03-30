@@ -1,5 +1,5 @@
 const { Pool } = require('pg');
-const log = require("./logs/logsManagement");
+const log = require("../logs/logsManagement");
 require('dotenv').config();
 
 const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
