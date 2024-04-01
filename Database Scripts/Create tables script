@@ -26,32 +26,34 @@ Table Conferências
 
 
 CREATE TABLE conferences (
-    conferenceID SERIAL primary KEY,
-    conferenceName VARCHAR(200) NOT NULL,
-    conferenceStartDate DATE,
-    conferenceEndDate DATE,
-    conferenceStartSubmission DATE,
-    conferenceEndSubmission DATE,
-    conferenceStartReview DATE,
-    conferenceEndReview DATE,
-    conferenceStartBidding DATE,
-    conferenceEndBidding DATE,
-    conferenceType INT,
-    conferenceArea INT,
-    FOREIGN KEY (conferenceArea) REFERENCES confAreas(confAreaID),
-    conferenceMaxReviewers INT,
-    conferenceMinReviewers INT,
-    conferenceMaxSubmissions INT,
-    conferenceCode VARCHAR(200)
-);
+    confID SERIAL primary KEY,
+    confName VARCHAR(200) NOT NULL,
+    confStartDate TIMESTAMP NOT NULL,
+    confEndDate TIMESTAMP NOT NULL,
+    confStartSubmission TIMESTAMP NOT NULL,
+    confEndSubmission TIMESTAMP NOT NULL,
+    confStartReview TIMESTAMP NOT NULL,
+    confEndReview TIMESTAMP NOT NULL,
+    confStartBidding TIMESTAMP NOT NULL,
+    confEndBidding TIMESTAMP NOT NULL,
+    confType INT,
+    confAreaID INT,
+    FOREIGN KEY (confAreaID) REFERENCES confAreas(confAreaID),
+    confMaxReviewers INT,
+    confMinReviewers INT,
+    confMaxSubmissions INT,
+    confCode VARCHAR(200),
+    confAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
+)
 ___________________________________________________________________________________________________________
 Table Submissions
 
 CREATE TABLE submissions(
     submissionID SERIAL primary KEY,
     confID INT,
-    FOREIGN KEY (confID) REFERENCES conferences(conferenceID),
-    submissionAccepted BOOLEAN DEFAULT false
+    FOREIGN KEY (confID) REFERENCES conferences(confID),
+    submissionAccepted BOOLEAN DEFAULT false,
+    submissionAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
 
 ___________________________________________________________________________________________________________
@@ -63,18 +65,16 @@ CREATE TABLE userRoles(
     FOREIGN KEY (userID) REFERENCES users(userID),
     userRole VARCHAR(200),
     confID INT,
-    FOREIGN KEY (confID) REFERENCES conferences(conferenceID)
+    FOREIGN KEY (confID) REFERENCES conferences(confID)
 );
 ___________________________________________________________________________________________________________
 Table userSpecialty
 
-CREATE TABLE userRoles(
-    userRoleID SERIAL primary KEY,
+CREATE TABLE userspecialties(
+    userSpecialtyID SERIAL primary KEY,
     userID INT,
     FOREIGN KEY (userID) REFERENCES users(userID),
-    userRole VARCHAR(200),
-    confID INT,
-    FOREIGN KEY (confID) REFERENCES conferences(conferenceID)
+    userAreaSpecialty VARCHAR(200)
 );
 ___________________________________________________________________________________________________________
 Table Reviews
@@ -87,7 +87,8 @@ CREATE TABLE reviews(
     userID INT,
     FOREIGN KEY (userID) REFERENCES users(userID),
     reviewConfidant INT,
-    reviewText VARCHAR(200)
+    reviewText VARCHAR(200),
+    reviewAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
 ___________________________________________________________________________________________________________
 Table Files
@@ -97,6 +98,7 @@ CREATE TABLE files(
     fileName VARCHAR(200),
     submissionID INT,
     FOREIGN KEY (submissionID) REFERENCES submissions(submissionID),
+    fileAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
 
 ___________________________________________________________________________________________________________
@@ -107,7 +109,8 @@ CREATE TABLE authors(
     userID INT,
     FOREIGN KEY (userID) REFERENCES users(userID),
     submissionID INT,
-    FOREIGN KEY (submissionID) REFERENCES submissions(submissionID)
+    FOREIGN KEY (submissionID) REFERENCES submissions(submissionID),
+    authorAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
 ___________________________________________________________________________________________________________
 Table Areas
