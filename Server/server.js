@@ -1,57 +1,74 @@
 const express = require("express");
-const cors = require("cors");
 const bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const db = require("./database");
-const mail = require("./emails");
+const passport = require("passport");
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const routes = require('./routes/index');
+const ver = require("./utility/verifications");
 const log = require("./logs/logsManagement");
-const ver = require("./verifications");
+require('./passportStrategies/localStrategy');
 
 const app = express();
 const PORT = process.env.PORT;
+const SECRET = process.env.SECRET;
 
-app.use(cors());
-app.options('*', cors())
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-//-----------Zona de Testes-------------//
-//const value = {useremail: "apos "}
-//const collum = {userid: "6"}
-//db.updateData("users", value, collum)
-//-----------Zona de Testes-------------//
-
-
-//-----------EndPoints-------------//
-
-//SignUp
-app.post("/signUp", async (req, res) => {
-    const username = req.body.username;
-    const password = req.body.password;
-    const email = req.body.email;
-    const phone = req.body.phone;
-
-    const findUserName = await db.fetchData("users", "username", username);
-
-    if (findUserName == null) {
-        try {
-            const hashedPassword = await bcrypt.hash(password, 10);
-            const newUser = { username: username, useremail: email, userphone: phone, userpassword: hashedPassword};
-            db.addData("users", newUser);
-
-            //sendEmail(email);
-            return res.status(201).send({ msg: "Utilizador criado com sucesso"});
-        } catch (error) {
-            console.error("Erro ao criar o utilizador: " + error);
-            return res.status(500).send({ msg: 'Erro interno de servidor' });
-        }
-    } else {
-        console.log("Utilizador já existe");
-        return res.status(409).send({ msg: 'Utilizador já existe' });
+app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser(SECRET));
+app.use(session({
+    secret: SECRET,
+    saveUninitialized: false,
+    resave: false,
+    cookie: {
+        maxAge: 60000 * 60 * 3,
     }
+}))
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(routes);
+
+//-----------Zona de Testes-------------//
+function ensureAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next(); // User is authenticated, proceed to the next middleware/route handler
+    } else {
+        // User is not authenticated, respond with a 401 Unauthorized status code
+        return res.status(401).send('User is not authenticated');
+    }
+}
+
+
+
+app.get("/", (request, response) => {
+    request.session.visited = true;
+    console.log(request.cookies);
+    return response.sendStatus(200);
 });
 
+
+app.post("/api/auth", passport.authenticate("local"), (request, response) => {
+    response.send(200);
+});
+
+app.get("/api/auth/status", ensureAuthenticated, (req, res) => {
+    //console.log("auth/status");
+    console.log(req.user);
+    //console.log(req.session);
+    res.send(200); 
+});
+
+app.post("/api/auth/logout", ensureAuthenticated, (request, response)=>{
+
+    request.logout((err)=>{
+        if (err) return response.sendStatus(400);
+        response.send(200);
+    });
+});
+
+
+//-----------Zona de Testes-------------//
 app.use(express.static('public'));
 app.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`);

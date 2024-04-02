@@ -1,5 +1,5 @@
 const { Pool } = require('pg');
-const log = require("./logs/logsManagement");
+const log = require("../logs/logsManagement");
 require('dotenv').config();
 
 const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
@@ -19,7 +19,6 @@ async function fetchData(table, collum, comparisonValue){ // utilizada para qual
     try{
         const queryText = `SELECT * FROM ${table} WHERE ${collum} = $1`;
         const result = await pool.query(queryText, [comparisonValue]);
-        console.log(result.rows);
         return result.rows;
     }catch(err){
         log.addLog(err, "database", "fetchData");
