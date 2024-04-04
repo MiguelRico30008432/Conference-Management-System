@@ -7,10 +7,21 @@ const routes = require('./routes/index');
 const ver = require("./utility/verifications");
 const log = require("./logs/logsManagement");
 require('./passportStrategies/localStrategy');
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT;
 const SECRET = process.env.SECRET;
+
+const corsOptions = {
+    origin: 'http://localhost:3000', // This should match the URL of your front-end application
+    credentials: true, // This is important as it allows the server to send cookies in CORS requests
+    optionsSuccessStatus: 200 // For legacy browsers like IE11
+  };
+  
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Enable pre-flight for all routes
+
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -48,7 +59,7 @@ app.get("/", (request, response) => {
 });
 
 
-app.post("/api/auth", passport.authenticate("local"), (request, response) => {
+app.post("/signIn", passport.authenticate("local"), (request, response) => {
     response.send(200);
 });
 
@@ -69,11 +80,6 @@ app.post("/api/auth/logout", ensureAuthenticated, (request, response)=>{
 
 
 //-----------Zona de Testes-------------//
-app.use(express.static('public'));
-app.listen(PORT, () => {
-    console.log(`Server is running on ${PORT}`);
-});
-
 
 //Send mail
 app.post("/sendMail", async (req, res) => {
