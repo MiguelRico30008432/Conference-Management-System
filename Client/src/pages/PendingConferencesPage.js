@@ -39,7 +39,7 @@ export default function PendingConferencesPage() {
     {
       field: "More Info.",
       headerName: "More Info.",
-      description: "This column have a button to accept the conference",
+      description: "This column have a button to give details about the conference",
       sortable: false,
       width: 100,
       renderCell: (params) => {
@@ -96,7 +96,7 @@ export default function PendingConferencesPage() {
     {
       field: "Reject",
       headerName: "Reject",
-      description: "This column have a button to accept the conference",
+      description: "This column have a button to reject the conference",
       sortable: false,
       width: 100,
       renderCell: (params) => {
