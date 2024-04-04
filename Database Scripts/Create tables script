@@ -28,6 +28,7 @@ Table Conferências
 CREATE TABLE conferences (
     confID SERIAL primary KEY,
     confName VARCHAR(200) NOT NULL,
+    confDescription VARCHAR(2048) NOT NULL,
     confStartDate TIMESTAMP NOT NULL,
     confEndDate TIMESTAMP NOT NULL,
     confStartSubmission TIMESTAMP NOT NULL,
