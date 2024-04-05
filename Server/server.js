@@ -8,6 +8,8 @@ const ver = require("./utility/verifications");
 const log = require("./logs/logsManagement");
 require('./passportStrategies/localStrategy');
 const cors = require('cors');
+const db = require("./utility/database");
+const bcrypt = require('bcrypt');
 
 const app = express();
 const PORT = process.env.PORT;
@@ -63,6 +65,35 @@ app.post("/signIn", passport.authenticate("local"), (request, response) => {
     response.send(200);
 });
 
+app.post("/signUp", async (req, res) => {
+    const { firstName, lastName, password, email, phone } = req.body;
+
+    try {
+        const findUserName = await db.fetchData("users", "useremail", email);
+        
+        if (!findUserName.length) {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const newUser = {
+                userfirstname: firstName,
+                userlastname: lastName,
+                useremail: email,
+                userphone: phone,
+                userpassword: hashedPassword
+            };
+
+            await db.addData("users", newUser);
+
+            return res.status(201).send({ msg: "Utilizador criado com sucesso"});
+        } else {
+            console.log("Utilizador já existe");
+            return res.status(409).send({ msg: 'Utilizador já existe' });
+        }
+    } catch (error) {
+        console.error("Erro ao criar o utilizador: ", error);
+        return res.status(500).send({ msg: 'Erro interno de servidor', error: error.message });
+    }
+});
+
 app.get("/api/auth/status", ensureAuthenticated, (req, res) => {
     //console.log("auth/status");
     console.log(req.user);
@@ -81,6 +112,7 @@ app.post("/api/auth/logout", ensureAuthenticated, (request, response)=>{
 
 //-----------Zona de Testes-------------//
 
+
 //Send mail
 app.post("/sendMail", async (req, res) => {
     try{
@@ -92,6 +124,7 @@ app.post("/sendMail", async (req, res) => {
     }
    
 });
+
 
 app.use(express.static('public'));
 app.listen(PORT, () => {

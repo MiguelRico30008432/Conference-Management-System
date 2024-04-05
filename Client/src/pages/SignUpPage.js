@@ -57,10 +57,16 @@ export default function SignUpPage() {
           "Content-type": "application/json; charset=UTF-8",
         },
       });
-      if (response.status != 200) {
+
+      if (response.status === 201) {
+        // Register successful, navigate to home page
+        navigate("/");
+      } else {
+        // Login failed, set error state
         setErrorOnLogin(true);
       }
     } catch (error) {
+      // Handle errors (e.g., network issues)
       setErrorOnLogin(true);
     }
   }

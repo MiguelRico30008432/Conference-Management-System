@@ -59,7 +59,6 @@ export default function SignInPage() {
         setErrorOnLogin(true);
       }
     } catch (error) {
-      // Handle errors (e.g., network issues)
       setErrorOnLogin(true);
     }
   };

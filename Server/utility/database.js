@@ -25,18 +25,19 @@ async function fetchData(table, collum, comparisonValue){ // utilizada para qual
     }
 }// testado para a tabela users
 
-async function addData(table, entryParameters){ //utilizada para inserir dados em qualquer tabela onde é recebido o nome da tabela e os parametros a inserir
-    // entryParameters = {nome da coluna: "Valor", (...)}   exemplo para a tabela users {username: "Bernardo", useremail:"teste@gmail.com", (...)}
-    try{
+async function addData(table, entryParameters){
+    try {
         const keys = Object.keys(entryParameters);
         const values = Object.values(entryParameters);
-        const queryText = `INSERT INTO ${table} (${keys.join(', ')}) VALUES (${values.map((_, i) => '$' + (i + 1)).join(', ')})`;
-        await pool.query(queryText, values);
-        return;
-    }catch(err){
+        const queryText = `INSERT INTO ${table} (${keys.join(', ')}) VALUES (${values.map((_, i) => '$' + (i + 1)).join(', ')}) RETURNING *;`;
+        
+        const result = await pool.query(queryText, values);        
+        return result;
+    } catch(err) {
         log.addLog(err, "database", "addData");
+        throw err; // Rethrow the error
     }
-} //testado para a tabela users
+}
 
 async function deleteData(table, collum, comparisonValue){ //utilizada para apagar dados em qualquer tabela onde é recebido o nome da tabela, a coluna e o parametro de comparação para saber que linha apagar
     try{
