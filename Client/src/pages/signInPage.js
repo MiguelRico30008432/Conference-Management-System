@@ -41,27 +41,27 @@ export default function SignInPage() {
   };
 
   const login = async (email, password) => {
-      try {
-        const response = await fetch("http://localhost:8003/signIn", {
-          method: "POST",
-          body: JSON.stringify({ email: email, password: password }),
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-          credentials: 'include', // Make sure to include credentials for cookies if session-based auth
-        });
-  
-        if (response.status === 200) {
-          // Login successful, navigate to home page
-          navigate('/'); // Adjust '/home' as needed to match your home route
-        } else {
-          // Login failed, set error state
-          setErrorOnLogin(true);
-        }
-      } catch (error) {
-        // Handle errors (e.g., network issues)
+    try {
+      const response = await fetch("http://localhost:8003/signIn", {
+        method: "POST",
+        body: JSON.stringify({ email: email, password: password }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+        credentials: "include",
+      });
+
+      if (response.status === 200) {
+        // Login successful, navigate to home page
+        navigate("/");
+      } else {
+        // Login failed, set error state
         setErrorOnLogin(true);
       }
+    } catch (error) {
+      // Handle errors (e.g., network issues)
+      setErrorOnLogin(true);
+    }
   };
 
   const inputsAreValidated = (email, password) => {

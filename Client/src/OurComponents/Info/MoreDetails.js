@@ -4,8 +4,13 @@ import MDTypography from "components/MDTypography";
 import Card from "@mui/material/Card";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
-import { Accordion, AccordionSummary, AccordionDetails, Typography } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Typography,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 export default function MoreDetails({ onClose, text }) {
   return (
@@ -25,13 +30,13 @@ export default function MoreDetails({ onClose, text }) {
               fontWeight="medium"
               color="grey"
               textAlign="center"
-              sx={{ mb: 3}}
+              sx={{ mb: 3 }}
               mt={1}
             >
-              {`Aqui aparece o nome da conferencia`}
+              {text.confName}
             </MDTypography>
 
-            <Accordion style={{ marginBottom: '10px' }}>
+            <Accordion style={{ marginBottom: "10px" }}>
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls="panel-content"
@@ -41,12 +46,12 @@ export default function MoreDetails({ onClose, text }) {
               </AccordionSummary>
               <AccordionDetails>
                 <Typography variant="body2">
-                  Aqui vai estar a descrição da conferencia  <br />
+                  Aqui vai estar a descrição da conferencia <br />
                 </Typography>
               </AccordionDetails>
             </Accordion>
 
-            <Accordion style={{ marginBottom: '10px' }}>
+            <Accordion style={{ marginBottom: "10px" }}>
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls="panel-content"
@@ -55,9 +60,10 @@ export default function MoreDetails({ onClose, text }) {
                 <Typography variant="h5">Important Dates</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <Typography variant="body2">
-                  Aqui vão estar as datas  <br />
-                </Typography>
+                <Typography variant="body1">Start Date:</Typography>
+                <Typography variant="body2"> {text.confStartDate}</Typography>
+                <Typography variant="body1">End Date:</Typography>
+                <Typography variant="body2"> {text.confEndDate}</Typography>
               </AccordionDetails>
             </Accordion>
 
