@@ -3,6 +3,8 @@ Table Users
 CREATE TABLE users (
     userID SERIAL primary KEY,
     userName VARCHAR(200) NOT NULL,
+    userFirstName VARCHAR(50) NOT NULL,
+    userLastName VARCHAR(50) NOT NULL,
     userEmail VARCHAR(100) NOT NULL,
     userPhone VARCHAR(15),
     userAdmin BOOLEAN DEFAULT false,
@@ -44,7 +46,8 @@ CREATE TABLE conferences (
     confMinReviewers INT,
     confMaxSubmissions INT,
     confCode VARCHAR(200),
-    confAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
+    confAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp,
+    confApproved BOOLEAN NULL
 )
 ___________________________________________________________________________________________________________
 Table Submissions
