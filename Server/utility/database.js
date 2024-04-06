@@ -31,8 +31,8 @@ async function addData(table, entryParameters){
         const values = Object.values(entryParameters);
         const queryText = `INSERT INTO ${table} (${keys.join(', ')}) VALUES (${values.map((_, i) => '$' + (i + 1)).join(', ')}) RETURNING *;`;
         
-        const result = await pool.query(queryText, values);        
-        return result;
+        await pool.query(queryText, values);        
+        return ;
     } catch(err) {
         log.addLog(err, "database", "addData");
         throw err; // Rethrow the error
