@@ -9,10 +9,26 @@ import {
   AccordionSummary,
   AccordionDetails,
   Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 export default function MoreDetails({ onClose, text }) {
+  //falta alterar os dados para o start e end de sbmissions/bidding/reviews
+  const rows = [
+    {phase: "Phase", start: "Start", end: "End"},
+    {phase: "Conference", start: text.confStartDate, end: text.confEndDate},
+    {phase: "Submissions", start: text.confStartDate, end: text.confEndDate},
+    {phase: "Bidding", start: text.confStartDate, end: text.confEndDate},
+    {phase: "Reviews", start: text.confStartDate, end: text.confEndDate}
+  ];
+
   return (
     <>
       <Card>
@@ -60,10 +76,35 @@ export default function MoreDetails({ onClose, text }) {
                 <Typography variant="h5">Important Dates</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <Typography variant="body1">Start Date:</Typography>
-                <Typography variant="body2"> {text.confStartDate}</Typography>
-                <Typography variant="body1">End Date:</Typography>
-                <Typography variant="body2"> {text.confEndDate}</Typography>
+                <TableContainer component={Paper}>
+                  <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                    <TableBody>
+                      {rows.map((row) => (
+                        <TableRow
+                          key={row.phase}
+                          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                        >
+                          <TableCell component="th" scope="row">{row.phase}</TableCell>
+                          <TableCell align="left">{row.start}</TableCell>
+                          <TableCell align="left">{row.end}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </AccordionDetails>
+            </Accordion>
+
+            <Accordion style={{ marginBottom: "10px" }}>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel-content"
+                id="panel-header"
+              >
+                <Typography variant="h5">Extra Info</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                        Aqui vou meter info extra como : conftype/ confareaid/ confmaxreviewers/	confminreviewers/	confmaxsubmissions
               </AccordionDetails>
             </Accordion>
 
