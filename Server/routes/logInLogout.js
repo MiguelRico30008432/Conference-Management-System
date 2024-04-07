@@ -2,18 +2,9 @@ const express = require('express');
 const router = express.Router(); 
 const db = require("../utility/database");
 const mail = require("../utility/emails");
+const auth = require("../utility/verifications");
 const bcrypt = require('bcrypt');
 const passport = require('passport');
-
-//Validates if user is authenticated
-function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next(); // User is authenticated, proceed to the next middleware/route handler
-    } else {
-        // User is not authenticated, respond with a 401 Unauthorized status code
-        return res.status(401).send('User is not authenticated');
-    }
-}
 
 //Login
 router.post("/signIn", passport.authenticate("local", {
@@ -54,7 +45,7 @@ router.post("/signUp", async (req, res) => {
 });
 
 //Logout
-router.post("/api/auth/logout", ensureAuthenticated, (request, response)=>{
+router.post("/api/auth/logout", auth.ensureAuthenticated, (request, response)=>{
 
     request.logout((err)=>{
         if (err) return response.sendStatus(400);
