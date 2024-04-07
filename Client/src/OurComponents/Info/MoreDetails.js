@@ -1,33 +1,33 @@
 import * as React from "react";
+import { useEffect } from "react";
 import MDButton from "components/MDButton";
 import MDTypography from "components/MDTypography";
-import Card from "@mui/material/Card";
-import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
 import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
+  Box,
+  Card,
+  Container,
+  Tab
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import {
+  TabContext,
+  TabList,
+  TabPanel 
+} from "@mui/lab"
 
 export default function MoreDetails({ onClose, text }) {
-  //falta alterar os dados para o start e end de sbmissions/bidding/reviews
-  const rows = [
-    { phase: "Phase", start: "Start", end: "End" },
-    { phase: "Conference", start: text.confStartDate, end: text.confEndDate },
-    { phase: "Submissions", start: text.confStartDate, end: text.confEndDate },
-    { phase: "Bidding", start: text.confStartDate, end: text.confEndDate },
-    { phase: "Reviews", start: text.confStartDate, end: text.confEndDate },
-  ];
+  const [value, setValue] = React.useState('1');
+  
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  useEffect(() => {
+    function test(){
+      console.log(text);
+    }
+
+    test();
+  }, []);
 
   return (
     <>
@@ -52,66 +52,50 @@ export default function MoreDetails({ onClose, text }) {
               {text.confname}
             </MDTypography>
 
-            <Accordion style={{ marginBottom: "10px" }}>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel-content"
-                id="panel-header"
-              >
-                <Typography variant="h5">Description</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography variant="body2">
-                  {text.confdescription} <br />
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
+            <TabContext value={value}>
+              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <TabList onChange={handleChange} aria-label="lab API tabs example">
+                  <Tab label="Description" value="1" />
+                  <Tab label="Important Dates" value="2" />
+                  <Tab label="Details" value="3" />
+                </TabList>
+              </Box>
+              <TabPanel value="1">
+                <MDTypography variant="body2">{text.confdescription}</MDTypography>
+              </TabPanel>
 
-            <Accordion style={{ marginBottom: "10px" }}>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel-content"
-                id="panel-header"
-              >
-                <Typography variant="h5">Important Dates</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <TableContainer component={Paper}>
-                  <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                    <TableBody>
-                      {rows.map((row) => (
-                        <TableRow
-                          key={row.phase}
-                          sx={{
-                            "&:last-child td, &:last-child th": { border: 0 },
-                          }}
-                        >
-                          <TableCell component="th" scope="row">
-                            {row.phase}
-                          </TableCell>
-                          <TableCell align="left">{row.start}</TableCell>
-                          <TableCell align="left">{row.end}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </AccordionDetails>
-            </Accordion>
+              <TabPanel value="2">
+                <MDTypography variant="h6">Conference</MDTypography>
+                <MDTypography variant="body2">Start: {text.confstartdate}</MDTypography>
+                <MDTypography variant="body2">End: {text.confenddate}<br/><br/></MDTypography>
 
-            <Accordion style={{ marginBottom: "10px" }}>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel-content"
-                id="panel-header"
-              >
-                <Typography variant="h5">Extra Info</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                Aqui vou meter info extra como : conftype/ confareaid/
-                confmaxreviewers/ confminreviewers/ confmaxsubmissions
-              </AccordionDetails>
-            </Accordion>
+                <MDTypography variant="h6">Submissions</MDTypography>
+                <MDTypography variant="body2">Start: {text.confstartsubmission}</MDTypography>
+                <MDTypography variant="body2">End: {text.confendsubmission}<br/><br/></MDTypography>
+
+                <MDTypography variant="h6">Bidding</MDTypography>
+                <MDTypography variant="body2">Start: {text.confstartbidding}</MDTypography>
+                <MDTypography variant="body2">End: {text.confendbidding}<br/><br/></MDTypography>
+
+                <MDTypography variant="h6">Reviews</MDTypography>
+                <MDTypography variant="body2">Start: {text.confstartreview}</MDTypography>
+                <MDTypography variant="body2">End: {text.confendreview}</MDTypography>
+              </TabPanel>
+
+              <TabPanel value="3">
+              <MDTypography variant="h6">Conference Area:</MDTypography>
+              <MDTypography variant="body2">{text.confareaname}<br/><br/></MDTypography>
+
+              <MDTypography variant="h6">Conference Code:</MDTypography>
+              <MDTypography variant="body2">{text.confcode}<br/><br/></MDTypography>
+
+              <MDTypography variant="h6">Max number of submissions</MDTypography>
+              <MDTypography variant="body2">{text.confmaxsubmissions}<br/><br/></MDTypography>
+
+              <MDTypography variant="h6">Min-Max number of reviewers</MDTypography>
+              <MDTypography variant="body2">{text.confminreviewers} - {text.confmaxreviewers}</MDTypography>
+              </TabPanel>
+            </TabContext>
 
             <MDButton
               variant="gradient"
