@@ -15,18 +15,18 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper
+  Paper,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 export default function MoreDetails({ onClose, text }) {
   //falta alterar os dados para o start e end de sbmissions/bidding/reviews
   const rows = [
-    {phase: "Phase", start: "Start", end: "End"},
-    {phase: "Conference", start: text.confStartDate, end: text.confEndDate},
-    {phase: "Submissions", start: text.confStartDate, end: text.confEndDate},
-    {phase: "Bidding", start: text.confStartDate, end: text.confEndDate},
-    {phase: "Reviews", start: text.confStartDate, end: text.confEndDate}
+    { phase: "Phase", start: "Start", end: "End" },
+    { phase: "Conference", start: text.confStartDate, end: text.confEndDate },
+    { phase: "Submissions", start: text.confStartDate, end: text.confEndDate },
+    { phase: "Bidding", start: text.confStartDate, end: text.confEndDate },
+    { phase: "Reviews", start: text.confStartDate, end: text.confEndDate },
   ];
 
   return (
@@ -49,7 +49,7 @@ export default function MoreDetails({ onClose, text }) {
               sx={{ mb: 3 }}
               mt={1}
             >
-              {text.confName}
+              {text.confname}
             </MDTypography>
 
             <Accordion style={{ marginBottom: "10px" }}>
@@ -58,11 +58,11 @@ export default function MoreDetails({ onClose, text }) {
                 aria-controls="panel-content"
                 id="panel-header"
               >
-                <Typography variant="h5">Descrição</Typography>
+                <Typography variant="h5">Description</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Typography variant="body2">
-                  Aqui vai estar a descrição da conferencia <br />
+                  {text.confdescription} <br />
                 </Typography>
               </AccordionDetails>
             </Accordion>
@@ -82,9 +82,13 @@ export default function MoreDetails({ onClose, text }) {
                       {rows.map((row) => (
                         <TableRow
                           key={row.phase}
-                          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                          sx={{
+                            "&:last-child td, &:last-child th": { border: 0 },
+                          }}
                         >
-                          <TableCell component="th" scope="row">{row.phase}</TableCell>
+                          <TableCell component="th" scope="row">
+                            {row.phase}
+                          </TableCell>
                           <TableCell align="left">{row.start}</TableCell>
                           <TableCell align="left">{row.end}</TableCell>
                         </TableRow>
@@ -104,7 +108,8 @@ export default function MoreDetails({ onClose, text }) {
                 <Typography variant="h5">Extra Info</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                        Aqui vou meter info extra como : conftype/ confareaid/ confmaxreviewers/	confminreviewers/	confmaxsubmissions
+                Aqui vou meter info extra como : conftype/ confareaid/
+                confmaxreviewers/ confminreviewers/ confmaxsubmissions
               </AccordionDetails>
             </Accordion>
 

@@ -4,8 +4,21 @@ const router = express.Router();
 
 router.get("/pendingConferences", async function (req, res) {
   try {
-    const result = await db.fetchData("conferences", "confapproved", 0);
+    const result = await db.fetchDataPendingConferences("confapproved", 0);
     return res.status(200).send(result);
+  } catch (error) {
+    return res.status(500).send("Internal Error");
+  }
+});
+
+router.post("/acceptOrRejectConference", async function (req, res) {
+  try {
+    await db.updateData(
+      "conferences",
+      { confapproved: req.body.acceptOrReject },
+      { confid: req.body.confid }
+    );
+    return res.status(200).send("");
   } catch (error) {
     return res.status(500).send("Internal Error");
   }

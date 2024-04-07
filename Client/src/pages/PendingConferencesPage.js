@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MDButton from "components/MDButton";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -10,17 +10,34 @@ import MoreDetails from "OurComponents/Info/MoreDetails";
 
 export default function PendingConferencesPage() {
   const [detailsOpen, setDetailsOpen] = useState(false);
-  const [dataForDetails, setDataForDetails] = useState({
-    id: 2,
-    confName: "Snow",
-    confStartDate: "Jon",
-    confEndDate: 35,
-  });
+  const [dataForDetails, setDataForDetails] = useState({});
+  const [rows, setRow] = useState([]);
+
+  async function acceptOrRejectConference(id, accept) {
+    try {
+      const response = await fetch(
+        "http://localhost:8003/acceptOrRejectConference",
+        {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+          body: JSON.stringify({ confid: id, acceptOrReject: accept }),
+        }
+      );
+      if (response.ok) {
+        window.location.reload();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const columns = [
-    { field: "confName", headerName: "Conference Name", width: 200 },
-    { field: "confStartDate", headerName: "Conference Start Date", width: 200 },
-    { field: "confEndDate", headerName: "Conference End Date", width: 200 },
+    { field: "confname", headerName: "Conference Name", width: 200 },
+    { field: "confstartdate", headerName: "Conference Start Date", width: 200 },
+    { field: "confenddate", headerName: "Conference End Date", width: 200 },
     {
       field: "More Info.",
       headerName: "More Info.",
@@ -58,8 +75,8 @@ export default function PendingConferencesPage() {
       sortable: false,
       width: 100,
       renderCell: (params) => {
-        const handleAcceptButtonClick = () => {
-          console.log("Botão clicado na linha com ID:", params.row);
+        const handleAcceptButtonClick = async () => {
+          await acceptOrRejectConference(params.row.id, 2);
         };
 
         return (
@@ -86,8 +103,8 @@ export default function PendingConferencesPage() {
       sortable: false,
       width: 100,
       renderCell: (params) => {
-        const handleRejectButtonClick = () => {
-          console.log("Botão clicado na linha com ID:", params.row.id);
+        const handleRejectButtonClick = async () => {
+          await acceptOrRejectConference(params.row.id, 1);
         };
 
         return (
@@ -109,20 +126,34 @@ export default function PendingConferencesPage() {
     },
   ];
 
-  const rows = [
-    {
-      id: 1,
-      confName: "Our conference",
-      confStartDate: "05-04-2024",
-      confEndDate: "05-05-2024",
-    },
-    {
-      id: 2,
-      confName: "Our conference2",
-      confStartDate: "05-04-2024",
-      confEndDate: "05-05-2024",
-    },
-  ];
+  useEffect(() => {
+    async function getRows() {
+      try {
+        const response = await fetch(
+          "http://localhost:8003/pendingConferences",
+          {
+            method: "GET",
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+            },
+            credentials: "include",
+          }
+        );
+
+        const jsonResponse = await response.json();
+
+        if (response.ok) {
+          for (let line of jsonResponse) {
+            setRow((allExistingRows) => [...allExistingRows, line]);
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    getRows();
+  }, []);
 
   return (
     <DashboardLayout>
