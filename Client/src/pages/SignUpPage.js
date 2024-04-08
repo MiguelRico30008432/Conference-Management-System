@@ -10,7 +10,7 @@ import MDButton from "components/MDButton";
 //Layout Component
 import SignInAndOutLayout from "OurLayouts/SignInAndOutLayout";
 import bgImage from "assets/images/conference_signup.jpg";
-import ErrorSiginSignout from "OurComponents/errorHandling/ErrorSiginSignout";
+import ErrorSiginSignup from "OurComponents/errorHandling/ErrorSiginSignup";
 
 // @mui material components
 import * as React from "react";
@@ -29,8 +29,8 @@ export default function SignUpPage() {
   const [emailAlert, setEmailAlert] = useState(null);
   const [phoneAlert, setPhoneAlert] = useState(null);
   const [passwordAlert, setPasswordAlert] = useState(null);
-  const [ErrorOnLogin, setErrorOnLogin] = useState(false);
-  const [errorText, setErrorText] = useState();
+  const [errorOnLogin, setErrorOnLogin] = useState(false);
+  const [errorOnRequest, setErrorOnRequest] = useState(null);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -66,8 +66,7 @@ export default function SignUpPage() {
       } else {
         // Login failed, set error state
         const jsonResponse = await response.json();
-        setErrorText(jsonResponse.msg);
-        setErrorOnLogin(true);
+        setErrorOnRequest(<Alert severity="error">{jsonResponse.msg}</Alert>);
       }
     } catch (error) {
       // Handle errors (e.g., network issues)
@@ -105,7 +104,7 @@ export default function SignUpPage() {
     return firstName && lastName && email && phone && password;
   };
 
-  return !ErrorOnLogin ? (
+  return !errorOnLogin ? (
     <SignInAndOutLayout image={bgImage}>
       <Card>
         <MDBox
@@ -212,6 +211,7 @@ export default function SignUpPage() {
               >
                 sign Up
               </MDButton>
+              {errorOnRequest}
               <MDBox mt={3} mb={1} textAlign="center">
                 <MDTypography variant="button" color="text">
                   Already have an account?{" "}
@@ -233,6 +233,6 @@ export default function SignUpPage() {
       </Card>
     </SignInAndOutLayout>
   ) : (
-    <ErrorSiginSignout backgourndImage={bgImage} text={errorText} />
+    <ErrorSiginSignup backgourndImage={bgImage} />
   );
 }

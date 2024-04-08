@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import MDButton from "components/MDButton";
+import Alert from "@mui/material/Alert";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "OurComponents/footer/Footer";
@@ -12,6 +13,42 @@ export default function PendingConferencesPage() {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [dataForDetails, setDataForDetails] = useState({});
   const [rows, setRow] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function getRows() {
+      try {
+        const response = await fetch(
+          "http://localhost:8003/pendingConferences",
+          {
+            method: "GET",
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+            },
+            credentials: "include",
+          }
+        );
+
+        const jsonResponse = await response.json();
+
+        if (response.ok) {
+          for (let line of jsonResponse) {
+            setRow((allExistingRows) => [...allExistingRows, line]);
+          }
+        } else {
+          setError(<Alert severity="error">{response.json()}</Alert>);
+        }
+      } catch (error) {
+        setError(
+          <Alert severity="error">
+            Something went wrong when obtaining the lines
+          </Alert>
+        );
+      }
+    }
+
+    getRows();
+  }, []);
 
   async function acceptOrRejectConference(id, accept) {
     try {
@@ -126,40 +163,14 @@ export default function PendingConferencesPage() {
     },
   ];
 
-  useEffect(() => {
-    async function getRows() {
-      try {
-        const response = await fetch(
-          "http://localhost:8003/pendingConferences",
-          {
-            method: "GET",
-            headers: {
-              "Content-type": "application/json; charset=UTF-8",
-            },
-            credentials: "include",
-          }
-        );
-
-        const jsonResponse = await response.json();
-
-        if (response.ok) {
-          for (let line of jsonResponse) {
-            setRow((allExistingRows) => [...allExistingRows, line]);
-          }
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    getRows();
-  }, []);
-
   return (
     <DashboardLayout>
       <UpperNavBar />
       {!detailsOpen ? (
-        <CompleteTable columns={columns} rows={rows} numerOfRowsPerPage={5} />
+        <>
+          {error}
+          <CompleteTable columns={columns} rows={rows} numerOfRowsPerPage={5} />
+        </>
       ) : (
         <MoreDetails
           text={dataForDetails}

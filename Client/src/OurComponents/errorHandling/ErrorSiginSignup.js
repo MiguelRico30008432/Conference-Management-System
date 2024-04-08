@@ -15,7 +15,7 @@ import Card from "@mui/material/Card";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 
-export default function ErrorSiginSignout({ backgourndImage, text }) {
+export default function ErrorSiginSignup({ backgourndImage, text }) {
   const navigate = useNavigate();
   return (
     <SignInAndOutLayout image={backgourndImage}>

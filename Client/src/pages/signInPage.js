@@ -10,7 +10,7 @@ import MDButton from "components/MDButton";
 //Layout Component
 import SignInAndOutLayout from "OurLayouts/SignInAndOutLayout";
 import bgImage from "assets/images/conference_signin.jpeg";
-import ErrorSiginSignout from "OurComponents/errorHandling/ErrorSiginSignout";
+import ErrorSiginSignup from "OurComponents/errorHandling/ErrorSiginSignup";
 
 // @mui material components
 import * as React from "react";
@@ -27,8 +27,8 @@ import { AuthContext } from "../auth.context";
 export default function SignInPage() {
   const [emailAlert, setEmailAlert] = useState(null);
   const [passwordAlert, setpasswordAlert] = useState(null);
-  const [ErrorOnLogin, setErrorOnLogin] = useState(false);
-  const [errorText, setErrorText] = useState();
+  const [errorOnLogin, seterrorOnLogin] = useState(false);
+  const [errorOnRequest, setErrorOnRequest] = useState(null);
   const { authenticateUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -55,19 +55,17 @@ export default function SignInPage() {
         credentials: "include",
       });
 
-      if (response.status === 200) {
-        // Login successful, navigate to home page
+      if (response.ok) {
         localStorage.setItem("user", email);
         authenticateUser();
         navigate("/");
         window.location.reload();
       } else {
         const jsonResponse = await response.json();
-        setErrorText(jsonResponse.msg);
-        setErrorOnLogin(true);
+        setErrorOnRequest(<Alert severity="error">{jsonResponse.msg}</Alert>);
       }
     } catch (error) {
-      setErrorOnLogin(true);
+      seterrorOnLogin(true);
     }
   };
 
@@ -86,7 +84,7 @@ export default function SignInPage() {
     return email && password;
   };
 
-  return !ErrorOnLogin ? (
+  return !errorOnLogin ? (
     <SignInAndOutLayout image={bgImage}>
       <Card>
         <MDBox
@@ -165,12 +163,13 @@ export default function SignInPage() {
                   </MDTypography>
                 </MDTypography>
               </MDBox>
+              {errorOnRequest}
             </Box>
           </Box>
         </Container>
       </Card>
     </SignInAndOutLayout>
   ) : (
-    <ErrorSiginSignout backgourndImage={bgImage} text={errorText} />
+    <ErrorSiginSignup backgourndImage={bgImage} />
   );
 }
