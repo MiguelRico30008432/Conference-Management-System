@@ -1,6 +1,6 @@
 // react-router-dom components
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useContext } from "react";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -21,12 +21,15 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Alert from "@mui/material/Alert";
 
+import { AuthContext } from "../auth.context";
+
 export default function SignInPage() {
   const navigate = useNavigate();
 
   const [emailAlert, setEmailAlert] = useState(null);
   const [passwordAlert, setpasswordAlert] = useState(null);
   const [ErrorOnLogin, setErrorOnLogin] = useState(false);
+  const { authenticateUser } = useContext(AuthContext);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -53,7 +56,10 @@ export default function SignInPage() {
 
       if (response.status === 200) {
         // Login successful, navigate to home page
+        localStorage.setItem('user', email);
+        authenticateUser();
         navigate("/");
+        window.location.reload();
       } else {
         // Login failed, set error state
         setErrorOnLogin(true);
