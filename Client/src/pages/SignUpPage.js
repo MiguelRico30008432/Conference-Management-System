@@ -10,6 +10,7 @@ import MDButton from "components/MDButton";
 //Layout Component
 import SignInAndOutLayout from "OurLayouts/SignInAndOutLayout";
 import bgImage from "assets/images/conference_signup.jpg";
+import ErrorSiginSignout from "OurComponents/errorHandling/ErrorSiginSignout";
 
 // @mui material components
 import * as React from "react";
@@ -29,6 +30,7 @@ export default function SignUpPage() {
   const [phoneAlert, setPhoneAlert] = useState(null);
   const [passwordAlert, setPasswordAlert] = useState(null);
   const [ErrorOnLogin, setErrorOnLogin] = useState(false);
+  const [errorText, setErrorText] = useState();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -63,6 +65,8 @@ export default function SignUpPage() {
         navigate("/");
       } else {
         // Login failed, set error state
+        const jsonResponse = await response.json();
+        setErrorText(jsonResponse.msg);
         setErrorOnLogin(true);
       }
     } catch (error) {
@@ -229,52 +233,6 @@ export default function SignUpPage() {
       </Card>
     </SignInAndOutLayout>
   ) : (
-    <SignInAndOutLayout image={bgImage}>
-      <Card>
-        <MDBox
-          variant="gradient"
-          bgColor="error"
-          borderRadius="lg"
-          coloredShadow="success"
-          mx={3}
-          mt={-3}
-          p={3}
-          mb={1}
-          textAlign="center"
-        >
-          <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
-            Oh no... Something went bad...
-          </MDTypography>
-        </MDBox>
-        <Container component="main" maxWidth="xs">
-          <Box
-            sx={{
-              mt: 2,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <MDTypography
-              variant="h10"
-              fontWeight="medium"
-              color="grey"
-              textAlign="center"
-              mt={1}
-            >
-              There was an error during the Sign Up. Please come back later.
-            </MDTypography>
-            <MDButton
-              variant="gradient"
-              color="info"
-              sx={{ mt: 2, mb: 2 }}
-              onClick={() => navigate("/")}
-            >
-              Return to Home Page
-            </MDButton>
-          </Box>
-        </Container>
-      </Card>
-    </SignInAndOutLayout>
+    <ErrorSiginSignout backgourndImage={bgImage} text={errorText} />
   );
 }
