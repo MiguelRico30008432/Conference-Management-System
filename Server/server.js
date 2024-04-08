@@ -1,7 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const passport = require("passport");
-const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const routes = require("./routes/index");
 const ver = require("./utility/verifications");
@@ -25,7 +24,6 @@ app.options("*", cors(corsOptions)); // Enable pre-flight for all routes
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser(SECRET));
 app.use(
   session({
     secret: SECRET,

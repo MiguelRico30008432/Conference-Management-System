@@ -10,10 +10,12 @@ export default function LogOut() {
   const { logOutUser } = useContext(AuthContext);
 
   useEffect(() => {
-    // Call logOutUser and navigate after the component has been rendered
-    logOutUser();
-    navigate("/HomePage");
-    window.location.reload();
+    const performLogout = async () => {
+      await logOutUser();
+      navigate("/HomePage");
+    };
+
+    performLogout();
   }, [logOutUser, navigate]);
 
   return (

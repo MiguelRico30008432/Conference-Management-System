@@ -17,9 +17,8 @@ function AuthProviderWrapper(props) {
           const activeUser = localStorage.getItem('user');
 
             if (activeUser) { //Desaparece quando houver o close session
-              const user = activeUser;
               setIsLoggedIn(true);
-              setUser(user);
+              setUser(activeUser);
             } else {
               setIsLoggedIn(false);
               setUser(null);
@@ -33,10 +32,25 @@ function AuthProviderWrapper(props) {
         
     };
 
-    const logOutUser = () => {                      
-        localStorage.removeItem('user');   
-        authenticateUser();
-    };
+    const logOutUser = async () => {
+      try {
+          const response = await fetch('http://localhost:8003/logOut', {
+              method: 'POST', 
+              credentials: 'include', 
+          });
+          
+          if (response.ok) {
+              localStorage.removeItem('user');
+              setIsLoggedIn(false);
+              setUser(null);
+              console.log('Logged out successfully');
+          } else {
+              throw new Error('Failed to log out');
+          }
+      } catch (error) {
+          console.error('Logout error:', error);
+      }
+  };
 
     useEffect(() => {
       authenticateUser();

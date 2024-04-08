@@ -54,15 +54,16 @@ export default function SignInPage() {
         },
         credentials: "include",
       });
-
+  
+      const jsonResponse = await response.json(); // Always parse the JSON response
+  
       if (response.ok) {
         localStorage.setItem("user", email);
         authenticateUser();
         navigate("/");
         window.location.reload();
       } else {
-        const jsonResponse = await response.json();
-        setErrorOnRequest(<Alert severity="error">{jsonResponse.msg}</Alert>);
+        setErrorOnRequest(<Alert severity="error">{jsonResponse.message}</Alert>);
       }
     } catch (error) {
       seterrorOnLogin(true);
