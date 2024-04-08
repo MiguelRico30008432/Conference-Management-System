@@ -65,7 +65,6 @@ const routes = [
     name: "Log Out",
     key: "logout",
     icon: <Icon fontSize="small">logout</Icon>,
-    route: "/LogOut",
     component: <LogOut />,
     display: isLogged,
   },
