@@ -5,14 +5,12 @@ import SignInPage from "pages/signInPage";
 import SignUpPage from "pages/SignUpPage";
 import LogOut from "pages/LogOut.js";
 import PendingConferencesPage from "pages/PendingConferencesPage";
-
-
-
+import MyConferences from "pages/MyConferences";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
 
-const isLogged = JSON.parse(localStorage.getItem('isLoggedIn'));
+const isLogged = JSON.parse(localStorage.getItem("isLoggedIn"));
 
 const routes = [
   {
@@ -31,6 +29,15 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/PendingConferences",
     component: <PendingConferencesPage />,
+    display: true,
+  },
+  {
+    type: "collapse",
+    name: "My Conferences",
+    key: "My Conferences",
+    icon: <Icon fontSize="small">dashboard</Icon>,
+    route: "/MyConferences",
+    component: <MyConferences />,
     display: true,
   },
   {
@@ -55,7 +62,7 @@ const routes = [
     type: "collapse",
     name: "Sign Up",
     key: "sign-up",
-    icon: <Icon fontSize="small">logout</Icon>,
+    icon: <Icon fontSize="small">login</Icon>,
     route: "/signup",
     component: <SignUpPage />,
     display: !isLogged,
@@ -78,7 +85,6 @@ const routes = [
     display: false,
   },
 ];
-
 
 export default routes;
 

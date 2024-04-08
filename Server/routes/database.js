@@ -11,7 +11,7 @@ router.get(
       const result = await db.fetchDataPendingConferences("confapproved", 0);
       return res.status(200).send(result);
     } catch (error) {
-      return res.status(500).send("Internal Error");
+      return res.status(500).send({ msg: "Internal Error" });
     }
   }
 );
@@ -23,9 +23,9 @@ router.post("/acceptOrRejectConference", async function (req, res) {
       { confapproved: req.body.acceptOrReject },
       { confid: req.body.confid }
     );
-    return res.status(200).send("");
+    return res.status(200).send({ msg: "" });
   } catch (error) {
-    return res.status(500).send("Internal Error");
+    return res.status(500).send({ msg: "Internal Error" });
   }
 });
 

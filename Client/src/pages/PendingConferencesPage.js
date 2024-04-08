@@ -31,12 +31,12 @@ export default function PendingConferencesPage() {
 
         const jsonResponse = await response.json();
 
-        if (response.ok) {
+        if (response === 200) {
           for (let line of jsonResponse) {
             setRow((allExistingRows) => [...allExistingRows, line]);
           }
         } else {
-          setError(<Alert severity="error">{response.json()}</Alert>);
+          setError(<Alert severity="error">{jsonResponse.msg}</Alert>);
         }
       } catch (error) {
         setError(
