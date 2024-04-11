@@ -7,30 +7,46 @@ const bcrypt = require("bcrypt");
 const passport = require("passport");
 
 //Login
-router.post('/signIn', (req, res, next) => {
-  passport.authenticate('local', (err, user, info) => {
-      if (err) {
-          return res.status(500).send({ success: false, message: 'An error occurred during authentication.' });
+router.post("/signIn", (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) {
+      return res
+        .status(500)
+        .send({
+          success: false,
+          message: "An error occurred during authentication.",
+        });
+    }
+    if (!user) {
+      // Check the message from Passport to determine the reason for failure
+      if (info.message === "User Not Found") {
+        // If the user doesn't exist
+        return res
+          .status(404)
+          .send({ success: false, message: "User not found." });
+      } else {
+        // For other authentication failures, such as incorrect password
+        return res
+          .status(401)
+          .send({
+            success: false,
+            message: "Unauthorized. Invalid credentials.",
+          });
       }
-      if (!user) {
-          // Check the message from Passport to determine the reason for failure
-          if (info.message === "User Not Found") {
-              // If the user doesn't exist
-              return res.status(404).send({ success: false, message: 'User not found.' });
-          } else {
-              // For other authentication failures, such as incorrect password
-              return res.status(401).send({ success: false, message: 'Unauthorized. Invalid credentials.' });
-          }
+    }
+    // If this function gets called, authentication was successful.
+    req.logIn(user, (loginErr) => {
+      if (loginErr) {
+        // Handle error during the login session establishment
+        return res
+          .status(500)
+          .send({ success: false, message: "Failed to establish a session." });
       }
-      // If this function gets called, authentication was successful.
-      req.logIn(user, (loginErr) => {
-          if (loginErr) {
-              // Handle error during the login session establishment
-              return res.status(500).send({ success: false, message: 'Failed to establish a session.' });
-          }
-          // Successful authentication
-          return res.status(200).send({ success: true, message: 'Authenticated successfully' });
-      });
+      // Successful authentication
+      return res
+        .status(200)
+        .send({ success: true, message: "Authenticated successfully" });
+    });
   })(req, res, next);
 });
 
@@ -68,18 +84,24 @@ router.post("/signUp", async (req, res) => {
 
 //Logout
 router.post("/logOut", auth.ensureAuthenticated, (request, response) => {
-  request.logout(function(err) {
+  request.logout(function (err) {
+    if (err) {
+      console.error("Logout error:", err);
+      return response
+        .status(500)
+        .send({ success: false, message: "Error logging out" });
+    }
+    request.session.destroy((err) => {
       if (err) {
-          console.error("Logout error:", err);
-          return response.status(500).send({ success: false, message: "Error logging out" });
+        console.error("Session destruction error:", err);
+        return response
+          .status(500)
+          .send({ success: false, message: "Error destroying session" });
       }
-      request.session.destroy((err) => {
-          if (err) {
-              console.error("Session destruction error:", err);
-              return response.status(500).send({ success: false, message: "Error destroying session" });
-          }
-          response.status(200).send({ success: true, message: "Logged out successfully" });
-      });
+      response
+        .status(200)
+        .send({ success: true, message: "Logged out successfully" });
+    });
   });
 });
 

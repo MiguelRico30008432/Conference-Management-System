@@ -3,14 +3,12 @@ import HomePage from "pages/HomePage";
 import PageNotFound from "pages/PageNotFound";
 import SignInPage from "pages/signInPage";
 import SignUpPage from "pages/SignUpPage";
-import LogOut from "pages/LogOut.js";
+import Logout from "pages/Logout.js";
 import PendingConferencesPage from "pages/PendingConferencesPage";
 import MyConferences from "pages/MyConferences";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
-
-const isLogged = JSON.parse(localStorage.getItem("isLoggedIn"));
 
 const routes = [
   {
@@ -52,28 +50,29 @@ const routes = [
   {
     type: "collapse",
     name: "Sign In",
-    key: "SignInPage",
+    key: "SignIn",
     icon: <Icon fontSize="small">login</Icon>,
     route: "/Signin",
     component: <SignInPage />,
-    display: !isLogged,
+    display: true,
   },
   {
     type: "collapse",
     name: "Sign Up",
-    key: "sign-up",
+    key: "signup",
     icon: <Icon fontSize="small">login</Icon>,
     route: "/signup",
     component: <SignUpPage />,
-    display: !isLogged,
+    display: true,
   },
   {
     type: "collapse",
     name: "Log Out",
     key: "logout",
     icon: <Icon fontSize="small">logout</Icon>,
-    component: <LogOut />,
-    display: isLogged,
+    route: "/logout",
+    component: <Logout />,
+    display: true,
   },
   {
     type: "collapse",

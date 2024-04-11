@@ -29,7 +29,7 @@ export default function SignInPage() {
   const [passwordAlert, setpasswordAlert] = useState(null);
   const [errorOnLogin, seterrorOnLogin] = useState(false);
   const [errorOnRequest, setErrorOnRequest] = useState(null);
-  const { authenticateUser } = useContext(AuthContext);
+  const { setIsLoggedIn, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
@@ -54,16 +54,18 @@ export default function SignInPage() {
         },
         credentials: "include",
       });
-  
-      const jsonResponse = await response.json(); // Always parse the JSON response
-  
+
+      const jsonResponse = await response.json();
+
       if (response.ok) {
         localStorage.setItem("user", email);
-        authenticateUser();
+        setIsLoggedIn(true);
+        setUser(email);
         navigate("/");
-        window.location.reload();
       } else {
-        setErrorOnRequest(<Alert severity="error">{jsonResponse.message}</Alert>);
+        setErrorOnRequest(
+          <Alert severity="error">{jsonResponse.message}</Alert>
+        );
       }
     } catch (error) {
       seterrorOnLogin(true);
