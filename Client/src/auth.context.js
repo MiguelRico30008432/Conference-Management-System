@@ -7,26 +7,6 @@ function AuthProviderWrapper(props) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    authenticateUser();
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("isLoggedIn", JSON.stringify(isLoggedIn));
-  }, [isLoggedIn]);
-
-  const authenticateUser = () => {
-    const activeUser = localStorage.getItem("user");
-
-    if (activeUser) {
-      setIsLoggedIn(true);
-      setUser(activeUser);
-    } else {
-      setIsLoggedIn(false);
-      setUser(null);
-    }
-  };
-
   return (
     <AuthContext.Provider
       value={{
@@ -34,7 +14,6 @@ function AuthProviderWrapper(props) {
         setIsLoggedIn,
         user,
         setUser,
-        authenticateUser,
       }}
     >
       {props.children}

@@ -58,7 +58,6 @@ export default function SignInPage() {
       const jsonResponse = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("user", email);
         setIsLoggedIn(true);
         setUser(email);
         navigate("/");
