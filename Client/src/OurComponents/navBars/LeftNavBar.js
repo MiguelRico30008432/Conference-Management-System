@@ -99,7 +99,10 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
         return null;
       }
 
-      if (key === "logout" && !isLoggedIn) {
+      if (
+        (key === "logout" && !isLoggedIn) ||
+        (key === "myProfile" && !isLoggedIn)
+      ) {
         return null;
       }
 

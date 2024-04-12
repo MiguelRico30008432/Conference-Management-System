@@ -6,6 +6,7 @@ import SignUpPage from "pages/SignUpPage";
 import Logout from "pages/Logout.js";
 import PendingConferencesPage from "pages/PendingConferencesPage";
 import MyConferences from "pages/MyConferences";
+import MyProfilePage from "pages/MyProfilePage";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -63,6 +64,15 @@ const routes = [
     icon: <Icon fontSize="small">login</Icon>,
     route: "/signup",
     component: <SignUpPage />,
+    display: true,
+  },
+  {
+    type: "collapse",
+    name: "My Profile",
+    key: "myProfile",
+    icon: <Icon fontSize="small">person</Icon>,
+    route: "/MyProfile",
+    component: <MyProfilePage />,
     display: true,
   },
   {
