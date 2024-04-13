@@ -29,7 +29,7 @@ export default function SignInPage() {
   const [passwordAlert, setpasswordAlert] = useState(null);
   const [errorOnLogin, seterrorOnLogin] = useState(false);
   const [errorOnRequest, setErrorOnRequest] = useState(null);
-  const { setIsLoggedIn, setUser, setAdmin } = useContext(AuthContext);
+  const { setIsLoggedIn, setUser, setAdmin, admin } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
@@ -60,6 +60,14 @@ export default function SignInPage() {
       if (response.ok) {
         setIsLoggedIn(true);
         setUser(email);
+
+        //Obter o valor de admin a partir da cookie
+        const adminCookie = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('Admin'))
+        ?.split('=')[1];
+
+        setAdmin(adminCookie);
         navigate("/");
       } else {
         setErrorOnRequest(

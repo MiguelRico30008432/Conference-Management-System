@@ -39,7 +39,7 @@ router.post("/signIn", (req, res, next) => {
           .send({ success: false, message: "Failed to establish a session." });
       }
       //adcição da informação do user à cookie (first name, last name e admin)
-      res.cookie("Admin", user.useradmin, { maxAge: 3600000, httpOnly: true });
+      res.cookie("Admin", user.useradmin, { maxAge: 3600000, httpOnly: false });
       // Successful authentication
       return res
         .status(200)

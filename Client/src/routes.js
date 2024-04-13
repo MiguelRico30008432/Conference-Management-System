@@ -3,7 +3,7 @@ import HomePage from "pages/HomePage";
 import PageNotFound from "pages/PageNotFound";
 import SignInPage from "pages/signInPage";
 import SignUpPage from "pages/SignUpPage";
-import Logout from "pages/Logout.js";
+import Logout from "pages/LogOut.js";
 import PendingConferencesPage from "pages/PendingConferencesPage";
 import MyConferences from "pages/MyConferences";
 import MyProfilePage from "pages/MyProfilePage";
