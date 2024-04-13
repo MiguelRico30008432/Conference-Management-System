@@ -10,12 +10,10 @@ const passport = require("passport");
 router.post("/signIn", (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) {
-      return res
-        .status(500)
-        .send({
-          success: false,
-          message: "An error occurred during authentication.",
-        });
+      return res.status(500).send({
+        success: false,
+        message: "An error occurred during authentication.",
+      });
     }
     if (!user) {
       // Check the message from Passport to determine the reason for failure
@@ -26,12 +24,10 @@ router.post("/signIn", (req, res, next) => {
           .send({ success: false, message: "User not found." });
       } else {
         // For other authentication failures, such as incorrect password
-        return res
-          .status(401)
-          .send({
-            success: false,
-            message: "Unauthorized. Invalid credentials.",
-          });
+        return res.status(401).send({
+          success: false,
+          message: "Unauthorized. Invalid credentials.",
+        });
       }
     }
     // If this function gets called, authentication was successful.
@@ -42,6 +38,8 @@ router.post("/signIn", (req, res, next) => {
           .status(500)
           .send({ success: false, message: "Failed to establish a session." });
       }
+      //adcição da informação do user à cookie (first name, last name e admin)
+      res.cookie("Admin", user.useradmin, { maxAge: 3600000, httpOnly: true });
       // Successful authentication
       return res
         .status(200)

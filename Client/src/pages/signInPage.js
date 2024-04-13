@@ -29,7 +29,7 @@ export default function SignInPage() {
   const [passwordAlert, setpasswordAlert] = useState(null);
   const [errorOnLogin, seterrorOnLogin] = useState(false);
   const [errorOnRequest, setErrorOnRequest] = useState(null);
-  const { setIsLoggedIn, setUser } = useContext(AuthContext);
+  const { setIsLoggedIn, setUser, setAdmin } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {

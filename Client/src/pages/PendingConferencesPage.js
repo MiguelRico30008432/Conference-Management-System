@@ -31,7 +31,7 @@ export default function PendingConferencesPage() {
 
         const jsonResponse = await response.json();
 
-        if (response === 200) {
+        if (response.status === 200) {
           for (let line of jsonResponse) {
             setRow((allExistingRows) => [...allExistingRows, line]);
           }
