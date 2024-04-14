@@ -19,30 +19,34 @@ router.get(
 
 router.post("/acceptOrRejectConference", async function (req, res) {
   try {
-    //Update Info on Database
+    // Update information in the database
     await db.updateData(
-      "conferences",{ confapproved: req.body.acceptOrReject },{ confid: req.body.confid }
+      "conferences",
+      { confapproved: req.body.acceptOrReject },
+      { confid: req.body.confid }
     );
-    // Fetch the Email from Database
+    // Fetch the user's email
     const userRecords = await db.fetchData("users", "userid", req.body.confowner);
     if (userRecords.length === 0) {
       return res.status(404).send({ msg: "User not found" });
     }
-    console.log(userRecords);
     const userEmail = userRecords[0].useremail;
-    console.log(userEmail);
+    const userName = userRecords[0].userfirstname + ' ' + userRecords[0].userlastname;
 
-    // Send Email
-    const subject = req.body.acceptOrReject === 2 ? "Your conference as been Accepted" : "Your conference as been Rejected";
-    const contentsubject = req.body.acceptOrReject === 2 ? "Accepted" : "Rejected";
-    const content = `Your conference submission has been ${contentsubject.toLowerCase()}. Thank you for your patience.`;
-    sendEmail(userEmail, subject, content);
+    // Define the subject and content of the email based on the accept or reject action
+    const emailSubject = 'Conference Submission Status Update';
+    const emailReplacements = {userName: userName, conferenceTitle: req.body.confname,actionTaken: req.body.acceptOrReject === 2 ? 'accepted' : 'rejected', 
+    additionalInfo: "For more information, please contact our support team."};
 
-    return res.status(200).send({ msg: "Update successful, email sent." });
+    sendEmail(userEmail, emailSubject, emailReplacements);
+
+    return res.status(200).send({ msg: `Email notification sent.` });
   } catch (error) {
     console.error("Error in /acceptOrRejectConference:", error);
     return res.status(500).send({ msg: "Internal Error" });
   }
 });
+
+module.exports = router;
 
 module.exports = router;

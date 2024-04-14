@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background-color: #0078D7;
+            color: #ffffff;
+            padding: 10px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+        .footer {
+            background-color: #f1f1f1;
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Conference Submission Update</h1>
+        </div>
+        <div class="content">
+            <p>Dear {userName},</p>
+            <p>We would like to inform you that your conference submission titled <strong>{conferenceTitle}</strong> has been {actionTaken}.</p>
+            <p>{additionalInfo}</p>
+            <p>Thank you for using our service, and we hope to see you participating in our future events.</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2024 CMSUAL. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
