@@ -4,7 +4,8 @@ import UpperNavBar from "OurComponents/navBars/UpperNavBar";
 
 // react-router-dom components
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { AuthContext } from "../auth.context";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -17,9 +18,44 @@ import Card from "@mui/material/Card";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
+import Alert from "@mui/material/Alert";
+
 export default function MyProfilePage() {
   const [editModeActive, setEditModeActive] = useState(false);
   const [changePassActive, setChangePassActive] = useState(false);
+  const [error, setError] = useState(null);
+  const { user } = useContext(AuthContext);
+
+  useEffect(() => {
+    async function getUserData() {
+      console.log(user);
+      try {
+        const response = await fetch("http://localhost:8003/userData", {
+          method: "POST",
+          body: JSON.stringify({ userID: user }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+        });
+
+        const jsonResponse = await response.json();
+        console.log(jsonResponse);
+        if (response.status === 200) {
+        } else {
+          setError(<Alert severity="error">{jsonResponse.msg}</Alert>);
+        }
+      } catch (error) {
+        setError(
+          <Alert severity="error">
+            Something went wrong when obtaining your informations
+          </Alert>
+        );
+      }
+    }
+
+    getUserData();
+  }, []);
 
   function handleSubmit() {}
 
@@ -30,6 +66,7 @@ export default function MyProfilePage() {
         Feel free to change your data by clicking on edit profile or change your
         password
       </MDTypography>
+      {error}
 
       {!editModeActive && (
         <MDButton

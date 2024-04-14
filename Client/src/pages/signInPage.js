@@ -59,7 +59,6 @@ export default function SignInPage() {
 
       if (response.ok) {
         setIsLoggedIn(true);
-        setUser(email);
 
         //Obter o valor de admin a partir da cookie
         const adminCookie =
@@ -68,6 +67,12 @@ export default function SignInPage() {
             .find((row) => row.startsWith("Admin"))
             ?.split("=")[1] === "true";
 
+        const userID = document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("UserID"))
+          ?.split("=")[1];
+
+        setUser(userID);
         setIsAdmin(adminCookie);
         navigate("/");
       } else {

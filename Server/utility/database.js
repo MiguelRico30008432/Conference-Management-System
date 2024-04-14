@@ -107,6 +107,24 @@ async function fetchDataPendingConferences(collum, comparisonValue) {
   }
 }
 
+async function fetchUserData(collum, comparisonValue) {
+  try {
+    const queryText = `SELECT 
+       userfirstname,
+       userlastname,
+       useremail,
+       userphone
+    FROM 
+        users
+    WHERE ${collum} = $1`;
+
+    const result = await pool.query(queryText, [comparisonValue]);
+    return result.rows;
+  } catch (err) {
+    log.addLog(err, "database", "fetchData");
+  }
+}
+
 module.exports = {
   fetchData,
   addData,
@@ -114,4 +132,5 @@ module.exports = {
   updateData,
   //customized functions
   fetchDataPendingConferences,
+  fetchUserData,
 };
