@@ -2,7 +2,6 @@ Table Users
 
 CREATE TABLE users (
     userID SERIAL primary KEY,
-    userName VARCHAR(200) NOT NULL,
     userFirstName VARCHAR(50) NOT NULL,
     userLastName VARCHAR(50) NOT NULL,
     userEmail VARCHAR(100) NOT NULL,
@@ -24,12 +23,23 @@ CREATE TABLE confAreas (
     confAreaName VARCHAR(200) NOT NULL
 );
 ___________________________________________________________________________________________________________
+
+CREATE TABLE confTypes (
+    confTypeID SERIAL primary KEY,
+    confTypeName VARCHAR(200) NOT NULL
+);
+___________________________________________________________________________________________________________
 Table Conferências
 
 
 CREATE TABLE conferences (
     confID SERIAL primary KEY,
     confName VARCHAR(200) NOT NULL,
+    confCity VARCHAR(40) NOT NULL,
+    confCountry VARCHAR(40) NOT NULL,
+    confWebPage VARCHAR(250) NOT NULL,
+    confOwner INT,
+    FOREIGN KEY (confOwner) REFERENCES users(userID),
     confDescription VARCHAR(2048) NOT NULL,
     confStartDate TIMESTAMP NOT NULL,
     confEndDate TIMESTAMP NOT NULL,
@@ -40,6 +50,7 @@ CREATE TABLE conferences (
     confStartBidding TIMESTAMP NOT NULL,
     confEndBidding TIMESTAMP NOT NULL,
     confType INT,
+    FOREIGN KEY (confType) REFERENCES confTypes(confTypeID),
     confAreaID INT,
     FOREIGN KEY (confAreaID) REFERENCES confAreas(confAreaID),
     confMaxReviewers INT,
@@ -72,15 +83,6 @@ CREATE TABLE userRoles(
     FOREIGN KEY (confID) REFERENCES conferences(confID)
 );
 ___________________________________________________________________________________________________________
-Table userSpecialty
-
-CREATE TABLE userspecialties(
-    userSpecialtyID SERIAL primary KEY,
-    userID INT,
-    FOREIGN KEY (userID) REFERENCES users(userID),
-    userAreaSpecialty VARCHAR(200)
-);
-___________________________________________________________________________________________________________
 Table Reviews
 
 CREATE TABLE reviews(
@@ -100,6 +102,7 @@ Table Files
 CREATE TABLE files(
     fileID SERIAL primary KEY,
     fileName VARCHAR(200),
+    file VARCHAR,
     submissionID INT,
     FOREIGN KEY (submissionID) REFERENCES submissions(submissionID),
     fileAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
@@ -117,9 +120,15 @@ CREATE TABLE authors(
     authorAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
 ___________________________________________________________________________________________________________
-Table Areas
+Table Invitations
 
-CREATE TABLE areas(
-    areaID SERIAL primary KEY,
-    areaName VARCHAR(200)
+CREATE TABLE invitations(
+    invitationID SERIAL primary KEY,
+    confID INT,
+    FOREIGN KEY (confID) REFERENCES conferences(confID),
+    invitationEmail VARCHAR(200),
+    invitationCode VARCHAR(200),
+    invitationRole VARCHAR(50),
+    invationCodeUsed BOOLEAN DEFAULT false,
+    invitationAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
