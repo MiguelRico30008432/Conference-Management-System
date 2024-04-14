@@ -50,7 +50,7 @@ export default function PendingConferencesPage() {
     getRows();
   }, []);
 
-  async function acceptOrRejectConference(id, accept) {
+  async function acceptOrRejectConference(id, accept, owner) {
     try {
       const response = await fetch(
         "http://localhost:8003/acceptOrRejectConference",
@@ -60,7 +60,7 @@ export default function PendingConferencesPage() {
             "Content-type": "application/json; charset=UTF-8",
           },
           credentials: "include",
-          body: JSON.stringify({ confid: id, acceptOrReject: accept }),
+          body: JSON.stringify({ confid: id, acceptOrReject: accept, confowner: owner}),
         }
       );
       if (response.ok) {
@@ -113,7 +113,7 @@ export default function PendingConferencesPage() {
       width: 100,
       renderCell: (params) => {
         const handleAcceptButtonClick = async () => {
-          await acceptOrRejectConference(params.row.id, 2);
+          await acceptOrRejectConference(params.row.id, 2, params.row.confowner);
         };
 
         return (
@@ -141,7 +141,7 @@ export default function PendingConferencesPage() {
       width: 100,
       renderCell: (params) => {
         const handleRejectButtonClick = async () => {
-          await acceptOrRejectConference(params.row.id, 1);
+          await acceptOrRejectConference(params.row.id, 1, params.row.confowner);
         };
 
         return (

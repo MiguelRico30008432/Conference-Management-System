@@ -92,7 +92,8 @@ async function fetchDataPendingConferences(collum, comparisonValue) {
         conferences.confmaxsubmissions,
         conferences.confcode,
         conferences.confadddate,
-        conferences.confapproved
+        conferences.confapproved,
+        conferences.confOwner
     FROM 
         conferences
     INNER JOIN 

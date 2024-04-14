@@ -19,21 +19,24 @@ router.get(
 
 router.post("/acceptOrRejectConference", async function (req, res) {
   try {
+    //Update Info on Database
     await db.updateData(
-      "conferences",
-      { confapproved: req.body.acceptOrReject },
-      { confid: req.body.confid }
+      "conferences",{ confapproved: req.body.acceptOrReject },{ confid: req.body.confid }
     );
-    
-    
-    const testEmail = "30009280@students.ual.pt";
-    
-    
-    const subject = req.body.acceptOrReject === 2 ? "Conference Accepted" : "Conference Rejected";
-    const content = `Your conference submission has been ${subject.toLowerCase()}. Thank you for your patience.`;
-    
-    // Send an email notification to the test email
-    sendEmail(testEmail, subject, content);
+    // Fetch the Email from Database
+    const userRecords = await db.fetchData("users", "userid", req.body.confowner);
+    if (userRecords.length === 0) {
+      return res.status(404).send({ msg: "User not found" });
+    }
+    console.log(userRecords);
+    const userEmail = userRecords[0].useremail;
+    console.log(userEmail);
+
+    // Send Email
+    const subject = req.body.acceptOrReject === 2 ? "Your conference as been Accepted" : "Your conference as been Rejected";
+    const contentsubject = req.body.acceptOrReject === 2 ? "Accepted" : "Rejected";
+    const content = `Your conference submission has been ${contentsubject.toLowerCase()}. Thank you for your patience.`;
+    sendEmail(userEmail, subject, content);
 
     return res.status(200).send({ msg: "Update successful, email sent." });
   } catch (error) {
