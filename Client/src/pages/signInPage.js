@@ -29,7 +29,7 @@ export default function SignInPage() {
   const [passwordAlert, setpasswordAlert] = useState(null);
   const [errorOnLogin, seterrorOnLogin] = useState(false);
   const [errorOnRequest, setErrorOnRequest] = useState(null);
-  const { setIsLoggedIn, setUser, setAdmin, admin } = useContext(AuthContext);
+  const { setIsLoggedIn, setUser, setIsAdmin } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
@@ -62,12 +62,13 @@ export default function SignInPage() {
         setUser(email);
 
         //Obter o valor de admin a partir da cookie
-        const adminCookie = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('Admin'))
-        ?.split('=')[1];
+        const adminCookie =
+          document.cookie
+            .split("; ")
+            .find((row) => row.startsWith("Admin"))
+            ?.split("=")[1] === "true";
 
-        setAdmin(adminCookie);
+        setIsAdmin(adminCookie);
         navigate("/");
       } else {
         setErrorOnRequest(
@@ -156,7 +157,7 @@ export default function SignInPage() {
                 fullWidth
                 sx={{ mt: 2 }}
               >
-                sign Up
+                sign In
               </MDButton>
               <MDBox mt={3} mb={1} textAlign="center">
                 <MDTypography variant="button" color="text">
@@ -169,7 +170,7 @@ export default function SignInPage() {
                     fontWeight="medium"
                     textGradient
                   >
-                    Sign Up
+                    Sign In
                   </MDTypography>
                 </MDTypography>
               </MDBox>

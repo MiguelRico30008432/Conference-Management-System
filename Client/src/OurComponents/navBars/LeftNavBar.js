@@ -35,7 +35,7 @@ import {
 import { AuthContext } from "../../auth.context";
 
 function Sidenav({ color, brand, brandName, routes, ...rest }) {
-  const { isLoggedIn } = useContext(AuthContext);
+  const { isLoggedIn, isAdmin, userRole } = useContext(AuthContext);
   const [controller, dispatch] = useMaterialUIController();
   const {
     miniSidenav,
@@ -88,21 +88,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
     ({ type, name, icon, title, noCollapse, key, href, route, display }) => {
       let returnValue;
 
-      if (!display) {
-        return null;
-      }
-
-      if (
-        (key === "SignIn" && isLoggedIn) ||
-        (key === "signup" && isLoggedIn)
-      ) {
-        return null;
-      }
-
-      if (
-        (key === "logout" && !isLoggedIn) ||
-        (key === "myProfile" && !isLoggedIn)
-      ) {
+      if (HideMenuOption(key, display)) {
         return null;
       }
 
@@ -163,6 +149,33 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
       return returnValue;
     }
   );
+
+  function HideMenuOption(key, display) {
+    //hide menu if the route is marked to do not display
+    if (!display) {
+      return true;
+    }
+
+    //hide menu if you are signIn
+    if ((key === "SignIn" && isLoggedIn) || (key === "signup" && isLoggedIn)) {
+      return true;
+    }
+
+    //hide menu if you are signOut
+    if (
+      (key === "logout" && !isLoggedIn) ||
+      (key === "myProfile" && !isLoggedIn) ||
+      (key === "MyConferences" && !isLoggedIn) ||
+      (key === "callForPapers" && !isLoggedIn)
+    ) {
+      return true;
+    }
+
+    //hide menu if you aren't admin
+    if (key === "PendingConferences" && !isAdmin) {
+      return true;
+    }
+  }
 
   return (
     <SidenavRoot

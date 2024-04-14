@@ -1,4 +1,3 @@
-import ExemplePage from "pages/ExemplePage";
 import HomePage from "pages/HomePage";
 import PageNotFound from "pages/PageNotFound";
 import SignInPage from "pages/signInPage";
@@ -7,11 +6,21 @@ import Logout from "pages/LogOut.js";
 import PendingConferencesPage from "pages/PendingConferencesPage";
 import MyConferences from "pages/MyConferences";
 import MyProfilePage from "pages/MyProfilePage";
+import CallForPapers from "pages/CallForPapers";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
 
 const routes = [
+  {
+    type: "collapse",
+    name: "Pending Conferences",
+    key: "PendingConferences",
+    icon: <Icon fontSize="small">dashboard</Icon>,
+    route: "/PendingConferences",
+    component: <PendingConferencesPage />,
+    display: true,
+  },
   {
     type: "collapse",
     name: "Home Page",
@@ -23,29 +32,20 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Pending Conferences",
-    key: "Pending Conferences",
+    name: "Call For Papers",
+    key: "callForPapers",
     icon: <Icon fontSize="small">dashboard</Icon>,
-    route: "/PendingConferences",
-    component: <PendingConferencesPage />,
+    route: "/CallForPapers",
+    component: <CallForPapers />,
     display: true,
   },
   {
     type: "collapse",
     name: "My Conferences",
-    key: "My Conferences",
+    key: "MyConferences",
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/MyConferences",
     component: <MyConferences />,
-    display: true,
-  },
-  {
-    type: "collapse",
-    name: "Página de Exemplo",
-    key: "ExemplePage",
-    icon: <Icon fontSize="small">assignment</Icon>,
-    route: "/ExemplePage",
-    component: <ExemplePage />,
     display: true,
   },
   {

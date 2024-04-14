@@ -6,7 +6,8 @@ const AuthContext = React.createContext();
 function AuthProviderWrapper(props) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
-  const [admin, setAdmin] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(null);
+  const [userRole, setUserRole] = useState(null);
 
   return (
     <AuthContext.Provider
@@ -15,8 +16,10 @@ function AuthProviderWrapper(props) {
         setIsLoggedIn,
         user,
         setUser,
-        admin,
-        setAdmin,
+        isAdmin,
+        setIsAdmin,
+        userRole,
+        setUserRole,
       }}
     >
       {props.children}
