@@ -175,6 +175,11 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
     if (key === "PendingConferences" && !isAdmin) {
       return true;
     }
+
+    //hide menu if you are admin
+    if (key === "myProfile" && isAdmin) {
+      return true;
+    }
   }
 
   return (
