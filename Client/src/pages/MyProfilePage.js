@@ -23,12 +23,18 @@ import Alert from "@mui/material/Alert";
 export default function MyProfilePage() {
   const [editModeActive, setEditModeActive] = useState(false);
   const [changePassActive, setChangePassActive] = useState(false);
-  const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null);
   const { user } = useContext(AuthContext);
+
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+
+  let importedEmail;
 
   useEffect(() => {
     async function getUserData() {
-      console.log(user);
       try {
         const response = await fetch("http://localhost:8003/userData", {
           method: "POST",
@@ -40,13 +46,18 @@ export default function MyProfilePage() {
         });
 
         const jsonResponse = await response.json();
-        console.log(jsonResponse);
+
         if (response.status === 200) {
+          setFirstName(jsonResponse[0].userfirstname);
+          setLastName(jsonResponse[0].userlastname);
+          setEmail(jsonResponse[0].useremail);
+          setPhone(jsonResponse[0].userphone);
+          importedEmail = jsonResponse[0].useremail;
         } else {
-          setError(<Alert severity="error">{jsonResponse.msg}</Alert>);
+          setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
         }
       } catch (error) {
-        setError(
+        setMessage(
           <Alert severity="error">
             Something went wrong when obtaining your informations
           </Alert>
@@ -57,7 +68,51 @@ export default function MyProfilePage() {
     getUserData();
   }, []);
 
-  function handleSubmit() {}
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    if (importedEmail != email) {
+      console.log(
+        "adicionar aqui um popup a questionar o user se quer alterar os dados do email dado que é o que usa para fazer login"
+      );
+    }
+
+    await saveUserData();
+  }
+
+  async function saveUserData() {
+    try {
+      const response = await fetch("http://localhost:8003/saveUserData", {
+        method: "POST",
+        body: JSON.stringify({
+          userID: user,
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          phone: phone,
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+        credentials: "include",
+      });
+
+      const jsonResponse = await response.json();
+      if (response.status === 200) {
+        setMessage(
+          <Alert severity="success">{"Yor data was saved with success"}</Alert>
+        );
+      } else {
+        setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
+      }
+    } catch (error) {
+      setMessage(
+        <Alert severity="error">
+          Something went wrong when obtaining your informations
+        </Alert>
+      );
+    }
+  }
 
   return (
     <DashboardLayout>
@@ -66,35 +121,29 @@ export default function MyProfilePage() {
         Feel free to change your data by clicking on edit profile or change your
         password
       </MDTypography>
-      {error}
 
-      {!editModeActive && (
-        <MDButton
-          variant="gradient"
-          color="info"
-          sx={{ mt: 2, mb: 2 }}
-          onClick={() => setEditModeActive(true)}
-        >
-          Edit Profile
-        </MDButton>
-      )}
+      {message}
 
-      {editModeActive && (
-        <MDButton
-          variant="gradient"
-          color="info"
-          sx={{ mt: 2, mb: 2 }}
-          onClick={() => setEditModeActive(false)}
-        >
-          Save Changes
-        </MDButton>
-      )}
+      <MDButton
+        variant="gradient"
+        color="info"
+        sx={{ mt: 2, mb: 2 }}
+        onClick={() => {
+          setEditModeActive(true);
+          setChangePassActive(false);
+        }}
+      >
+        Edit Profile
+      </MDButton>
 
       <MDButton
         variant="gradient"
         color="info"
         sx={{ mt: 2, mb: 2, ml: 1 }}
-        onClick={() => setChangePassActive(true)}
+        onClick={() => {
+          setChangePassActive(true);
+          setEditModeActive(false);
+        }}
       >
         Change Password
       </MDButton>
@@ -113,7 +162,8 @@ export default function MyProfilePage() {
                   id="firstName"
                   label="First Name"
                   autoFocus
-                  defaultValue={"teste"}
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
                   disabled={!editModeActive}
                   sx={{ ml: 2, mt: 2, width: "90%" }}
                 />
@@ -126,12 +176,13 @@ export default function MyProfilePage() {
                   label="Last Name"
                   name="lastName"
                   autoComplete="family-name"
-                  defaultValue={"teste"}
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
                   disabled={!editModeActive}
-                  sx={{ mt: 2, width: "90%" }}
+                  sx={{ ml: 2, mt: 2, width: "90%" }}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={5}>
                 <TextField
                   required
                   fullWidth
@@ -139,7 +190,8 @@ export default function MyProfilePage() {
                   label="Email Address"
                   name="email"
                   autoComplete="email"
-                  defaultValue={"teste"}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   disabled={!editModeActive}
                   sx={{ ml: 2, mt: 2, width: "90%" }}
                 />
@@ -151,17 +203,33 @@ export default function MyProfilePage() {
                   id="phone"
                   label="Phone Number"
                   name="phone"
-                  defaultValue={"teste"}
+                  autoComplete="phone"
+                  value={phone}
                   disabled={!editModeActive}
-                  sx={{ ml: 2, mt: 2, width: "20%" }}
+                  onChange={(e) => setPhone(e.target.value)}
+                  sx={{ ml: 2, mt: 2, width: "35%" }}
                 />
               </Grid>
             </Grid>
+            <MDButton
+              type="submit"
+              variant="gradient"
+              color="info"
+              sx={{
+                ml: 2,
+                mt: 2,
+                mb: 2,
+                display: editModeActive ? "block" : "none",
+              }}
+              onClick={() => setEditModeActive(false)}
+            >
+              Save Changes
+            </MDButton>
             <MDBox mt={3} mb={1} textAlign="center"></MDBox>
           </Box>
         </Card>
       ) : (
-        <Card>
+        <Card sx={{ maxWidth: 1400 }}>
           <MDBox mt={1} mb={1} textAlign="center"></MDBox>
           <Box component="form" noValidate onSubmit={handleSubmit}>
             <Grid container spacing={1}>
@@ -176,7 +244,7 @@ export default function MyProfilePage() {
                   autoComplete="new-password"
                   defaultValue={"teste"}
                   disabled={!editModeActive}
-                  sx={{ ml: 2, mt: 2, width: 300 }}
+                  sx={{ ml: 2, mt: 2, width: "50%" }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -190,7 +258,7 @@ export default function MyProfilePage() {
                   autoComplete="new-password"
                   defaultValue={"teste"}
                   disabled={!editModeActive}
-                  sx={{ ml: 2, mt: 2, width: 300 }}
+                  sx={{ ml: 2, mt: 2, width: "50%" }}
                 />
               </Grid>
             </Grid>
