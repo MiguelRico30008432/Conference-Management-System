@@ -2,6 +2,7 @@ const express = require("express");
 const db = require("../utility/database");
 const auth = require("../utility/verifications");
 const { sendEmail } = require("../utility/emails");
+const bcrypt = require("bcrypt");
 const router = express.Router();
 
 router.get(
@@ -74,6 +75,22 @@ router.post("/saveUserData", auth.ensureAuthenticated, async (req, res) => {
         userLastName: req.body.lastName,
         userEmail: req.body.email,
         userPhone: req.body.phone,
+      },
+      { userid: req.body.userID }
+    );
+    return res.status(200).send({ msg: "" });
+  } catch (error) {
+    return res.status(500).send({ msg: "Internal Error" });
+  }
+});
+
+router.post("/saveUserPassword", auth.ensureAuthenticated, async (req, res) => {
+  try {
+    const hashedPassword = await bcrypt.hash(req.body.userPassword, 10);
+    await db.updateData(
+      "users",
+      {
+        userPassword: hashedPassword,
       },
       { userid: req.body.userID }
     );
