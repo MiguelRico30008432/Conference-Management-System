@@ -7,7 +7,7 @@ function AuthProviderWrapper(props) {
   const [isLoggedIn, setIsLoggedIn] = useState(
     localStorage.getItem("isLoggedIn") === "true"
   );
-  const [user, setUser] = useState(localStorage.getItem("user") === "true");
+  const [user, setUser] = useState(localStorage.getItem("user"));
   const [isAdmin, setIsAdmin] = useState(
     localStorage.getItem("isAdmin") === "true"
   );
