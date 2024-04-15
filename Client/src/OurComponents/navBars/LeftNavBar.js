@@ -85,7 +85,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
 
   // Render all the routes from the routes.js (All the visible items on the Sidenav)
   const renderRoutes = routes.map(
-    ({ type, name, icon, title, noCollapse, key, href, route, display }) => {
+    ({ type, name, icon, noCollapse, key, href, route, display }) => {
       let returnValue;
 
       if (HideMenuOption(key, display)) {
@@ -131,7 +131,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
             mb={1}
             ml={1}
           >
-            {title}
+            {name}
           </MDTypography>
         );
       } else if (type === "divider") {
@@ -157,22 +157,26 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
     }
 
     //hide menu if you are signIn
-    if ((key === "SignIn" && isLoggedIn) || (key === "signup" && isLoggedIn)) {
+    if ((key === "SignIn" && isLoggedIn) || (key === "Signup" && isLoggedIn)) {
       return true;
     }
 
     //hide menu if you are signOut
     if (
-      (key === "logout" && !isLoggedIn) ||
-      (key === "myProfile" && !isLoggedIn) ||
+      (key === "Logout" && !isLoggedIn) ||
+      (key === "MyProfile" && !isLoggedIn) ||
       (key === "MyConferences" && !isLoggedIn) ||
-      (key === "callForPapers" && !isLoggedIn)
+      (key === "CallForPapers" && !isLoggedIn) ||
+      (key === "ConferencesTitle" && !isLoggedIn)
     ) {
       return true;
     }
 
     //hide menu if you aren't admin
-    if (key === "PendingConferences" && !isAdmin) {
+    if (
+      (key === "PendingConferences" && !isAdmin) ||
+      (key === "AdminTitle" && !isAdmin)
+    ) {
       return true;
     }
 

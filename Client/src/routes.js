@@ -13,6 +13,12 @@ import Icon from "@mui/material/Icon";
 
 const routes = [
   {
+    type: "title",
+    name: "admin",
+    key: "AdminTitle",
+    display: true,
+  },
+  {
     type: "collapse",
     name: "Pending Conferences",
     key: "PendingConferences",
@@ -22,18 +28,31 @@ const routes = [
     display: true,
   },
   {
+    type: "title",
+    name: "HomePage",
+    key: "HomePageTitle",
+    display: true,
+  },
+
+  {
     type: "collapse",
     name: "Home Page",
-    key: "Home Page",
+    key: "HomePage",
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/HomePage",
     component: <HomePage />,
     display: true,
   },
   {
+    type: "title",
+    name: "Conferences",
+    key: "ConferencesTitle",
+    display: true,
+  },
+  {
     type: "collapse",
     name: "Call For Papers",
-    key: "callForPapers",
+    key: "CallForPapers",
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/CallForPapers",
     component: <CallForPapers />,
@@ -49,6 +68,12 @@ const routes = [
     display: true,
   },
   {
+    type: "title",
+    name: "User",
+    key: "User",
+    display: true,
+  },
+  {
     type: "collapse",
     name: "Sign In",
     key: "SignIn",
@@ -60,7 +85,7 @@ const routes = [
   {
     type: "collapse",
     name: "Sign Up",
-    key: "signup",
+    key: "Signup",
     icon: <Icon fontSize="small">login</Icon>,
     route: "/signup",
     component: <SignUpPage />,
@@ -69,7 +94,7 @@ const routes = [
   {
     type: "collapse",
     name: "My Profile",
-    key: "myProfile",
+    key: "MyProfile",
     icon: <Icon fontSize="small">person</Icon>,
     route: "/MyProfile",
     component: <MyProfilePage />,
@@ -78,7 +103,7 @@ const routes = [
   {
     type: "collapse",
     name: "Log Out",
-    key: "logout",
+    key: "Logout",
     icon: <Icon fontSize="small">logout</Icon>,
     route: "/logout",
     component: <Logout />,
