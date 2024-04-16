@@ -93,8 +93,14 @@ export default function MyProfilePage() {
 
   async function handleSubmitForPassword(event) {
     event.preventDefault();
-
-    if (password != repeatPassword) {
+  
+    if (password.length === 0 || repeatPassword.length === 0) {
+      setMessage(
+        <Alert severity="error">
+          Please fill in the password field.
+        </Alert>
+      );
+    } else if (password !== repeatPassword) {
       setMessage(
         <Alert severity="error">
           The first password does not match with the second one.
