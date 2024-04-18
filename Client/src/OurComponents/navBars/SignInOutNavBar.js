@@ -32,7 +32,7 @@ import MDButton from "components/MDButton";
 
 // Material Dashboard 2 React example components
 import DefaultNavbarLink from "examples/Navbars/DefaultNavbar/DefaultNavbarLink";
-import DefaultNavbarMobile from "examples/Navbars/DefaultNavbar/DefaultNavbarMobile";
+import DefaultNavbarMobileSignInSignOut from "./NavbarMobile";
 
 // Material Dashboard 2 React base styles
 import breakpoints from "assets/theme/base/breakpoints";
@@ -51,7 +51,7 @@ export default function SignInOutNavBar({ transparent, light, action }) {
   const closeMobileNavbar = () => setMobileNavbar(false);
 
   useEffect(() => {
-    // A function that sets the display state for the DefaultNavbarMobile.
+    // A function that sets the display state for the DefaultNavbarMobileSignInSignOut.
     function displayMobileNavbar() {
       if (window.innerWidth < breakpoints.values.lg) {
         setMobileView(true);
@@ -166,7 +166,7 @@ export default function SignInOutNavBar({ transparent, light, action }) {
           <Icon fontSize="default">{mobileNavbar ? "close" : "menu"}</Icon>
         </MDBox>
       </MDBox>
-      {mobileView && <DefaultNavbarMobile open={mobileNavbar} close={closeMobileNavbar} />}
+      {mobileView && <DefaultNavbarMobileSignInSignOut open={mobileNavbar} close={closeMobileNavbar} />}
     </Container>
   );
 }
