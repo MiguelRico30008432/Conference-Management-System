@@ -68,6 +68,15 @@ router.post("/userData", auth.ensureAuthenticated, async (req, res) => {
 
 router.post("/saveUserData", auth.ensureAuthenticated, async (req, res) => {
   try {
+    const userRecords = await db.fetchData(
+      "users",
+      "useremail",
+      req.body.email
+    );
+    if (userRecords.length != 0) {
+      return res.status(404).send({ msg: "Email already in use" });
+    }
+
     await db.updateData(
       "users",
       {
