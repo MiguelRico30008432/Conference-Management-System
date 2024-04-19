@@ -15,7 +15,6 @@ CREATE TABLE users (
 INSERT INTO users (userName, userEmail, userPhone, userPassword) 
 VALUES ('teste', 'teste@teste.teste', '910128912', 'testePassword');
 
-select * from users
 ___________________________________________________________________________________________________________
 Table confAreas
 
@@ -61,6 +60,16 @@ CREATE TABLE conferences (
     confAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp,
     confApproved INT DEFAULT 0
 )
+
+INSERT INTO conferences (confName, confCity, confCountry, confWebPage, confOwner, confDescription, confStartDate, confEndDate, confStartSubmission, confEndSubmission, confStartReview, confEndReview, confStartBidding, confEndBidding, confType, confAreaID, confMaxReviewers, confMinReviewers, confMaxSubmissions, confCode)
+VALUES ('Exemplo de Conferência', 'Cidade Exemplo', 'País Exemplo', 'http://exemplo.com', 12, 'Descrição da conferência', '2024-05-01', '2024-05-03', '2024-03-01', '2024-03-15', '2024-03-20', '2024-04-05', '2024-04-10', '2024-04-15', 1, 1, 5, 3, 100, 'CONF123');
+
+INSERT INTO conferences (confName, confCity, confCountry, confWebPage, confOwner, confDescription, confStartDate, confEndDate, confStartSubmission, confEndSubmission, confStartReview, confEndReview, confStartBidding, confEndBidding, confType, confAreaID, confMaxReviewers, confMinReviewers, confMaxSubmissions, confCode)
+VALUES ('Conferência de Exemplo 1', 'Cidade1', 'País1', 'http://site1.com', 12, 'Descrição da conferência 1', '2024-06-01', '2024-06-03', '2024-04-01', '2024-04-15', '2024-04-20', '2024-05-05', '2024-05-10', '2024-05-15', 1, 1, 8, 4, 120, 'CONF001');
+
+INSERT INTO conferences (confName, confCity, confCountry, confWebPage, confOwner, confDescription, confStartDate, confEndDate, confStartSubmission, confEndSubmission, confStartReview, confEndReview, confStartBidding, confEndBidding, confType, confAreaID, confMaxReviewers, confMinReviewers, confMaxSubmissions, confCode)
+VALUES ('Conferência de Exemplo 3', 'Cidade3', 'País3', 'http://site3.com', 12, 'Descrição da conferência 3', '2024-08-01', '2024-08-03', '2024-06-01', '2024-06-15', '2024-06-20', '2024-07-05', '2024-07-10', '2024-07-15', 1, 1, 7, 5, 180, 'CONF003');
+
 ___________________________________________________________________________________________________________
 Table Submissions
 

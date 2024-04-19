@@ -126,6 +126,25 @@ async function fetchUserData(collum, comparisonValue) {
   }
 }
 
+async function fetchMyConferences(comparisonValue) {
+  try {
+    const queryText = `SELECT 
+      conferences.confid AS "id",
+      confName,
+      userrole
+    FROM 
+      conferences
+    INNER JOIN 
+      userRoles ON userRoles.confid = conferences.confid
+      WHERE userRoles.userid = $1`;
+
+    const result = await pool.query(queryText, [comparisonValue]);
+    return result.rows;
+  } catch (err) {
+    log.addLog(err, "database", "fetchData");
+  }
+}
+
 module.exports = {
   fetchData,
   addData,
@@ -134,4 +153,5 @@ module.exports = {
   //customized functions
   fetchDataPendingConferences,
   fetchUserData,
+  fetchMyConferences,
 };
