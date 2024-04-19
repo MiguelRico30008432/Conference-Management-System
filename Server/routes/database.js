@@ -73,7 +73,8 @@ router.post("/saveUserData", auth.ensureAuthenticated, async (req, res) => {
       "useremail",
       req.body.email
     );
-    if (userRecords.length != 0) {
+
+    if (userRecords.length != 0 && userRecords[0].userid != req.body.userID) {
       return res.status(404).send({ msg: "Email already in use" });
     }
 

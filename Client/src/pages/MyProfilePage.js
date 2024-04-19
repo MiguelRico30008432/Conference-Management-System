@@ -29,11 +29,15 @@ export default function MyProfilePage() {
   const { user } = useContext(AuthContext);
 
   const [firstName, setFirstName] = useState("");
+  const [originalFirstName, setOriginalFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [originalLastName, setOriginalLastName] = useState("");
   const [filiation, setFiliation] = useState("");
+  const [originalFiliation, setOriginalFiliation] = useState("");
   const [email, setEmail] = useState("");
   const [originalEmail, setOriginalEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [originalPhone, setOriginalPhone] = useState("");
 
   const [password, setPasword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
@@ -54,11 +58,15 @@ export default function MyProfilePage() {
 
         if (response.status === 200) {
           setFirstName(jsonResponse[0].userfirstname);
+          setOriginalFirstName(jsonResponse[0].userfirstname);
           setLastName(jsonResponse[0].userlastname);
+          setOriginalLastName(jsonResponse[0].userlastname);
           setFiliation(jsonResponse[0].userfiliation);
-          setOriginalEmail(jsonResponse[0].useremail);
+          setOriginalFiliation(jsonResponse[0].userfiliation);
           setEmail(jsonResponse[0].useremail);
+          setOriginalEmail(jsonResponse[0].useremail);
           setPhone(jsonResponse[0].userphone);
+          setOriginalPhone(jsonResponse[0].userphone);
         } else {
           setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
         }
@@ -76,29 +84,28 @@ export default function MyProfilePage() {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    const inputsOk = valideInputs();
 
-    if (inputsOk) {
-      if (originalEmail != email) {
-        setOpenEmailChangeDialog(true);
+    if (makeRequest) {
+      if (valideInputs) {
+        if (originalEmail != email) {
+          setOpenEmailChangeDialog(true);
+        } else {
+          await saveUserData();
+        }
       } else {
-        await saveUserData();
+        setMessage(
+          <Alert severity="error">All fields marked with * are required.</Alert>
+        );
       }
-    } else {
-      setMessage(
-        <Alert severity="error">All fields marked with * are required.</Alert>
-      );
     }
   }
 
   async function handleSubmitForPassword(event) {
     event.preventDefault();
-  
+
     if (password.length === 0 || repeatPassword.length === 0) {
       setMessage(
-        <Alert severity="error">
-          Please fill in the password field.
-        </Alert>
+        <Alert severity="error">Please fill in the password field.</Alert>
       );
     } else if (password !== repeatPassword) {
       setMessage(
@@ -108,6 +115,20 @@ export default function MyProfilePage() {
       );
     } else {
       await saveUserPassword();
+    }
+  }
+
+  function makeRequest() {
+    if (
+      originalFirstName != firstName ||
+      originalLastName != lastName ||
+      originalFiliation != filiation ||
+      originalEmail != email ||
+      originalPhone != phone
+    ) {
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -136,10 +157,17 @@ export default function MyProfilePage() {
       });
 
       const jsonResponse = await response.json();
+
       if (response.status === 200) {
         setMessage(
           <Alert severity="success">{"Yor data was saved with success"}</Alert>
         );
+
+        setOriginalFirstName(firstName);
+        setOriginalLastName(lastName);
+        setOriginalFiliation(filiation);
+        setOriginalPhone(phone);
+        setOriginalEmail(email);
       } else {
         setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
       }
@@ -196,6 +224,7 @@ export default function MyProfilePage() {
         onClick={() => {
           setEditModeActive(true);
           setChangePassActive(false);
+          setMessage(null);
         }}
       >
         Edit Profile
