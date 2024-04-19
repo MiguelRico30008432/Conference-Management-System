@@ -29,6 +29,7 @@ export default function SignUpPage() {
   const [emailAlert, setEmailAlert] = useState(null);
   const [phoneAlert, setPhoneAlert] = useState(null);
   const [passwordAlert, setPasswordAlert] = useState(null);
+  const [affiliationAlert, setAffiliationAlert] = useState(null);
   const [errorOnLogin, setErrorOnLogin] = useState(false);
   const [errorOnRequest, setErrorOnRequest] = useState(null);
 
@@ -37,14 +38,31 @@ export default function SignUpPage() {
 
     const data = new FormData(event.currentTarget);
     const formData = Object.fromEntries(data.entries());
-    const { firstName, lastName, email, phone, password } = formData;
+    const { firstName, lastName, email, phone, password, affiliation } =
+      formData;
 
-    if (inputsAreValidated(firstName, lastName, email, phone, password)) {
-      await signup(firstName, lastName, email, phone, password);
+    if (
+      inputsAreValidated(
+        firstName,
+        lastName,
+        email,
+        phone,
+        password,
+        affiliation
+      )
+    ) {
+      await signup(firstName, lastName, email, phone, password, affiliation);
     }
   };
 
-  async function signup(firstName, lastName, email, phone, password) {
+  async function signup(
+    firstName,
+    lastName,
+    email,
+    phone,
+    password,
+    affiliation
+  ) {
     try {
       const response = await fetch("http://localhost:8003/signUp", {
         method: "POST",
@@ -54,6 +72,7 @@ export default function SignUpPage() {
           email: email,
           phone: phone,
           password: password,
+          affiliation: affiliation,
         }),
         headers: {
           "Content-type": "application/json; charset=UTF-8",
@@ -74,7 +93,14 @@ export default function SignUpPage() {
     }
   }
 
-  const inputsAreValidated = (firstName, lastName, email, phone, password) => {
+  const inputsAreValidated = (
+    firstName,
+    lastName,
+    email,
+    phone,
+    password,
+    affiliation
+  ) => {
     setFirstNameAlert(
       firstName === "" ? (
         <Alert severity="error">You must insert your first Name!</Alert>
@@ -100,8 +126,13 @@ export default function SignUpPage() {
         <Alert severity="error">You must insert your password!</Alert>
       ) : null
     );
+    setAffiliationAlert(
+      password === "" ? (
+        <Alert severity="error">You must insert your Affiliation!</Alert>
+      ) : null
+    );
 
-    return firstName && lastName && email && phone && password;
+    return firstName && lastName && email && phone && password && affiliation;
   };
 
   return !errorOnLogin ? (
@@ -193,6 +224,16 @@ export default function SignUpPage() {
                   />
                   {passwordAlert}
                 </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    name="affiliation"
+                    label="Affiliation"
+                    id="affiliation"
+                  />
+                  {passwordAlert}
+                </Grid>
                 <Grid item xs={8}>
                   <TextField
                     fullWidth
@@ -200,6 +241,7 @@ export default function SignUpPage() {
                     label="Intivation Code"
                     name="code"
                   />
+                  {affiliationAlert}
                 </Grid>
               </Grid>
               <MDButton

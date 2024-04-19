@@ -6,6 +6,7 @@ CREATE TABLE users (
     userLastName VARCHAR(50) NOT NULL,
     userEmail VARCHAR(100) NOT NULL,
     userPhone VARCHAR(15),
+    useraffiliation VARCHAR(20) NOT NULL,
     userAdmin BOOLEAN DEFAULT false,
     userPassword VARCHAR(200) NOT NULL,
     userAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp

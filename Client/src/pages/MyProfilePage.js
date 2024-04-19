@@ -32,8 +32,8 @@ export default function MyProfilePage() {
   const [originalFirstName, setOriginalFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [originalLastName, setOriginalLastName] = useState("");
-  const [filiation, setFiliation] = useState("");
-  const [originalFiliation, setOriginalFiliation] = useState("");
+  const [affiliation, setAffiliation] = useState("");
+  const [originalAffiliation, setOriginalAffiliation] = useState("");
   const [email, setEmail] = useState("");
   const [originalEmail, setOriginalEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -61,8 +61,8 @@ export default function MyProfilePage() {
           setOriginalFirstName(jsonResponse[0].userfirstname);
           setLastName(jsonResponse[0].userlastname);
           setOriginalLastName(jsonResponse[0].userlastname);
-          setFiliation(jsonResponse[0].userfiliation);
-          setOriginalFiliation(jsonResponse[0].userfiliation);
+          setAffiliation(jsonResponse[0].useraffiliation);
+          setOriginalAffiliation(jsonResponse[0].useraffiliation);
           setEmail(jsonResponse[0].useremail);
           setOriginalEmail(jsonResponse[0].useremail);
           setPhone(jsonResponse[0].userphone);
@@ -122,7 +122,7 @@ export default function MyProfilePage() {
     if (
       originalFirstName != firstName ||
       originalLastName != lastName ||
-      originalFiliation != filiation ||
+      originalAffiliation != affiliation ||
       originalEmail != email ||
       originalPhone != phone
     ) {
@@ -146,7 +146,7 @@ export default function MyProfilePage() {
           userID: user,
           firstName: firstName,
           lastName: lastName,
-          filiation: filiation,
+          affiliation: affiliation,
           email: email,
           phone: phone,
         }),
@@ -165,7 +165,7 @@ export default function MyProfilePage() {
 
         setOriginalFirstName(firstName);
         setOriginalLastName(lastName);
-        setOriginalFiliation(filiation);
+        setOriginalAffiliation(affiliation);
         setOriginalPhone(phone);
         setOriginalEmail(email);
       } else {
@@ -290,12 +290,13 @@ export default function MyProfilePage() {
               </Grid>
               <Grid item xs={12} sm={5}>
                 <TextField
+                  required
                   fullWidth
-                  id="filiation"
-                  label="Filiation"
-                  name="filiaton"
-                  value={filiation}
-                  onChange={(e) => setFiliation(e.target.value)}
+                  id="affiliation"
+                  label="affiliation"
+                  name="affiliation"
+                  value={affiliation}
+                  onChange={(e) => setAffiliation(e.target.value)}
                   disabled={!editModeActive}
                   sx={{ ml: 2, mt: 2, width: "90%" }}
                 />

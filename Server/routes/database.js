@@ -81,10 +81,11 @@ router.post("/saveUserData", auth.ensureAuthenticated, async (req, res) => {
     await db.updateData(
       "users",
       {
-        userFirstName: req.body.firstName,
-        userLastName: req.body.lastName,
-        userEmail: req.body.email,
-        userPhone: req.body.phone,
+        userfirstName: req.body.firstName,
+        userlastName: req.body.lastName,
+        useremail: req.body.email,
+        userphone: req.body.phone,
+        useraffiliation: req.body.affiliation,
       },
       { userid: req.body.userID }
     );

@@ -113,7 +113,8 @@ async function fetchUserData(collum, comparisonValue) {
        userfirstname,
        userlastname,
        useremail,
-       userphone
+       userphone,
+       useraffiliation
     FROM 
         users
     WHERE ${collum} = $1`;

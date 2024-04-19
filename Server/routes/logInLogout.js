@@ -51,7 +51,7 @@ router.post("/signIn", (req, res, next) => {
 
 //User Registration
 router.post("/signUp", async (req, res) => {
-  const { firstName, lastName, password, email, phone } = req.body;
+  const { firstName, lastName, password, email, phone, affiliation } = req.body;
 
   try {
     const findUserName = await db.fetchData("users", "useremail", email);
@@ -64,6 +64,7 @@ router.post("/signUp", async (req, res) => {
         useremail: email,
         userphone: phone,
         userpassword: hashedPassword,
+        useraffiliation: affiliation,
       };
 
       await db.addData("users", newUser);
