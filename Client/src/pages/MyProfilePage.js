@@ -159,7 +159,7 @@ export default function MyProfilePage() {
 
       if (response.status === 200) {
         setMessage(
-          <Alert severity="success">{"Yor data was saved with success"}</Alert>
+          <Alert severity="success">{"Your data was saved with success"}</Alert>
         );
 
         setOriginalFirstName(firstName);

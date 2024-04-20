@@ -56,7 +56,6 @@ CREATE TABLE conferences (
     confMaxReviewers INT,
     confMinReviewers INT,
     confMaxSubmissions INT,
-    confCode VARCHAR(200),
     confAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp,
     confApproved INT DEFAULT 0
 )

@@ -6,7 +6,17 @@ const router = express.Router();
 
 router.post("/userData", auth.ensureAuthenticated, async (req, res) => {
   try {
-    const result = await db.fetchUserData("userid", req.body.userID);
+    const query = `
+    SELECT 
+      userfirstname,
+      userlastname,
+      useremail,
+      userphone,
+      useraffiliation
+    FROM users
+    WHERE userid = ${req.body.userID}`;
+
+    const result = await db.fetchDataCst(query);
     return res.status(200).send(result);
   } catch (error) {
     return res.status(500).send({ msg: "Internal Error" });

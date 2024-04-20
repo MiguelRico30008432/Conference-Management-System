@@ -5,7 +5,18 @@ const router = express.Router();
 
 router.post("/myConferences", auth.ensureAuthenticated, async (req, res) => {
   try {
-    const result = await db.fetchMyConferences(req.body.userid);
+    const query = `
+      SELECT 
+        userRoles.confid AS "id",
+        confName,
+        conferences.confid,
+        STRING_AGG(userrole, ', ') AS userrole
+      FROM conferences
+      INNER JOIN userRoles ON userRoles.confid = conferences.confid
+      WHERE userRoles.userid = ${req.body.userid} AND confenddate >= NOW()
+      GROUP BY userRoles.confid, confName, conferences.confid`;
+
+    const result = await db.fetchDataCst(query);
     return res.status(200).send(result);
   } catch (error) {
     return res.status(500).send({ msg: "Internal Error" });
