@@ -60,7 +60,12 @@ export default function PendingConferencesPage() {
             "Content-type": "application/json; charset=UTF-8",
           },
           credentials: "include",
-          body: JSON.stringify({ confid: id, acceptOrReject: accept, confowner: owner, confname: name}),
+          body: JSON.stringify({
+            confid: id,
+            acceptOrReject: accept,
+            confowner: owner,
+            confname: name,
+          }),
         }
       );
       if (response.ok) {
@@ -72,7 +77,7 @@ export default function PendingConferencesPage() {
   }
 
   const columns = [
-    { field: "confname", headerName: "Conference Name", width: 200 },
+    { field: "confname", headerName: "Conference Name", width: 400 },
     { field: "confstartdate", headerName: "Conference Start Date", width: 200 },
     { field: "confenddate", headerName: "Conference End Date", width: 200 },
     {
@@ -113,7 +118,12 @@ export default function PendingConferencesPage() {
       width: 100,
       renderCell: (params) => {
         const handleAcceptButtonClick = async () => {
-          await acceptOrRejectConference(params.row.id, 2, params.row.confowner, params.row.confname);
+          await acceptOrRejectConference(
+            params.row.id,
+            2,
+            params.row.confowner,
+            params.row.confname
+          );
         };
 
         return (
@@ -141,7 +151,12 @@ export default function PendingConferencesPage() {
       width: 100,
       renderCell: (params) => {
         const handleRejectButtonClick = async () => {
-          await acceptOrRejectConference(params.row.id, 1, params.row.confowner, params.row.confname);
+          await acceptOrRejectConference(
+            params.row.id,
+            1,
+            params.row.confowner,
+            params.row.confname
+          );
         };
 
         return (
@@ -169,7 +184,11 @@ export default function PendingConferencesPage() {
       {!detailsOpen ? (
         <>
           {error}
-          <CompleteTable columns={columns} rows={rows} numerOfRowsPerPage={5} />
+          <CompleteTable
+            columns={columns}
+            rows={rows}
+            numerOfRowsPerPage={100}
+          />
         </>
       ) : (
         <MoreDetails

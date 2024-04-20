@@ -48,15 +48,15 @@ export default function MyConferences() {
   }, []);
 
   const columns = [
-    { field: "confname", headerName: "Conference Name", width: 200 },
-    { field: "userrole", headerName: "Your Role", width: 100 },
+    { field: "confname", headerName: "Conference Name", width: 600 },
+    { field: "userrole", headerName: "Your Role", width: 200 },
     {
       field: "",
       headerName: "Enter in conference",
       description:
         "This column have a button taht allows the user to enter int a specific conference",
       sortable: false,
-      width: 300,
+      width: 200,
       renderCell: (params) => {
         const handleMoreDetailsButtonClick = () => {
           console.log(params.row);
@@ -74,7 +74,7 @@ export default function MyConferences() {
               minHeight: "30px",
             }}
           >
-            Details
+            Enter
           </MDButton>
         );
       },
