@@ -2,6 +2,7 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import MDButton from "components/MDButton";
 import Alert from "@mui/material/Alert";
+import Card from "@mui/material/Card";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "OurComponents/footer/Footer";
@@ -184,11 +185,14 @@ export default function PendingConferencesPage() {
       {!detailsOpen ? (
         <>
           {error}
-          <CompleteTable
-            columns={columns}
-            rows={rows}
-            numerOfRowsPerPage={100}
-          />
+          <Card>
+            <CompleteTable
+              columns={columns}
+              rows={rows}
+              numerOfRowsPerPage={100}
+              height={200}
+            />
+          </Card>
         </>
       ) : (
         <MoreDetails
@@ -196,6 +200,7 @@ export default function PendingConferencesPage() {
           onClose={() => setDetailsOpen(false)}
         />
       )}
+      <br></br>
       <Footer />
     </DashboardLayout>
   );

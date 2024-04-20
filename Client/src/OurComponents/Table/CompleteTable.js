@@ -7,32 +7,18 @@ export default function CompleteTable({
   columns,
   rows,
   withCheckBoxSelection = false,
-  height = 400,
+  height,
   width = "100%",
   numerOfRowsPerPage = 5,
 }) {
   const [selectedRows, setSelectedRows] = useState([]);
 
-  const getLine = (itm) => {
-    const lines = [];
-    for (const row of rows) {
-      for (const selectedRow of selectedRows) {
-        if (selectedRow === row.id) {
-          lines.push(
-            <p key={row.id}>
-              {`ID: ${row.id}, First Name: ${row.firstName}, Last Name: ${row.lastName}`}
-            </p>
-          );
-        }
-      }
-    }
-    return lines;
-  };
-
   return (
     <>
       <Card>
-        <div style={{ height: height, width: width }}>
+        <div
+          style={{ height: rows.length > 0 ? "100%" : height, width: width }}
+        >
           <DataGrid
             rows={rows}
             columns={columns}
@@ -41,16 +27,38 @@ export default function CompleteTable({
                 paginationModel: { page: 0, pageSize: numerOfRowsPerPage },
               },
             }}
-            pageSizeOptions={[6, 10]}
+            pageSizeOptions={[10, 50, { value: 100, label: "100" }]}
             checkboxSelection={withCheckBoxSelection}
             onRowSelectionModelChange={
               withCheckBoxSelection ? (itm) => setSelectedRows(itm) : null
             }
             sx={{
-              "& .MuiDataGrid-columnHeader, & .MuiDataGrid-cell": {
+              //colunas
+              "& .MuiDataGrid-columnHeader": {
                 backgroundColor: "white",
-                color: "white",
-                fontWeight: 10,
+                color: "#1F4576",
+                fontWeight: 11,
+              },
+              //linhas
+              "& .MuiDataGrid-cell": {
+                backgroundColor: "white",
+                color: "#1F4576",
+                fontWeight: 11,
+              },
+              //contorno aquando a seleção da célula
+              "& .MuiDataGrid-cell.MuiDataGrid-cell:focus": {
+                outline: "none",
+              },
+              //cor da linha selecionada
+              "& .MuiDataGrid-row.Mui-selected": {
+                backgroundColor: "#E6E6E6",
+              },
+              "& .MuiDataGrid-row:hover.Mui-selected": {
+                backgroundColor: "#E6E6E6",
+              },
+              //Indicador do número de linhas selecionadas
+              "& .MuiDataGrid-selectedRowCount": {
+                color: "#1F4576",
               },
             }}
           />

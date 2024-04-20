@@ -14,7 +14,13 @@ export default function CallForPapers() {
   return (
     <DashboardLayout>
       <UpperNavBar />
-      <CompleteTable columns={columns} rows={rows} numerOfRowsPerPage={5} />
+      <CompleteTable
+        columns={columns}
+        rows={rows}
+        numerOfRowsPerPage={100}
+        height={200}
+      />
+      <br></br>
       <Footer />
     </DashboardLayout>
   );

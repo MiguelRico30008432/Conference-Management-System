@@ -6,6 +6,8 @@ import CompleteTable from "OurComponents/Table/CompleteTable";
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../auth.context";
 import Alert from "@mui/material/Alert";
+import Card from "@mui/material/Card";
+
 import MDButton from "components/MDButton";
 
 export default function MyConferences() {
@@ -27,6 +29,8 @@ export default function MyConferences() {
         });
 
         const jsonResponse = await response.json();
+
+        console.log(jsonResponse);
 
         if (response.status === 200) {
           for (let line of jsonResponse) {
@@ -85,7 +89,15 @@ export default function MyConferences() {
     <DashboardLayout>
       <UpperNavBar />
       {error}
-      <CompleteTable columns={columns} rows={rows} numerOfRowsPerPage={5} />
+      <Card>
+        <CompleteTable
+          columns={columns}
+          rows={rows}
+          numerOfRowsPerPage={5}
+          height={200}
+        />
+      </Card>
+      <br></br>
       <Footer />
     </DashboardLayout>
   );
