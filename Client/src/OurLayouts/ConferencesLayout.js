@@ -1,4 +1,3 @@
-
 // prop-types is a library for typechecking of props
 import PropTypes from "prop-types";
 
@@ -16,14 +15,9 @@ import PageLayout from "examples/LayoutContainers/PageLayout";
 import { AuthContext } from "../auth.context";
 
 export default function ConferencesLayout({ coverHeight, image, children }) {
-  const { setIsLoggedIn, setUser, setIsAdmin } = useContext(AuthContext);
-
-
   return (
     <PageLayout>
-      <ConferenceNavBar
-        dark
-      />
+      <ConferenceNavBar dark />
       <MDBox
         minHeight={coverHeight}
         borderRadius="xl"
@@ -32,7 +26,10 @@ export default function ConferencesLayout({ coverHeight, image, children }) {
         pt={6}
         pb={10}
         sx={{
-          backgroundImage: ({ functions: { linearGradient, rgba }, palette: { gradients } }) =>
+          backgroundImage: ({
+            functions: { linearGradient, rgba },
+            palette: { gradients },
+          }) =>
             image &&
             `${linearGradient(
               rgba(gradients.dark.main, 0.4),
@@ -43,7 +40,12 @@ export default function ConferencesLayout({ coverHeight, image, children }) {
           backgroundRepeat: "no-repeat",
         }}
       />
-      <MDBox mt={{ xs: -20, lg: -20 }} px={1} width="calc(100% - 2rem)" mx="auto">
+      <MDBox
+        mt={{ xs: -20, lg: -20 }}
+        px={1}
+        width="calc(100% - 2rem)"
+        mx="auto"
+      >
         <Grid container spacing={1} justifyContent="center">
           <Grid item xs={11} sm={9} md={5} lg={4} xl={4}>
             {children}
@@ -55,12 +57,12 @@ export default function ConferencesLayout({ coverHeight, image, children }) {
 }
 
 // Setting default props for the CoverLayout
-SignInAndOutLayout.defaultProps = {
+ConferencesLayout.defaultProps = {
   coverHeight: "35vh",
 };
 
 // Typechecking props for the CoverLayout
-SignInAndOutLayout.propTypes = {
+ConferencesLayout.propTypes = {
   coverHeight: PropTypes.string,
   image: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,

@@ -5,11 +5,21 @@ import Reviews from "pages/ConferencePages/ReviewsPage";
 import Mails from "pages/ConferencePages/EmailsPage";
 import ComiteManagement from "pages/ConferencePages/ComiteManagement";
 import ConferenceDefinitions from "pages/ConferencePages/ConferenceDefinitionsPage";
+import ConferencePage from "pages/ConferencePages/ConferencePage";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
 
 const routes = [
+  {
+    type: "collapse",
+    name: "ConferencePage",
+    key: "ConferencePage",
+    icon: <Icon fontSize="small">assignment</Icon>,
+    route: "/MyConferences/Conference",
+    component: <ConferencePage />,
+    display: true,
+  },
   {
     type: "collapse",
     name: "Submissions",

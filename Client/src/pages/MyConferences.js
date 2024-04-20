@@ -2,9 +2,12 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "OurComponents/footer/Footer";
 import UpperNavBar from "OurComponents/navBars/UpperNavBar";
 
+import ConferencePage from "./ConferencePages/ConferencePage";
+
 import CompleteTable from "OurComponents/Table/CompleteTable";
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../auth.context";
+import { ConferenceContext } from "../conference.context";
 import Alert from "@mui/material/Alert";
 import Card from "@mui/material/Card";
 
@@ -12,9 +15,11 @@ import MDButton from "components/MDButton";
 
 export default function MyConferences() {
   const { user } = useContext(AuthContext);
+  const { setConfID, setUserRole } = useContext(ConferenceContext);
 
   const [rows, setRow] = useState([]);
   const [error, setError] = useState(null);
+  const [openConference, setOpenConference] = useState(false);
 
   useEffect(() => {
     async function getMyConferences() {
@@ -61,7 +66,9 @@ export default function MyConferences() {
       width: 200,
       renderCell: (params) => {
         const handleMoreDetailsButtonClick = () => {
-          console.log(params.row);
+          setConfID(params.row.confid);
+          setUserRole(params.row.userrole);
+          setOpenConference(true);
         };
 
         return (
@@ -84,19 +91,25 @@ export default function MyConferences() {
   ];
 
   return (
-    <DashboardLayout>
-      <UpperNavBar />
-      {error}
-      <Card>
-        <CompleteTable
-          columns={columns}
-          rows={rows}
-          numerOfRowsPerPage={5}
-          height={200}
-        />
-      </Card>
-      <br></br>
-      <Footer />
-    </DashboardLayout>
+    <>
+      {openConference ? (
+        <ConferencePage></ConferencePage>
+      ) : (
+        <DashboardLayout>
+          <UpperNavBar />
+          {error}
+          <Card>
+            <CompleteTable
+              columns={columns}
+              rows={rows}
+              numerOfRowsPerPage={5}
+              height={200}
+            />
+          </Card>
+          <br></br>
+          <Footer />
+        </DashboardLayout>
+      )}
+    </>
   );
 }

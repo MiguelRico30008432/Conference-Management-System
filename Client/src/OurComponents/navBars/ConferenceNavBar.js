@@ -1,18 +1,3 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
 import { useState, useEffect } from "react";
 
 // react-router components
@@ -47,7 +32,8 @@ export default function ConferenceNavBar({ transparent, light, action }) {
   const [mobileNavbar, setMobileNavbar] = useState(false);
   const [mobileView, setMobileView] = useState(false);
 
-  const openMobileNavbar = ({ currentTarget }) => setMobileNavbar(currentTarget.parentNode);
+  const openMobileNavbar = ({ currentTarget }) =>
+    setMobileNavbar(currentTarget.parentNode);
   const closeMobileNavbar = () => setMobileNavbar(false);
 
   useEffect(() => {
@@ -103,7 +89,12 @@ export default function ConferenceNavBar({ transparent, light, action }) {
       >
         {/* Esta MDBox contem os links. É onde estão definidas as primeiras opções do menu (Submissões / Bidding / Reviews / Envio de Mails / Gestão do Comitê / Definições da Conferência) */}
         <MDBox color="inherit" display={{ xs: "none", lg: "flex" }} m={0} p={0}>
-          <DefaultNavbarLink icon="dashboard" name="Return to Home" route="/HomePage" light={light} />
+          <DefaultNavbarLink
+            icon="dashboard"
+            name="Return"
+            route="/HomePage"
+            light={light}
+          />
           <DefaultNavbarLink
             icon="key"
             name="sign in"
@@ -115,10 +106,10 @@ export default function ConferenceNavBar({ transparent, light, action }) {
             name="sign up"
             route="/Signup"
             light={light}
-          />   
+          />
         </MDBox>
-       
-        {/* Esta MDBox define a navbar quando estamos em modo mobile */}          
+
+        {/* Esta MDBox define a navbar quando estamos em modo mobile */}
         <MDBox
           display={{ xs: "inline-block", lg: "none" }}
           lineHeight={0}
@@ -131,20 +122,22 @@ export default function ConferenceNavBar({ transparent, light, action }) {
           <Icon fontSize="default">{mobileNavbar ? "close" : "menu"}</Icon>
         </MDBox>
       </MDBox>
-      {mobileView && <DefaultNavbarMobile open={mobileNavbar} close={closeMobileNavbar} />}
+      {mobileView && (
+        <DefaultNavbarMobile open={mobileNavbar} close={closeMobileNavbar} />
+      )}
     </Container>
   );
 }
 
 // Setting default values for the props of DefaultNavbar
-SignInOutNavBar.defaultProps = {
+ConferenceNavBar.defaultProps = {
   transparent: false,
   light: false,
   action: false,
 };
 
-// Typechecking props for the SignInOutNavBar
-SignInOutNavBar.propTypes = {
+// Typechecking props for the ConferenceNavBar
+ConferenceNavBar.propTypes = {
   transparent: PropTypes.bool,
   light: PropTypes.bool,
   action: PropTypes.oneOfType([

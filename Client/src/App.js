@@ -30,6 +30,7 @@ import createCache from "@emotion/cache";
 
 // Material Dashboard 2 React routes
 import routes from "routes";
+import conferenceRoutes from "conferenceRoutes";
 
 // Material Dashboard 2 React contexts
 import {
@@ -197,6 +198,7 @@ export default function App() {
       {layout === "vr" && <NavBarSettings />}
       <Routes>
         {getRoutes(routes)}
+        {getRoutes(conferenceRoutes)}
         <Route path="*" element={<Navigate to="/PageNotFound" />} />
         <Route index element={<Navigate to="/HomePage" />} />
       </Routes>
