@@ -17,7 +17,7 @@ export default function PendingConferencesPage() {
   const [dataForDetails, setDataForDetails] = useState({});
   const [rows, setRow] = useState([]);
   const [error, setError] = useState(null);
-  const { isLoggedIn } = useContext(AuthContext);
+  const { isLoggedIn, isAdmin } = useContext(AuthContext);
 
   useEffect(() => {
     async function getRows() {
@@ -51,7 +51,7 @@ export default function PendingConferencesPage() {
       }
     }
 
-    if (isLoggedIn) {
+    if (isLoggedIn && isAdmin) {
       getRows();
     }
   }, [isLoggedIn]);
