@@ -167,7 +167,8 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
       (key === "MyProfile" && !isLoggedIn) ||
       (key === "MyConferences" && !isLoggedIn) ||
       (key === "CallForPapers" && !isLoggedIn) ||
-      (key === "ConferencesTitle" && !isLoggedIn)
+      (key === "ConferencesTitle" && !isLoggedIn) ||
+      (key === "CreateConference" && !isLoggedIn)
     ) {
       return true;
     }

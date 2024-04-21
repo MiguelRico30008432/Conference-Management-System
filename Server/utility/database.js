@@ -26,6 +26,17 @@ async function fetchData(table, collum, comparisonValue) {
   }
 } // testado para a tabela users
 
+async function fetchAllData(table, column) {
+  // utilizada para qualquer tipo de search onde recebe o nome da tabela, da coluna e do parametro de comparação
+  try {
+    const queryText = `SELECT ${column} FROM ${table}`;
+    const result = await pool.query(queryText, []);
+    return result.rows;
+  } catch (err) {
+    log.addLog(err, "database", "fetchData");
+  }
+}
+
 async function addData(table, entryParameters) {
   try {
     const keys = Object.keys(entryParameters);
