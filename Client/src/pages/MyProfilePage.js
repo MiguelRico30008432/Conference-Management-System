@@ -40,6 +40,29 @@ export default function MyProfilePage() {
 
   const [password, setPasword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
+/* Fetch test about giving userinfo to the frontend
+  fetch('http://localhost:8003/authUser', {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Cache-Control': 'no-cache'
+    }
+  })
+  .then(response => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error(`Server responded with status: ${response.status}`);
+    }
+  })
+  .then(data => {
+    console.log('User data:', data);
+    // Use the data as needed in your app
+  })
+  .catch(error => {
+    console.error('Fetch error:', error);
+  });
+*/
 
   useEffect(() => {
     async function getUserData() {

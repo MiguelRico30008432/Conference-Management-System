@@ -104,5 +104,10 @@ router.post("/logOut", auth.ensureAuthenticated, (request, response) => {
     });
   });
 });
+//Endpoint used for giving info about the user to the frontend pages
+router.get('/authUser', auth.ensureAuthenticated, (req, res) => {
+  const { userid, useremail, useradmin } = req.user;
+  res.json({ userid, useremail, useradmin });
+});
 
 module.exports = router;

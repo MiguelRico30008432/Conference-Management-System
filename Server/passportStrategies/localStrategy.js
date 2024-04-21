@@ -15,7 +15,6 @@ passport.deserializeUser(async (id, done) => {
         }
         const userInfo = {
             "userid": findUser[0].userid,
-            "username": findUser[0].username,
             "useremail": findUser[0].useremail,
             "useradmin": findUser[0].useradmin
         };
