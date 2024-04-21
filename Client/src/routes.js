@@ -7,6 +7,7 @@ import PendingConferencesPage from "pages/PendingConferencesPage";
 import MyConferences from "pages/MyConferences";
 import MyProfilePage from "pages/MyProfilePage";
 import CallForPapers from "pages/CallForPapers";
+import CreateConference from "pages/CreateConference";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -65,6 +66,15 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/MyConferences",
     component: <MyConferences />,
+    display: true,
+  },
+  {
+    type: "collapse",
+    name: "Create Conference",
+    key: "CreateConference",
+    icon: <Icon fontSize="small">dashboard</Icon>,
+    route: "/CreateConference",
+    component: <CreateConference />,
     display: true,
   },
   {
