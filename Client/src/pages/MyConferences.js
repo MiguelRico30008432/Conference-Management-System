@@ -14,7 +14,7 @@ import Card from "@mui/material/Card";
 import MDButton from "components/MDButton";
 
 export default function MyConferences() {
-  const { user } = useContext(AuthContext);
+  const { user, isLoggedIn } = useContext(AuthContext);
   const { setConfID, setUserRole } = useContext(ConferenceContext);
 
   const [rows, setRow] = useState([]);
@@ -50,9 +50,10 @@ export default function MyConferences() {
         );
       }
     }
-
-    getMyConferences();
-  }, []);
+    if (isLoggedIn) {
+      getMyConferences();
+    }
+  }, [isLoggedIn]);
 
   const columns = [
     { field: "confname", headerName: "Conference Name", width: 600 },

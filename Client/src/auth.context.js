@@ -1,24 +1,46 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
+
 import PropTypes from "prop-types";
 
 const AuthContext = React.createContext();
 
 function AuthProviderWrapper(props) {
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    localStorage.getItem("isLoggedIn") === "true"
-  );
-  const [user, setUser] = useState(localStorage.getItem("user"));
-  const [isAdmin, setIsAdmin] = useState(
-    localStorage.getItem("isAdmin") === "true"
-  );
-  const [userRole, setUserRole] = useState(localStorage.getItem("userRole"));
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
+  const [userEmail, setUserEmail] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    localStorage.setItem("isLoggedIn", isLoggedIn);
-    localStorage.setItem("user", user);
-    localStorage.setItem("isAdmin", isAdmin);
-    localStorage.setItem("userRole", userRole);
-  }, [isLoggedIn, user, isAdmin, userRole]);
+    async function getUserAuthData() {
+      try {
+        const response = await fetch("http://localhost:8003/authUser", {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const userData = await response.json();
+          setIsLoggedIn(true);
+          setUser(userData.userid);
+          setUserEmail(userData.useremail);
+          setIsAdmin(userData.useradmin);
+        }
+      } catch (error) {
+        console.error("Error in auth context", error);
+        setErrorDialogOpen(true);
+        navigate("/");
+      }
+    }
+
+    getUserAuthData();
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -27,13 +49,21 @@ function AuthProviderWrapper(props) {
         setIsLoggedIn,
         user,
         setUser,
+        userEmail,
+        setUserEmail,
         isAdmin,
         setIsAdmin,
-        userRole,
-        setUserRole,
       }}
     >
       {props.children}
+
+      <PopUpWithMessage
+        open={errorDialogOpen}
+        handleConfirm={() => setErrorDialogOpen(false)}
+        justConfirmButton={true}
+        title={"Sorry but it seems that you lost your connection :("}
+        text={"Please try again later..."}
+      />
     </AuthContext.Provider>
   );
 }

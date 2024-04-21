@@ -11,20 +11,30 @@ export default function PopUpWithMessage({
   handleClose,
   handleConfirm,
   text,
+  title,
+  justConfirmButton = false,
 }) {
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Confirm Email Change</DialogTitle>
+      <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <DialogContentText>{text}</DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} color="primary">
-          Cancel
-        </Button>
-        <Button onClick={handleConfirm} color="primary">
-          Confirm
-        </Button>
+        {justConfirmButton ? (
+          <Button onClick={handleConfirm} color="primary">
+            Confirm
+          </Button>
+        ) : (
+          <>
+            <Button onClick={handleClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handleConfirm} color="primary">
+              Confirm
+            </Button>
+          </>
+        )}
       </DialogActions>
     </Dialog>
   );

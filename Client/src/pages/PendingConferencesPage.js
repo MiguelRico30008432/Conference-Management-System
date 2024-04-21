@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import MDButton from "components/MDButton";
 import Alert from "@mui/material/Alert";
 import Card from "@mui/material/Card";
@@ -10,11 +10,14 @@ import UpperNavBar from "OurComponents/navBars/UpperNavBar";
 import CompleteTable from "OurComponents/Table/CompleteTable";
 import MoreDetails from "OurComponents/Info/MoreDetails";
 
+import { AuthContext } from "../auth.context";
+
 export default function PendingConferencesPage() {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [dataForDetails, setDataForDetails] = useState({});
   const [rows, setRow] = useState([]);
   const [error, setError] = useState(null);
+  const { isLoggedIn } = useContext(AuthContext);
 
   useEffect(() => {
     async function getRows() {
@@ -48,8 +51,10 @@ export default function PendingConferencesPage() {
       }
     }
 
-    getRows();
-  }, []);
+    if (isLoggedIn) {
+      getRows();
+    }
+  }, [isLoggedIn]);
 
   async function acceptOrRejectConference(id, accept, owner, name) {
     try {
