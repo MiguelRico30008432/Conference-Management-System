@@ -73,6 +73,13 @@ export default function CreateConference() {
       setDisclaimer(
         "Submission, Review, or Bidding start date cannot be earlier than conference start date."
       );
+      if (
+        submissionStartDate >= startDate &&
+        reviewStartDate >= startDate && 
+        biddingStartDate >= startDate
+      ){
+        setDisclaimer("");
+      }
     } else if (
       submissionEndDate >= endDate ||
       reviewEndDate >= endDate || 
@@ -81,7 +88,11 @@ export default function CreateConference() {
       setDisclaimer(
         "Submission, Review, or Bidding end date cannot be later than conference end date."
       );
-      if (biddingEndDate < endDate){
+      if (
+        biddingEndDate < endDate &&
+        submissionEndDate < endDate &&
+        reviewEndDate < endDate
+      ){
         setDisclaimer("");
       }
     } else {
@@ -390,6 +401,7 @@ export default function CreateConference() {
                       onChange={(event) => {
                         setStartDate(event.target.value);
                         setBiddingStartDate(event.target.value);
+                        handleAllStartDates(event);
                       }}
                     />
                   </Grid>

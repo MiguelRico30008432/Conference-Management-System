@@ -98,4 +98,5 @@ module.exports = {
   addData,
   deleteData,
   updateData,
+  fetchAllData,
 };
