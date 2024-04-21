@@ -31,9 +31,6 @@ function AuthProviderWrapper(props) {
           setUser(userData.userid);
           setUserEmail(userData.useremail);
           setIsAdmin(userData.useradmin);
-        } else {
-          setErrorDialogOpen(true);
-          navigate("/");
         }
       } catch (error) {
         console.error("Error in auth context", error);
