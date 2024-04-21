@@ -55,7 +55,10 @@ export default function SignInPage() {
         credentials: "include",
       });
 
+      
+      //console.log("Received response from server:", response); //Its used to test if user info is being passed by the backend
       const jsonResponse = await response.json();
+      //console.log("Parsed JSON response:", jsonResponse); //Its used to test if user info is being passed by the backend
 
       if (response.ok) {
         setIsLoggedIn(true);

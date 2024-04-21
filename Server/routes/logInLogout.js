@@ -18,12 +18,8 @@ router.post("/signIn", (req, res, next) => {
     if (!user) {
       // Check the message from Passport to determine the reason for failure
       if (info.message === "User Not Found") {
-        // If the user doesn't exist
-        return res
-          .status(404)
-          .send({ success: false, message: "User not found." });
+        return res.status(404).send({ success: false, message: "User not found." });
       } else {
-        // For other authentication failures, such as incorrect password
         return res.status(401).send({
           success: false,
           message: "Unauthorized. Invalid credentials.",
@@ -33,18 +29,18 @@ router.post("/signIn", (req, res, next) => {
     // If this function gets called, authentication was successful.
     req.logIn(user, (loginErr) => {
       if (loginErr) {
-        // Handle error during the login session establishment
-        return res
-          .status(500)
-          .send({ success: false, message: "Failed to establish a session." });
+        return res.status(500).send({ success: false, message: "Failed to establish a session." });
       }
-      //adcição da informação do user à cookie (userid e admin)
-      res.cookie("UserID", user.userid, { maxAge: 3600000, httpOnly: false });
-      res.cookie("Admin", user.useradmin, { maxAge: 3600000, httpOnly: false });
-      // Successful authentication
-      return res
-        .status(200)
-        .send({ success: true, message: "Authenticated successfully" });
+      // Successful authentication, send user details
+      return res.status(200).send({
+        success: true,
+        message: "Authenticated successfully",
+        user: {
+          userid: user.userid,
+          useremail: user.useremail,
+          useradmin: user.useradmin
+        }
+      });
     });
   })(req, res, next);
 });
