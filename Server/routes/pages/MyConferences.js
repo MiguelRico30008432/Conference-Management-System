@@ -25,7 +25,7 @@ router.post("/myConferences", auth.ensureAuthenticated, async (req, res) => {
 
 router.post("/createConference", auth.ensureAuthenticated, async (req, res) => {
   try {
-    const { title, confType, confArea, startDate, endDate, submissionStartDate, submissionEndDate, reviewStartDate, reviewEndDate, biddingStartDate, 
+    const { title, user, confType, confArea, startDate, endDate, submissionStartDate, submissionEndDate, reviewStartDate, reviewEndDate, biddingStartDate, 
     biddingEndDate, description, country, city, numberMinReviewrs, numberMaxReviewrs, numberMaxSubmissions, confLink } = req.body;
     
     const findTypeId = await db.fetchData("conftypes", "conftypename", confType);
@@ -38,6 +38,7 @@ router.post("/createConference", auth.ensureAuthenticated, async (req, res) => {
       "conferences",
       {
         confname: title,
+        confowner: user,
         conftype: conftypeid,
         confareaid: confareaid,
         confstartdate: startDate,
