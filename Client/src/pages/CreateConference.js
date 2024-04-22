@@ -1,6 +1,7 @@
 // react-router-dom components
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../auth.context";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -45,60 +46,34 @@ export default function CreateConference() {
   const [conferenceTypes, setConferenceTypes] = useState([]);
   const [conferenceAreas, setConferenceAreas] = useState([]);
 
+  const { user } = useContext(AuthContext);
+
 //Handles the disclaimers in the Date picker
 
-  const handleStartDateChange = (event) => {
-    const newStartDate = new Date(event.target.value);
-    const todayDate = new Date();
-    if (newStartDate <= todayDate){
+const handleStartDateChange = (event) => {
+  const newStartDate = new Date(event.target.value);
+  const todayDate = new Date();
+  // Adding 10 days to todayDate (a rever)
+  todayDate.setDate(todayDate.getDate() + 10);
+  if (newStartDate <= todayDate) {
       setDisclaimer(
-      "Conference Start Date must be superior to today."
+          "Conference Start Date in minimum 10days."
       );
-    } else {
+  } else {
       setDisclaimer("");
-    };
-  };
+  }
+};
 
-  const handleDateChange = (event) => {
+  const handleEndDateChange = (event) => {
     const newEndDate = event.target.value;
     setEndDate(newEndDate);
-
-    if (newEndDate < startDate) {
-      setDisclaimer("End date cannot be earlier than start date.");
-    } else if (
-      submissionStartDate < startDate ||
-      reviewStartDate < startDate ||
-      biddingStartDate < startDate
-    ) {
-      setDisclaimer(
-        "Submission, Review, or Bidding start date cannot be earlier than conference start date."
-      );
-      if (
-        submissionStartDate >= startDate &&
-        reviewStartDate >= startDate && 
-        biddingStartDate >= startDate
-      ){
-        setDisclaimer("");
-      }
-    } else if (
-      submissionEndDate >= endDate ||
-      reviewEndDate >= endDate || 
-      biddingEndDate >= endDate 
-    ){
-      setDisclaimer(
-        "Submission, Review, or Bidding end date cannot be later than conference end date."
-      );
-      if (
-        biddingEndDate < endDate &&
-        submissionEndDate < endDate &&
-        reviewEndDate < endDate
-      ){
-        setDisclaimer("");
-      }
+    if (newEndDate <= startDate) {
+      setDisclaimer('Conference end date cannot be earlier than Conference start date.');
     } else {
-      setDisclaimer("");
+      setDisclaimer('');
     }
   };
+
 
   //Handles the Dropdown menus
   const handleTypeChange = (event) => {
@@ -143,22 +118,20 @@ export default function CreateConference() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const formData = Object.fromEntries(data.entries());
-    const { startDate, endDate, submissionStartDate, submissionEndDate, reviewStartDate, reviewEndDate, 
-      biddingStartDate, biddingEndDate } = formData;
+    const { title, startDate, endDate, submissionStartDate, submissionEndDate, reviewStartDate, reviewEndDate, 
+      biddingStartDate, biddingEndDate, description, country, city, numberMinReviewrs, numberMaxReviewrs, numberMaxSubmissions, confLink } = formData;
 
-    const { title, confType, confArea, description, country, city, numberMinReviewrs, numberMaxReviewrs, numberMaxSubmissions, confLink } = formData;
-
-    await createConference( title, confType, confArea, startDate, endDate, submissionStartDate, submissionEndDate, reviewStartDate, 
+    await createConference( title, user, confType, confArea, startDate, endDate, submissionStartDate, submissionEndDate, reviewStartDate, 
       reviewEndDate, biddingStartDate, biddingEndDate, description, country, city, numberMinReviewrs, numberMaxReviewrs, numberMaxSubmissions, confLink);
   };
 
-  const createConference = async (title, confType, confArea, startDate, endDate, submissionStartDate, submissionEndDate, reviewStartDate, reviewEndDate, 
+  const createConference = async (title, user, confType, confArea, startDate, endDate, submissionStartDate, submissionEndDate, reviewStartDate, reviewEndDate, 
     biddingStartDate, biddingEndDate, description, country, city, numberMinReviewrs, numberMaxReviewrs, numberMaxSubmissions, confLink) => {
     try {
       const response = await fetch("http://localhost:8003/createConference", {
         method: "POST",
         body: JSON.stringify({ 
-          title: title, confType: confType, confArea: confArea, startDate: startDate, endDate: endDate, submissionStartDate: submissionStartDate, 
+          title: title, user: user, confType: confType, confArea: confArea, startDate: startDate, endDate: endDate, submissionStartDate: submissionStartDate, 
           submissionEndDate: submissionEndDate, reviewStartDate: reviewStartDate, reviewEndDate: reviewEndDate, 
           biddingStartDate: biddingStartDate, biddingEndDate: biddingEndDate, description: description, country: country, 
           city: city, numberMinReviewrs: numberMinReviewrs, numberMaxReviewrs: numberMaxReviewrs, numberMaxSubmissions: numberMaxSubmissions, confLink: confLink}),
@@ -320,8 +293,8 @@ export default function CreateConference() {
                       InputLabelProps={{ shrink: true }}
                       sx={{ margin: '5px 0px 0px 0px' }}
                       onChange={(event) => {
-                        handleDateChange(event);
                         setEndDate(event.target.value);
+                        handleEndDateChange(event);
                       }}
                     />
                   </Grid>
@@ -336,7 +309,6 @@ export default function CreateConference() {
                       InputLabelProps={{ shrink: true }}
                       sx={{ margin: '0px 0px 0px 15px' }}
                       onChange={(event) => {
-                        setStartDate(event.target.value);
                         setSubmissionStartDate(event.target.value);
                       }}
                     />
@@ -351,7 +323,6 @@ export default function CreateConference() {
                       id="submissionEndDate"
                       InputLabelProps={{ shrink: true }}
                       onChange={(event) => {
-                        handleDateChange(event);
                         setSubmissionEndDate(event.target.value);
                       }}
                     />
@@ -367,7 +338,6 @@ export default function CreateConference() {
                       InputLabelProps={{ shrink: true }}
                       sx={{ marginLeft: '15px' }}
                       onChange={(event) => {
-                        setStartDate(event.target.value);
                         setReviewStartDate(event.target.value);
                       }}
                     />
@@ -383,7 +353,6 @@ export default function CreateConference() {
                       InputLabelProps={{ shrink: true }}
                       sx={{ marginRight:'20px' }}
                       onChange={(event) => {
-                        handleDateChange(event);
                         setReviewEndDate(event.target.value);
                       }}
                     />
@@ -399,9 +368,7 @@ export default function CreateConference() {
                       InputLabelProps={{ shrink: true }}
                       sx={{ marginLeft: '15px' }}
                       onChange={(event) => {
-                        setStartDate(event.target.value);
                         setBiddingStartDate(event.target.value);
-                        handleAllStartDates(event);
                       }}
                     />
                   </Grid>
@@ -416,7 +383,6 @@ export default function CreateConference() {
                       InputLabelProps={{ shrink: true }}
                       sx={{ marginRight:'20px', marginBottom: '15px'}}
                       onChange={(event) => {
-                        handleDateChange(event);
                         setBiddingEndDate(event.target.value);
                       }}
                     />
