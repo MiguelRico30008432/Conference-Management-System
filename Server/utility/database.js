@@ -88,7 +88,7 @@ async function fetchDataCst(select) {
     const result = await pool.query(select);
     return result.rows;
   } catch (err) {
-    log.addLog(err, "database", "fetchData");
+    log.addLog(err, "database", "fetchDataCst");
   }
 }
 

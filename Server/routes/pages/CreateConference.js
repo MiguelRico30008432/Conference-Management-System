@@ -63,7 +63,14 @@ router.post("/createConference", auth.ensureAuthenticated, async (req, res) => {
       confwebpage: confLink,
     });
 
-    const addedConfID = await db.fetchData("conferences", "confname", title);
+    const query = `
+      SELECT 
+        confid
+      FROM conferences
+      WHERE confowner = ${user} AND confenddate >= NOW()
+      ORDER BY confadddate DESC`;
+
+    const addedConfID = await db.fetchDataCst(query);
 
     await db.addData("userroles", {
       userid: user,
