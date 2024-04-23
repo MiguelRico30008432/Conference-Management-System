@@ -60,10 +60,12 @@ export default function MyConferences() {
     { field: "userrole", headerName: "Your Role", width: 200 },
     {
       field: "",
-      headerName: "Enter in conference",
+      headerName: "",
       description:
-        "This column have a button taht allows the user to enter int a specific conference",
+        "This column has a button taht allows the user to enter int a specific conference",
       sortable: false,
+      disableColumnMenu: true,
+      resizable: false,
       width: 200,
       renderCell: (params) => {
         const handleMoreDetailsButtonClick = () => {

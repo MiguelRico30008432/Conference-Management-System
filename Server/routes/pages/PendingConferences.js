@@ -1,6 +1,7 @@
 const express = require("express");
 const db = require("../../utility/database");
 const auth = require("../../utility/verifications");
+const email = require("../../utility/emails");
 const router = express.Router();
 
 router.get(
@@ -68,7 +69,7 @@ router.post("/acceptOrRejectConference", async function (req, res) {
       additionalInfo: "For more information, please contact our support team.",
     };
 
-    sendEmail(userEmail, emailSubject, emailReplacements);
+    email.sendEmail(userEmail, emailSubject, emailReplacements);
 
     return res.status(200).send({ msg: `Email notification sent.` });
   } catch (error) {

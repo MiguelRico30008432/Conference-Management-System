@@ -88,10 +88,12 @@ export default function PendingConferencesPage() {
     { field: "confenddate", headerName: "Conference End Date", width: 200 },
     {
       field: "More Info.",
-      headerName: "More Info.",
+      headerName: "",
       description:
-        "This column have a button to give details about the conference",
+        "This column has a button to give details about the conference",
       sortable: false,
+      disableColumnMenu: true,
+      resizable: false,
       width: 100,
       renderCell: (params) => {
         const handleMoreDetailsButtonClick = () => {
@@ -118,9 +120,11 @@ export default function PendingConferencesPage() {
     },
     {
       field: "Aprove",
-      headerName: "Aprove",
-      description: "This column have a button to accept the conference",
+      headerName: "",
+      description: "This column has a button to accept the conference",
       sortable: false,
+      disableColumnMenu: true,
+      resizable: false,
       width: 100,
       renderCell: (params) => {
         const handleAcceptButtonClick = async () => {
@@ -151,9 +155,11 @@ export default function PendingConferencesPage() {
     },
     {
       field: "Reject",
-      headerName: "Reject",
-      description: "This column have a button to reject the conference",
+      headerName: "",
+      description: "This column has a button to reject the conference",
       sortable: false,
+      disableColumnMenu: true,
+      resizable: false,
       width: 100,
       renderCell: (params) => {
         const handleRejectButtonClick = async () => {

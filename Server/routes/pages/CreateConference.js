@@ -62,6 +62,15 @@ router.post("/createConference", auth.ensureAuthenticated, async (req, res) => {
       confmaxsubmissions: numberMaxSubmissions,
       confwebpage: confLink,
     });
+
+    const addedConfID = await db.fetchData("conferences", "confname", title);
+
+    await db.addData("userroles", {
+      userid: user,
+      userrole: "chair",
+      confid: addedConfID[0].confid,
+    });
+
     return res.status(200).send({ msg: "Conferência criada com sucesso" });
   } catch (error) {
     return res.status(500).send({ msg: "Internal Error" });
