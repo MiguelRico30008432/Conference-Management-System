@@ -10,7 +10,7 @@ import ConferencePage from "pages/ConferencePages/ConferencePage";
 // @mui icons
 import Icon from "@mui/material/Icon";
 
-const routes = [
+const ConfRoutes = [
   {
     type: "collapse",
     name: "ConferencePage",
@@ -85,4 +85,4 @@ const routes = [
   },
 ];
 
-export default routes;
+export default ConfRoutes;

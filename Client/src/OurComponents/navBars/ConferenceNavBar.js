@@ -18,12 +18,14 @@ import MDButton from "components/MDButton";
 // Material Dashboard 2 React example components
 import DefaultNavbarLink from "examples/Navbars/DefaultNavbar/DefaultNavbarLink";
 import DefaultNavbarMobile from "examples/Navbars/DefaultNavbar/DefaultNavbarMobile";
+import SidenavCollapse from "examples/Sidenav/SidenavCollapse";
 
 // Material Dashboard 2 React base styles
 import breakpoints from "assets/theme/base/breakpoints";
 
 // Material Dashboard 2 React context
 import { useMaterialUIController } from "context";
+import ConfRoutes from "../../conferenceRoutes";
 
 export default function ConferenceNavBar({ transparent, light, action }) {
   const [controller] = useMaterialUIController();
@@ -32,9 +34,16 @@ export default function ConferenceNavBar({ transparent, light, action }) {
   const [mobileNavbar, setMobileNavbar] = useState(false);
   const [mobileView, setMobileView] = useState(false);
 
+  const [selectedComponent, setSelectedComponent] = useState(null);
+
   const openMobileNavbar = ({ currentTarget }) =>
     setMobileNavbar(currentTarget.parentNode);
   const closeMobileNavbar = () => setMobileNavbar(false);
+
+  const handleLinkClick = (component) => {
+    // Atualiza o estado para definir o componente selecionado para renderização na MDBox
+    setSelectedComponent(component);
+  };
 
   useEffect(() => {
     // A function that sets the display state for the DefaultNavbarMobile.
@@ -61,7 +70,26 @@ export default function ConferenceNavBar({ transparent, light, action }) {
     return () => window.removeEventListener("resize", displayMobileNavbar);
   }, []);
 
+  const renderRoutes = ConfRoutes.map(
+    ({ type, name, icon, noCollapse, key, href, route, display, component }) => {
+      let returnValue;
+
+      if (type === "collapse") {
+        return href ? (
+          <DefaultNavbarLink name={name} icon={icon} />
+        ) : (
+          <DefaultNavbarLink name={name} icon={icon} onClick={() => {
+            console.log("Link clicado:", name);
+            handleLinkClick(component);
+          }}  />
+        );
+      }
+      return null;
+    }
+  );
+
   return (
+
     <Container>
       {/* Esta MDBox define a barra onde estarão as opções do menu */}
       <MDBox
@@ -89,25 +117,10 @@ export default function ConferenceNavBar({ transparent, light, action }) {
       >
         {/* Esta MDBox contem os links. É onde estão definidas as primeiras opções do menu (Submissões / Bidding / Reviews / Envio de Mails / Gestão do Comitê / Definições da Conferência) */}
         <MDBox color="inherit" display={{ xs: "none", lg: "flex" }} m={0} p={0}>
-          <DefaultNavbarLink
-            icon="dashboard"
-            name="Return"
-            route="/HomePage"
-            light={light}
-          />
-          <DefaultNavbarLink
-            icon="key"
-            name="sign in"
-            route="/Signin"
-            light={light}
-          />
-          <DefaultNavbarLink
-            icon="account_circle"
-            name="sign up"
-            route="/Signup"
-            light={light}
-          />
+          {renderRoutes}
         </MDBox>
+        {console.log(selectedComponent)}
+        <MDBox>{selectedComponent}</MDBox>
 
         {/* Esta MDBox define a navbar quando estamos em modo mobile */}
         <MDBox
