@@ -1,6 +1,5 @@
 //Layout Component
 import ConferencesLayout from "OurLayouts/ConferencesLayout";
-import bgImage from "assets/images/conference_signin.jpeg";
 import { ConferenceContext } from "conference.context";
 
 // @mui material components
@@ -14,8 +13,7 @@ export default function ConferencePage() {
   console.log(confID);
 
   return (
-    <ConferencesLayout image={bgImage}>
-      <Card></Card>
+    <ConferencesLayout>
     </ConferencesLayout>
   );
 }

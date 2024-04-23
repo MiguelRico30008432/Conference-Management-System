@@ -17,7 +17,7 @@ import { AuthContext } from "../auth.context";
 export default function ConferencesLayout({ coverHeight, image, children }) {
   return (
     <PageLayout>
-      <ConferenceNavBar dark />
+      <ConferenceNavBar/>
       <MDBox
         minHeight={coverHeight}
         borderRadius="xl"
