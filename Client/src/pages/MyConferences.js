@@ -3,6 +3,7 @@ import Footer from "OurComponents/footer/Footer";
 import UpperNavBar from "OurComponents/navBars/UpperNavBar";
 
 import ConferencePage from "./ConferencePages/ConferencePage";
+import { useNavigate } from "react-router-dom";
 
 import CompleteTable from "OurComponents/Table/CompleteTable";
 import { useEffect, useState, useContext } from "react";
@@ -20,6 +21,8 @@ export default function MyConferences() {
   const [rows, setRow] = useState([]);
   const [error, setError] = useState(null);
   const [openConference, setOpenConference] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function getMyConferences() {
@@ -72,7 +75,7 @@ export default function MyConferences() {
           setConfID(params.row.confid);
           setUserRole(params.row.userrole);
           await saveConfIDOnUser(params.row.confid);
-          setOpenConference(true);
+          navigate("/MyConferences/Conference");
         };
 
         return (
@@ -120,24 +123,20 @@ export default function MyConferences() {
 
   return (
     <>
-      {openConference ? (
-        <ConferencePage></ConferencePage>
-      ) : (
-        <DashboardLayout>
-          <UpperNavBar />
-          {error}
-          <Card>
-            <CompleteTable
-              columns={columns}
-              rows={rows}
-              numerOfRowsPerPage={5}
-              height={200}
-            />
-          </Card>
-          <br></br>
-          <Footer />
-        </DashboardLayout>
-      )}
+      <DashboardLayout>
+        <UpperNavBar />
+        {error}
+        <Card>
+          <CompleteTable
+            columns={columns}
+            rows={rows}
+            numerOfRowsPerPage={5}
+            height={200}
+          />
+        </Card>
+        <br></br>
+        <Footer />
+      </DashboardLayout>
     </>
   );
 }

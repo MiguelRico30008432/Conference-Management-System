@@ -27,6 +27,10 @@ import breakpoints from "assets/theme/base/breakpoints";
 import { useMaterialUIController } from "context";
 import ConfRoutes from "../../conferenceRoutes";
 
+import * as React from 'react';
+import {Button, ClickAwayListener, Grow, Paper, Popper, MenuItem, MenuList, Stack} from '@mui/material';
+
+
 export default function ConferenceNavBar({ transparent, light, action }) {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
@@ -40,10 +44,95 @@ export default function ConferenceNavBar({ transparent, light, action }) {
     setMobileNavbar(currentTarget.parentNode);
   const closeMobileNavbar = () => setMobileNavbar(false);
 
-  const handleLinkClick = (component) => {
-    // Atualiza o estado para definir o componente selecionado para renderização na MDBox
-    setSelectedComponent(component);
+  //------------Referente à NavBar da Conferência-----------------//
+  const [open, setOpen] = useState(false);
+  const anchorRef = React.useRef(null);
+
+  const handleToggle = () => {
+    setOpen((prevOpen) => !prevOpen);
   };
+
+  const handleClose = (event) => {
+    if (anchorRef.current && anchorRef.current.contains(event.target)) {
+      return;
+    }
+
+    setOpen(false);
+  };
+
+  function handleListKeyDown(event) {
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      setOpen(false);
+    } else if (event.key === 'Escape') {
+      setOpen(false);
+    }
+  }
+
+  // return focus to the button when we transitioned from !open -> open
+  const prevOpen = React.useRef(open);
+  React.useEffect(() => {
+    if (prevOpen.current === true && open === false) {
+      anchorRef.current.focus();
+    }
+
+    prevOpen.current = open;
+  }, [open]);
+
+  const renderRoutes = ConfRoutes.map(({ type, name, parentkey, display }) => {
+    if (display === true && type === "title") {
+
+      return (
+          <Stack direction="row" spacing={2} key={parentkey}>
+            <Button
+              ref={anchorRef}
+              id={`composition-button-${parentkey}`}
+              aria-controls={open ? `composition-menu-${parentkey}` : undefined}
+              aria-expanded={open ? "true" : undefined}
+              aria-haspopup="true"
+              onClick={handleToggle}
+            >
+              {name}
+            </Button>
+            <Popper
+              open={open}
+              anchorEl={anchorRef.current}
+              role={undefined}
+              placement="bottom-start"
+              transition
+              disablePortal
+            >
+              {({ TransitionProps, placement }) => (
+                <Grow
+                  {...TransitionProps}
+                  style={{
+                    transformOrigin:
+                      placement === 'bottom-start' ? 'left top' : 'left bottom',
+                  }}
+                >
+                  <Paper>
+                    <ClickAwayListener onClickAway={handleClose}>
+                      <MenuList
+                        autoFocusItem={open}
+                        id="composition-menu"
+                        aria-labelledby="composition-button"
+                        onKeyDown={handleListKeyDown}
+                      >
+                        <MenuItem onClick={handleClose}>Profile</MenuItem>
+                        <MenuItem onClick={handleClose}>My account</MenuItem>
+                        <MenuItem onClick={handleClose}>Logout</MenuItem>
+                      </MenuList>
+                    </ClickAwayListener>
+                  </Paper>
+                </Grow>
+              )}
+            </Popper>
+          </Stack>
+        );
+      }; 
+  });
+
+  //------------Referente à NavBar da Conferência-----------------//
 
   useEffect(() => {
     // A function that sets the display state for the DefaultNavbarMobile.
@@ -69,24 +158,6 @@ export default function ConferenceNavBar({ transparent, light, action }) {
     // Remove event listener on cleanup
     return () => window.removeEventListener("resize", displayMobileNavbar);
   }, []);
-
-  const renderRoutes = ConfRoutes.map(
-    ({ type, name, icon, noCollapse, key, href, route, display, component }) => {
-      let returnValue;
-
-      if (type === "collapse") {
-        return href ? (
-          <DefaultNavbarLink name={name} icon={icon} />
-        ) : (
-          <DefaultNavbarLink name={name} icon={icon} onClick={() => {
-            console.log("Link clicado:", name);
-            handleLinkClick(component);
-          }}  />
-        );
-      }
-      return null;
-    }
-  );
 
   return (
 
@@ -119,8 +190,6 @@ export default function ConferenceNavBar({ transparent, light, action }) {
         <MDBox color="inherit" display={{ xs: "none", lg: "flex" }} m={0} p={0}>
           {renderRoutes}
         </MDBox>
-        {console.log(selectedComponent)}
-        <MDBox>{selectedComponent}</MDBox>
 
         {/* Esta MDBox define a navbar quando estamos em modo mobile */}
         <MDBox
