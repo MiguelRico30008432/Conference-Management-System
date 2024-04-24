@@ -68,9 +68,10 @@ export default function MyConferences() {
       resizable: false,
       width: 200,
       renderCell: (params) => {
-        const handleMoreDetailsButtonClick = () => {
+        const handleMoreDetailsButtonClick = async () => {
           setConfID(params.row.confid);
           setUserRole(params.row.userrole);
+          await saveConfIDOnUser(params.row.confid);
           setOpenConference(true);
         };
 
@@ -92,6 +93,30 @@ export default function MyConferences() {
       },
     },
   ];
+
+  async function saveConfIDOnUser(confID) {
+    try {
+      const response = await fetch("http://localhost:8003/updateConfContext", {
+        method: "POST",
+        body: JSON.stringify({ userid: user, confid: confID }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+        credentials: "include",
+      });
+
+      if (response.status != 200) {
+        const jsonResponse = await response.json();
+        setError(<Alert severity="error">{jsonResponse.msg}</Alert>);
+      }
+    } catch (error) {
+      setError(
+        <Alert severity="error">
+          Something went wrong when obtaining the lines
+        </Alert>
+      );
+    }
+  }
 
   return (
     <>
