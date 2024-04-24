@@ -20,13 +20,13 @@ const ConfRoutes = [
   {
     type: "collapse",
     name: "Details",
-    key: "Details",
+    submenu: "Details",
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/MyConferences/Conference",
     component: <ConferencePage/>,
     display: true,
   },
-  /*{
+  {
     type: "title",
     name: "Submissions",
     parentkey: "Submissions",
@@ -35,7 +35,7 @@ const ConfRoutes = [
   {
     type: "collapse",
     name: "Submissions",
-    key: "Submissions",
+    submenu: "Submissions",
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/MyConferences/Conference/Submissions",
     component: <Submissions/>,
@@ -50,7 +50,7 @@ const ConfRoutes = [
   {
     type: "collapse",
     name: "Bidding",
-    key: "Bidding",
+    submenu: "Bidding",
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/MyConferences/Conference/Bidding",
     component: <Bidding />,
@@ -65,7 +65,7 @@ const ConfRoutes = [
   {
     type: "collapse",
     name: "Reviews",
-    key: "Reviews",
+    submenu: "Reviews",
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/MyConferences/Conference/Reviews",
     component: <Reviews />,
@@ -80,7 +80,7 @@ const ConfRoutes = [
   {
     type: "collapse",
     name: "Envio de Mails",
-    key: "Emails",
+    submenu: "Emails",
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/MyConferences/Conference/EMails",
     component: <Mails />,
@@ -95,7 +95,7 @@ const ConfRoutes = [
   {
     type: "collapse",
     name: "Gestão do Comitê",
-    key: "Settings",
+    submenu: "Settings",
     icon: <Icon fontSize="small">login</Icon>,
     route: "/MyConferences/Conference/ComiteManagement",
     component: <ComiteManagement />,
@@ -104,7 +104,7 @@ const ConfRoutes = [
   {
     type: "collapse",
     name: "Definições",
-    key: "Settings",
+    submenu: "Settings",
     icon: <Icon fontSize="small">login</Icon>,
     route: "/MyConferences/Conference/Settings",
     component: <ConferenceDefinitions />,
@@ -118,7 +118,7 @@ const ConfRoutes = [
     route: "/PageNotFound",
     component: <PageNotFound />,
     display: false,
-  },*/
+  },
 ];
 
 export default ConfRoutes;
