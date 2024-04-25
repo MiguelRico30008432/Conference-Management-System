@@ -10,6 +10,7 @@ CREATE TABLE users (
     userAdmin BOOLEAN DEFAULT false,
     userPassword VARCHAR(200) NOT NULL,
     userAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
+    userCurrentConfID bigint NULL
 );
 
 INSERT INTO users (userName, userEmail, userPhone, userPassword) 

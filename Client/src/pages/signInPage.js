@@ -29,7 +29,8 @@ export default function SignInPage() {
   const [passwordAlert, setpasswordAlert] = useState(null);
   const [errorOnLogin, seterrorOnLogin] = useState(false);
   const [errorOnRequest, setErrorOnRequest] = useState(null);
-  const { setIsLoggedIn, setUser, setIsAdmin } = useContext(AuthContext);
+  const { setIsLoggedIn, setUser, setIsAdmin, setUserEmail } =
+    useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
@@ -55,36 +56,23 @@ export default function SignInPage() {
         credentials: "include",
       });
 
-      
-      //console.log("Received response from server:", response); //Its used to test if user info is being passed by the backend
       const jsonResponse = await response.json();
-      //console.log("Parsed JSON response:", jsonResponse); //Its used to test if user info is being passed by the backend
 
       if (response.ok) {
         setIsLoggedIn(true);
-
-        //Obter o valor de admin a partir da cookie
-        const adminCookie =
-          document.cookie
-            .split("; ")
-            .find((row) => row.startsWith("Admin"))
-            ?.split("=")[1] === "true";
-
-        const userID = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("UserID"))
-          ?.split("=")[1];
-
-        setUser(userID);
-        setIsAdmin(adminCookie);
+        setUser(jsonResponse.userid);
+        setUserEmail(jsonResponse.useremail);
+        setIsAdmin(jsonResponse.useradmin);
         navigate("/");
       } else {
         setErrorOnRequest(
           <Alert severity="error">{jsonResponse.message}</Alert>
         );
+        setIsLoggedIn(false);
       }
     } catch (error) {
       seterrorOnLogin(true);
+      setIsLoggedIn(false);
     }
   };
 

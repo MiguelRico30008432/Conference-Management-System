@@ -18,7 +18,9 @@ router.post("/signIn", (req, res, next) => {
     if (!user) {
       // Check the message from Passport to determine the reason for failure
       if (info.message === "User Not Found") {
-        return res.status(404).send({ success: false, message: "User not found." });
+        return res
+          .status(404)
+          .send({ success: false, message: "User not found." });
       } else {
         return res.status(401).send({
           success: false,
@@ -26,20 +28,19 @@ router.post("/signIn", (req, res, next) => {
         });
       }
     }
-    // If this function gets called, authentication was successful.
+
+    // If this function gets called, authentication was successful
     req.logIn(user, (loginErr) => {
       if (loginErr) {
-        return res.status(500).send({ success: false, message: "Failed to establish a session." });
+        return res
+          .status(500)
+          .send({ success: false, message: "Failed to establish a session." });
       }
       // Successful authentication, send user details
       return res.status(200).send({
-        success: true,
-        message: "Authenticated successfully",
-        user: {
-          userid: user.userid,
-          useremail: user.useremail,
-          useradmin: user.useradmin
-        }
+        userid: user.userid,
+        useremail: user.useremail,
+        useradmin: user.useradmin,
       });
     });
   })(req, res, next);
@@ -101,7 +102,7 @@ router.post("/logOut", auth.ensureAuthenticated, (request, response) => {
   });
 });
 //Endpoint used for giving info about the user to the frontend pages
-router.get('/authUser', auth.ensureAuthenticated, (req, res) => {
+router.get("/authUser", auth.ensureAuthenticated, (req, res) => {
   const { userid, useremail, useradmin } = req.user;
   res.json({ userid, useremail, useradmin });
 });

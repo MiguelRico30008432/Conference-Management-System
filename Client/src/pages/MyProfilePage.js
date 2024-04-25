@@ -25,7 +25,7 @@ export default function MyProfilePage() {
   const [changePassActive, setChangePassActive] = useState(false);
   const [openEmailChangeDialog, setOpenEmailChangeDialog] = useState(false);
   const [message, setMessage] = useState(null);
-  const { user } = useContext(AuthContext);
+  const { user, isLoggedIn } = useContext(AuthContext);
 
   const [firstName, setFirstName] = useState("");
   const [originalFirstName, setOriginalFirstName] = useState("");
@@ -40,29 +40,6 @@ export default function MyProfilePage() {
 
   const [password, setPasword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
-/* Fetch test about giving userinfo to the frontend
-  fetch('http://localhost:8003/authUser', {
-    method: 'GET',
-    credentials: 'include',
-    headers: {
-      'Cache-Control': 'no-cache'
-    }
-  })
-  .then(response => {
-    if (response.ok) {
-      return response.json();
-    } else {
-      throw new Error(`Server responded with status: ${response.status}`);
-    }
-  })
-  .then(data => {
-    console.log('User data:', data);
-    // Use the data as needed in your app
-  })
-  .catch(error => {
-    console.error('Fetch error:', error);
-  });
-*/
 
   useEffect(() => {
     async function getUserData() {
@@ -101,8 +78,10 @@ export default function MyProfilePage() {
       }
     }
 
-    getUserData();
-  }, []);
+    if (isLoggedIn) {
+      getUserData();
+    }
+  }, [isLoggedIn]);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -271,6 +250,7 @@ export default function MyProfilePage() {
           saveUserData();
           setOpenEmailChangeDialog(false);
         }}
+        title={"Confirm Email Change"}
         text={
           "Are you sure you want to change your email address? Changing your email address will affect your login."
         }

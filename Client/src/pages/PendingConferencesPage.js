@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import MDButton from "components/MDButton";
 import Alert from "@mui/material/Alert";
 import Card from "@mui/material/Card";
@@ -10,11 +10,14 @@ import UpperNavBar from "OurComponents/navBars/UpperNavBar";
 import CompleteTable from "OurComponents/Table/CompleteTable";
 import MoreDetails from "OurComponents/Info/MoreDetails";
 
+import { AuthContext } from "../auth.context";
+
 export default function PendingConferencesPage() {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [dataForDetails, setDataForDetails] = useState({});
   const [rows, setRow] = useState([]);
   const [error, setError] = useState(null);
+  const { isLoggedIn, isAdmin } = useContext(AuthContext);
 
   useEffect(() => {
     async function getRows() {
@@ -48,8 +51,10 @@ export default function PendingConferencesPage() {
       }
     }
 
-    getRows();
-  }, []);
+    if (isLoggedIn && isAdmin) {
+      getRows();
+    }
+  }, [isLoggedIn]);
 
   async function acceptOrRejectConference(id, accept, owner, name) {
     try {
@@ -83,10 +88,12 @@ export default function PendingConferencesPage() {
     { field: "confenddate", headerName: "Conference End Date", width: 200 },
     {
       field: "More Info.",
-      headerName: "More Info.",
+      headerName: "",
       description:
-        "This column have a button to give details about the conference",
+        "This column has a button to give details about the conference",
       sortable: false,
+      disableColumnMenu: true,
+      resizable: false,
       width: 100,
       renderCell: (params) => {
         const handleMoreDetailsButtonClick = () => {
@@ -113,9 +120,11 @@ export default function PendingConferencesPage() {
     },
     {
       field: "Aprove",
-      headerName: "Aprove",
-      description: "This column have a button to accept the conference",
+      headerName: "",
+      description: "This column has a button to accept the conference",
       sortable: false,
+      disableColumnMenu: true,
+      resizable: false,
       width: 100,
       renderCell: (params) => {
         const handleAcceptButtonClick = async () => {
@@ -146,9 +155,11 @@ export default function PendingConferencesPage() {
     },
     {
       field: "Reject",
-      headerName: "Reject",
-      description: "This column have a button to reject the conference",
+      headerName: "",
+      description: "This column has a button to reject the conference",
       sortable: false,
+      disableColumnMenu: true,
+      resizable: false,
       width: 100,
       renderCell: (params) => {
         const handleRejectButtonClick = async () => {

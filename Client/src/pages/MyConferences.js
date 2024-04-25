@@ -3,6 +3,7 @@ import Footer from "OurComponents/footer/Footer";
 import UpperNavBar from "OurComponents/navBars/UpperNavBar";
 
 import ConferencePage from "./ConferencePages/ConferencePage";
+import { useNavigate } from "react-router-dom";
 
 import CompleteTable from "OurComponents/Table/CompleteTable";
 import { useEffect, useState, useContext } from "react";
@@ -14,12 +15,14 @@ import Card from "@mui/material/Card";
 import MDButton from "components/MDButton";
 
 export default function MyConferences() {
-  const { user } = useContext(AuthContext);
+  const { user, isLoggedIn } = useContext(AuthContext);
   const { setConfID, setUserRole } = useContext(ConferenceContext);
 
   const [rows, setRow] = useState([]);
   const [error, setError] = useState(null);
   const [openConference, setOpenConference] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function getMyConferences() {
@@ -50,25 +53,29 @@ export default function MyConferences() {
         );
       }
     }
-
-    getMyConferences();
-  }, []);
+    if (isLoggedIn) {
+      getMyConferences();
+    }
+  }, [isLoggedIn]);
 
   const columns = [
     { field: "confname", headerName: "Conference Name", width: 600 },
     { field: "userrole", headerName: "Your Role", width: 200 },
     {
       field: "",
-      headerName: "Enter in conference",
+      headerName: "",
       description:
-        "This column have a button taht allows the user to enter int a specific conference",
+        "This column has a button taht allows the user to enter int a specific conference",
       sortable: false,
+      disableColumnMenu: true,
+      resizable: false,
       width: 200,
       renderCell: (params) => {
-        const handleMoreDetailsButtonClick = () => {
+        const handleMoreDetailsButtonClick = async () => {
           setConfID(params.row.confid);
           setUserRole(params.row.userrole);
-          setOpenConference(true);
+          await saveConfIDOnUser(params.row.confid);
+          navigate("/MyConferences/Conference");
         };
 
         return (
@@ -90,26 +97,46 @@ export default function MyConferences() {
     },
   ];
 
+  async function saveConfIDOnUser(confID) {
+    try {
+      const response = await fetch("http://localhost:8003/updateConfContext", {
+        method: "POST",
+        body: JSON.stringify({ userid: user, confid: confID }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+        credentials: "include",
+      });
+
+      if (response.status != 200) {
+        const jsonResponse = await response.json();
+        setError(<Alert severity="error">{jsonResponse.msg}</Alert>);
+      }
+    } catch (error) {
+      setError(
+        <Alert severity="error">
+          Something went wrong when obtaining the lines
+        </Alert>
+      );
+    }
+  }
+
   return (
     <>
-      {openConference ? (
-        <ConferencePage></ConferencePage>
-      ) : (
-        <DashboardLayout>
-          <UpperNavBar />
-          {error}
-          <Card>
-            <CompleteTable
-              columns={columns}
-              rows={rows}
-              numerOfRowsPerPage={5}
-              height={200}
-            />
-          </Card>
-          <br></br>
-          <Footer />
-        </DashboardLayout>
-      )}
+      <DashboardLayout>
+        <UpperNavBar />
+        {error}
+        <Card>
+          <CompleteTable
+            columns={columns}
+            rows={rows}
+            numerOfRowsPerPage={5}
+            height={200}
+          />
+        </Card>
+        <br></br>
+        <Footer />
+      </DashboardLayout>
     </>
   );
 }

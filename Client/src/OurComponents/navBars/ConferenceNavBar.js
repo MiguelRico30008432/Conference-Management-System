@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
+import { Button, Menu, MenuItem } from "@mui/material";
 
 // react-router components
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 // prop-types is a library for typechecking of props.
 import PropTypes from "prop-types";
@@ -12,11 +13,8 @@ import Icon from "@mui/material/Icon";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
-import MDButton from "components/MDButton";
 
 // Material Dashboard 2 React example components
-import DefaultNavbarLink from "examples/Navbars/DefaultNavbar/DefaultNavbarLink";
 import DefaultNavbarMobile from "examples/Navbars/DefaultNavbar/DefaultNavbarMobile";
 
 // Material Dashboard 2 React base styles
@@ -24,6 +22,9 @@ import breakpoints from "assets/theme/base/breakpoints";
 
 // Material Dashboard 2 React context
 import { useMaterialUIController } from "context";
+import ConfRoutes from "../../conferenceRoutes";
+
+import * as React from 'react';
 
 export default function ConferenceNavBar({ transparent, light, action }) {
   const [controller] = useMaterialUIController();
@@ -35,6 +36,43 @@ export default function ConferenceNavBar({ transparent, light, action }) {
   const openMobileNavbar = ({ currentTarget }) =>
     setMobileNavbar(currentTarget.parentNode);
   const closeMobileNavbar = () => setMobileNavbar(false);
+
+  //------------Referente à NavBar da Conferência-----------------//
+  const [open, setOpen] = useState(false);
+  const anchorRef = React.useRef(null);
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [subMenus, setSubMenus] = useState([]);
+  const navigate = useNavigate();
+
+  // return focus to the button when we transitioned from !open -> open
+  const prevOpen = React.useRef(open);
+
+  useEffect(() => {
+    if (prevOpen.current === true && open === false) {
+      anchorRef.current.focus();
+    }
+
+    prevOpen.current = open;
+  }, [open]);
+
+  const handleClick = (event, parentKey) => {
+    setAnchorEl(event.currentTarget);
+    const menus = ConfRoutes.filter(
+      (item) => item.type === "collapse" && item.submenu === parentKey
+    );
+    setSubMenus(menus);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleSubMenuClick = (route) => {
+    handleClose();
+    navigate(route);
+  };
+  //------------Referente à NavBar da Conferência-----------------//
 
   useEffect(() => {
     // A function that sets the display state for the DefaultNavbarMobile.
@@ -89,24 +127,38 @@ export default function ConferenceNavBar({ transparent, light, action }) {
       >
         {/* Esta MDBox contem os links. É onde estão definidas as primeiras opções do menu (Submissões / Bidding / Reviews / Envio de Mails / Gestão do Comitê / Definições da Conferência) */}
         <MDBox color="inherit" display={{ xs: "none", lg: "flex" }} m={0} p={0}>
-          <DefaultNavbarLink
-            icon="dashboard"
-            name="Return"
-            route="/HomePage"
-            light={light}
-          />
-          <DefaultNavbarLink
-            icon="key"
-            name="sign in"
-            route="/Signin"
-            light={light}
-          />
-          <DefaultNavbarLink
-            icon="account_circle"
-            name="sign up"
-            route="/Signup"
-            light={light}
-          />
+          {ConfRoutes.map((item) => {
+            if (item.type === "title") {
+              return (
+                <div key={item.name}>
+                  <Button
+                    aria-controls="simple-menu"
+                    aria-haspopup="true"
+                    onClick={(e) => handleClick(e, item.parentkey)}
+                  >
+                    {item.name}
+                  </Button>
+                </div>
+              );
+            }
+            return null;
+          })}
+          <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            {subMenus.map((subMenu) => (
+              <MenuItem
+                key={subMenu.name}
+                onClick={() => handleSubMenuClick(subMenu.route)}
+              >
+                {subMenu.name}
+              </MenuItem>
+            ))}
+          </Menu>
         </MDBox>
 
         {/* Esta MDBox define a navbar quando estamos em modo mobile */}
