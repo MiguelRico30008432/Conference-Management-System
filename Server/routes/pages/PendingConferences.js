@@ -69,7 +69,7 @@ router.post("/acceptOrRejectConference", async function (req, res) {
       additionalInfo: "For more information, please contact our support team.",
     };
 
-    email.sendEmail(userEmail, emailSubject, emailReplacements);
+    email.sendEmail(userEmail, emailSubject, emailReplacements, 'emailAcceptReject.html');
 
     return res.status(200).send({ msg: `Email notification sent.` });
   } catch (error) {
