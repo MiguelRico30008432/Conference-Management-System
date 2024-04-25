@@ -141,3 +141,15 @@ CREATE TABLE invitations(
     invationCodeUsed BOOLEAN DEFAULT false,
     invitationAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
+___________________________________________________________________________________________________________
+Table Events
+
+CREATE TABLE events(
+    eventID SERIAL primary KEY,
+    confID INT,
+    FOREIGN KEY (confID) REFERENCES conferences(confID),
+    eventName VARCHAR(200)
+);
+
+
+
