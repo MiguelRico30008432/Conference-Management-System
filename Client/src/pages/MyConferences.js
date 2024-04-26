@@ -1,18 +1,16 @@
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "OurComponents/footer/Footer";
 import UpperNavBar from "OurComponents/navBars/UpperNavBar";
-
-import ConferencePage from "./ConferencePages/ConferencePage";
 import { useNavigate } from "react-router-dom";
-
 import CompleteTable from "OurComponents/Table/CompleteTable";
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../auth.context";
 import { ConferenceContext } from "../conference.context";
 import Alert from "@mui/material/Alert";
 import Card from "@mui/material/Card";
-
 import MDButton from "components/MDButton";
+import MDBox from "components/MDBox";
+import MDTypography from "components/MDTypography";
 
 export default function MyConferences() {
   const { user, isLoggedIn } = useContext(AuthContext);
@@ -20,7 +18,6 @@ export default function MyConferences() {
 
   const [rows, setRow] = useState([]);
   const [error, setError] = useState(null);
-  const [openConference, setOpenConference] = useState(false);
 
   const navigate = useNavigate();
 
@@ -64,12 +61,11 @@ export default function MyConferences() {
     {
       field: "",
       headerName: "",
-      description:
-        "This column has a button taht allows the user to enter int a specific conference",
+      description: "",
       sortable: false,
       disableColumnMenu: true,
       resizable: false,
-      width: 200,
+      width: 90,
       renderCell: (params) => {
         const handleMoreDetailsButtonClick = async () => {
           setConfID(params.row.confid);
@@ -125,6 +121,24 @@ export default function MyConferences() {
     <>
       <DashboardLayout>
         <UpperNavBar />
+        <MDBox mb={5} textAlign="left">
+          <Card>
+            <MDTypography ml={2} variant="body2">
+              On this page, you'll find a comprehensive list of all the
+              conferences you are participating in. Once inside, you'll have
+              access to a wealth of resources, sessions, and interactive
+              features tailored to enhance your conference experience.
+            </MDTypography>
+            <MDTypography ml={2} variant="body2">
+              Each entry represents a unique opportunity for learning,
+              networking, and collaboration.
+            </MDTypography>
+            <MDTypography ml={2} variant="body2">
+              To explore any conference further, simply click on the "Enter"
+              button next to its details.
+            </MDTypography>
+          </Card>
+        </MDBox>
         {error}
         <Card>
           <CompleteTable
