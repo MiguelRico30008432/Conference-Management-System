@@ -8,12 +8,13 @@ import Container from "@mui/material/Container";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 
-export default function SubmissionsPage() {
+export default function CreateSubmission() {
   const { confID, userRole } = useContext(ConferenceContext);
 
   return (
     <DashboardLayout>
       <ConfNavbar />
+      Create Submission
       <Container maxWidth="sm">
         <MDBox mt={10} mb={2} textAlign="left">
           <MDBox mb={3} textAlign="left">

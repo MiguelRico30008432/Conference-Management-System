@@ -73,7 +73,7 @@ export default function MyConferences() {
           setConfID(params.row.confid);
           setUserRole(params.row.userrole);
           await saveConfIDOnUser(params.row.confid);
-          navigate("/MyConferences/Conference");
+          navigate("/MyConferences/ConferenceDescription");
         };
 
         return (

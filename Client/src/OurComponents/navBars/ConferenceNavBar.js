@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext} from "react";
 import { Button, Menu, MenuItem } from "@mui/material";
 
 // react-router components
@@ -23,6 +23,7 @@ import breakpoints from "assets/theme/base/breakpoints";
 // Material Dashboard 2 React context
 import { useMaterialUIController } from "context";
 import ConfRoutes from "../../conferenceRoutes";
+import { ConferenceContext } from "../../conference.context";
 
 import * as React from 'react';
 
@@ -44,6 +45,8 @@ export default function ConferenceNavBar({ transparent, light, action }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [subMenus, setSubMenus] = useState([]);
   const navigate = useNavigate();
+
+  const { userRole } = useContext(ConferenceContext);
 
   // return focus to the button when we transitioned from !open -> open
   const prevOpen = React.useRef(open);
@@ -127,8 +130,9 @@ export default function ConferenceNavBar({ transparent, light, action }) {
       >
         {/* Esta MDBox contem os links. É onde estão definidas as primeiras opções do menu (Submissões / Bidding / Reviews / Envio de Mails / Gestão do Comitê / Definições da Conferência) */}
         <MDBox color="inherit" display={{ xs: "none", lg: "flex" }} m={0} p={0}>
+          {console.log(userRole)}
           {ConfRoutes.map((item) => {
-            if (item.type === "title") {
+            if (item.type === "title" && (item.permissions.includes(userRole) || item.permissions.includes("All"))) {
               return (
                 <div key={item.name}>
                   <Button
@@ -150,14 +154,18 @@ export default function ConferenceNavBar({ transparent, light, action }) {
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            {subMenus.map((subMenu) => (
-              <MenuItem
-                key={subMenu.name}
-                onClick={() => handleSubMenuClick(subMenu.route)}
-              >
-                {subMenu.name}
-              </MenuItem>
-            ))}
+            {subMenus.map((subMenu) => {
+              // Verifique se o usuário tem permissão para ver este submenu
+              if (subMenu.permissions.includes(userRole) || subMenu.permissions.includes("All")) {
+                return (
+                  <MenuItem
+                    key={subMenu.name}
+                    onClick={() => handleSubMenuClick(subMenu.route)}
+                  >
+                    {subMenu.name}
+                  </MenuItem>
+                );
+              }})}
           </Menu>
         </MDBox>
 

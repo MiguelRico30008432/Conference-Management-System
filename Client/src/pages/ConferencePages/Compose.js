@@ -18,7 +18,7 @@ import FormControl from "@mui/material/FormControl";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import MDBox from "components/MDBox";
 
-export default function EmailsPage() {
+export default function Compose() {
   const { confID, userRole } = useContext(ConferenceContext);
   const [recipient, setRecipient] = useState("");
 

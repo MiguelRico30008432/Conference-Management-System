@@ -11,13 +11,13 @@ import Container from "@mui/material/Container";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 
-export default function BiddingPage() {
+export default function Assignements() {
   const { confID, userRole } = useContext(ConferenceContext);
 
   return (
     <DashboardLayout>
       <ConfNavbar />
-      Bidding Process
+      Assignements
       <Container maxWidth="sm">
         <MDBox mt={10} mb={2} textAlign="left">
           <MDBox mb={3} textAlign="left">

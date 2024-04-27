@@ -10,13 +10,13 @@ import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 
 
-export default function ConferencePage() {
+export default function ConferenceDetails() {
   const { confID, userRole } = useContext(ConferenceContext);
 
   return (
     <DashboardLayout>
       <ConfNavbar/>
-      Conference Page
+      Conference Description
     </DashboardLayout>
   );
 }
