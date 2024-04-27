@@ -23,10 +23,14 @@ export default function ComitteeManagementPage() {
 
   const [infoOpen, setInfoOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
-  const [showSaveButton, setShowSaveButton] = useState(false);
-  const [memberName, setMemberName] = useState(null);
   const [rows, setRow] = useState([]);
   const [error, setError] = useState(null);
+
+  const [selectValueRole, setSelectValueRole] = useState("Choose a role");
+  const [showSaveButton, setShowSaveButton] = useState(false);
+  const [memberName, setMemberName] = useState(null);
+  const [memberID, setMemberID] = useState(null);
+  const [memberRoles, setMemberRoles] = useState(null);
 
   useEffect(() => {
     async function getRows() {
@@ -148,7 +152,7 @@ export default function ComitteeManagementPage() {
       resizable: false,
       width: 60,
       renderCell: (params) => {
-        const editMember = () => {};
+        if (params.row.userid === user) return null;
 
         return (
           <div
@@ -164,6 +168,9 @@ export default function ComitteeManagementPage() {
               color="success"
               onClick={() => {
                 setMemberName(params.row.userfirstname);
+                setMemberID(params.row.userid);
+                setMemberRoles(params.row.userrole);
+                setSelectValueRole("Choose a role");
                 setInfoOpen(false);
                 setEditOpen(true);
               }}
@@ -248,6 +255,31 @@ export default function ComitteeManagementPage() {
     },
   ];
 
+  async function changeMemberRole() {
+    try {
+      const response = await fetch("http://localhost:8003/updateRoleMember", {
+        method: "POST",
+        body: JSON.stringify({
+          userid: memberID,
+          confid: confID,
+          role: selectValueRole,
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+        credentials: "include",
+      });
+
+      if (response.status === 200) {
+        window.location.reload();
+      } else {
+        const jsonResponse = await response.json();
+        setError(<Alert severity="error">{jsonResponse.msg}</Alert>);
+      }
+    } catch (error) {
+      setError(<Alert severity="error">Something went wrong.</Alert>);
+    }
+  }
   return (
     <DashboardLayout>
       <ConfNavbar />
@@ -308,13 +340,14 @@ export default function ComitteeManagementPage() {
 
           {/* Quanto edit for clicado */}
           {editOpen && (
-            <MDBox mb={3}>
-              <Card>
-                <MDTypography ml={2} variant="h6">
-                  Edit {memberName} data
-                </MDTypography>
-                <MDTypography ml={2} variant="body2">
-                  Change role by selecting in the newxt drop down menu
+            <Card>
+              <MDTypography ml={2} mt={2} variant="h6">
+                Edit {memberName} roles
+              </MDTypography>
+
+              <MDBox mb={3}>
+                <MDTypography mt={1} ml={2} variant="body2">
+                  Change the role by selecting in the next drop down menu
                 </MDTypography>
 
                 <FormControl
@@ -326,13 +359,24 @@ export default function ComitteeManagementPage() {
                     displayEmpty
                     IconComponent={() => <ArrowDropDownIcon />}
                     sx={{ height: 30 }}
-                    onChange={() => setShowSaveButton(true)}
+                    value={selectValueRole}
+                    onChange={(event) => {
+                      if (event.target.value === "Choose a role") {
+                        setSelectValueRole("Choose a role");
+                        setShowSaveButton(false);
+                      } else {
+                        setSelectValueRole(event.target.value);
+                        setShowSaveButton(true);
+                      }
+                    }}
                   >
-                    <MenuItem value="" disabled>
-                      Choose a the role
-                    </MenuItem>
-                    <MenuItem value="chair">Chair</MenuItem>
-                    <MenuItem value="pc-members">PC Members</MenuItem>
+                    <MenuItem value="Choose a role">Choose a role</MenuItem>
+                    {!memberRoles.includes("Chair") && (
+                      <MenuItem value="Chair">Chair</MenuItem>
+                    )}
+                    {!memberRoles.includes("Committee") && (
+                      <MenuItem value="Committee">Committee</MenuItem>
+                    )}
                   </Select>
                 </FormControl>
 
@@ -349,37 +393,39 @@ export default function ComitteeManagementPage() {
                       maxHeight: "30px",
                       minWidth: "5px",
                       minHeight: "30px",
-                      mt: 1,
+                      mt: 2,
                       ml: 2,
-                      mb: 2,
+                      mb: 1,
                     }}
                   >
                     Close
                   </MDButton>
+
                   {showSaveButton && (
                     <MDButton
                       variant="gradient"
                       color="success"
-                      onClick={() => {
+                      onClick={async () => {
                         setEditOpen(false);
                         setShowSaveButton(false);
+                        await changeMemberRole();
                       }}
                       sx={{
                         maxWidth: "20px",
                         maxHeight: "30px",
                         minWidth: "5px",
                         minHeight: "30px",
-                        mt: 1,
+                        mt: 2,
                         ml: 2,
-                        mb: 2,
+                        mb: 1,
                       }}
                     >
                       Save
                     </MDButton>
                   )}
                 </div>
-              </Card>
-            </MDBox>
+              </MDBox>
+            </Card>
           )}
         </MDBox>
       </Container>

@@ -64,4 +64,20 @@ router.post("/removePCMember", auth.ensureAuthenticated, async (req, res) => {
   }
 });
 
+router.post("/updateRoleMember", auth.ensureAuthenticated, async (req, res) => {
+  try {
+    const queryText = `
+      UPDATE userRoles SET
+        userrole = '${req.body.role}'
+      WHERE
+        confid = ${req.body.confid}
+      AND userid = ${req.body.userid}`;
+
+    await db.fetchDataCst(queryText);
+    return res.status(200).send({ msg: "" });
+  } catch (error) {
+    return res.status(500).send({ msg: "Internal Error" });
+  }
+});
+
 module.exports = router;
