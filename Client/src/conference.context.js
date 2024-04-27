@@ -24,8 +24,8 @@ function ConferenceProviderWrapper(props) {
 
         if (response.ok) {
           const userData = await response.json();
-          setConfID(userData.usercurrentconfid);
-          setUserRole(userData.userrole);
+          setConfID(parseInt(userData[0].usercurrentconfid));
+          setUserRole(userData[0].userrole);
         }
       } catch (error) {
         console.error("Error in auth context", error);
