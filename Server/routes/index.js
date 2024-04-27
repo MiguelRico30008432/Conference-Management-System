@@ -9,8 +9,10 @@ const myConferences = require("./pages/MyConferences");
 const createConference = require("./pages/CreateConference");
 const ConferenceContext = require("./conferenceContext");
 const ComitteeManagementPage = require("./pages/ComiteManagement");
+const emailsPage = require("./pages/EmailsPage");
 
 router.use(logInLogoutRouter);
+router.use(emailsPage);
 router.use(usersRouter);
 router.use(pendingConferences);
 router.use(myProfile);

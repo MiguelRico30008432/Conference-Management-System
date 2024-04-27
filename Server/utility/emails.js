@@ -5,6 +5,10 @@ const emailFrom = process.env.EMAILFROM;
 const emailPassword = process.env.EMAILPASSWORD;
 
 function sendEmail(to, subject, replacements,file) {
+    console.log(to);
+    console.log(subject);
+    console.log(replacements);
+    console.log(file);
     const filePath = path.join(__dirname, 'emailTemplates', file);
     
     fs.readFile(filePath, { encoding: 'utf-8' }, (err, html) => {
