@@ -13,15 +13,17 @@ import Footer from "OurComponents/footer/Footer";
 import CompleteTable from "OurComponents/Table/CompleteTable";
 import { v4 as uuidv4 } from "uuid";
 import MDTypography from "components/MDTypography";
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"; // Import the ArrowDropDownIcon
+import { FormControl, MenuItem, Select } from "@mui/material";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
 
 export default function ComitteeManagementPage() {
-  const { confID, userRole } = useContext(ConferenceContext);
+  const { confID } = useContext(ConferenceContext);
   const { user, isLoggedIn } = useContext(AuthContext);
 
   const [infoOpen, setInfoOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [popMessage, setPopMessage] = useState(false);
   const [rows, setRow] = useState([]);
   const [error, setError] = useState(null);
 
@@ -83,7 +85,7 @@ export default function ComitteeManagementPage() {
       resizable: false,
       width: 60,
       renderCell: (params) => {
-        const memberInfo = async () => {
+        async function memberInfo() {
           try {
             const response = await fetch(
               "http://localhost:8003/comiteInfoUser",
@@ -108,7 +110,7 @@ export default function ComitteeManagementPage() {
           } catch (error) {
             setError(<Alert severity="error">Something went wrong.</Alert>);
           }
-        };
+        }
 
         return (
           <div
@@ -198,34 +200,6 @@ export default function ComitteeManagementPage() {
       renderCell: (params) => {
         if (params.row.userid === user) return null;
 
-        const deleteMember = async () => {
-          try {
-            const response = await fetch(
-              "http://localhost:8003/removePCMember",
-              {
-                method: "POST",
-                body: JSON.stringify({
-                  userid: params.row.userid,
-                  confid: confID,
-                }),
-                headers: {
-                  "Content-type": "application/json; charset=UTF-8",
-                },
-                credentials: "include",
-              }
-            );
-
-            if (response.status === 200) {
-              window.location.reload();
-            } else {
-              const jsonResponse = await response.json();
-              setError(<Alert severity="error">{jsonResponse.msg}</Alert>);
-            }
-          } catch (error) {
-            setError(<Alert severity="error">Something went wrong.</Alert>);
-          }
-        };
-
         return (
           <div
             style={{
@@ -238,7 +212,10 @@ export default function ComitteeManagementPage() {
             <MDButton
               variant="gradient"
               color="error"
-              onClick={deleteMember}
+              onClick={() => {
+                setPopMessage(true);
+                setMemberID(params.row.userid);
+              }}
               sx={{
                 maxWidth: "100px",
                 maxHeight: "30px",
@@ -253,6 +230,31 @@ export default function ComitteeManagementPage() {
       },
     },
   ];
+
+  async function deleteMember() {
+    try {
+      const response = await fetch("http://localhost:8003/removePCMember", {
+        method: "POST",
+        body: JSON.stringify({
+          userid: memberID,
+          confid: confID,
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+        credentials: "include",
+      });
+
+      if (response.status === 200) {
+        window.location.reload();
+      } else {
+        const jsonResponse = await response.json();
+        setError(<Alert severity="error">{jsonResponse.msg}</Alert>);
+      }
+    } catch (error) {
+      setError(<Alert severity="error">Something went wrong.</Alert>);
+    }
+  }
 
   async function changeMemberRole() {
     try {
@@ -279,10 +281,25 @@ export default function ComitteeManagementPage() {
       setError(<Alert severity="error">Something went wrong.</Alert>);
     }
   }
+
   return (
     <DashboardLayout>
       <ConfNavbar />
       <Container maxWidth="sm">
+        {/*Mensagem de erro*/}
+        <PopUpWithMessage
+          open={popMessage}
+          handleClose={() => setPopMessage(false)}
+          handleConfirm={async () => {
+            await deleteMember();
+            setPopMessage(false);
+          }}
+          affirmativeButtonName={"Yes, I'm Sure"}
+          negativeButtonName={"Cancel"}
+          title={"Confirm Remove Member?"}
+          text={"Are you sure you want to remove the selected user?"}
+        />
+
         <MDBox mt={10} mb={2} textAlign="left">
           <MDBox mb={3} textAlign="left">
             <Card>

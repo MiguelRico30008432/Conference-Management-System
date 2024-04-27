@@ -60,7 +60,7 @@ function AuthProviderWrapper(props) {
       <PopUpWithMessage
         open={errorDialogOpen}
         handleConfirm={() => setErrorDialogOpen(false)}
-        justConfirmButton={true}
+        justOneButton={true}
         title={"Sorry but it seems that you lost your connection :("}
         text={"Please try again later..."}
       />

@@ -10,9 +10,11 @@ export default function PopUpWithMessage({
   open,
   handleClose,
   handleConfirm,
+  justOneButton = false,
+  affirmativeButtonName = "Confirm",
+  negativeButtonName = "Cancel",
   text,
   title,
-  justConfirmButton = false,
 }) {
   return (
     <Dialog open={open} onClose={handleClose}>
@@ -21,17 +23,17 @@ export default function PopUpWithMessage({
         <DialogContentText>{text}</DialogContentText>
       </DialogContent>
       <DialogActions>
-        {justConfirmButton ? (
+        {justOneButton ? (
           <Button onClick={handleConfirm} color="primary">
-            Confirm
+            {affirmativeButtonName}
           </Button>
         ) : (
           <>
-            <Button onClick={handleClose} color="primary">
-              Cancel
-            </Button>
             <Button onClick={handleConfirm} color="primary">
-              Confirm
+              {affirmativeButtonName}
+            </Button>
+            <Button onClick={handleClose} color="primary">
+              {negativeButtonName}
             </Button>
           </>
         )}
