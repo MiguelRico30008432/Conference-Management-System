@@ -1,7 +1,6 @@
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import ConfNavbar from "../../OurComponents/navBars/ConferenceNavBar";
 import Container from "@mui/material/Container";
-
 import { ConferenceContext } from "conference.context";
 import { AuthContext } from "auth.context";
 import * as React from "react";

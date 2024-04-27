@@ -1,10 +1,7 @@
-//Layout Component
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import ConfNavbar from "../../OurComponents/navBars/ConferenceNavBar";
 import { ConferenceContext } from "conference.context";
 import Footer from "OurComponents/footer/Footer";
-
-// @mui material components
 import * as React from "react";
 import { useState, useContext } from "react";
 import Card from "@mui/material/Card";
