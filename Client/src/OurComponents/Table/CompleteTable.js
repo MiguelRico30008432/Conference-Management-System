@@ -9,6 +9,7 @@ export default function CompleteTable({
   withCheckBoxSelection = false,
   height,
   width = "100%",
+  rowHeight = 41,
   numerOfRowsPerPage = 5,
 }) {
   const [selectedRows, setSelectedRows] = useState([]);
@@ -32,6 +33,7 @@ export default function CompleteTable({
             onRowSelectionModelChange={
               withCheckBoxSelection ? (itm) => setSelectedRows(itm) : null
             }
+            rowHeight={rowHeight}
             sx={{
               //colunas
               "& .MuiDataGrid-columnHeader": {

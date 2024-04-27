@@ -1,5 +1,7 @@
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import ConfNavbar from "../../OurComponents/navBars/ConferenceNavBar";
+import Container from "@mui/material/Container";
+
 import { ConferenceContext } from "conference.context";
 import { AuthContext } from "auth.context";
 import * as React from "react";
@@ -10,16 +12,19 @@ import MDBox from "components/MDBox";
 import Alert from "@mui/material/Alert";
 import Footer from "OurComponents/footer/Footer";
 import CompleteTable from "OurComponents/Table/CompleteTable";
-import MoreDetails from "OurComponents/Info/MoreDetails";
 import { v4 as uuidv4 } from "uuid";
 import MDTypography from "components/MDTypography";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"; // Import the ArrowDropDownIcon
 
 export default function ComitteeManagementPage() {
   const { confID, userRole } = useContext(ConferenceContext);
   const { user, isLoggedIn } = useContext(AuthContext);
 
-  const [detailsOpen, setDetailsOpen] = useState(false);
-  const [dataForDetails, setDataForDetails] = useState({});
+  const [infoOpen, setInfoOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [showSaveButton, setShowSaveButton] = useState(false);
+  const [memberName, setMemberName] = useState(null);
   const [rows, setRow] = useState([]);
   const [error, setError] = useState(null);
 
@@ -63,102 +68,181 @@ export default function ComitteeManagementPage() {
     { field: "userfirstname", headerName: "First Name", width: 150 },
     { field: "userlastname", headerName: "Last Name", width: 150 },
     { field: "useremail", headerName: "Email", width: 250 },
-    { field: "userphone", headerName: "Phone", width: 120 },
     { field: "useraffiliation", headerName: "Affiliation", width: 90 },
-    { field: "userrole", headerName: "Role", width: 130 },
+    { field: "userrole", headerName: "Role", width: 200 },
     {
-      field: "info",
+      field: "Info",
+      filterable: false,
       headerName: "",
-      description:
-        "This column has a button to give details about the conference",
+      description: "",
       sortable: false,
       disableColumnMenu: true,
       resizable: false,
       width: 60,
       renderCell: (params) => {
-        const handleMoreDetailsButtonClick = () => {
-          setDataForDetails(params.row);
-          setDetailsOpen(true);
+        const memberInfo = async () => {
+          try {
+            const response = await fetch(
+              "http://localhost:8003/comiteInfoUser",
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  userid: params.row.userid,
+                  confid: confID,
+                }),
+                headers: {
+                  "Content-type": "application/json; charset=UTF-8",
+                },
+                credentials: "include",
+              }
+            );
+
+            if (response.status === 200) {
+            } else {
+              const jsonResponse = await response.json();
+              setError(<Alert severity="error">{jsonResponse.msg}</Alert>);
+            }
+          } catch (error) {
+            setError(<Alert severity="error">Something went wrong.</Alert>);
+          }
         };
 
         return (
-          <MDButton
-            variant="gradient"
-            color="info"
-            onClick={handleMoreDetailsButtonClick}
-            sx={{
-              maxWidth: "20px",
-              maxHeight: "30px",
-              minWidth: "5px",
-              minHeight: "30px",
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
             }}
           >
-            Info
-          </MDButton>
+            <MDButton
+              variant="gradient"
+              color="info"
+              onClick={async () => {
+                //await memberInfo();
+                setMemberName(params.row.userfirstname);
+                setEditOpen(false);
+                setInfoOpen(true);
+              }}
+              sx={{
+                maxWidth: "20px",
+                maxHeight: "30px",
+                minWidth: "5px",
+                minHeight: "30px",
+              }}
+            >
+              Info
+            </MDButton>
+          </div>
         );
       },
     },
     {
-      field: "edit",
+      field: "Edit",
+      filterable: false,
       headerName: "",
-      description:
-        "This column has a button to give details about the conference",
+      description: "",
       sortable: false,
       disableColumnMenu: true,
       resizable: false,
       width: 60,
       renderCell: (params) => {
-        const handleMoreDetailsButtonClick = () => {
-          setDataForDetails(params.row);
-          setDetailsOpen(true);
-        };
+        const editMember = () => {};
 
         return (
-          <MDButton
-            variant="gradient"
-            color="success"
-            onClick={handleMoreDetailsButtonClick}
-            sx={{
-              maxWidth: "20px",
-              maxHeight: "30px",
-              minWidth: "5px",
-              minHeight: "30px",
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
             }}
           >
-            Edit
-          </MDButton>
+            <MDButton
+              variant="gradient"
+              color="success"
+              onClick={() => {
+                setMemberName(params.row.userfirstname);
+                setInfoOpen(false);
+                setEditOpen(true);
+              }}
+              sx={{
+                maxWidth: "20px",
+                maxHeight: "30px",
+                minWidth: "5px",
+                minHeight: "30px",
+              }}
+            >
+              Edit
+            </MDButton>
+          </div>
         );
       },
     },
     {
-      field: "remove",
+      field: "Remove",
+      filterable: false,
       headerName: "",
-      description:
-        "This column has a button to give details about the conference",
+      description: "",
       sortable: false,
       disableColumnMenu: true,
       resizable: false,
       width: 110,
       renderCell: (params) => {
-        const handleMoreDetailsButtonClick = () => {
-          setDataForDetails(params.row);
-          setDetailsOpen(true);
+        if (params.row.userid === user) return null;
+
+        const deleteMember = async () => {
+          try {
+            const response = await fetch(
+              "http://localhost:8003/removePCMember",
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  userid: params.row.userid,
+                  confid: confID,
+                }),
+                headers: {
+                  "Content-type": "application/json; charset=UTF-8",
+                },
+                credentials: "include",
+              }
+            );
+
+            if (response.status === 200) {
+              window.location.reload();
+            } else {
+              const jsonResponse = await response.json();
+              setError(<Alert severity="error">{jsonResponse.msg}</Alert>);
+            }
+          } catch (error) {
+            setError(<Alert severity="error">Something went wrong.</Alert>);
+          }
         };
 
         return (
-          <MDButton
-            variant="gradient"
-            color="error"
-            onClick={handleMoreDetailsButtonClick}
-            sx={{
-              maxWidth: "100px",
-              maxHeight: "30px",
-              minWidth: "30px",
-              minHeight: "30px",
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
             }}
           >
-            Remove User
-          </MDButton>
+            <MDButton
+              variant="gradient"
+              color="error"
+              onClick={deleteMember}
+              sx={{
+                maxWidth: "100px",
+                maxHeight: "30px",
+                minWidth: "30px",
+                minHeight: "30px",
+              }}
+            >
+              Remove User
+            </MDButton>
+          </div>
         );
       },
     },
@@ -167,39 +251,138 @@ export default function ComitteeManagementPage() {
   return (
     <DashboardLayout>
       <ConfNavbar />
-      <MDBox mt={10} mb={2} textAlign="left">
-        <MDBox mb={5} textAlign="left">
-          <Card>
-            <MDTypography ml={2} variant="h6">
-              Program Committee
-            </MDTypography>
-            <MDTypography ml={2} variant="body2">
-              To access additional details, modify roles, or remove a PC member,
-              simply click on 'info', 'edit', or 'remove user
-            </MDTypography>
-          </Card>
-        </MDBox>
+      <Container maxWidth="sm">
+        <MDBox mt={10} mb={2} textAlign="left">
+          <MDBox mb={3} textAlign="left">
+            <Card>
+              <MDTypography ml={2} variant="h6">
+                Committee Management
+              </MDTypography>
+              <MDTypography ml={2} variant="body2">
+                To access additional details, modify roles, or remove a PC
+                member, simply click on 'info', 'edit', or 'remove user'
+              </MDTypography>
+            </Card>
+          </MDBox>
 
-        {!detailsOpen ? (
-          <>
+          {/* Tabela principal */}
+          <MDBox mb={3}>
             <Card>
               {error}
               <CompleteTable
                 columns={columns}
                 rows={rows}
                 numerOfRowsPerPage={5}
-                height={200}
+                height={350}
               />
             </Card>
-          </>
-        ) : (
-          <MoreDetails
-            text={dataForDetails}
-            onClose={() => setDetailsOpen(false)}
-          />
-        )}
-      </MDBox>
+          </MDBox>
 
+          {/* Quanto info for clicado */}
+          {infoOpen && (
+            <MDBox mb={3}>
+              <Card>
+                <MDTypography ml={2} variant="h6">
+                  Info about {memberName}
+                </MDTypography>
+
+                <MDButton
+                  variant="gradient"
+                  color="info"
+                  onClick={() => setInfoOpen(false)}
+                  sx={{
+                    maxWidth: "20px",
+                    maxHeight: "30px",
+                    minWidth: "5px",
+                    minHeight: "30px",
+                    mt: 1,
+                    ml: 2,
+                    mb: 2,
+                  }}
+                >
+                  Close
+                </MDButton>
+              </Card>
+            </MDBox>
+          )}
+
+          {/* Quanto edit for clicado */}
+          {editOpen && (
+            <MDBox mb={3}>
+              <Card>
+                <MDTypography ml={2} variant="h6">
+                  Edit {memberName} data
+                </MDTypography>
+                <MDTypography ml={2} variant="body2">
+                  Change role by selecting in the newxt drop down menu
+                </MDTypography>
+
+                <FormControl
+                  variant="outlined"
+                  sx={{ mt: 1, ml: 2, width: 200 }}
+                >
+                  <Select
+                    id="recipient"
+                    displayEmpty
+                    IconComponent={() => <ArrowDropDownIcon />}
+                    sx={{ height: 30 }}
+                    onChange={() => setShowSaveButton(true)}
+                  >
+                    <MenuItem value="" disabled>
+                      Choose a the role
+                    </MenuItem>
+                    <MenuItem value="chair">Chair</MenuItem>
+                    <MenuItem value="pc-members">PC Members</MenuItem>
+                  </Select>
+                </FormControl>
+
+                <div style={{ display: "flex", gap: 1 }}>
+                  <MDButton
+                    variant="gradient"
+                    color="info"
+                    onClick={() => {
+                      setEditOpen(false);
+                      setShowSaveButton(false);
+                    }}
+                    sx={{
+                      maxWidth: "20px",
+                      maxHeight: "30px",
+                      minWidth: "5px",
+                      minHeight: "30px",
+                      mt: 1,
+                      ml: 2,
+                      mb: 2,
+                    }}
+                  >
+                    Close
+                  </MDButton>
+                  {showSaveButton && (
+                    <MDButton
+                      variant="gradient"
+                      color="success"
+                      onClick={() => {
+                        setEditOpen(false);
+                        setShowSaveButton(false);
+                      }}
+                      sx={{
+                        maxWidth: "20px",
+                        maxHeight: "30px",
+                        minWidth: "5px",
+                        minHeight: "30px",
+                        mt: 1,
+                        ml: 2,
+                        mb: 2,
+                      }}
+                    >
+                      Save
+                    </MDButton>
+                  )}
+                </div>
+              </Card>
+            </MDBox>
+          )}
+        </MDBox>
+      </Container>
       <Footer />
     </DashboardLayout>
   );

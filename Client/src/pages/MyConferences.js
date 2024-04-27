@@ -59,13 +59,15 @@ export default function MyConferences() {
     { field: "confname", headerName: "Conference Name", width: 600 },
     { field: "userrole", headerName: "Your Role", width: 200 },
     {
-      field: "",
+      field: "Enter",
+      filterable: false,
       headerName: "",
       description: "",
       sortable: false,
       disableColumnMenu: true,
       resizable: false,
       width: 90,
+
       renderCell: (params) => {
         const handleMoreDetailsButtonClick = async () => {
           setConfID(params.row.confid);
@@ -75,19 +77,28 @@ export default function MyConferences() {
         };
 
         return (
-          <MDButton
-            variant="gradient"
-            color="info"
-            onClick={handleMoreDetailsButtonClick}
-            sx={{
-              maxWidth: "80px",
-              maxHeight: "30px",
-              minWidth: "30px",
-              minHeight: "30px",
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
             }}
           >
-            Enter
-          </MDButton>
+            <MDButton
+              variant="gradient"
+              color="info"
+              onClick={handleMoreDetailsButtonClick}
+              sx={{
+                maxWidth: "80px",
+                maxHeight: "30px",
+                minWidth: "30px",
+                minHeight: "30px",
+              }}
+            >
+              Enter
+            </MDButton>
+          </div>
         );
       },
     },
@@ -129,10 +140,7 @@ export default function MyConferences() {
               access to a wealth of resources, sessions, and interactive
               features tailored to enhance your conference experience.
             </MDTypography>
-            <MDTypography ml={2} variant="body2">
-              Each entry represents a unique opportunity for learning,
-              networking, and collaboration.
-            </MDTypography>
+
             <MDTypography ml={2} variant="body2">
               To explore any conference further, simply click on the "Enter"
               button next to its details.

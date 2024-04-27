@@ -88,6 +88,7 @@ export default function PendingConferencesPage() {
     { field: "confenddate", headerName: "Conference End Date", width: 200 },
     {
       field: "More Info.",
+      filterable: false,
       headerName: "",
       description:
         "This column has a button to give details about the conference",
@@ -120,6 +121,7 @@ export default function PendingConferencesPage() {
     },
     {
       field: "Aprove",
+      filterable: false,
       headerName: "",
       description: "This column has a button to accept the conference",
       sortable: false,
@@ -137,24 +139,34 @@ export default function PendingConferencesPage() {
         };
 
         return (
-          <MDButton
-            variant="gradient"
-            color="success"
-            onClick={handleAcceptButtonClick}
-            sx={{
-              maxWidth: "80px",
-              maxHeight: "30px",
-              minWidth: "30px",
-              minHeight: "30px",
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
             }}
           >
-            Accept
-          </MDButton>
+            <MDButton
+              variant="gradient"
+              color="success"
+              onClick={handleAcceptButtonClick}
+              sx={{
+                maxWidth: "80px",
+                maxHeight: "30px",
+                minWidth: "30px",
+                minHeight: "30px",
+              }}
+            >
+              Accept
+            </MDButton>
+          </div>
         );
       },
     },
     {
       field: "Reject",
+      filterable: false,
       headerName: "",
       description: "This column has a button to reject the conference",
       sortable: false,
@@ -172,19 +184,28 @@ export default function PendingConferencesPage() {
         };
 
         return (
-          <MDButton
-            variant="gradient"
-            color="error"
-            onClick={handleRejectButtonClick}
-            sx={{
-              maxWidth: "80px",
-              maxHeight: "30px",
-              minWidth: "30px",
-              minHeight: "30px",
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
             }}
           >
-            Reject
-          </MDButton>
+            <MDButton
+              variant="gradient"
+              color="error"
+              onClick={handleRejectButtonClick}
+              sx={{
+                maxWidth: "80px",
+                maxHeight: "30px",
+                minWidth: "30px",
+                minHeight: "30px",
+              }}
+            >
+              Reject
+            </MDButton>
+          </div>
         );
       },
     },

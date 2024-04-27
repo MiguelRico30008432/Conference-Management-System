@@ -1,27 +1,26 @@
 //Layout Component
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import ConfNavbar from "../../OurComponents/navBars/ConferenceNavBar"
+import ConfNavbar from "../../OurComponents/navBars/ConferenceNavBar";
 import { ConferenceContext } from "conference.context";
 import Footer from "OurComponents/footer/Footer";
 
 // @mui material components
 import * as React from "react";
 import { useState, useContext } from "react";
-import Card from '@mui/material/Card';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import FormControl from '@mui/material/FormControl';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'; // Import the ArrowDropDownIcon
-
-
+import Card from "@mui/material/Card";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import MDTypography from "components/MDTypography";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import FormControl from "@mui/material/FormControl";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import MDBox from "components/MDBox";
 
 export default function EmailsPage() {
   const { confID, userRole } = useContext(ConferenceContext);
-  const [recipient, setRecipient] = useState('');
+  const [recipient, setRecipient] = useState("");
 
   const handleSendEmail = (event) => {
     event.preventDefault();
@@ -34,95 +33,109 @@ export default function EmailsPage() {
 
   return (
     <DashboardLayout>
-      <ConfNavbar/>
+      <ConfNavbar />
       <Container maxWidth="sm">
-        <Card sx={{ mt: 6, p: 3 }}>
-          <Typography variant="h6" gutterBottom component="div">
-            Send Email
-          </Typography>
-          <Box component="form" onSubmit={handleSendEmail} noValidate sx={{ mt: 1 }}>
-            <Typography variant="subtitle1" sx={{ mt: 2, mb: 1 }}>
-              Send To
-            </Typography>
-            <FormControl fullWidth margin="normal" variant="outlined" sx={{ width: '100%' }}>
-              <Select
-                id="recipient"
-                value={recipient}
-                onChange={handleRecipientChange}
-                displayEmpty
-                inputProps={{ 'aria-label': 'Without label' }}
-                IconComponent={() => <ArrowDropDownIcon />} // Use IconComponent to display the arrow
-                sx={{ height: '3rem' }} // Adjust height here
+        <MDBox mt={10} textAlign="left">
+          <MDBox textAlign="left">
+            <Card>
+              <MDTypography ml={2} variant="h6">
+                Send Email
+              </MDTypography>
+              <MDTypography ml={2} variant="body2">
+                text goes here
+              </MDTypography>
+            </Card>
+          </MDBox>
+          <Card sx={{ mt: 3, p: 3 }}>
+            <Box component="form" onSubmit={handleSendEmail} noValidate>
+              <MDTypography variant="body2">Send To</MDTypography>
+              <FormControl
+                fullWidth
+                margin="normal"
+                variant="outlined"
+                sx={{ width: "100%" }}
               >
-                <MenuItem value="" disabled>Choose a Group to Send the Email</MenuItem>
-                <MenuItem value="chair">Chair</MenuItem>
-                <MenuItem value="pc-members">PC Members</MenuItem>
-              </Select>
-            </FormControl>
-            <Typography variant="subtitle1" sx={{ mt: 2, mb: 1 }}>
-              Subject *
-            </Typography>
-            <Box
-              sx={{
-                '& textarea': {
-                  width: '100%',
-                  padding: '18.5px 14px',
-                  fontSize: '0.9rem',
-                  fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-                  border: '1px solid #c4c4c4',
-                  borderRadius: '4px',
-                  '&:focus': {
-                    outline: '2px solid #3f51b5',
-                    borderColor: 'transparent',
+                <Select
+                  id="recipient"
+                  value={recipient}
+                  onChange={handleRecipientChange}
+                  displayEmpty
+                  inputProps={{ "aria-label": "Without label" }}
+                  IconComponent={() => <ArrowDropDownIcon />} // Use IconComponent to display the arrow
+                  sx={{ height: "3rem" }} // Adjust height here
+                >
+                  <MenuItem value="" disabled>
+                    Choose a Group to Send the Email
+                  </MenuItem>
+                  <MenuItem value="chair">Chair</MenuItem>
+                  <MenuItem value="committee">Committee</MenuItem>
+                </Select>
+              </FormControl>
+              <MDTypography variant="body2" sx={{ mt: 2, mb: 1 }}>
+                Subject *
+              </MDTypography>
+              <Box
+                sx={{
+                  "& textarea": {
+                    width: "100%",
+                    padding: "18.5px 14px",
+                    fontSize: "0.9rem",
+                    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+                    border: "1px solid #c4c4c4",
+                    borderRadius: "4px",
+                    "&:focus": {
+                      outline: "2px solid #3f51b5",
+                      borderColor: "transparent",
+                    },
+                    resize: "vertical",
                   },
-                  resize: 'vertical',
-                },
-              }}
-            >
-              <textarea
-                aria-label="Subject"
-                rows={1}
-                placeholder="Enter your subject here"
-                required
-              />
-            </Box>
-            <Typography variant="subtitle1" sx={{ mt: 2, mb: 1 }}>
-              Description *
-            </Typography>
-            <Box
-              sx={{
-                '& textarea': {
-                  width: '100%',
-                  padding: '18.5px 14px',
-                  fontSize: '0.9rem',
-                  fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-                  border: '1px solid #c4c4c4',
-                  borderRadius: '4px',
-                  '&:focus': {
-                    outline: '2px solid #3f51b5',
-                    borderColor: 'transparent',
+                }}
+              >
+                <textarea
+                  aria-label="Subject"
+                  rows={1}
+                  placeholder="Enter your subject here"
+                  required
+                />
+              </Box>
+              <MDTypography variant="body2" sx={{ mt: 2, mb: 1 }}>
+                Description *
+              </MDTypography>
+              <Box
+                sx={{
+                  "& textarea": {
+                    width: "100%",
+                    padding: "18.5px 14px",
+                    fontSize: "0.9rem",
+                    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+                    border: "1px solid #c4c4c4",
+                    borderRadius: "4px",
+                    "&:focus": {
+                      outline: "2px solid #3f51b5",
+                      borderColor: "transparent",
+                    },
+                    resize: "vertical",
                   },
-                  resize: 'vertical',
-                },
-              }}
-            >
-              <textarea
-                aria-label="Description"
-                rows={4}
-                placeholder="Enter your description here"
-                required
-              />
+                }}
+              >
+                <textarea
+                  aria-label="Description"
+                  rows={4}
+                  placeholder="Enter your description here"
+                  required
+                />
+              </Box>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2, color: "white !important" }}
+              >
+                Send Email
+              </Button>
             </Box>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2, color: 'white !important' }}
-            >
-              Send Email
-            </Button>
-          </Box>
-        </Card>
+          </Card>
+        </MDBox>
       </Container>
       <br></br>
       <Footer />

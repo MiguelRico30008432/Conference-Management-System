@@ -74,7 +74,7 @@ router.post("/createConference", auth.ensureAuthenticated, async (req, res) => {
 
     await db.addData("userroles", {
       userid: user,
-      userrole: "chair",
+      userrole: "Chair",
       confid: addedConfID[0].confid,
     });
 
