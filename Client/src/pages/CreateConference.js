@@ -45,7 +45,7 @@ export default function CreateConference() {
   const [conferenceTypes, setConferenceTypes] = useState([]);
   const [conferenceAreas, setConferenceAreas] = useState([]);
 
-  const { user } = useContext(AuthContext);
+  const { user, isLoggedIn } = useContext(AuthContext);
 
   //Handles the disclaimers in the Date picker
 
@@ -107,9 +107,11 @@ export default function CreateConference() {
   };
 
   useEffect(() => {
-    fetchConferenceTypes();
-    fetchConferenceAreas();
-  }, []);
+    if (isLoggedIn) {
+      fetchConferenceTypes();
+      fetchConferenceAreas();
+    }
+  }, [isLoggedIn]);
 
   //Handles Submit form
   const handleSubmit = async (event) => {
