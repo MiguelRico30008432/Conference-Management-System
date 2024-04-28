@@ -11,7 +11,7 @@ router.post("/confContext", auth.ensureAuthenticated, async (req, res) => {
         STRING_AGG(userrole, ', ') AS userrole
     FROM users
     INNER JOIN conferences ON conferences.confid = users.usercurrentconfid
-    INNER JOIN userRoles ON userRoles.confid = conferences.confid
+    INNER JOIN userRoles ON userRoles.confid = conferences.confid AND userRoles.userid = users.userid 
     WHERE users.userid = ${req.body.userid}
     GROUP BY usercurrentconfid`;
 

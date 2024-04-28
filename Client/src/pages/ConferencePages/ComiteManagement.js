@@ -477,7 +477,7 @@ export default function ComitteeManagementPage() {
 
               <MDBox mb={3}>
                 <MDTypography mt={1} ml={2} variant="body2">
-                  Change the role by selecting in the next drop down menu
+                  Change the role using the dropdown menu below
                 </MDTypography>
 
                 <FormControl
