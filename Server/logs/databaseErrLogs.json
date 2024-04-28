@@ -83,3 +83,8 @@
 {"originFile":"database.js","time":"2024-04-27 21:58:59","function":"fetchDataWithJoin","mensagem":{"length":106,"name":"error","severity":"ERROR","code":"42703","position":"157","file":"parse_relation.c","line":"3713","routine":"errorMissingColumn"}}
 {"originFile":"database.js","time":"2024-04-27 22:02:36","function":"fetchDataWithJoin","mensagem":{"length":106,"name":"error","severity":"ERROR","code":"42703","position":"157","file":"parse_relation.c","line":"3713","routine":"errorMissingColumn"}}
 {"originFile":"database.js","time":"2024-04-27 22:04:42","function":"fetchDataWithJoin","mensagem":{"length":106,"name":"error","severity":"ERROR","code":"42703","position":"157","file":"parse_relation.c","line":"3713","routine":"errorMissingColumn"}}
+{"originFile":"database.js","time":"2024-04-28 21:20:37","function":"fetchDataWithJoin","mensagem":{"length":97,"name":"error","severity":"ERROR","code":"42601","position":"160","file":"scan.l","line":"1241","routine":"scanner_yyerror"}}
+{"originFile":"database.js","time":"2024-04-28 21:21:02","function":"fetchDataWithJoin","mensagem":{"length":95,"name":"error","severity":"ERROR","code":"42601","position":"160","file":"scan.l","line":"1241","routine":"scanner_yyerror"}}
+{"originFile":"database.js","time":"2024-04-28 21:22:22","function":"fetchDataWithJoin","mensagem":{"length":107,"name":"error","severity":"ERROR","code":"42601","position":"160","file":"scan.l","line":"1241","routine":"scanner_yyerror"}}
+{"originFile":"database.js","time":"2024-04-28 21:26:16","function":"fetchDataWithJoin","mensagem":{}}
+{"originFile":"database.js","time":"2024-04-28 21:27:30","function":"fetchDataWithJoin","mensagem":{}}

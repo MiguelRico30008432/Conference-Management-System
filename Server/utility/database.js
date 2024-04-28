@@ -101,16 +101,33 @@ async function fetchDataWithJoin(mainTable, joinTable, joinCondition, joinSecond
       WHERE ${joinTable}.${joinSecondCondition} = '${filterValue}' AND ${joinTable}.${filterSecondColumn} = '${filterSecondValue}';
     `;
     const result = await pool.query(queryText);
-    
     // Extract just the email values from the result set
     const emails = result.rows.map(row => row.useremail);
-    
     return emails;
   } catch (err) {
     log.addLog(err, "database", "fetchDataWithJoin");
     throw err; // Rethrow the error
   }
 }
+
+async function fetchAllEmailData(mainTable, joinTable, joinCondition, joinSecondCondition, filterColumn, filterSecondColumn, filterValue, filterSecondValue) {
+  try {
+    const queryText = `
+      SELECT ${filterColumn}
+      FROM ${mainTable}
+      JOIN ${joinTable} ON ${mainTable}.${joinCondition} = ${joinTable}.${joinCondition}
+      WHERE ${joinTable}.${joinSecondCondition} = '${filterValue}' AND ${joinTable}.${filterSecondColumn} IN (${filterSecondValue.map(value => `'${value}'`).join(', ')});
+    `;
+    const result = await pool.query(queryText);
+    // Extract just the email values from the result set
+    const emails = result.rows.map(row => row.useremail);
+    return emails;
+  } catch (err) {
+    log.addLog(err, "database", "fetchDataWithJoin");
+    throw err; // Rethrow the error
+  }
+}
+
 module.exports = {
   fetchData,
   fetchDataCst,
@@ -118,4 +135,6 @@ module.exports = {
   deleteData,
   updateData,
   fetchAllData,
-  fetchDataWithJoin,};
+  fetchDataWithJoin,
+  fetchAllEmailData,
+};
