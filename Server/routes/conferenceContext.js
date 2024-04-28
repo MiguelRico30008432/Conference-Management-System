@@ -28,12 +28,13 @@ router.post(
   auth.ensureAuthenticated,
   async (req, res) => {
     try {
-      await db.updateData(
-        "users",
-        { usercurrentconfid: req.body.confid },
-        { userid: req.body.userid }
-      );
+      const queryText = `
+      UPDATE users SET
+        usercurrentconfid = ${req.body.confid}
+      WHERE
+        userid = ${req.body.userid}`;
 
+      await db.fetchDataCst(queryText);
       return res.status(200).send({ msg: "" });
     } catch (error) {
       return res.status(500).send({ msg: "Internal Error" });

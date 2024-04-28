@@ -86,7 +86,7 @@ export default function MyProfilePage() {
   async function handleSubmit(event) {
     event.preventDefault();
 
-    if (makeRequest) {
+    if (makeRequest()) {
       if (valideInputs) {
         if (originalEmail != email) {
           setOpenEmailChangeDialog(true);
@@ -121,11 +121,11 @@ export default function MyProfilePage() {
 
   function makeRequest() {
     if (
-      originalFirstName != firstName ||
-      originalLastName != lastName ||
-      originalAffiliation != affiliation ||
-      originalEmail != email ||
-      originalPhone != phone
+      originalFirstName !== firstName ||
+      originalLastName !== lastName ||
+      originalAffiliation !== affiliation ||
+      originalEmail !== email ||
+      originalPhone !== phone
     ) {
       return true;
     } else {

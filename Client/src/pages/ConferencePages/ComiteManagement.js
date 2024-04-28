@@ -18,8 +18,8 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
 
 export default function ComitteeManagementPage() {
-  const { confID } = useContext(ConferenceContext);
-  const { user, isLoggedIn } = useContext(AuthContext);
+  const { confID, userRole } = useContext(ConferenceContext);
+  const { user } = useContext(AuthContext);
 
   const [infoOpen, setInfoOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -65,10 +65,16 @@ export default function ComitteeManagementPage() {
       }
     }
 
-    if (isLoggedIn && confID > 0) {
-      getRows();
+    if (confID > 0) {
+      if (userRole.includes("Chair")) {
+        getRows();
+      } else {
+        setError(
+          <Alert severity="error">User does not have permissions</Alert>
+        );
+      }
     }
-  }, [isLoggedIn, confID]);
+  }, [confID]);
 
   const columns = [
     { field: "userfirstname", headerName: "First Name", width: 150 },
