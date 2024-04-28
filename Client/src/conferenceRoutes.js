@@ -8,6 +8,7 @@ import AllSubmissions from "pages/ConferencePages/AllSubmissions";
 //Bidding
 import Bidding from "pages/ConferencePages/BiddingPage";
 import Assignements from "pages/ConferencePages/Assignements";
+import Conflicts from "pages/ConferencePages/Conflicts";
 
 //Reviews 
 import MyReviews from "pages/ConferencePages/MyReviews";
@@ -20,6 +21,7 @@ import SendInvitation from "pages/ConferencePages/SendInvitation";
 //Administration
 import ComiteManagement from "pages/ConferencePages/ComiteManagement";
 import ConferenceDefinitions from "pages/ConferencePages/ConferenceDefinitionsPage";
+import SubmissionsDecision from "pages/ConferencePages/SubmissionsDecision";
 
 //Details
 import ConferenceDescription from "pages/ConferencePages/ConferenceDescription";
@@ -102,6 +104,14 @@ const ConfRoutes = [
     permissions: ["Chair", "Committee"],
   },
   {
+    type: "collapse",//Done
+    name: "Conflicts Of Interest",
+    submenu: "Bidding",
+    route: "/MyConferences/Conference/ConflictsOfInterest",
+    component: <Conflicts />,
+    permissions: ["Chair"],
+  },
+  {
     type: "title",
     name: "Reviews",
     parentkey: "Reviews",
@@ -165,6 +175,14 @@ const ConfRoutes = [
     submenu: "Settings",
     route: "/MyConferences/Conference/ConferenceSettings",
     component: <ConferenceDefinitions />,
+    permissions: ["Chair"],
+  },
+  {
+    type: "collapse",//Done
+    name: "Submissions Decision",
+    submenu: "Settings",
+    route: "/MyConferences/Conference/SubmissionsDecision",
+    component: <SubmissionsDecision />,
     permissions: ["Chair"],
   },
   {
