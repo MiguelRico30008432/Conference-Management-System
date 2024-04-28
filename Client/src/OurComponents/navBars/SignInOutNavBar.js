@@ -114,13 +114,13 @@ export default function SignInOutNavBar({ transparent, light, action }) {
           <DefaultNavbarLink icon="dashboard" name="Return to Home" route="/HomePage" light={light} />
           <DefaultNavbarLink
             icon="key"
-            name="sign in"
+            name="Sign In"
             route="/Signin"
             light={light}
           />
           <DefaultNavbarLink
             icon="account_circle"
-            name="sign up"
+            name="Sign Up"
             route="/Signup"
             light={light}
           />   
