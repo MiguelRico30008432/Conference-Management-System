@@ -315,143 +315,59 @@ export default function ComitteeManagementPage() {
                   Information about {memberName}
                 </MDTypography>
 
-                <MDBox ml={2}>
-                  <table>
-                    <tbody>
-                      <tr>
-                        <td>
-                          <MDTypography variant="body2">
-                            <b>First name:</b>
-                          </MDTypography>
-                        </td>
-                        <td style={{ paddingLeft: 20 }}>
-                          <MDTypography variant="body2">
-                            {memberInfoData.userfirstname}
-                          </MDTypography>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <MDTypography variant="body2">
-                            <b>Last name:</b>
-                          </MDTypography>
-                        </td>
-                        <td style={{ paddingLeft: 20 }}>
-                          <MDTypography variant="body2">
-                            {memberInfoData.userlastname}
-                          </MDTypography>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <MDTypography variant="body2">
-                            <b>Email:</b>
-                          </MDTypography>
-                        </td>
-                        <td style={{ paddingLeft: 20 }}>
-                          <MDTypography variant="body2">
-                            {memberInfoData.useremail}
-                          </MDTypography>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <MDTypography variant="body2">
-                            <b>Phone:</b>
-                          </MDTypography>
-                        </td>
-                        <td style={{ paddingLeft: 20 }}>
-                          <MDTypography variant="body2">
-                            {memberInfoData.userphone}
-                          </MDTypography>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <MDTypography variant="body2">
-                            <b>Affiliation:</b>
-                          </MDTypography>
-                        </td>
-                        <td style={{ paddingLeft: 20 }}>
-                          <MDTypography variant="body2">
-                            {memberInfoData.useraffiliation}
-                          </MDTypography>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <MDTypography variant="body2">
-                            <b>Created Date:</b>
-                          </MDTypography>
-                        </td>
-                        <td style={{ paddingLeft: 20 }}>
-                          <MDTypography variant="body2">
-                            {memberInfoData.useradddate}
-                          </MDTypography>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <MDTypography variant="body2">
-                            <b>Submitted papers:</b>
-                          </MDTypography>
-                        </td>
-                        <td style={{ paddingLeft: 20 }}>
-                          <MDTypography variant="body2">
-                            Missing Info
-                          </MDTypography>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <MDTypography variant="body2">
-                            <b>Assigned submissions:</b>
-                          </MDTypography>
-                        </td>
-                        <td style={{ paddingLeft: 20 }}>
-                          <MDTypography variant="body2">
-                            Missing Info
-                          </MDTypography>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <MDTypography variant="body2">
-                            <b>Bidding:</b>
-                          </MDTypography>
-                        </td>
-                        <td style={{ paddingLeft: 20 }}>
-                          <MDTypography variant="body2">
-                            Missing Info
-                          </MDTypography>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <MDTypography variant="body2">
-                            <b>Reviewed submissions:</b>
-                          </MDTypography>
-                        </td>
-                        <td style={{ paddingLeft: 20 }}>
-                          <MDTypography variant="body2">
-                            Missing Info
-                          </MDTypography>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <MDTypography variant="body2">
-                            <b>Conflict list:</b>
-                          </MDTypography>
-                        </td>
-                        <td style={{ paddingLeft: 20 }}>
-                          <MDTypography variant="body2">
-                            Missing Info
-                          </MDTypography>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <MDBox ml={2} mb={1}>
+                  <MDTypography variant="body2">
+                    <b>First name: </b>
+                    {memberInfoData.userfirstname}
+                  </MDTypography>
+
+                  <MDTypography variant="body2">
+                    <b>Last name: </b> {memberInfoData.userlastname}
+                  </MDTypography>
+
+                  <MDTypography variant="body2">
+                    <b>Email: </b> {memberInfoData.useremail}
+                  </MDTypography>
+
+                  <MDTypography variant="body2">
+                    <b>Phone: </b> {memberInfoData.userphone}
+                  </MDTypography>
+
+                  <MDTypography variant="body2">
+                    <b>Affiliation: </b> {memberInfoData.useraffiliation}
+                  </MDTypography>
+
+                  <MDTypography variant="body2">
+                    <b>Created Date: </b> {memberInfoData.useradddate}
+                  </MDTypography>
+
+                  <MDTypography mt={2} variant="body2">
+                    <b>Submitted papers:</b>
+                  </MDTypography>
+                  <MDTypography variant="body2">Missing Info</MDTypography>
+
+                  <MDTypography variant="body2">
+                    <b>Assigned submissions:</b>
+                  </MDTypography>
+                  <MDTypography variant="body2">Missing Info</MDTypography>
+
+                  <MDTypography variant="body2">
+                    <b>Bidding:</b>
+                  </MDTypography>
+
+                  <MDTypography variant="body2">Missing Info</MDTypography>
+
+                  <MDTypography variant="body2">
+                    <b>Reviewed submissions:</b>
+                  </MDTypography>
+
+                  <MDTypography variant="body2">Missing Info</MDTypography>
+
+                  <MDTypography variant="body2">
+                    <b>Conflict list:</b>
+                  </MDTypography>
+
+                  <MDTypography variant="body2">Missing Info</MDTypography>
                 </MDBox>
 
                 <MDButton
