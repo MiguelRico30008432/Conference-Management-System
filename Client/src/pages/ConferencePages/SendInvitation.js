@@ -31,7 +31,6 @@ export default function SendInvitation() {
   return (
     <DashboardLayout>
       <ConfNavbar />
-      SendInvitation
       <Container maxWidth="sm">
         <MDBox mt={10} textAlign="left">
           <MDBox textAlign="left">

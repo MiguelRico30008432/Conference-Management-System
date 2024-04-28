@@ -14,13 +14,12 @@ export default function AllSubmissions() {
   return (
     <DashboardLayout>
       <ConfNavbar />
-      AllSubmissions
       <Container maxWidth="sm">
         <MDBox mt={10} mb={2} textAlign="left">
           <MDBox mb={3} textAlign="left">
             <Card>
               <MDTypography ml={2} variant="h6">
-                Submissions
+                AllSubmissions
               </MDTypography>
               <MDTypography ml={2} variant="body2">
                 text goes here

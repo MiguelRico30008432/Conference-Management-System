@@ -14,13 +14,12 @@ export default function BiddingPage() {
   return (
     <DashboardLayout>
       <ConfNavbar />
-      Bidding Process
       <Container maxWidth="sm">
         <MDBox mt={10} mb={2} textAlign="left">
           <MDBox mb={3} textAlign="left">
             <Card>
               <MDTypography ml={2} variant="h6">
-                Bidding
+                Bidding Process
               </MDTypography>
               <MDTypography ml={2} variant="body2">
                 text goes here
