@@ -60,4 +60,21 @@ router.post("/sendComposeEmail", auth.ensureAuthenticated, async (req, res) => {
   }
 });
 
+//Checks if there are any committee members
+router.get("/checkCommitteeMembers", async (req, res) => {
+  const { confID } = req.query;
+  try {
+    // Query the database to check if there are any committee members for the given conference ID
+    const committeeMembers = await db.fetchData('userroles', 'confID', confID);
+    // Check if there are any committee members
+    const committeeMembersExist = committeeMembers.some(member => member.userrole === 'Committee');
+
+    // Send response indicating if committee members exist
+    res.status(200).json({ committeeMembersExist });
+  } catch (error) {
+    console.error("Error checking committee members:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 module.exports = router;

@@ -88,3 +88,6 @@
 {"originFile":"database.js","time":"2024-04-28 21:22:22","function":"fetchDataWithJoin","mensagem":{"length":107,"name":"error","severity":"ERROR","code":"42601","position":"160","file":"scan.l","line":"1241","routine":"scanner_yyerror"}}
 {"originFile":"database.js","time":"2024-04-28 21:26:16","function":"fetchDataWithJoin","mensagem":{}}
 {"originFile":"database.js","time":"2024-04-28 21:27:30","function":"fetchDataWithJoin","mensagem":{}}
+{"originFile":"database.js","time":"2024-04-29 00:09:39","function":"fetchData","mensagem":{"length":147,"name":"error","severity":"ERROR","code":"22P02","where":"unnamed portal parameter $1 = '...'","file":"numutils.c","line":"617","routine":"pg_strtoint32_safe"}}
+{"originFile":"database.js","time":"2024-04-29 00:09:49","function":"fetchData","mensagem":{"length":147,"name":"error","severity":"ERROR","code":"22P02","where":"unnamed portal parameter $1 = '...'","file":"numutils.c","line":"617","routine":"pg_strtoint32_safe"}}
+{"originFile":"database.js","time":"2024-04-29 00:12:20","function":"fetchData","mensagem":{"length":147,"name":"error","severity":"ERROR","code":"22P02","where":"unnamed portal parameter $1 = '...'","file":"numutils.c","line":"617","routine":"pg_strtoint32_safe"}}

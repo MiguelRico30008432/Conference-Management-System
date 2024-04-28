@@ -3,7 +3,7 @@ import ConfNavbar from "../../OurComponents/navBars/ConferenceNavBar";
 import { ConferenceContext } from "conference.context";
 import Footer from "OurComponents/footer/Footer";
 
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import Card from "@mui/material/Card";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
@@ -17,7 +17,7 @@ import MDBox from "components/MDBox";
 import Alert from '@mui/material/Alert';
 
 export default function Compose() {
-  const { confID, userRole } = useContext(ConferenceContext);
+  const {confID} = useContext(ConferenceContext);
   const [recipient, setRecipient] = useState("");
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
@@ -25,6 +25,26 @@ export default function Compose() {
   const [subjectError, setSubjectError] = useState("");
   const [descriptionError, setDescriptionError] = useState("");
   const [sendResponse, setSendResponse] = useState({ success: false, message: "" });
+  const [committeeMembersExist, setCommitteeMembersExist] = useState(false);
+
+  useEffect(() => {
+    // Make a request to backend to check for committee members
+    fetch(`http://localhost:8003/checkCommitteeMembers?confID=${confID}`, {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+      credentials: "include",
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Set state based on response from backend
+      setCommitteeMembersExist(data.committeeMembersExist);
+    })
+    .catch(error => {
+      console.error("Error checking committee members:", error);
+    });
+  }, [confID]);
 
   const handleSendEmail = async (event) => {
     event.preventDefault();
@@ -98,8 +118,12 @@ export default function Compose() {
                 >
                   <MenuItem value="" disabled>Choose a Group to Send the Email</MenuItem>
                   <MenuItem value="chair">Chair</MenuItem>
-                  <MenuItem value="committee">Committee</MenuItem>
-                  <MenuItem value="all">Chair and Committee</MenuItem>
+                  {committeeMembersExist && (
+                    <>
+                      <MenuItem value="committee">Committee</MenuItem>
+                      <MenuItem value="all">Chair and Committee</MenuItem>
+                    </>
+                  )}
                 </Select>
                 {recipientError && <Alert severity="error">{recipientError}</Alert>}
               </FormControl>
