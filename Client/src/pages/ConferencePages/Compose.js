@@ -119,10 +119,10 @@ export default function Compose() {
                   <MenuItem value="" disabled>Choose a Group to Send the Email</MenuItem>
                   <MenuItem value="chair">Chair</MenuItem>
                   {committeeMembersExist && (
-                    <>
-                      <MenuItem value="committee">Committee</MenuItem>
-                      <MenuItem value="all">Chair and Committee</MenuItem>
-                    </>
+                    <MenuItem value="committee">Committee</MenuItem>
+                  )}
+                  {committeeMembersExist && (
+                    <MenuItem value="all">Chair and Committee</MenuItem>
                   )}
                 </Select>
                 {recipientError && <Alert severity="error">{recipientError}</Alert>}

@@ -66,9 +66,9 @@ router.get("/checkCommitteeMembers", async (req, res) => {
   try {
     // Query the database to check if there are any committee members for the given conference ID
     const committeeMembers = await db.fetchData('userroles', 'confID', confID);
-    // Check if there are any committee members
-    const committeeMembersExist = committeeMembers.some(member => member.userrole === 'Committee');
-
+    
+    // Check if committeeMembers is defined and not empty before using some()
+    const committeeMembersExist = committeeMembers && committeeMembers.length > 0 && committeeMembers.some(member => member.userrole === 'Committee');
     // Send response indicating if committee members exist
     res.status(200).json({ committeeMembersExist });
   } catch (error) {
