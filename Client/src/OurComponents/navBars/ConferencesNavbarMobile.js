@@ -16,18 +16,57 @@ Coded by www.creative-tim.com
 // prop-types is a library for typechecking of props.
 import PropTypes from "prop-types";
 
-// @mui material components
-import Menu from "@mui/material/Menu";
-
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 
-// Material Dashboard 2 React example components
-import DefaultNavbarLink from "examples/Navbars/DefaultNavbar/DefaultNavbarLink";
+import * as React from 'react';
+import { useState, useEffect, useContext} from "react";
+import { Button, Menu, MenuItem } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import ConfRoutes from "../../conferenceRoutes";
+import { ConferenceContext } from "../../conference.context";
 
-function DefaultNavbarMobile({ open, close }) {
+function ConferencesNavbarMobile({ open, close }) {
   const { width } = open && open.getBoundingClientRect();
 
+  //----------------------------------------------------------------//
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [subMenus, setSubMenus] = useState([]);
+
+  const navigate = useNavigate();
+  const { userRole } = useContext(ConferenceContext);
+  const anchorRef = React.useRef(null);
+
+
+  const handleClick = (event, parentKey) => {
+    setAnchorEl(event.currentTarget);
+    const menus = ConfRoutes.filter(
+      (item) => item.type === "collapse" && item.submenu === parentKey
+    );
+    setSubMenus(menus);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleSubMenuClick = (route) => {
+    handleClose();
+    navigate(route);
+  };
+
+  const prevOpen = React.useRef(open);
+
+  useEffect(() => {
+    if (prevOpen.current === true && open === false) {
+      anchorRef.current.focus();
+    }
+
+    prevOpen.current = open;
+  }, [open]);
+
+ //-----------------------------------------------------------------//
+  
   return (
     <Menu
       getContentAnchorEl={null}
@@ -45,19 +84,56 @@ function DefaultNavbarMobile({ open, close }) {
       MenuListProps={{ style: { width: `calc(${width}px - 4rem)` } }}
     >
       <MDBox px={0.5}>
-        <DefaultNavbarLink icon="donut_large" name="dashboard" route="/dashboard" />
-        <DefaultNavbarLink icon="person" name="profile" route="/profile" />
-        <DefaultNavbarLink icon="account_circle" name="sign up" route="/authentication/sign-up" />
-        <DefaultNavbarLink icon="key" name="sign in" route="/authentication/sign-in" />
+        {ConfRoutes.map((item) => {
+            if (item.type === "title" && (item.permissions.includes(userRole) || item.permissions.includes("All"))) {
+              return (
+                <div key={item.name}>
+                  <Button
+                    aria-controls="simple-menu"
+                    aria-haspopup="true"
+                    style={{ textTransform: "none", color: "black" }}
+                    onClick={(e) => handleClick(e, item.parentkey)}
+                  >
+                    {item.name}
+                  </Button>
+                </div>
+              );
+            }
+            return null;
+          })}
+          <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+            anchorOrigin={{ // Define a origem do submenu
+              vertical: "top",
+              horizontal: "right", 
+            }}
+          >
+            {subMenus.map((subMenu) => {
+              // Verifique se o usuário tem permissão para ver este submenu
+              if (subMenu.permissions.includes(userRole) || subMenu.permissions.includes("All")) {
+                return (
+                  <MenuItem
+                    key={subMenu.name}
+                    onClick={() => handleSubMenuClick(subMenu.route)}
+                  >
+                    {subMenu.name}
+                  </MenuItem>
+                );
+              }})}
+          </Menu>
       </MDBox>
     </Menu>
   );
 }
 
 // Typechecking props for the DefaultNavbarMenu
-DefaultNavbarMobile.propTypes = {
+ConferencesNavbarMobile.propTypes = {
   open: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]).isRequired,
   close: PropTypes.oneOfType([PropTypes.func, PropTypes.bool, PropTypes.object]).isRequired,
 };
 
-export default DefaultNavbarMobile;
+export default ConferencesNavbarMobile;

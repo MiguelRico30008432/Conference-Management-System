@@ -15,7 +15,7 @@ import Icon from "@mui/material/Icon";
 import MDBox from "components/MDBox";
 
 // Material Dashboard 2 React example components
-import DefaultNavbarMobile from "examples/Navbars/DefaultNavbar/DefaultNavbarMobile";
+import ConferencesNavbarMobile from "../navBars/ConferencesNavbarMobile";
 
 // Material Dashboard 2 React base styles
 import breakpoints from "assets/theme/base/breakpoints";
@@ -78,7 +78,7 @@ export default function ConferenceNavBar({ transparent, light, action }) {
   //------------Referente à NavBar da Conferência-----------------//
 
   useEffect(() => {
-    // A function that sets the display state for the DefaultNavbarMobile.
+    // A function that sets the display state for the ConferencesNavbarMobile.
     function displayMobileNavbar() {
       if (window.innerWidth < breakpoints.values.lg) {
         setMobileView(true);
@@ -130,7 +130,6 @@ export default function ConferenceNavBar({ transparent, light, action }) {
       >
         {/* Esta MDBox contem os links. É onde estão definidas as primeiras opções do menu (Submissões / Bidding / Reviews / Envio de Mails / Gestão do Comitê / Definições da Conferência) */}
         <MDBox color="inherit" display={{ xs: "none", lg: "flex" }} m={0} p={0}>
-          {console.log(userRole)}
           {ConfRoutes.map((item) => {
             if (item.type === "title" && (item.permissions.includes(userRole) || item.permissions.includes("All"))) {
               return (
@@ -138,6 +137,7 @@ export default function ConferenceNavBar({ transparent, light, action }) {
                   <Button
                     aria-controls="simple-menu"
                     aria-haspopup="true"
+                    style={{ textTransform: "none", color: "black" }}
                     onClick={(e) => handleClick(e, item.parentkey)}
                   >
                     {item.name}
@@ -183,7 +183,7 @@ export default function ConferenceNavBar({ transparent, light, action }) {
         </MDBox>
       </MDBox>
       {mobileView && (
-        <DefaultNavbarMobile open={mobileNavbar} close={closeMobileNavbar} />
+        <ConferencesNavbarMobile open={mobileNavbar} close={closeMobileNavbar} />
       )}
     </Container>
   );
