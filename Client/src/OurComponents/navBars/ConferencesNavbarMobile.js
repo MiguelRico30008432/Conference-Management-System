@@ -18,23 +18,6 @@ import PropTypes from "prop-types";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
-import {IconButton, Icon } from "@mui/material";
-import MDTypography from "components/MDTypography";
-import NotificationItem from "examples/Items/NotificationItem";
-
-import {
-  navbar,
-  navbarContainer,
-  navbarRow,
-  navbarMobileMenu,
-} from "examples/Navbars/DashboardNavbar/styles";
-
-import {
-  useMaterialUIController,
-  setTransparentNavbar,
-  setMiniSidenav,
-  setOpenConfigurator,
-} from "context";
 
 import * as React from 'react';
 import { useState, useEffect, useContext} from "react";
@@ -45,31 +28,6 @@ import { ConferenceContext } from "../../conference.context";
 
 function ConferencesNavbarMobile({ open, close }) {
   const { width } = open && open.getBoundingClientRect();
-
-  const [controller, dispatch] = useMaterialUIController();
-  const { miniSidenav, transparentNavbar, fixedNavbar, darkMode } = controller;
-  const [openMenu, setOpenMenu] = useState(false);
-
-  const handleMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav);
-  const handleCloseMenu = () => setOpenMenu(false);
-
-  const renderMenu = () => (
-    <Menu
-      anchorEl={openMenu}
-      anchorReference={null}
-      anchorOrigin={{
-        vertical: "bottom",
-        horizontal: "left",
-      }}
-      open={Boolean(openMenu)}
-      onClose={handleCloseMenu}
-      sx={{ mt: 2 }}
-    >
-      <NotificationItem icon={<Icon>email</Icon>} title="Check new messages" />
-      <NotificationItem icon={<Icon>podcasts</Icon>} title="Manage Podcast sessions" />
-      <NotificationItem icon={<Icon>shopping_cart</Icon>} title="Payment successfully completed" />
-    </Menu>
-  );
 
   //----------------------------------------------------------------//
   const [anchorEl, setAnchorEl] = useState(null);

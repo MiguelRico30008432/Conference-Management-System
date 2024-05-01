@@ -33,12 +33,12 @@ export default function DefaultNavbarMobileSignInSignOut({ open, close }) {
       <DefaultNavbarLink icon="dashboard" name="Return to Home" route="/HomePage" />
           <DefaultNavbarLink
             icon="key"
-            name="sign in"
+            name="Sign in"
             route="/Signin"
           />
           <DefaultNavbarLink
             icon="account_circle"
-            name="sign up"
+            name="Sign up"
             route="/Signup"
           />
       </MDBox>
