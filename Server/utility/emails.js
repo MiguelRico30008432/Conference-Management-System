@@ -4,7 +4,7 @@ const nodemailer = require('nodemailer');
 const emailFrom = process.env.EMAILFROM;
 const emailPassword = process.env.EMAILPASSWORD;
 
-function sendEmail(to, subject, replacements,file) {
+function sendEmail(to, subject, replacements, file, callback) {
     console.log(to);
     console.log(subject);
     console.log(replacements);
@@ -14,7 +14,7 @@ function sendEmail(to, subject, replacements,file) {
     fs.readFile(filePath, { encoding: 'utf-8' }, (err, html) => {
         if (err) {
             console.error('Error reading HTML file:', err);
-            return;
+            return callback(err); // Pass the error to the callback
         }
         
         // Substitutes variables in HTML File
@@ -41,12 +41,14 @@ function sendEmail(to, subject, replacements,file) {
 
             transporter.sendMail(mailOptions, (error, info) => {
                 if (error) {
-                    return console.error('Failed to send email:', error);
+                    return callback(error); // Pass the error to the callback
                 }
                 console.log('Email sent:', info.response);
+                callback(null, info); // Pass null as error and info to the callback
             });
         } catch (error) {
             console.error('Nodemailer transport setup failed:', error);
+            callback(error); // Pass the error to the callback
         }
     });
 }

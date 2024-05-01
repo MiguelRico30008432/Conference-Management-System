@@ -9,10 +9,11 @@ import PropTypes from "prop-types";
 
 // @mui material components
 import Container from "@mui/material/Container";
-import Icon from "@mui/material/Icon";
+import {Icon, IconButton} from "@mui/material";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
+import MDTypography from "components/MDTypography";
 
 // Material Dashboard 2 React example components
 import ConferencesNavbarMobile from "../navBars/ConferencesNavbarMobile";
@@ -21,16 +22,28 @@ import ConferencesNavbarMobile from "../navBars/ConferencesNavbarMobile";
 import breakpoints from "assets/theme/base/breakpoints";
 
 // Material Dashboard 2 React context
-import { useMaterialUIController } from "context";
 import ConfRoutes from "../../conferenceRoutes";
 import { ConferenceContext } from "../../conference.context";
+
+import NotificationItem from "examples/Items/NotificationItem";
+
+import {
+  navbar,
+  navbarContainer,
+  navbarRow,
+  navbarMobileMenu,
+} from "examples/Navbars/DashboardNavbar/styles";
+
+import {
+  useMaterialUIController,
+  setTransparentNavbar,
+  setMiniSidenav,
+  setOpenConfigurator,
+} from "context";
 
 import * as React from 'react';
 
 export default function ConferenceNavBar({ transparent, light, action }) {
-  const [controller] = useMaterialUIController();
-  const { darkMode } = controller;
-
   const [mobileNavbar, setMobileNavbar] = useState(false);
   const [mobileView, setMobileView] = useState(false);
 
@@ -76,6 +89,30 @@ export default function ConferenceNavBar({ transparent, light, action }) {
     navigate(route);
   };
   //------------Referente à NavBar da Conferência-----------------//
+
+  const handleMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav);
+  const [controller, dispatch] = useMaterialUIController();
+  const { miniSidenav, transparentNavbar, fixedNavbar, darkMode } = controller;
+  const [openMenu, setOpenMenu] = useState(false);
+  const handleCloseMenu = () => setOpenMenu(false);
+
+  const renderMenu = () => (
+    <Menu
+      anchorEl={openMenu}
+      anchorReference={null}
+      anchorOrigin={{
+        vertical: "bottom",
+        horizontal: "left",
+      }}
+      open={Boolean(openMenu)}
+      onClose={handleCloseMenu}
+      sx={{ mt: 2 }}
+    >
+      <NotificationItem icon={<Icon>email</Icon>} title="Check new messages" />
+      <NotificationItem icon={<Icon>podcasts</Icon>} title="Manage Podcast sessions" />
+      <NotificationItem icon={<Icon>shopping_cart</Icon>} title="Payment successfully completed" />
+    </Menu>
+  );
 
   useEffect(() => {
     // A function that sets the display state for the ConferencesNavbarMobile.
@@ -180,6 +217,24 @@ export default function ConferenceNavBar({ transparent, light, action }) {
           onClick={openMobileNavbar}
         >
           <Icon fontSize="default">{mobileNavbar ? "close" : "menu"}</Icon>
+        </MDBox>
+        <MDBox>
+          <IconButton
+            size="small"
+            disableRipple
+            color="inherit"
+            sx={navbarMobileMenu}
+            onClick={handleMiniSidenav}
+          >
+           
+            <Icon fontSize="medium"> 
+              {miniSidenav ? "menu_open" : "menu"}
+            </Icon>
+            <MDTypography variant="body2" color="text">
+              Menu
+              </MDTypography>
+          </IconButton>
+          {renderMenu()}
         </MDBox>
       </MDBox>
       {mobileView && (
