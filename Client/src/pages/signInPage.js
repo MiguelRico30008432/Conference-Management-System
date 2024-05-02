@@ -22,6 +22,8 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Alert from "@mui/material/Alert";
 
+import LoadingCircle from "OurComponents/loading/LoadingCircle";
+
 import { AuthContext } from "../auth.context";
 
 export default function SignInPage() {
@@ -31,6 +33,8 @@ export default function SignInPage() {
   const [errorOnRequest, setErrorOnRequest] = useState(null);
   const { setIsLoggedIn, setUser, setIsAdmin, setUserEmail } =
     useContext(AuthContext);
+  const [openLoading, setOpenLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
@@ -46,6 +50,7 @@ export default function SignInPage() {
   };
 
   const login = async (email, password) => {
+    setOpenLoading(true);
     try {
       const response = await fetch("http://localhost:8003/signIn", {
         method: "POST",
@@ -74,6 +79,7 @@ export default function SignInPage() {
       seterrorOnLogin(true);
       setIsLoggedIn(false);
     }
+    setOpenLoading(false);
   };
 
   const inputsAreValidated = (email, password) => {
@@ -92,90 +98,93 @@ export default function SignInPage() {
   };
 
   return !errorOnLogin ? (
-    <SignInAndOutLayout image={bgImage}>
-      <Card>
-        <MDBox
-          variant="gradient"
-          bgColor="info"
-          borderRadius="lg"
-          coloredShadow="success"
-          mx={2}
-          mt={-3}
-          p={3}
-          mb={1}
-          textAlign="center"
-        >
-          <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
-            Sign in
-          </MDTypography>
-        </MDBox>
-        <Container component="main" maxWidth="xs">
-          <CssBaseline />
-          <Box
-            sx={{
-              mt: 2,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
+    <>
+      {openLoading && <LoadingCircle open={openLoading}></LoadingCircle>}
+      <SignInAndOutLayout image={bgImage}>
+        <Card>
+          <MDBox
+            variant="gradient"
+            bgColor="info"
+            borderRadius="lg"
+            coloredShadow="success"
+            mx={2}
+            mt={-3}
+            p={3}
+            mb={1}
+            textAlign="center"
           >
-            <Box component="form" noValidate onSubmit={handleSubmit}>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <TextField
-                    autoComplete="given-name"
-                    name="email"
-                    required
-                    fullWidth
-                    id="email"
-                    label="Email"
-                    autoFocus
-                  />
-                  {emailAlert}
+            <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
+              Sign in
+            </MDTypography>
+          </MDBox>
+          <Container component="main" maxWidth="xs">
+            <CssBaseline />
+            <Box
+              sx={{
+                mt: 2,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <Box component="form" noValidate onSubmit={handleSubmit}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <TextField
+                      autoComplete="given-name"
+                      name="email"
+                      required
+                      fullWidth
+                      id="email"
+                      label="Email"
+                      autoFocus
+                    />
+                    {emailAlert}
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      required
+                      fullWidth
+                      name="password"
+                      label="Password"
+                      type="password"
+                      id="password"
+                      autoComplete="new-password"
+                    />
+                    {passwordAlert}
+                  </Grid>
                 </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    fullWidth
-                    name="password"
-                    label="Password"
-                    type="password"
-                    id="password"
-                    autoComplete="new-password"
-                  />
-                  {passwordAlert}
-                </Grid>
-              </Grid>
-              <MDButton
-                type="submit"
-                variant="gradient"
-                color="info"
-                fullWidth
-                sx={{ mt: 2 }}
-              >
-                sign In
-              </MDButton>
-              <MDBox mt={3} mb={1} textAlign="center">
-                <MDTypography variant="button" color="text">
-                  You need to create an account?{" "}
-                  <MDTypography
-                    component={Link}
-                    to="/signup"
-                    variant="button"
-                    color="info"
-                    fontWeight="medium"
-                    textGradient
-                  >
-                    Sign Up
+                <MDButton
+                  type="submit"
+                  variant="gradient"
+                  color="info"
+                  fullWidth
+                  sx={{ mt: 2 }}
+                >
+                  sign In
+                </MDButton>
+                <MDBox mt={3} mb={1} textAlign="center">
+                  <MDTypography variant="button" color="text">
+                    You need to create an account?{" "}
+                    <MDTypography
+                      component={Link}
+                      to="/signup"
+                      variant="button"
+                      color="info"
+                      fontWeight="medium"
+                      textGradient
+                    >
+                      Sign Up
+                    </MDTypography>
                   </MDTypography>
-                </MDTypography>
-              </MDBox>
-              {errorOnRequest}
+                </MDBox>
+                {errorOnRequest}
+              </Box>
             </Box>
-          </Box>
-        </Container>
-      </Card>
-    </SignInAndOutLayout>
+          </Container>
+        </Card>
+      </SignInAndOutLayout>
+    </>
   ) : (
     <ErrorSiginSignup backgourndImage={bgImage} />
   );
