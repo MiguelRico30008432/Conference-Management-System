@@ -1,6 +1,7 @@
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import ConfNavbar from "../../OurComponents/navBars/ConferenceNavBar";
 import { ConferenceContext } from "conference.context";
+import { AuthContext } from "auth.context";
 import Footer from "OurComponents/footer/Footer";
 
 import React, { useState, useContext, useEffect } from "react";
@@ -17,7 +18,8 @@ import MDBox from "components/MDBox";
 import Alert from '@mui/material/Alert';
 
 export default function Compose() {
-  const {confID} = useContext(ConferenceContext);
+  const { confID } = useContext(ConferenceContext);
+  const { isLoggedIn } = useContext(AuthContext);
   const [recipient, setRecipient] = useState("");
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
@@ -28,22 +30,29 @@ export default function Compose() {
   const [committeeMembersExist, setCommitteeMembersExist] = useState(false);
 
   useEffect(() => {
-    // Make a request to backend to check for committee members
-    fetch(`http://localhost:8003/checkCommitteeMembers?confID=${confID}`, {
-      method: "GET",
-      headers: {
-        "Content-type": "application/json; charset=UTF-8",
-      },
-      credentials: "include",
-    })
-    .then(response => response.json())
-    .then(data => {
-      // Set state based on response from backend
-      setCommitteeMembersExist(data.committeeMembersExist);
-    })
-    .catch(error => {
-      console.error("Error checking committee members:", error);
-    });
+    async function getData() {
+      // Make a request to backend to check for committee members
+      await fetch(`http://localhost:8003/checkCommitteeMembers?confID=${confID}`, {
+        method: "GET",
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+        credentials: "include",
+      })
+        .then(response => response.json())
+        .then(data => {
+          // Set state based on response from backend
+          setCommitteeMembersExist(data.committeeMembersExist);
+        })
+        .catch(error => {
+          console.error("Error checking committee members:", error);
+        });
+    }
+
+    if (confID) {
+      getData();
+    }
+
   }, [confID]);
 
   const handleSendEmail = async (event) => {
@@ -51,14 +60,14 @@ export default function Compose() {
     setRecipientError('');
     setSubjectError('');
     setDescriptionError('');
-  
+
     if (!recipient || !subject || !description) {
       if (!recipient) setRecipientError('You must select a recipient!');
       if (!subject) setSubjectError('You must enter a subject!');
       if (!description) setDescriptionError('You must enter a description!');
       return;
     }
-  
+
     try {
       const response = await fetch("http://localhost:8003/sendComposeEmail", {
         method: "POST",
@@ -68,14 +77,14 @@ export default function Compose() {
         },
         credentials: "include",
       });
-  
+
       const data = await response.json();
       console.log("Response from backend:", data); // Log the response
-  
+
       if (!response.ok) {
         throw new Error(data.message || "Failed to send email.");
       }
-  
+
       setSendResponse({ success: true, message: "Email sent successfully." });
       setRecipient("");
       setSubject("");

@@ -43,13 +43,13 @@ export default function DefinitionsPage() {
   const [minReviewers, setMinReviewers] = useState("");
   const [maxReviewers, setMaxReviewers] = useState("");
   const [submissionUpdate, setSubmissionUpdate] = useState("");
- 
-  useEffect(() =>{
-    async function getConfData(){
-      try{
-         const response = await fetch("http://localhost:8003/confDefinitions", {
+
+  useEffect(() => {
+    async function getConfData() {
+      try {
+        const response = await fetch("http://localhost:8003/confDefinitions", {
           method: "POST",
-          body: JSON.stringify({confid: confID, userid: user}),
+          body: JSON.stringify({ confid: confID, userid: user }),
           headers: {
             "Content-type": "application/json; charset=UTF-8",
           },
@@ -57,8 +57,8 @@ export default function DefinitionsPage() {
         });
 
         const jsonResponse = await response.json();
-        
-        if (response.status === 200){
+
+        if (response.status === 200) {
           setName(jsonResponse[0].confname);
           setWebpage(jsonResponse[0].confwebpage);
           setCity(jsonResponse[0].confcity);
@@ -79,7 +79,7 @@ export default function DefinitionsPage() {
           setError(<Alert severity="error">{jsonResponse.msg}</Alert>);
         }
 
-      }catch{
+      } catch {
         setError(
           <Alert severity="error">
             Something went wrong when obtaining the conference definitions
@@ -88,12 +88,12 @@ export default function DefinitionsPage() {
       }
     }
 
-    if (isLoggedIn) {
+    if (isLoggedIn && confID) {
       getConfData();
     }
-  }, [isLoggedIn])
+  }, [isLoggedIn, confID])
 
-  async function handleSubmit(event){
+  async function handleSubmit(event) {
     event.preventDefault();
   }
 
@@ -121,16 +121,16 @@ export default function DefinitionsPage() {
             </Card>
           </MDBox>
           <MDBox mb={3} textAlign="left">
-              <MDButton
-                variant="gradient"
-                color="info"
-                sx={{ mt: 2, mb: 2 }}
-                onClick={() => {
-                  setEditModeActive(true);
-                  setMessage(null);
-                }}>
+            <MDButton
+              variant="gradient"
+              color="info"
+              sx={{ mt: 2, mb: 2 }}
+              onClick={() => {
+                setEditModeActive(true);
+                setMessage(null);
+              }}>
               Edit Conference Definitions
-              </MDButton>
+            </MDButton>
 
             <Card sx={{ maxWidth: 1400 }}>
               <MDBox mt={1} mb={1} textAlign="center"></MDBox>
@@ -203,10 +203,10 @@ export default function DefinitionsPage() {
                   </Grid>
                   <Grid item xs={12} sm={5}>
                     <FormControl fullWidth>
-                      <InputLabel 
+                      <InputLabel
                         id="confsubupdate"
                         sx={{ ml: 2, mt: 3, width: "90%" }}
-                        >Submissions Update</InputLabel>
+                      >Submissions Update</InputLabel>
                       <Select
                         required
                         fullWidth
@@ -378,7 +378,7 @@ export default function DefinitionsPage() {
                 </MDButton>
                 <MDBox mt={3} mb={1} textAlign="center"></MDBox>
               </Box>
-            </Card>              
+            </Card>
           </MDBox>
         </MDBox>
       </Container>
