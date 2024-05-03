@@ -12,7 +12,7 @@ router.post("/confDefinitions", auth.ensureAuthenticated, async (req, res) => {
         confwebpage,
         confcity,
         confcountry,
-        users.useremail AS contact,
+        confcontact,
         confstartsubmission,
         confendsubmission,
         confstartbidding,
@@ -22,13 +22,12 @@ router.post("/confDefinitions", auth.ensureAuthenticated, async (req, res) => {
         confstartdate,
         confenddate,
         confminreviewers,
-        confmaxreviewers
+        confmaxreviewers,
+        confsubupdate
       FROM conferences
-      INNER JOIN users ON conferences.confowner = users.userid
       WHERE conferences.confid = ${req.body.confid}`;
 
     const result = await db.fetchDataCst(query);
-    console.log(result)
     return res.status(200).send(result);
   } catch (error) {
     log.addLog(err, "database", "ConferenceDefinitions -> /confDefinitions");
