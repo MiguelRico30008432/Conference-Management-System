@@ -149,7 +149,7 @@ export default function DefinitionsPage() {
   async function handleSubmit(event) {
     event.preventDefault();
     if (makeRequest()) {
-      if (valideInputs) {
+      if (valideInputs()) {
           await saveUserData();
       } else {
         setMessage(

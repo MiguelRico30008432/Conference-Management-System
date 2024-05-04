@@ -85,7 +85,7 @@ export default function MyProfilePage() {
     event.preventDefault();
 
     if (makeRequest()) {
-      if (valideInputs) {
+      if (valideInputs()) {
         if (originalEmail != email) {
           setOpenEmailChangeDialog(true);
         } else {
