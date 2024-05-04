@@ -17,16 +17,18 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
+import LoadingCircle from "OurComponents/loading/LoadingCircle";
 
 
 export default function DefinitionsPage() {
-  const { confID, userRole } = useContext(ConferenceContext);
-  const { user, isLoggedIn } = useContext(AuthContext);
+  const { confID } = useContext(ConferenceContext);
+  const { isLoggedIn } = useContext(AuthContext);
 
+  const [openLoading, setOpenLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [editModeActive, setEditModeActive] = useState(false);
 
-  const [error, setError] = useState("");
+  //original value
   const [name, setName] = useState("");
   const [webpage, setWebpage] = useState("");
   const [city, setCity] = useState("");
@@ -44,12 +46,31 @@ export default function DefinitionsPage() {
   const [maxReviewers, setMaxReviewers] = useState("");
   const [submissionUpdate, setSubmissionUpdate] = useState("");
 
+  //new values
+  const [newName, setNewName] = useState("");
+  const [newWebpage, setNewWebpage] = useState("");
+  const [newCity, setNewCity] = useState("");
+  const [newCountry, setNewCountry] = useState("");
+  const [newContact, setNewContact] = useState("");
+  const [newSubmissionsStart, setNewSubmissionStart] = useState("");
+  const [newSubmissionsEnd, setNewSubmissionEnd] = useState("");
+  const [newBiddingStart, setNewBiddingStart] = useState("");
+  const [newBiddingEnd, setNewBiddingEnd] = useState("");
+  const [newReviewStart, setNewReviewStart] = useState("");
+  const [newReviewEnd, setNewReviewEnd] = useState("");
+  const [newConfStart, setNewConfStart] = useState("");
+  const [newConfEnd, setNewConfEnd] = useState("");
+  const [newMinReviewers, setNewMinReviewers] = useState("");
+  const [newMaxReviewers, setNewMaxReviewers] = useState("");
+  const [newSubmissionUpdate, setNewSubmissionUpdate] = useState("");
+
   useEffect(() => {
     async function getConfData() {
+      setOpenLoading(true);
       try {
         const response = await fetch("http://localhost:8003/confDefinitions", {
           method: "POST",
-          body: JSON.stringify({ confid: confID, userid: user }),
+          body: JSON.stringify({ confid: confID}),
           headers: {
             "Content-type": "application/json; charset=UTF-8",
           },
@@ -60,32 +81,64 @@ export default function DefinitionsPage() {
 
         if (response.status === 200) {
           setName(jsonResponse[0].confname);
+          setNewName(jsonResponse[0].confname);
+
           setWebpage(jsonResponse[0].confwebpage);
+          setNewWebpage(jsonResponse[0].confwebpage);
+
           setCity(jsonResponse[0].confcity);
+          setNewCity(jsonResponse[0].confcity);
+
           setCountry(jsonResponse[0].confcountry);
+          setNewCountry(jsonResponse[0].confcountry);
+
           setContact(jsonResponse[0].confcontact);
+          setNewContact(jsonResponse[0].confcontact);
+
           setSubmissionStart(jsonResponse[0].confstartsubmission)
+          setNewSubmissionStart(jsonResponse[0].confstartsubmission)
+
           setSubmissionEnd(jsonResponse[0].confendsubmission)
+          setNewSubmissionEnd(jsonResponse[0].confendsubmission)
+
           setBiddingStart(jsonResponse[0].confstartbidding)
+          setNewBiddingStart(jsonResponse[0].confstartbidding)
+
           setBiddingEnd(jsonResponse[0].confendbidding)
+          setNewBiddingEnd(jsonResponse[0].confendbidding)
+
           setReviewStart(jsonResponse[0].confstartreview)
+          setNewReviewStart(jsonResponse[0].confstartreview)
+
           setReviewEnd(jsonResponse[0].confendreview)
+          setNewReviewEnd(jsonResponse[0].confendreview)
+
           setConfStart(jsonResponse[0].confstartdate)
+          setNewConfStart(jsonResponse[0].confstartdate)
+
           setConfEnd(jsonResponse[0].confenddate)
+          setNewConfEnd(jsonResponse[0].confenddate)
+
           setMinReviewers(jsonResponse[0].confminreviewers)
+          setNewMinReviewers(jsonResponse[0].confminreviewers)
+
           setMaxReviewers(jsonResponse[0].confmaxreviewers)
+          setNewMaxReviewers(jsonResponse[0].confmaxreviewers)
+
           setSubmissionUpdate(jsonResponse[0].confsubupdate)
+          setNewSubmissionUpdate(jsonResponse[0].confsubupdate)
         } else {
-          setError(<Alert severity="error">{jsonResponse.msg}</Alert>);
+          setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
         }
 
       } catch {
-        setError(
+        setMessage(
           <Alert severity="error">
             Something went wrong when obtaining the conference definitions
           </Alert>
         );
       }
+      setOpenLoading(false);
     }
 
     if (isLoggedIn && confID) {
@@ -95,6 +148,46 @@ export default function DefinitionsPage() {
 
   async function handleSubmit(event) {
     event.preventDefault();
+    if (makeRequest()) {
+      if (valideInputs) {
+          await saveUserData();
+      } else {
+        setMessage(
+          <Alert severity="error">All fields marked with * are required.</Alert>
+        );
+      }
+    }
+  }
+
+  function makeRequest() {
+    if (
+      name !== newName ||
+      webpage !== newWebpage ||
+      city !== newCity ||
+      country !== newCountry ||
+      contact !== newContact ||
+      submissionsStart !== newSubmissionsStart ||
+      submissionsEnd !== newSubmissionsEnd ||
+      biddingStart !== newBiddingStart ||
+      biddingEnd !== newBiddingEnd ||
+      reviewStart !== newReviewStart ||
+      reviewEnd !== newReviewEnd ||
+      confStart !== newConfStart ||
+      confEnd !== newConfEnd ||
+      minReviewers !== newMinReviewers ||
+      maxReviewers !== newMaxReviewers ||
+      submissionUpdate !== newSubmissionUpdate
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  function valideInputs() {
+    if (newName === "" || newCity === "" || newCountry === "" || newContact === "" || newSubmissionsStart === "" || newSubmissionsEnd === "" || newBiddingStart === "" || newBiddingEnd === "" || newReviewStart === "" || newReviewEnd === "" || newConfStart === "" || newConfEnd === "" || newReviewEnd === "" || newMinReviewers === "" || newMaxReviewers === "" || newSubmissionUpdate === ""){
+      return false;
+    } else { return true; }
   }
 
   const formatDate = (dateString) => {
@@ -105,7 +198,76 @@ export default function DefinitionsPage() {
     return `${year}-${month}-${day}`;
   };
 
+  async function saveUserData() {
+    setOpenLoading(true);
+    try {
+      const response = await fetch("http://localhost:8003/saveConfDefinitions", {
+        method: "POST",
+        body: JSON.stringify({
+          confid: confID, 
+          confname: newName,
+          confwebpage: newWebpage,
+          confcity: newCity,
+          confcountry: newCountry,
+          confcontact: newContact,
+          confstartsubmission: newSubmissionsStart,
+          confendsubmission: newSubmissionsEnd,
+          confstartbidding: newBiddingStart,
+          confendbidding: newBiddingEnd,
+          confstartreview: newReviewStart,
+          confendreview: newReviewEnd,
+          confstartdate: newConfStart,
+          confenddate: newConfEnd,
+          confminreviewers: newMinReviewers,
+          confmaxreviewers: newMaxReviewers,
+          confsubupdate: newSubmissionUpdate,
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+        credentials: "include",
+      });
+
+      const jsonResponse = await response.json();
+
+      if (response.status === 200) {
+        setMessage(
+          <Alert severity="success">{"Your data was saved with success"}</Alert>
+        );
+
+        setName(newName);
+        setWebpage(newWebpage);
+        setCity(newCity);
+        setCountry(newCountry);
+        setContact(newContact);
+        setSubmissionStart(newSubmissionsStart);
+        setSubmissionEnd(newSubmissionsEnd);
+        setBiddingStart(newBiddingStart);
+        setBiddingEnd(newBiddingEnd);
+        setReviewStart(newReviewStart);
+        setReviewEnd(newReviewEnd);
+        setConfStart(newConfStart);
+        setConfEnd(newConfEnd);
+        setMinReviewers(newMinReviewers);
+        setMaxReviewers(newMaxReviewers);
+        setSubmissionUpdate(newSubmissionUpdate);
+
+      } else {
+        setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
+      }
+    } catch (error) {
+      setMessage(
+        <Alert severity="error">
+          Something went wrong when obtaining your informations
+        </Alert>
+      );
+    }
+    setOpenLoading(false);
+  }
+
   return (
+    <>
+    {openLoading && <LoadingCircle />}
     <DashboardLayout>
       <ConfNavbar />
       <Container maxWidth="sm">
@@ -120,6 +282,9 @@ export default function DefinitionsPage() {
               </MDTypography>
             </Card>
           </MDBox>
+
+          {message}
+          
           <MDBox mb={3} textAlign="left">
             <MDButton
               variant="gradient"
@@ -144,8 +309,8 @@ export default function DefinitionsPage() {
                       id="confname"
                       label="Conference Name"
                       autoFocus
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
                       disabled={!editModeActive}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
@@ -156,8 +321,8 @@ export default function DefinitionsPage() {
                       id="confwebpage"
                       label="Conference Web Page"
                       name="confwebpage"
-                      value={webpage}
-                      onChange={(e) => setWebpage(e.target.value)}
+                      value={newWebpage}
+                      onChange={(e) => setNewWebpage(e.target.value)}
                       disabled={!editModeActive}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
@@ -169,8 +334,8 @@ export default function DefinitionsPage() {
                       id="confcity"
                       label="City"
                       name="confcity"
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
+                      value={newCity}
+                      onChange={(e) => setNewCity(e.target.value)}
                       disabled={!editModeActive}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
@@ -182,8 +347,8 @@ export default function DefinitionsPage() {
                       id="confcountry"
                       label="Country"
                       name="confcountry"
-                      value={country}
-                      onChange={(e) => setCountry(e.target.value)}
+                      value={newCountry}
+                      onChange={(e) => setNewCountry(e.target.value)}
                       disabled={!editModeActive}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
@@ -195,9 +360,9 @@ export default function DefinitionsPage() {
                       id="confcontact"
                       label="Support Contact"
                       name="confcontact"
-                      value={contact}
+                      value={newContact}
                       disabled={!editModeActive}
-                      onChange={(e) => setContact(e.target.value)}
+                      onChange={(e) => setNewContact(e.target.value)}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
                   </Grid>
@@ -213,9 +378,9 @@ export default function DefinitionsPage() {
                         labelId="confsubupdate"
                         label="Submissions Update"
                         id="confsubupdate"
-                        value={submissionUpdate}
+                        value={newSubmissionUpdate}
                         disabled={!editModeActive}
-                        onChange={(e) => setSubmissionUpdate(e.target.value)}
+                        onChange={(e) => setNewSubmissionUpdate(e.target.value)}
                         sx={{ ml: 2, mt: 3.5, width: "90%" }}
                       >
                         <MenuItem value={true}>True</MenuItem>
@@ -231,9 +396,9 @@ export default function DefinitionsPage() {
                       label="Submissions Start Date"
                       name="confstartsubmission"
                       type="date"
-                      value={formatDate(submissionsStart)}
+                      value={formatDate(newSubmissionsStart)}
                       disabled={!editModeActive}
-                      onChange={(e) => setSubmissionStart(e.target.value)}
+                      onChange={(e) => setNewSubmissionStart(e.target.value)}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
                   </Grid>
@@ -245,9 +410,9 @@ export default function DefinitionsPage() {
                       label="Submissions End Date"
                       name="confendsubmission"
                       type="date"
-                      value={formatDate(submissionsEnd)}
+                      value={formatDate(newSubmissionsEnd)}
                       disabled={!editModeActive}
-                      onChange={(e) => setSubmissionEnd(e.target.value)}
+                      onChange={(e) => setNewSubmissionEnd(e.target.value)}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
                   </Grid>
@@ -259,9 +424,9 @@ export default function DefinitionsPage() {
                       label="Bidding Start Date"
                       name="confstartbidding"
                       type="date"
-                      value={formatDate(biddingStart)}
+                      value={formatDate(newBiddingStart)}
                       disabled={!editModeActive}
-                      onChange={(e) => setBiddingStart(e.target.value)}
+                      onChange={(e) => setNewBiddingStart(e.target.value)}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
                   </Grid>
@@ -273,9 +438,9 @@ export default function DefinitionsPage() {
                       label="Bidding End Date"
                       name="confendbidding"
                       type="date"
-                      value={formatDate(biddingEnd)}
+                      value={formatDate(newBiddingEnd)}
                       disabled={!editModeActive}
-                      onChange={(e) => setBiddingEnd(e.target.value)}
+                      onChange={(e) => setNewBiddingEnd(e.target.value)}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
                   </Grid>
@@ -287,9 +452,9 @@ export default function DefinitionsPage() {
                       label="Reviews Start Date"
                       name="confstartreview"
                       type="date"
-                      value={formatDate(reviewStart)}
+                      value={formatDate(newReviewStart)}
                       disabled={!editModeActive}
-                      onChange={(e) => setReviewStart(e.target.value)}
+                      onChange={(e) => setNewReviewStart(e.target.value)}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
                   </Grid>
@@ -301,9 +466,9 @@ export default function DefinitionsPage() {
                       label="Reviews End Date"
                       name="confendreview"
                       type="date"
-                      value={formatDate(reviewEnd)}
+                      value={formatDate(newReviewEnd)}
                       disabled={!editModeActive}
-                      onChange={(e) => setReviewEnd(e.target.value)}
+                      onChange={(e) => setNewReviewEnd(e.target.value)}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
                   </Grid>
@@ -315,9 +480,9 @@ export default function DefinitionsPage() {
                       label="Conferance Start Date"
                       name="confstartdate"
                       type="date"
-                      value={formatDate(confStart)}
+                      value={formatDate(newConfStart)}
                       disabled={!editModeActive}
-                      onChange={(e) => setConfStart(e.target.value)}
+                      onChange={(e) => setNewConfStart(e.target.value)}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
                   </Grid>
@@ -329,9 +494,9 @@ export default function DefinitionsPage() {
                       label="Conference End Date"
                       name="confenddate"
                       type="date"
-                      value={formatDate(confEnd)}
+                      value={formatDate(newConfEnd)}
                       disabled={!editModeActive}
-                      onChange={(e) => setConfEnd(e.target.value)}
+                      onChange={(e) => setNewConfEnd(e.target.value)}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
                   </Grid>
@@ -342,9 +507,9 @@ export default function DefinitionsPage() {
                       id="confminreviewers"
                       label="Minimun Number of Reviews"
                       name="confminreviewers"
-                      value={minReviewers}
+                      value={newMinReviewers}
                       disabled={!editModeActive}
-                      onChange={(e) => setMinReviewers(e.target.value)}
+                      onChange={(e) => setNewMinReviewers(e.target.value)}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
                   </Grid>
@@ -355,9 +520,9 @@ export default function DefinitionsPage() {
                       id="confmaxreviewers"
                       label="Maximum Number of Reviews"
                       name="confmaxreviewers"
-                      value={maxReviewers}
+                      value={newMaxReviewers}
                       disabled={!editModeActive}
-                      onChange={(e) => setMaxReviewers(e.target.value)}
+                      onChange={(e) => setNewMaxReviewers(e.target.value)}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
                   </Grid>
@@ -383,5 +548,6 @@ export default function DefinitionsPage() {
         </MDBox>
       </Container>
     </DashboardLayout>
+    </>
   );
 }
