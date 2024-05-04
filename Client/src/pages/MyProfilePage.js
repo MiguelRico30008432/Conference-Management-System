@@ -3,6 +3,7 @@ import Footer from "OurComponents/footer/Footer";
 import UpperNavBar from "OurComponents/navBars/UpperNavBar";
 import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
 import { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../auth.context";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -36,6 +37,8 @@ export default function MyProfilePage() {
 
   const [password, setPasword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function getUserData() {

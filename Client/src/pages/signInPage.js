@@ -22,7 +22,7 @@ export default function SignInPage() {
   const [passwordAlert, setpasswordAlert] = useState(null);
   const [errorOnLogin, seterrorOnLogin] = useState(false);
   const [errorOnRequest, setErrorOnRequest] = useState(null);
-  const { setIsLoggedIn, setUser, setIsAdmin, setUserEmail } =
+  const { setIsLoggedIn, setUser, setIsAdmin, setUserEmail, setGetUserAuth } =
     useContext(AuthContext);
   const [openLoading, setOpenLoading] = useState(false);
 
@@ -59,6 +59,7 @@ export default function SignInPage() {
         setUser(jsonResponse.userid);
         setUserEmail(jsonResponse.useremail);
         setIsAdmin(jsonResponse.useradmin);
+        setGetUserAuth(true);
         navigate("/");
       } else {
         setErrorOnRequest(

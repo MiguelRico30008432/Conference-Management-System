@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function Logout() {
   const navigate = useNavigate();
-  const { setIsLoggedIn, setUser, setUserEmail, setIsAdmin } =
+  const { setIsLoggedIn, setUser, setUserEmail, setIsAdmin, setGetUserAuth } =
     useContext(AuthContext);
 
   useEffect(() => {
@@ -21,6 +21,7 @@ export default function Logout() {
       setUser(null);
       setUserEmail(null);
       setIsAdmin(false);
+      setGetUserAuth(false);
       navigate("/");
     }
 

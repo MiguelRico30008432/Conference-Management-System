@@ -37,6 +37,28 @@ function ConferenceProviderWrapper(props) {
     }
   }, [user]);
 
+  useEffect(() => {
+    const handleBeforeUnload = async (event) => {
+      try {
+        await fetch("http://localhost:8003/updateConfContext", {
+          method: "POST",
+          body: JSON.stringify({ userid: user, confid: null }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+        });
+      } catch (error) {}
+      console.log("Usuário está saindo da página");
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [user]);
+
   return (
     <ConferenceContext.Provider
       value={{

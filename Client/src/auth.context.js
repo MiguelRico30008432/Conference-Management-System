@@ -12,7 +12,16 @@ function AuthProviderWrapper(props) {
   const [userEmail, setUserEmail] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+  const [getUserAuth, setGetUserAuth] = useState(
+    localStorage.getItem("UserAuth") === null
+      ? false
+      : JSON.parse(localStorage.getItem("UserAuth"))
+  );
   const navigate = useNavigate();
+
+  useEffect(() => {
+    localStorage.setItem("UserAuth", getUserAuth);
+  }, [getUserAuth]);
 
   useEffect(() => {
     async function getUserAuthData() {
@@ -31,15 +40,22 @@ function AuthProviderWrapper(props) {
           setUser(userData.userid);
           setUserEmail(userData.useremail);
           setIsAdmin(userData.useradmin);
+        } else {
+          setErrorDialogOpen(true);
+          setGetUserAuth(false);
+          navigate("/");
         }
       } catch (error) {
         console.error("Error in auth context", error);
         setErrorDialogOpen(true);
+        setGetUserAuth(false);
         navigate("/");
       }
     }
 
-    getUserAuthData();
+    if (getUserAuth) {
+      getUserAuthData();
+    }
   }, []);
 
   return (
@@ -53,6 +69,7 @@ function AuthProviderWrapper(props) {
         setUserEmail,
         isAdmin,
         setIsAdmin,
+        setGetUserAuth,
       }}
     >
       {props.children}
