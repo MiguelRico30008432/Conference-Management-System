@@ -1,18 +1,11 @@
-// react-router-dom components
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useContext } from "react";
-
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
-
-//Layout Component
 import SignInAndOutLayout from "OurLayouts/SignInAndOutLayout";
 import bgImage from "assets/images/conference_signin.jpeg";
 import ErrorSiginSignup from "OurComponents/errorHandling/ErrorSiginSignup";
-
-// @mui material components
 import * as React from "react";
 import Card from "@mui/material/Card";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -21,9 +14,7 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Alert from "@mui/material/Alert";
-
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
-
 import { AuthContext } from "../auth.context";
 
 export default function SignInPage() {
@@ -99,7 +90,7 @@ export default function SignInPage() {
 
   return !errorOnLogin ? (
     <>
-      {openLoading && <LoadingCircle open={openLoading}></LoadingCircle>}
+      {openLoading && <LoadingCircle />}
       <SignInAndOutLayout image={bgImage}>
         <Card>
           <MDBox

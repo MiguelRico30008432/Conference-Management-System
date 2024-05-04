@@ -11,6 +11,7 @@ import Card from "@mui/material/Card";
 import MDButton from "components/MDButton";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
+import LoadingCircle from "OurComponents/loading/LoadingCircle";
 
 export default function MyConferences() {
   const { user, isLoggedIn } = useContext(AuthContext);
@@ -18,11 +19,13 @@ export default function MyConferences() {
 
   const [rows, setRow] = useState([]);
   const [error, setError] = useState(null);
+  const [openLoading, setOpenLoading] = useState(false);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     async function getMyConferences() {
+      setOpenLoading(true);
       try {
         const response = await fetch("http://localhost:8003/myConferences", {
           method: "POST",
@@ -34,7 +37,7 @@ export default function MyConferences() {
         });
 
         const jsonResponse = await response.json();
-        console.log(jsonResponse)
+        console.log(jsonResponse);
 
         if (response.status === 200) {
           for (let line of jsonResponse) {
@@ -50,7 +53,9 @@ export default function MyConferences() {
           </Alert>
         );
       }
+      setOpenLoading(false);
     }
+
     if (isLoggedIn) {
       getMyConferences();
     }
@@ -131,6 +136,7 @@ export default function MyConferences() {
 
   return (
     <>
+      {openLoading && <LoadingCircle />}
       <DashboardLayout>
         <UpperNavBar />
         <MDBox mb={5} textAlign="left">

@@ -2,28 +2,24 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "OurComponents/footer/Footer";
 import UpperNavBar from "OurComponents/navBars/UpperNavBar";
 import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
-
-// react-router-dom components
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../auth.context";
-
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
-
-// @mui material components
 import * as React from "react";
 import Card from "@mui/material/Card";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
+import LoadingCircle from "OurComponents/loading/LoadingCircle";
 
 export default function MyProfilePage() {
   const [editModeActive, setEditModeActive] = useState(false);
   const [changePassActive, setChangePassActive] = useState(false);
   const [openEmailChangeDialog, setOpenEmailChangeDialog] = useState(false);
+  const [openLoading, setOpenLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const { user, isLoggedIn } = useContext(AuthContext);
 
@@ -43,6 +39,7 @@ export default function MyProfilePage() {
 
   useEffect(() => {
     async function getUserData() {
+      setOpenLoading(true);
       try {
         const response = await fetch("http://localhost:8003/userData", {
           method: "POST",
@@ -76,6 +73,7 @@ export default function MyProfilePage() {
           </Alert>
         );
       }
+      setOpenLoading(false);
     }
 
     if (isLoggedIn) {
@@ -140,6 +138,7 @@ export default function MyProfilePage() {
   }
 
   async function saveUserData() {
+    setOpenLoading(true);
     try {
       const response = await fetch("http://localhost:8003/saveUserData", {
         method: "POST",
@@ -179,9 +178,11 @@ export default function MyProfilePage() {
         </Alert>
       );
     }
+    setOpenLoading(false);
   }
 
   async function saveUserPassword() {
+    setOpenLoading(true);
     try {
       const response = await fetch("http://localhost:8003/saveUserPassword", {
         method: "POST",
@@ -206,203 +207,207 @@ export default function MyProfilePage() {
         </Alert>
       );
     }
+    setOpenLoading(false);
   }
 
   return (
-    <DashboardLayout>
-      <UpperNavBar />
-      <MDTypography variant="h6">
-        Feel free to change your data by clicking on edit profile or change your
-        password
-      </MDTypography>
+    <>
+      {openLoading && <LoadingCircle />}
+      <DashboardLayout>
+        <UpperNavBar />
+        <MDTypography variant="h6">
+          Feel free to change your data by clicking on edit profile or change
+          your password
+        </MDTypography>
 
-      {message}
+        {message}
 
-      <MDButton
-        variant="gradient"
-        color="info"
-        sx={{ mt: 2, mb: 2 }}
-        onClick={() => {
-          setEditModeActive(true);
-          setChangePassActive(false);
-          setMessage(null);
-        }}
-      >
-        Edit Profile
-      </MDButton>
+        <MDButton
+          variant="gradient"
+          color="info"
+          sx={{ mt: 2, mb: 2 }}
+          onClick={() => {
+            setEditModeActive(true);
+            setChangePassActive(false);
+            setMessage(null);
+          }}
+        >
+          Edit Profile
+        </MDButton>
 
-      <MDButton
-        variant="gradient"
-        color="info"
-        sx={{ mt: 2, mb: 2, ml: 1 }}
-        onClick={() => {
-          setEditModeActive(false);
-          setChangePassActive(true);
-        }}
-      >
-        Change Password
-      </MDButton>
+        <MDButton
+          variant="gradient"
+          color="info"
+          sx={{ mt: 2, mb: 2, ml: 1 }}
+          onClick={() => {
+            setEditModeActive(false);
+            setChangePassActive(true);
+          }}
+        >
+          Change Password
+        </MDButton>
 
-      <PopUpWithMessage
-        open={openEmailChangeDialog}
-        handleClose={() => setOpenEmailChangeDialog(false)}
-        handleConfirm={async () => {
-          saveUserData();
-          setOpenEmailChangeDialog(false);
-        }}
-        title={"Confirm Email Change"}
-        text={
-          "Are you sure you want to change your email address? Changing your email address will affect your login."
-        }
-      />
+        <PopUpWithMessage
+          open={openEmailChangeDialog}
+          handleClose={() => setOpenEmailChangeDialog(false)}
+          handleConfirm={async () => {
+            saveUserData();
+            setOpenEmailChangeDialog(false);
+          }}
+          title={"Confirm Email Change"}
+          text={
+            "Are you sure you want to change your email address? Changing your email address will affect your login."
+          }
+        />
 
-      {!changePassActive ? (
-        <Card sx={{ maxWidth: 1400 }}>
-          <MDBox mt={1} mb={1} textAlign="center"></MDBox>
-          <Box component="form" noValidate onSubmit={handleSubmit}>
-            <Grid container spacing={1}>
-              <Grid item xs={12} sm={5}>
-                <TextField
-                  autoComplete="given-name"
-                  name="firstName"
-                  required
-                  fullWidth
-                  id="firstName"
-                  label="First Name"
-                  autoFocus
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  disabled={!editModeActive}
-                  sx={{ ml: 2, mt: 2, width: "90%" }}
-                />
+        {!changePassActive ? (
+          <Card sx={{ maxWidth: 1400 }}>
+            <MDBox mt={1} mb={1} textAlign="center"></MDBox>
+            <Box component="form" noValidate onSubmit={handleSubmit}>
+              <Grid container spacing={1}>
+                <Grid item xs={12} sm={5}>
+                  <TextField
+                    autoComplete="given-name"
+                    name="firstName"
+                    required
+                    fullWidth
+                    id="firstName"
+                    label="First Name"
+                    autoFocus
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    disabled={!editModeActive}
+                    sx={{ ml: 2, mt: 2, width: "90%" }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={5}>
+                  <TextField
+                    required
+                    fullWidth
+                    id="lastName"
+                    label="Last Name"
+                    name="lastName"
+                    autoComplete="family-name"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    disabled={!editModeActive}
+                    sx={{ ml: 2, mt: 2, width: "90%" }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={5}>
+                  <TextField
+                    required
+                    fullWidth
+                    id="affiliation"
+                    label="affiliation"
+                    name="affiliation"
+                    value={affiliation}
+                    onChange={(e) => setAffiliation(e.target.value)}
+                    disabled={!editModeActive}
+                    sx={{ ml: 2, mt: 2, width: "90%" }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={5}>
+                  <TextField
+                    required
+                    fullWidth
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={!editModeActive}
+                    sx={{ ml: 2, mt: 2, width: "90%" }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    id="phone"
+                    label="Phone Number"
+                    name="phone"
+                    autoComplete="phone"
+                    value={phone}
+                    disabled={!editModeActive}
+                    onChange={(e) => setPhone(e.target.value)}
+                    sx={{ ml: 2, mt: 2, width: "35%" }}
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={12} sm={5}>
-                <TextField
-                  required
-                  fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  autoComplete="family-name"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  disabled={!editModeActive}
-                  sx={{ ml: 2, mt: 2, width: "90%" }}
-                />
+              <MDButton
+                type="submit"
+                variant="gradient"
+                color="info"
+                sx={{
+                  ml: 2,
+                  mt: 2,
+                  mb: 2,
+                  display: editModeActive ? "block" : "none",
+                }}
+                onClick={() => setEditModeActive(false)}
+              >
+                Save Changes
+              </MDButton>
+              <MDBox mt={3} mb={1} textAlign="center"></MDBox>
+            </Box>
+          </Card>
+        ) : (
+          <Card sx={{ maxWidth: 1400 }}>
+            <MDBox mt={1} mb={1} textAlign="center"></MDBox>
+            <Box component="form" noValidate onSubmit={handleSubmitForPassword}>
+              <Grid container spacing={1}>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type="password"
+                    id="password"
+                    autoComplete="new-password"
+                    value={password}
+                    onChange={(e) => setPasword(e.target.value)}
+                    sx={{ ml: 2, mt: 2, width: "50%" }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    name="password"
+                    label="Repeat Password"
+                    type="password"
+                    id="password"
+                    autoComplete="new-password"
+                    value={repeatPassword}
+                    onChange={(e) => setRepeatPassword(e.target.value)}
+                    sx={{ ml: 2, mt: 2, width: "50%" }}
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={12} sm={5}>
-                <TextField
-                  required
-                  fullWidth
-                  id="affiliation"
-                  label="affiliation"
-                  name="affiliation"
-                  value={affiliation}
-                  onChange={(e) => setAffiliation(e.target.value)}
-                  disabled={!editModeActive}
-                  sx={{ ml: 2, mt: 2, width: "90%" }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={5}>
-                <TextField
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={!editModeActive}
-                  sx={{ ml: 2, mt: 2, width: "90%" }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  id="phone"
-                  label="Phone Number"
-                  name="phone"
-                  autoComplete="phone"
-                  value={phone}
-                  disabled={!editModeActive}
-                  onChange={(e) => setPhone(e.target.value)}
-                  sx={{ ml: 2, mt: 2, width: "35%" }}
-                />
-              </Grid>
-            </Grid>
-            <MDButton
-              type="submit"
-              variant="gradient"
-              color="info"
-              sx={{
-                ml: 2,
-                mt: 2,
-                mb: 2,
-                display: editModeActive ? "block" : "none",
-              }}
-              onClick={() => setEditModeActive(false)}
-            >
-              Save Changes
-            </MDButton>
-            <MDBox mt={3} mb={1} textAlign="center"></MDBox>
-          </Box>
-        </Card>
-      ) : (
-        <Card sx={{ maxWidth: 1400 }}>
-          <MDBox mt={1} mb={1} textAlign="center"></MDBox>
-          <Box component="form" noValidate onSubmit={handleSubmitForPassword}>
-            <Grid container spacing={1}>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="new-password"
-                  value={password}
-                  onChange={(e) => setPasword(e.target.value)}
-                  sx={{ ml: 2, mt: 2, width: "50%" }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="password"
-                  label="Repeat Password"
-                  type="password"
-                  id="password"
-                  autoComplete="new-password"
-                  value={repeatPassword}
-                  onChange={(e) => setRepeatPassword(e.target.value)}
-                  sx={{ ml: 2, mt: 2, width: "50%" }}
-                />
-              </Grid>
-            </Grid>
-            <MDButton
-              type="submit"
-              variant="gradient"
-              color="info"
-              sx={{
-                ml: 2,
-                mt: 2,
-                mb: 2,
-              }}
-              onClick={() => setEditModeActive(false)}
-            >
-              Save Changes
-            </MDButton>
-            <MDBox mt={3} mb={1} textAlign="center"></MDBox>
-          </Box>
-        </Card>
-      )}
+              <MDButton
+                type="submit"
+                variant="gradient"
+                color="info"
+                sx={{
+                  ml: 2,
+                  mt: 2,
+                  mb: 2,
+                }}
+                onClick={() => setEditModeActive(false)}
+              >
+                Save Changes
+              </MDButton>
+              <MDBox mt={3} mb={1} textAlign="center"></MDBox>
+            </Box>
+          </Card>
+        )}
 
-      <MDBox mt={3} mb={1} textAlign="center"></MDBox>
-      <Footer />
-    </DashboardLayout>
+        <MDBox mt={3} mb={1} textAlign="center"></MDBox>
+        <Footer />
+      </DashboardLayout>
+    </>
   );
 }
