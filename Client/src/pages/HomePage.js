@@ -117,7 +117,7 @@ export default function HomePage() {
           <div style={{ padding: '20px' }}>
             <h2 style={{ padding: '10px', borderRadius: '5px', color: '#6495ED' }}>Conference Management</h2>
             <p>Organize, manage, and coordinate with authors and reviewers.<br></br>
-              Here you can create your conference, organize and manage the different components of the conference, and get everyone involved! 
+              UAL Conf simplifies the creation, organization and management of your conference.
             </p>
           </div>
         </div>
@@ -128,8 +128,8 @@ export default function HomePage() {
         <div ref={submitPapersRef} id="submit-papers" style={{ textAlign: 'center', padding: '20px 20px' }}>
           <div style={{ padding: '20px' }}>
             <h2 style={{ padding: '10px', borderRadius: '5px', color: '#6495ED' }}>Submit Papers</h2>
-            <p>Submit your papers to top conferences effortlessly. <br></br>
-            Here you will be able to submit all the necessary documents for the conference.</p>
+            <p>Submit your papers effortlessly. <br></br>
+            UAL Conf simplifies the submition of all the necessary documents for the conference.</p>
           </div>
         </div>
       )}
@@ -140,7 +140,7 @@ export default function HomePage() {
           <div style={{ padding: '20px' }}>
             <h2 style={{ padding: '10px', borderRadius: '5px', color: '#6495ED' }}>Review Process</h2>
             <p>Efficiently review papers and manage the entire review process.<br></br>
-            Review, and manage the different versions, to achieve a final version of your conference.</p>
+            UAL Conf simplifies the review, and control of the different versions, to achieve a final version of your conference.</p>
           </div>
         </div>
       )}
