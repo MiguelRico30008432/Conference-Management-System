@@ -86,7 +86,7 @@ export default function MyProfilePage() {
 
     if (makeRequest()) {
       if (valideInputs()) {
-        if (originalEmail != email) {
+        if (originalEmail !== email) {
           setOpenEmailChangeDialog(true);
         } else {
           await saveUserData();
