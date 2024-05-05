@@ -58,31 +58,36 @@ export default function Compose() {
     setRecipientError('');
     setSubjectError('');
     setDescriptionError('');
-
+  
     if (!recipient || !subject || !description) {
       if (!recipient) setRecipientError('You must select a recipient!');
       if (!subject) setSubjectError('You must enter a subject!');
       if (!description) setDescriptionError('You must enter a description!');
       return;
     }
-
+  
     try {
       const response = await fetch("http://localhost:8003/sendComposeEmail", {
         method: "POST",
-        body: JSON.stringify({ recipient, subject, description, confID }),
+        body: JSON.stringify({ 
+          recipient, 
+          subject, 
+          description: JSON.stringify(description),
+          confID: confID 
+        }),
         headers: {
           "Content-type": "application/json; charset=UTF-8",
         },
         credentials: "include",
       });
-
+  
       const data = await response.json();
       console.log("Response from backend:", data); // Log the response
-
+  
       if (!response.ok) {
         throw new Error(data.message || "Failed to send email.");
       }
-
+  
       setSendResponse({ success: true, message: "Email sent successfully." });
       setRecipient("");
       setSubject("");
@@ -145,7 +150,7 @@ export default function Compose() {
                       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
                       border: "1px solid #c4c4c4",
                       borderRadius: "4px",
-                      resize: "vertical",
+                      resize: "none", 
                       marginTop: "8px",
                     }
                   }}
@@ -155,6 +160,12 @@ export default function Compose() {
                     placeholder="Enter your subject here"
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault(); // Prevent default behavior of enter key
+                      }
+                    }}
+                    rows={1} 
                   />
                 </Box>
                 {subjectError && <Alert severity="error">{subjectError}</Alert>}
@@ -189,7 +200,7 @@ export default function Compose() {
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2, color: 'white !important' }} // Add color: 'white !important' here
+                sx={{ mt: 3, mb: 2, color: 'white !important' }}
               >
                 Send Email
               </Button>

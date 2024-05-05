@@ -45,13 +45,15 @@ router.post("/sendComposeEmail", auth.ensureAuthenticated, async (req, res) => {
       );
     }
 
+    // Convert description to a string with preserved line breaks
+    const formattedDescription = typeof description === 'string' ? description : description.join('\n');
 
-      await sendEmail(result, subject, emailReplacements, 'SendComposeEmail.html', (error, info) => {
-        if (error) {
-          console.error(error);
-          return res.status(500).json({ success: false, message: "An error occurred while sending the email." });
-        }
-      });
+    await sendEmail(result, subject, { descriptionEmail: formattedDescription }, 'SendComposeEmail.html', (error, info) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "An error occurred while sending the email." });
+      }
+    });
 
     res.status(200).json({ success: true, message: "Emails sent successfully." });
   } catch (error) {
