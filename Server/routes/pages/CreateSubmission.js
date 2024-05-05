@@ -23,18 +23,18 @@ router.post(
       fs.unlinkSync(file.path);
 
       //insert submission
-      await db.fetchDataCst(
-        `INSERT INTO submissions (confid) VALUES (${file.confID})`
+      const result = await db.fetchDataCst(
+        `INSERT INTO submissions (submissionconfID, submissionMainAuthor) VALUES (${req.body.confID}, ${req.body.userid})`
       );
 
       const submissionid = await db.fetchDataCst(
-        `SELECT MAX(submissionid) FROM submissions WHERE confid = '${file.confID}`
+        `SELECT MAX(submissionid) FROM submissions WHERE submissionconfID = '${file.confID} AND submissionMainAuthor = ${req.body.userid}`
       );
 
       //insert authors
       //await db.fetchDataCst(
       // `INSERT INTO files (fileName, file, submissionID) VALUES ('${file.originalname}', '${base64File}', 2)`
-      //);
+      //);s
 
       //insert file
       await db.fetchDataCst(

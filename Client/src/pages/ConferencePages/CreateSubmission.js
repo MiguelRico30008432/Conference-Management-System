@@ -1,6 +1,8 @@
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import ConfNavbar from "../../OurComponents/navBars/ConferenceNavBar";
 import { ConferenceContext } from "conference.context";
+import { AuthContext } from "auth.context";
+
 import * as React from "react";
 import { useState, useContext } from "react";
 import Card from "@mui/material/Card";
@@ -17,6 +19,8 @@ import MDInput from "components/MDInput";
 
 export default function CreateSubmission() {
   const { confID } = useContext(ConferenceContext);
+  const { user } = useContext(AuthContext);
+
   const [openLoading, setOpenLoading] = useState(false);
   const [message, setMessage] = useState(null);
 
@@ -36,6 +40,7 @@ export default function CreateSubmission() {
 
     const formData = new FormData();
     formData.append("confID", confID);
+    formData.append("userid", user);
     formData.append("file", file);
     formData.append("firstName", firstName);
     formData.append("lastName", lastName);

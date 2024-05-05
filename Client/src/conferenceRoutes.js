@@ -1,7 +1,7 @@
 import PageNotFound from "pages/PageNotFound";
 
 //Submissions
-import CreateSubmission from "pages/ConferencePages/CreateSubmission"
+import CreateSubmission from "pages/ConferencePages/CreateSubmission";
 import MySubmissions from "pages/ConferencePages/MySubmissions";
 import AllSubmissions from "pages/ConferencePages/AllSubmissions";
 
@@ -10,7 +10,7 @@ import Bidding from "pages/ConferencePages/BiddingPage";
 import Assignements from "pages/ConferencePages/Assignements";
 import Conflicts from "pages/ConferencePages/Conflicts";
 
-//Reviews 
+//Reviews
 import MyReviews from "pages/ConferencePages/MyReviews";
 import AllReviews from "pages/ConferencePages/AllReviews";
 
@@ -28,7 +28,6 @@ import ConferenceDescription from "pages/ConferencePages/ConferenceDescription";
 import ConferenceDates from "pages/ConferencePages/ConferenceDates";
 import Events from "pages/ConferencePages/Events";
 
-
 const ConfRoutes = [
   {
     type: "title",
@@ -37,7 +36,7 @@ const ConfRoutes = [
     permissions: ["All"],
   },
   {
-    type: "collapse",//Done
+    type: "collapse", //Done
     name: "Description",
     submenu: "Details",
     route: "/MyConferences/ConferenceDescription",
@@ -45,7 +44,7 @@ const ConfRoutes = [
     permissions: ["All"],
   },
   {
-    type: "collapse",//Done
+    type: "collapse", //Done
     name: "Dates",
     submenu: "Details",
     route: "/MyConferences/ConferenceDates",
@@ -53,12 +52,12 @@ const ConfRoutes = [
     permissions: ["All"],
   },
   {
-    type: "collapse",//Done
+    type: "collapse", //Done
     name: "Events",
     submenu: "Details",
     route: "/MyConferences/Events",
     component: <Events />,
-    permissions: ["Chair", "Committee"],
+    permissions: ["Owner", "Chair", "Committee"],
   },
   {
     type: "title",
@@ -67,7 +66,7 @@ const ConfRoutes = [
     permissions: ["All"],
   },
   {
-    type: "collapse",//Done
+    type: "collapse", //Done
     name: "Create Submission",
     submenu: "Submissions",
     route: "/MyConferences/Conference/CreateSubmission",
@@ -75,7 +74,7 @@ const ConfRoutes = [
     permissions: ["All"],
   },
   {
-    type: "collapse",//Done
+    type: "collapse", //Done
     name: "My Submission",
     submenu: "Submissions",
     route: "/MyConferences/Conference/MySubmissions",
@@ -83,116 +82,116 @@ const ConfRoutes = [
     permissions: ["All"],
   },
   {
-    type: "collapse",//Done
+    type: "collapse", //Done
     name: "All Submission",
     submenu: "Submissions",
     route: "/MyConferences/Conference/AllSubmissions",
     component: <AllSubmissions />,
-    permissions: ["Chair", "Committee"],
+    permissions: ["Owner", "Chair", "Committee"],
   },
   {
     type: "title",
     name: "Bidding",
     parentkey: "Bidding",
-    permissions: ["Chair", "Committee"],
+    permissions: ["Owner", "Chair", "Committee"],
   },
   {
-    type: "collapse",//Done
+    type: "collapse", //Done
     name: "Bidding Process",
     submenu: "Bidding",
     route: "/MyConferences/Conference/Bidding",
     component: <Bidding />,
-    permissions: ["Chair", "Committee"],
+    permissions: ["Owner", "Chair", "Committee"],
   },
   {
-    type: "collapse",//Done
+    type: "collapse", //Done
     name: "Assignements",
     submenu: "Bidding",
     route: "/MyConferences/Conference/Assignements",
     component: <Assignements />,
-    permissions: ["Chair", "Committee"],
+    permissions: ["Owner", "Chair", "Committee"],
   },
   {
-    type: "collapse",//Done
+    type: "collapse", //Done
     name: "Conflicts Of Interest",
     submenu: "Bidding",
     route: "/MyConferences/Conference/ConflictsOfInterest",
     component: <Conflicts />,
-    permissions: ["Chair"],
+    permissions: ["Owner", "Chair"],
   },
   {
     type: "title",
     name: "Reviews",
     parentkey: "Reviews",
-    permissions: ["Chair", "Committee"],
+    permissions: ["Owner", "Chair", "Committee"],
   },
   {
-    type: "collapse",//Done
+    type: "collapse", //Done
     name: "All Reviews",
     submenu: "Reviews",
     route: "/MyConferences/Conference/AllReviews",
     component: <AllReviews />,
-    permissions: ["Chair", "Committee"],
+    permissions: ["Owner", "Chair", "Committee"],
   },
   {
-    type: "collapse",//Done
+    type: "collapse", //Done
     name: "Assigned to me",
     submenu: "Reviews",
     route: "/MyConferences/Conference/MyReviews",
     component: <MyReviews />,
-    permissions: ["Chair", "Committee"],
+    permissions: ["Owner", "Chair", "Committee"],
   },
   {
     type: "title",
     name: "Emails",
     parentkey: "Emails",
-    permissions: ["Chair", "Committee"],
+    permissions: ["Owner", "Chair", "Committee"],
   },
   {
-    type: "collapse",//Done
+    type: "collapse", //Done
     name: "Compose",
     submenu: "Emails",
     route: "/MyConferences/Conference/EMails/Compose",
     component: <Compose />,
-    permissions: ["Chair", "Committee"],
+    permissions: ["Owner", "Chair", "Committee"],
   },
   {
-    type: "collapse",//Done
+    type: "collapse", //Done
     name: "Send Invitation",
     submenu: "Emails",
     route: "/MyConferences/Conference/EMails/SendInvitation",
     component: <SendInvitation />,
-    permissions: ["Chair", "Committee"],
+    permissions: ["Owner", "Chair", "Committee"],
   },
   {
     type: "title",
     name: "Administration",
     parentkey: "Settings",
-    permissions: ["Chair"],
+    permissions: ["Owner", "Chair"],
   },
   {
-    type: "collapse",//Done
+    type: "collapse", //Done
     name: "Comittee Management",
     submenu: "Settings",
     route: "/MyConferences/Conference/ComiteManagement",
     component: <ComiteManagement />,
-    permissions: ["Chair"],
+    permissions: ["Owner", "Chair"],
   },
   {
-    type: "collapse",//Done
+    type: "collapse", //Done
     name: "Conference Settings",
     submenu: "Settings",
     route: "/MyConferences/Conference/ConferenceSettings",
     component: <ConferenceDefinitions />,
-    permissions: ["Chair"],
+    permissions: ["Owner", "Chair"],
   },
   {
-    type: "collapse",//Done
+    type: "collapse", //Done
     name: "Submissions Decision",
     submenu: "Settings",
     route: "/MyConferences/Conference/SubmissionsDecision",
     component: <SubmissionsDecision />,
-    permissions: ["Chair"],
+    permissions: ["Owner", "Chair"],
   },
   {
     type: "404",

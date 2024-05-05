@@ -75,9 +75,9 @@ Table Submissions
 
 CREATE TABLE submissions(
     submissionID SERIAL primary KEY,
-    confID INT,
-    FOREIGN KEY (confID) REFERENCES conferences(confID),
+    submissionconfID INT,FOREIGN KEY (confID) REFERENCES conferences(confID),
     submissionAccepted BOOLEAN DEFAULT false,
+    submissionMainAuthor INT,FOREIGN KEY (userid) REFERENCES users(userid),
     submissionAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
 

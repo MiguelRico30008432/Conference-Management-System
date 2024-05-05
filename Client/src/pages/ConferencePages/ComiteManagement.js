@@ -70,7 +70,7 @@ export default function ComitteeManagementPage() {
     }
 
     if (confID > 0) {
-      if (userRole.includes("Chair")) {
+      if (userRole.includes("Chair") || userRole.includes("Owner")) {
         getRows();
       } else {
         setError(
@@ -138,7 +138,8 @@ export default function ComitteeManagementPage() {
       resizable: false,
       width: 60,
       renderCell: (params) => {
-        if (params.row.userid === user) return null;
+        if (params.row.userid === user || params.row.userrole === "Owner")
+          return null;
 
         return (
           <div
@@ -183,7 +184,8 @@ export default function ComitteeManagementPage() {
       resizable: false,
       width: 110,
       renderCell: (params) => {
-        if (params.row.userid === user) return null;
+        if (params.row.userid === user || params.row.userrole === "Owner")
+          return null;
 
         return (
           <div
