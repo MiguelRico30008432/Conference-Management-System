@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../auth.context";
 import MDBox from "components/MDBox";
@@ -11,14 +11,11 @@ import Card from "@mui/material/Card";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
-import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
-import Tooltip from "@mui/material/Tooltip";
 import Alert from "@mui/material/Alert";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import Diversity3Icon from "@mui/icons-material/Diversity3";
 import MDTypography from "components/MDTypography";
 
 export default function CreateConference() {
@@ -37,15 +34,13 @@ export default function CreateConference() {
   const [biddingEndDate, setBiddingEndDate] = useState("");
   const [conferenceTypes, setConferenceTypes] = useState([]);
   const [conferenceAreas, setConferenceAreas] = useState([]);
-
   const { user, isLoggedIn } = useContext(AuthContext);
 
-  //Handles the disclaimers in the Date picker
 
-  const handleStartDateChange = (event) => {
+//Handles the disclaimers in the Date picker
+  const handleConfDate = (event) => {
     const newStartDate = new Date(event.target.value);
     const todayDate = new Date();
-    // Adding 10 days to todayDate (a rever)
     todayDate.setDate(todayDate.getDate() + 10);
     if (newStartDate <= todayDate) {
       setDisclaimer("Conference Start Date in minimum 10days.");
@@ -54,16 +49,73 @@ export default function CreateConference() {
     }
   };
 
-  const handleEndDateChange = (event) => {
-    const newEndDate = event.target.value;
-    setEndDate(newEndDate);
-    if (newEndDate <= startDate) {
-      setDisclaimer(
-        "Conference end date cannot be earlier than Conference start date."
-      );
+  const startDateChange = (event, disclaimerMessage) => {
+    const newstartDate = event.target.value;
+    if (newstartDate >= startDate) {
+      setDisclaimer(disclaimerMessage);
     } else {
       setDisclaimer("");
     }
+  };
+
+  const endDateChange = (event, startDate, setEndDate, disclaimerMessage) => {
+    const newEndDate = event.target.value;
+    setEndDate(newEndDate);
+    if (newEndDate < startDate) {
+      setDisclaimer(disclaimerMessage);
+    } else {
+      setDisclaimer("");
+    }
+  };
+
+  const startDateComparison = (event, endDate, setStartDate, disclaimerMessage) => {
+    const newStartDate = event.target.value;
+    setStartDate(newStartDate);
+    if (newStartDate <= endDate) {
+      setDisclaimer(disclaimerMessage);
+    } else {
+      setDisclaimer("");
+    }
+  };
+
+  const confDateChange = (event) => {
+    endDateChange(event, startDate, setEndDate, "Conference end date cannot be earlier than Conference start date.");
+  };
+
+  const submissionStartDateChange = (event) => {
+    startDateChange(event, "Submission start date cannot be superior or equal to the Conference start date.");
+  };
+  
+  const submissionEndDateChange = (event) => {
+    endDateChange(event, submissionStartDate, setSubmissionEndDate, "Submission end date cannot be earlier than Submission start date.");
+  };
+
+  const submissionEndDateComparison = (event) => {
+    startDateChange(event, "Submission end date cannot be superior than Conference start date.");
+  };
+
+  const biddingStartDateChange = (event) => {
+    startDateComparison(event, submissionEndDate, setBiddingStartDate, "Bidding start date cannot be inferior or equal to the Submission end date.");
+  };
+
+  const biddingEndDateChange = (event) => {
+    endDateChange(event, biddingStartDate, setBiddingEndDate, "Bidding end date cannot be earlier than Bidding start date.");
+  };
+
+  const biddingEndDateComparison = (event) => {
+    startDateChange(event, "Bidding end date cannot be superior than Conference start date.");
+  };
+
+  const reviewStartDateChange = (event) => {
+    startDateComparison(event, biddingEndDate, setReviewStartDate, "Review start date cannot be inferior or equal to the Bidding end date.");
+  };
+
+  const reviewEndDateChange = (event) => {
+    endDateChange(event, reviewStartDate, setReviewEndDate, "Review end date cannot be earlier than Review start date.");
+  };
+
+  const reviewEndDateComparison = (event) => {
+    startDateChange(event, "Review end date cannot be superior than Conference start date.");
   };
 
   //Handles the Dropdown menus
@@ -103,66 +155,83 @@ export default function CreateConference() {
     if (isLoggedIn) {
       fetchConferenceTypes();
       fetchConferenceAreas();
+      addFieldEventListeners();
     }
   }, [isLoggedIn]);
+
+  const handleFieldClick = () => {
+    setMessage(null); 
+  };
+  
+  const addFieldEventListeners = () => {
+    const formFields = document.querySelectorAll('input, select, textarea');
+  
+    formFields.forEach(field => {
+      field.addEventListener('click', handleFieldClick); 
+    });
+  };
 
   //Handles Submit form
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const formData = Object.fromEntries(data.entries());
-    
-    const requiredFields = [
-      "title",
-      "startDate",
-      "endDate",
-      "submissionStartDate",
-      "submissionEndDate",
-      "reviewStartDate",
-      "reviewEndDate",
-      "biddingStartDate",
-      "biddingEndDate",
-      "description",
-      "country",
-      "city",
-      "numberMinReviewrs",
-      "numberMaxReviewrs",
-      "numberMaxSubmissions",
-      "confLink"
-    ];
+  const data = new FormData(event.currentTarget);
+  const formData = Object.fromEntries(data.entries());
   
-    const fieldMappings = {
-      title: "Title",
-      startDate: "Conference Start Date",
-      endDate: "Conference End Date",
-      submissionStartDate: "Submission Start Date",
-      submissionEndDate: "Submission End Date",
-      reviewStartDate: "Review Start Date",
-      reviewEndDate: "Review End Date",
-      biddingStartDate: "Bidding Start Date",
-      biddingEndDate: "Bidding End Date",
-      description: "Description",
-      country: "Country",
-      city: "City",
-      numberMinReviewrs: "Nº min Reviewrs",
-      numberMaxReviewrs: "Nº max reviewrs",
-      numberMaxSubmissions: "Nº max Submissions",
-      confLink: "Conference Webpage"
-    };
-  
-    const missingFields = requiredFields
-      .filter(field => !formData[field])
-      .map(field => fieldMappings[field] || field); 
+  const allFieldsEmpty = Object.values(formData).every(value => !value);
 
-    // If there are missing fields, display an alert message
-    if (missingFields.length > 0) {
-      const missingFieldsMessage = `Please provide values for the following fields: ${missingFields.join(", ")}`;
-      setMessage(<Alert severity="error">{missingFieldsMessage}</Alert>);
-      return; 
-    }
+  if (allFieldsEmpty) {
+    setMessage(<Alert severity="error">All the fields are empty. <br></br>Please provide values.</Alert>);
+    return;
+  }
   
+  const requiredFields = [
+    "title",
+    "startDate",
+    "endDate",
+    "submissionStartDate",
+    "submissionEndDate",
+    "reviewStartDate",
+    "reviewEndDate",
+    "biddingStartDate",
+    "biddingEndDate",
+    "description",
+    "country",
+    "city",
+    "numberMinReviewrs",
+    "numberMaxReviewrs",
+    "numberMaxSubmissions",
+    "confLink"
+  ];
+
+  const fieldMappings = {
+    title: "Title",
+    startDate: "Conference Start Date",
+    endDate: "Conference End Date",
+    submissionStartDate: "Submission Start Date",
+    submissionEndDate: "Submission End Date",
+    reviewStartDate: "Review Start Date",
+    reviewEndDate: "Review End Date",
+    biddingStartDate: "Bidding Start Date",
+    biddingEndDate: "Bidding End Date",
+    description: "Description",
+    country: "Country",
+    city: "City",
+    numberMinReviewrs: "Nº min Reviewrs",
+    numberMaxReviewrs: "Nº max reviewrs",
+    numberMaxSubmissions: "Nº max Submissions",
+    confLink: "Conference Webpage"
+  };
+
+  const missingFields = requiredFields
+    .filter(field => !formData[field])
+    .map(field => fieldMappings[field] || field); 
+
+  if (missingFields.length > 0) {
+    const missingFieldsMessage = `Please provide values for the following fields: ${missingFields.join(", ")}`;
+    setMessage(<Alert severity="error">{missingFieldsMessage}</Alert>);
+    return
+  }
   
-    
     const {
       title,
       startDate,
@@ -420,7 +489,7 @@ export default function CreateConference() {
                           InputLabelProps={{ shrink: true }}
                           onChange={(event) => {
                             setStartDate(event.target.value);
-                            handleStartDateChange(event);
+                            handleConfDate(event);
                           }}
                         />
                       </Grid>
@@ -435,7 +504,7 @@ export default function CreateConference() {
                           InputLabelProps={{ shrink: true }}
                           onChange={(event) => {
                             setEndDate(event.target.value);
-                            handleEndDateChange(event);
+                            confDateChange(event);
                           }}
                         />
                       </Grid>
@@ -450,6 +519,7 @@ export default function CreateConference() {
                           InputLabelProps={{ shrink: true }}
                           onChange={(event) => {
                             setSubmissionStartDate(event.target.value);
+                            submissionStartDateChange(event);
                           }}
                         />
                       </Grid>
@@ -464,6 +534,8 @@ export default function CreateConference() {
                           InputLabelProps={{ shrink: true }}
                           onChange={(event) => {
                             setSubmissionEndDate(event.target.value);
+                            submissionEndDateChange(event);
+                            submissionEndDateComparison(event);
                           }}
                         />
                       </Grid>
@@ -478,6 +550,7 @@ export default function CreateConference() {
                           InputLabelProps={{ shrink: true }}
                           onChange={(event) => {
                             setBiddingStartDate(event.target.value);
+                            biddingStartDateChange(event);
                           }}
                         />
                       </Grid>
@@ -492,6 +565,8 @@ export default function CreateConference() {
                           InputLabelProps={{ shrink: true }}
                           onChange={(event) => {
                             setBiddingEndDate(event.target.value);
+                            biddingEndDateChange(event);
+                            biddingEndDateComparison(event);
                           }}
                         />
                       </Grid>
@@ -506,6 +581,7 @@ export default function CreateConference() {
                           InputLabelProps={{ shrink: true }}
                           onChange={(event) => {
                             setReviewStartDate(event.target.value);
+                            reviewStartDateChange(event);
                           }}
                         />
                       </Grid>
@@ -521,6 +597,8 @@ export default function CreateConference() {
                           sx={{ mb: "15px" }}
                           onChange={(event) => {
                             setReviewEndDate(event.target.value);
+                            reviewEndDateChange(event);
+                            reviewEndDateComparison(event);
                           }}
                         />
                       </Grid>

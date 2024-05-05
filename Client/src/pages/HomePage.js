@@ -1,7 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "OurComponents/footer/Footer";
-import UpperNavBar from "OurComponents/navBars/UpperNavBar";
 import imageroom from "../assets/images/imageroom.jpg";
 import imageroom1 from "../assets/images/imageroom1.jpg";
 import imageroom2 from "../assets/images/imageroom2.jpg";
