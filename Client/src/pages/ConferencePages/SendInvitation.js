@@ -71,42 +71,42 @@ export default function SendInvitation() {
     }
   ];
 
-  useEffect(() => {
-    async function getData() {
-      try {
-        const response = await fetch(`http://localhost:8003/checkInvitations?confID=${confID}`, {
-          method: "GET",
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-          credentials: "include", // Ensure cookies are sent with the request if needed
-        });
-        if (!response.ok) {
-          throw new Error('Failed to fetch data');
-        }
-        const { invitationsSent } = await response.json();
-
-        // Function to format date
-        function formatDate(dateString) {
-          const date = new Date(dateString);
-          return date.toLocaleDateString('en-GB');
-        }
-
-        // Transform the data to match the column format
-        const transformedData = invitationsSent.map(invite => ({
-          id: invite.invitationid,
-          recipient: invite.invitationemail,
-          role: invite.invitationrole,
-          status: invite.invitationcodeused ? 'Used' : 'Pending',
-          dateSent: formatDate(invite.invitationadddate)
-        }));
-        setRows(transformedData);
-      } catch (error) {
-        console.error("Error fetching invitations data:", error);
-        // Optionally handle errors in state/UI
+  const getData = async () => {
+    try {
+      const response = await fetch(`http://localhost:8003/checkInvitations?confID=${confID}`, {
+        method: "GET",
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+        credentials: "include", // Ensure cookies are sent with the request if needed
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
       }
-    }
+      const { invitationsSent } = await response.json();
 
+      // Function to format date
+      function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-GB');
+      }
+
+      // Transform the data to match the column format
+      const transformedData = invitationsSent.map(invite => ({
+        id: invite.invitationid,
+        recipient: invite.invitationemail,
+        role: invite.invitationrole,
+        status: invite.invitationcodeused ? 'Used' : 'Pending',
+        dateSent: formatDate(invite.invitationadddate)
+      }));
+      setRows(transformedData);
+    } catch (error) {
+      console.error("Error fetching invitations data:", error);
+      // Optionally handle errors in state/UI
+    }
+  };
+
+  useEffect(() => {
     if (confID) {
       getData();
     }
@@ -136,7 +136,7 @@ export default function SendInvitation() {
     }
   };
 
-  const handleSendInvitation = (event) => {
+  const handleSendInvitation = async (event) => {
     event.preventDefault(); // Prevent default form submission behavior
     setRoleError("");
     setEmailError("");
@@ -165,7 +165,7 @@ export default function SendInvitation() {
   
     // Send the list of emails to the backend
     try {
-      fetch('http://localhost:8003/sendNewInvitation', {
+      const response = await fetch('http://localhost:8003/sendNewInvitation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -176,18 +176,15 @@ export default function SendInvitation() {
           recipients: emailList,
           confID: confID
         }),
-      })
-        .then(response => {
-          if (response.ok) {
-            setInvitationEmailSuccess("Invitations sent successfully");
-          } else {
-            throw new Error('Failed to send invitations');
-          }
-        })
-        .catch(error => {
-          console.error("Error sending invitations:", error);
-          setInvitationError("An error occurred while sending invitations. Please try again.");
-        });
+      });
+  
+      if (response.ok) {
+        setInvitationEmailSuccess("Invitations sent successfully");
+        // Update table data after sending invitations
+        getData(); // Assuming getData function fetches updated data
+      } else {
+        throw new Error('Failed to send invitations');
+      }
     } catch (error) {
       console.error("Error sending invitations:", error);
       setInvitationError("An error occurred while sending invitations. Please try again.");
