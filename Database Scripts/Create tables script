@@ -113,8 +113,7 @@ CREATE TABLE files(
     fileID SERIAL primary KEY,
     fileName VARCHAR(200),
     file VARCHAR,
-    submissionID INT,
-    FOREIGN KEY (submissionID) REFERENCES submissions(submissionID),
+    submissionID INT, FOREIGN KEY (submissionID) REFERENCES submissions(submissionID),
     fileAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
 
@@ -123,10 +122,8 @@ Table Authors
 
 CREATE TABLE authors(
     authorID SERIAL primary KEY,
-    userID INT,
-    FOREIGN KEY (userID) REFERENCES users(userID),
-    submissionID INT,
-    FOREIGN KEY (submissionID) REFERENCES submissions(submissionID),
+    userID INT,FOREIGN KEY (userID) REFERENCES users(userID),
+    submissionID INT,FOREIGN KEY (submissionID) REFERENCES submissions(submissionID),
     authorAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
 ___________________________________________________________________________________________________________
