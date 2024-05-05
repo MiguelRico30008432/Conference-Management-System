@@ -1,7 +1,6 @@
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import ConfNavbar from "../../OurComponents/navBars/ConferenceNavBar";
 import { ConferenceContext } from "conference.context";
-import { AuthContext } from "auth.context";
 import Footer from "OurComponents/footer/Footer";
 
 import React, { useState, useContext, useEffect } from "react";
@@ -19,7 +18,6 @@ import Alert from '@mui/material/Alert';
 
 export default function Compose() {
   const { confID } = useContext(ConferenceContext);
-  const { isLoggedIn } = useContext(AuthContext);
   const [recipient, setRecipient] = useState("");
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");

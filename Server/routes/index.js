@@ -11,9 +11,11 @@ const ConferenceContext = require("./conferenceContext");
 const ComitteeManagementPage = require("./pages/ComiteManagement");
 const emailsPage = require("./pages/EmailsPage");
 const conferenceDefinitions = require("./pages/ConferenceDefinitions");
+const sendInvitations = require("./pages/SendInvitations");
 
 router.use(logInLogoutRouter);
 router.use(emailsPage);
+router.use(sendInvitations);
 router.use(usersRouter);
 router.use(pendingConferences);
 router.use(myProfile);

@@ -2,8 +2,9 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import ConfNavbar from "../../OurComponents/navBars/ConferenceNavBar";
 import { ConferenceContext } from "conference.context";
 import Footer from "OurComponents/footer/Footer";
-import * as React from "react";
-import { useState, useContext } from "react";
+import MDButton from "components/MDButton";
+import CompleteTable from "OurComponents/Table/CompleteTable";
+import React, { useState, useContext, useEffect } from "react";
 import Card from "@mui/material/Card";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
@@ -14,18 +15,183 @@ import Select from "@mui/material/Select";
 import FormControl from "@mui/material/FormControl";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import MDBox from "components/MDBox";
+import Alert from '@mui/material/Alert';
+
+// Email validation regex
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function SendInvitation() {
-  const { confID, userRole } = useContext(ConferenceContext);
-  const [recipient, setRecipient] = useState("");
+  const { confID } = useContext(ConferenceContext);
+  const [role, setRole] = useState("");
+  const [roleError, setRoleError] = useState("");
+  const [emails, setEmails] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [rows, setRows] = useState([]);
+  const [deleteError, setDeleteError] = useState("");
+  const [invitationError, setInvitationError] = useState("");
+  const [deleteSuccessMessage, setDeleteSuccessMessage] = useState("");
+  const [invitationEmailSuccess, setInvitationEmailSuccess] = useState("");
 
-  const handleSendEmail = (event) => {
-    event.preventDefault();
-    // Implement your logic for sending an email here
+  const columns = [
+    { field: 'recipient', headerName: 'Recipient', width: 200 },
+    { field: 'role', headerName: 'Role', width: 200 },
+    { field: 'status', headerName: 'Status', width: 200 },
+    { field: 'dateSent', headerName: 'Date Sent', width: 200 },
+    {
+      field: 'actions',
+      headerName: '',
+      sortable: false,
+      width: 100,
+      renderCell: (params) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          {params.row.status === 'Used' ? null : (
+            <MDButton
+              variant="gradient"
+              color="error"
+              onClick={() => handleDeleteInvitation(params.id)}
+              sx={{
+                maxWidth: "80px",
+                maxHeight: "30px",
+                minWidth: "30px",
+                minHeight: "30px",
+              }}
+            >
+              Delete
+            </MDButton>
+          )}
+        </div>
+      ),
+    }
+  ];
+
+  useEffect(() => {
+    async function getData() {
+      try {
+        const response = await fetch(`http://localhost:8003/checkInvitations?confID=${confID}`, {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          credentials: "include", // Ensure cookies are sent with the request if needed
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        const { invitationsSent } = await response.json();
+
+        // Function to format date
+        function formatDate(dateString) {
+          const date = new Date(dateString);
+          return date.toLocaleDateString('en-GB');
+        }
+
+        // Transform the data to match the column format
+        const transformedData = invitationsSent.map(invite => ({
+          id: invite.invitationid,
+          recipient: invite.invitationemail,
+          role: invite.invitationrole,
+          status: invite.invitationcodeused ? 'Used' : 'Pending',
+          dateSent: formatDate(invite.invitationadddate)
+        }));
+        setRows(transformedData);
+      } catch (error) {
+        console.error("Error fetching invitations data:", error);
+        // Optionally handle errors in state/UI
+      }
+    }
+
+    if (confID) {
+      getData();
+    }
+  }, [confID]);
+
+  const handleDeleteInvitation = async (invitationId) => {
+    try {
+      const response = await fetch('http://localhost:8003/deleteInvitation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ invitationId }) // Sending invitationId in the body
+      });
+      if (response.ok) {
+        const updatedRows = rows.filter(row => row.id !== invitationId);
+        setRows(updatedRows);
+        setDeleteError(""); // Clear delete error if any
+        setDeleteSuccessMessage("Invitation deleted successfully");
+      } else {
+        throw new Error('Failed to delete the invitation');
+      }
+    } catch (error) {
+      console.error('Error deleting invitation:', error);
+      setDeleteError("Failed to delete the invitation. Please try again.");
+    }
   };
 
-  const handleRecipientChange = (event) => {
-    setRecipient(event.target.value);
+  const handleSendInvitation = (event) => {
+    event.preventDefault(); // Prevent default form submission behavior
+    setRoleError("");
+    setEmailError("");
+    setInvitationError("");
+    setDeleteError("");
+    setInvitationEmailSuccess("");
+  
+    if (!role) {
+      setRoleError("You must select a role!");
+      return;
+    }
+  
+    if (!emails) {
+      setEmailError("You must enter recipients!");
+      return;
+    }
+  
+    const emailList = emails.split(',').map(email => email.trim());
+  
+    const invalidEmails = emailList.filter(email => !emailRegex.test(email));
+  
+    if (invalidEmails.length > 0) {
+      setEmailError('Invalid email format: ' + invalidEmails.join(', '));
+      return;
+    }
+  
+    // Send the list of emails to the backend
+    try {
+      fetch('http://localhost:8003/sendNewInvitation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          role: role,
+          recipients: emailList,
+          confID: confID
+        }),
+      })
+        .then(response => {
+          if (response.ok) {
+            setInvitationEmailSuccess("Invitations sent successfully");
+          } else {
+            throw new Error('Failed to send invitations');
+          }
+        })
+        .catch(error => {
+          console.error("Error sending invitations:", error);
+          setInvitationError("An error occurred while sending invitations. Please try again.");
+        });
+    } catch (error) {
+      console.error("Error sending invitations:", error);
+      setInvitationError("An error occurred while sending invitations. Please try again.");
+    }
   };
 
   return (
@@ -33,108 +199,81 @@ export default function SendInvitation() {
       <ConfNavbar />
       <Container maxWidth="sm">
         <MDBox mt={10} textAlign="left">
-          <MDBox textAlign="left">
-            <Card>
-              <MDTypography ml={2} variant="h6">
-                Send Email
-              </MDTypography>
-              <MDTypography ml={2} variant="body2">
-                text goes here
-              </MDTypography>
-            </Card>
-          </MDBox>
+          <Card>
+            <MDTypography ml={2} variant="h6">
+              Send Invitation
+            </MDTypography>
+          </Card>
           <Card sx={{ mt: 3, p: 3 }}>
-            <Box component="form" onSubmit={handleSendEmail} noValidate>
-              <MDTypography variant="body2">Send To</MDTypography>
-              <FormControl
-                fullWidth
-                margin="normal"
-                variant="outlined"
-                sx={{ width: "100%" }}
-              >
+            {invitationEmailSuccess && <Alert severity="success">{invitationEmailSuccess}</Alert>}
+            {invitationError && <Alert severity="error">{invitationError}</Alert>}
+            <Box component="form" onSubmit={handleSendInvitation} noValidate>
+              <FormControl fullWidth margin="normal" variant="outlined" error={Boolean(roleError)}>
+                <MDTypography variant="body2">Role *</MDTypography>
                 <Select
-                  id="recipient"
-                  value={recipient}
-                  onChange={handleRecipientChange}
+                  id="role"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
                   displayEmpty
                   inputProps={{ "aria-label": "Without label" }}
-                  IconComponent={() => <ArrowDropDownIcon />} // Use IconComponent to display the arrow
-                  sx={{ height: "3rem" }} // Adjust height here
+                  IconComponent={ArrowDropDownIcon}
+                  sx={{ height: "3rem" }}
                 >
-                  <MenuItem value="" disabled>
-                    Choose a Group to Send the Email
-                  </MenuItem>
+                  <MenuItem value="" disabled>Choose a Role</MenuItem>
                   <MenuItem value="chair">Chair</MenuItem>
                   <MenuItem value="committee">Committee</MenuItem>
                 </Select>
+                {roleError && <Alert severity="error">{roleError}</Alert>}
               </FormControl>
-              <MDTypography variant="body2" sx={{ mt: 2, mb: 1 }}>
-                Subject *
-              </MDTypography>
-              <Box
-                sx={{
-                  "& textarea": {
-                    width: "100%",
-                    padding: "18.5px 14px",
-                    fontSize: "0.9rem",
-                    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-                    border: "1px solid #c4c4c4",
-                    borderRadius: "4px",
-                    "&:focus": {
-                      outline: "2px solid #3f51b5",
-                      borderColor: "transparent",
-                    },
-                    resize: "vertical",
-                  },
-                }}
-              >
-                <textarea
-                  aria-label="Subject"
-                  rows={1}
-                  placeholder="Enter your subject here"
-                  required
-                />
-              </Box>
-              <MDTypography variant="body2" sx={{ mt: 2, mb: 1 }}>
-                Description *
-              </MDTypography>
-              <Box
-                sx={{
-                  "& textarea": {
-                    width: "100%",
-                    padding: "18.5px 14px",
-                    fontSize: "0.9rem",
-                    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-                    border: "1px solid #c4c4c4",
-                    borderRadius: "4px",
-                    "&:focus": {
-                      outline: "2px solid #3f51b5",
-                      borderColor: "transparent",
-                    },
-                    resize: "vertical",
-                  },
-                }}
-              >
-                <textarea
-                  aria-label="Description"
-                  rows={4}
-                  placeholder="Enter your description here"
-                  required
-                />
-              </Box>
+              <FormControl fullWidth error={Boolean(emailError)}>
+                <MDTypography variant="body2" sx={{ mt: 2, mb: 1 }}>Recipients *</MDTypography>
+                <Box
+                  sx={{
+                    "& textarea": {
+                      width: "100%",
+                      padding: "18.5px 14px",
+                      fontSize: "0.9rem",
+                      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+                      border: "1px solid #c4c4c4",
+                      borderRadius: "4px",
+                      resize: "vertical",
+                      marginTop: "8px",
+                    }
+                  }}
+                >
+                  <textarea
+                    id="emails"
+                    placeholder="Enter recipients separated by commas"
+                    value={emails}
+                    onChange={(e) => setEmails(e.target.value)}
+                    rows={4}
+                  />
+                </Box>
+                {emailError && <Alert severity="error">{emailError}</Alert>}
+              </FormControl>
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2, color: "white !important" }}
+                sx={{ mt: 3, mb: 2, color: 'white !important' }}
               >
-                Send Email
+                Send Invitation
               </Button>
             </Box>
           </Card>
+          <Card sx={{ mt: 3 }}>
+            {deleteError && <Alert severity="error">{deleteError}</Alert>}
+            {deleteSuccessMessage && <Alert severity="success">{deleteSuccessMessage}</Alert>}
+            <CompleteTable
+              columns={columns}
+              rows={rows}
+              numerOfRowsPerPage={5}
+              height={200}
+            />
+          </Card>
         </MDBox>
+        <br></br>
       </Container>
-      <br></br>
       <Footer />
     </DashboardLayout>
   );

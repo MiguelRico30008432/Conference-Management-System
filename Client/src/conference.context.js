@@ -7,6 +7,7 @@ const ConferenceContext = React.createContext();
 function ConferenceProviderWrapper(props) {
   const [confID, setConfID] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const [confName, setConfName] = useState(null);
 
   const { user } = useContext(AuthContext);
 

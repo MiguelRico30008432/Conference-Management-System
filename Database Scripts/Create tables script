@@ -139,7 +139,7 @@ CREATE TABLE invitations(
     invitationEmail VARCHAR(200),
     invitationCode VARCHAR(200),
     invitationRole VARCHAR(50),
-    invationCodeUsed BOOLEAN DEFAULT false,
+    invitationCodeUsed BOOLEAN DEFAULT false,
     invitationAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
 ___________________________________________________________________________________________________________
