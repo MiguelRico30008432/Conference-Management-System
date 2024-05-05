@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 
 // react-router components
 import { useLocation, Link } from "react-router-dom";
@@ -38,6 +38,8 @@ import {
   setOpenConfigurator,
 } from "context";
 
+import { AuthContext } from "../../auth.context";
+
 
 export default function UpperNavBar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
@@ -45,6 +47,7 @@ export default function UpperNavBar({ absolute, light, isMini }) {
   const { miniSidenav, transparentNavbar, fixedNavbar, darkMode } = controller;
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
+  const { isLoggedIn } = useContext(AuthContext);
 
   useEffect(() => {
     // Setting the navbar type
@@ -119,6 +122,10 @@ export default function UpperNavBar({ absolute, light, isMini }) {
         <MDBox color="inherit" mb={{ xs: 1, md: 0 }} sx={(theme) => navbarRow(theme, { isMini })}>
           <Breadcrumbs icon="home" title={route[route.length - 1]} route={route} light={light} />
         </MDBox>
+        <MDBox sx={{ flex: 1 }} /> {/* Pushes the welcome message to the right */}
+        <MDBox>
+          {isLoggedIn && <p>Welcome</p>} {/* Display Welcome if user is logged in */}
+        </MDBox>
         {isMini ? null : (
           <MDBox sx={(theme) => navbarRow(theme, { isMini })}>
             <MDBox pr={1}>
@@ -131,13 +138,12 @@ export default function UpperNavBar({ absolute, light, isMini }) {
                 sx={navbarMobileMenu}
                 onClick={handleMiniSidenav}
               >
-               
-                <Icon sx={iconsStyle} fontSize="medium"> 
+                <Icon sx={iconsStyle} fontSize="medium">
                   {miniSidenav ? "menu_open" : "menu"}
                 </Icon>
                 <MDTypography variant="body2" color="text">
                   Menu
-                  </MDTypography>
+                </MDTypography>
               </IconButton>
               {renderMenu()}
             </MDBox>

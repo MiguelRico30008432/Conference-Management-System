@@ -95,26 +95,26 @@ export default function DefinitionsPage() {
           setContact(jsonResponse[0].confcontact);
           setNewContact(jsonResponse[0].confcontact);
 
-          setSubmissionStart(jsonResponse[0].confstartsubmission)
-          setNewSubmissionStart(jsonResponse[0].confstartsubmission)
+          setSubmissionStart(formatDate(jsonResponse[0].confstartsubmission))
+          setNewSubmissionStart(formatDate(jsonResponse[0].confstartsubmission))
 
-          setSubmissionEnd(jsonResponse[0].confendsubmission)
-          setNewSubmissionEnd(jsonResponse[0].confendsubmission)
+          setSubmissionEnd(formatDate(jsonResponse[0].confendsubmission))
+          setNewSubmissionEnd(formatDate(jsonResponse[0].confendsubmission))
 
-          setBiddingStart(jsonResponse[0].confstartbidding)
-          setNewBiddingStart(jsonResponse[0].confstartbidding)
+          setBiddingStart(formatDate(jsonResponse[0].confstartbidding))
+          setNewBiddingStart(formatDate(jsonResponse[0].confstartbidding))
 
-          setBiddingEnd(jsonResponse[0].confendbidding)
-          setNewBiddingEnd(jsonResponse[0].confendbidding)
+          setBiddingEnd(formatDate(jsonResponse[0].confendbidding))
+          setNewBiddingEnd(formatDate(jsonResponse[0].confendbidding))
 
-          setReviewStart(jsonResponse[0].confstartreview)
-          setNewReviewStart(jsonResponse[0].confstartreview)
+          setReviewStart(formatDate(jsonResponse[0].confstartreview))
+          setNewReviewStart(formatDate(jsonResponse[0].confstartreview))
 
-          setReviewEnd(jsonResponse[0].confendreview)
-          setNewReviewEnd(jsonResponse[0].confendreview)
+          setReviewEnd(formatDate(jsonResponse[0].confendreview))
+          setNewReviewEnd(formatDate(jsonResponse[0].confendreview))
 
-          setConfStart(jsonResponse[0].confstartdate)
-          setNewConfStart(jsonResponse[0].confstartdate)
+          setConfStart(formatDate(jsonResponse[0].confstartdate))
+          setNewConfStart(formatDate(jsonResponse[0].confstartdate))
 
           setConfEnd(jsonResponse[0].confenddate)
           setNewConfEnd(jsonResponse[0].confenddate)
@@ -146,15 +146,19 @@ export default function DefinitionsPage() {
     }
   }, [isLoggedIn, confID])
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const formattedDate = date.toISOString().split('T')[0];
+    return formattedDate;
+  };
+
   async function handleSubmit(event) {
     event.preventDefault();
     if (makeRequest()) {
       if (valideInputs()) {
+        if(datesVerifications()){            
           await saveUserData();
-      } else {
-        setMessage(
-          <Alert severity="error">All fields marked with * are required.</Alert>
-        );
+        } 
       }
     }
   }
@@ -180,23 +184,23 @@ export default function DefinitionsPage() {
     ) {
       return true;
     } else {
+      <Alert severity="error">
+        No changes were registered!
+      </Alert>
       return false;
     }
   }
 
   function valideInputs() {
     if (newName === "" || newCity === "" || newCountry === "" || newContact === "" || newSubmissionsStart === "" || newSubmissionsEnd === "" || newBiddingStart === "" || newBiddingEnd === "" || newReviewStart === "" || newReviewEnd === "" || newConfStart === "" || newConfEnd === "" || newReviewEnd === "" || newMinReviewers === "" || newMaxReviewers === "" || newSubmissionUpdate === ""){
+      setMessage(
+        <Alert severity="error">All fields marked with * are required.</Alert>
+      );
       return false;
-    } else { return true; }
+    } else { 
+      return true; 
+    }
   }
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    let month = (date.getMonth() + 1).toString().padStart(2, '0'); // adiciona zero à esquerda se necessário
-    let day = date.getDate().toString().padStart(2, '0'); // adiciona zero à esquerda se necessário
-    return `${year}-${month}-${day}`;
-  };
 
   async function saveUserData() {
     setOpenLoading(true);
@@ -263,6 +267,74 @@ export default function DefinitionsPage() {
       );
     }
     setOpenLoading(false);
+  }
+
+  function datesVerifications(){
+    //---------------------Submissions------------------//
+    if (newSubmissionsEnd <= newSubmissionsStart){
+      setMessage(
+        <Alert severity="error">
+          Submission End Date must be after Submission Start Date 
+        </Alert>
+      );
+      return false;
+    }
+    //---------------------Bidding------------------//
+    if (newBiddingEnd <= newBiddingStart){
+      setMessage(
+        <Alert severity="error">
+          Bidding End Date must be after Bidding Start Date 
+        </Alert>
+      );
+      return false;
+    }
+    //---------------------Reviews------------------//
+    if (newReviewEnd <= newReviewStart){
+      setMessage(
+        <Alert severity="error">
+          Review End Date must be after Review Start Date 
+        </Alert>
+      );
+      return false;
+    }
+    //---------------------Conference------------------//
+    if (newConfEnd <= newConfStart){
+      setMessage(
+        <Alert severity="error">
+          Conference End Date must be after Conference Start Date 
+        </Alert>
+      );
+      return false;
+    }
+    //---------------------Between Them------------------//
+    if (newSubmissionsStart >= newBiddingStart || newSubmissionsStart >= newBiddingEnd || newSubmissionsStart >= newReviewStart || newSubmissionsStart >= newReviewEnd || newSubmissionsStart >= newConfStart || newSubmissionsStart >= newConfEnd || newSubmissionsEnd >= newBiddingStart || newSubmissionsEnd >= newBiddingEnd || newSubmissionsEnd >= newReviewStart || newSubmissionsEnd >= newReviewEnd || newSubmissionsEnd >= newConfStart || newSubmissionsEnd >= newConfEnd){
+      setMessage(
+        <Alert severity="error">
+          Biddings / Reviews / Conference dates must be after Submissions Dates
+        </Alert>
+      );
+      return false;
+    }
+
+    if (newBiddingStart >= newReviewStart || newBiddingStart >= newReviewEnd || newBiddingStart >= newConfStart || newBiddingStart >= newConfEnd || newBiddingEnd >= newReviewStart || newBiddingEnd >= newReviewEnd || newBiddingEnd >= newConfStart || newBiddingEnd >= newConfEnd){
+      setMessage(
+        <Alert severity="error">
+          Reviews / Conference dates must be after Bidding Dates
+        </Alert>
+      );
+      return false;
+    }
+
+    if (newReviewStart >= newConfStart || newReviewStart >= newConfEnd || newReviewEnd >= newConfStart || newReviewEnd >= newConfEnd){
+      setMessage(
+        <Alert severity="error">
+          Conference dates must be after Review Dates
+        </Alert>
+      );
+      return false;
+    }
+
+    return true;
   }
 
   return (
@@ -396,9 +468,9 @@ export default function DefinitionsPage() {
                       label="Submissions Start Date"
                       name="confstartsubmission"
                       type="date"
-                      value={formatDate(newSubmissionsStart)}
+                      value={newSubmissionsStart}
                       disabled={!editModeActive}
-                      onChange={(e) => setNewSubmissionStart(e.target.value)}
+                      onChange={(e) => setNewSubmissionStart(formatDate(e.target.value))}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
                   </Grid>
@@ -410,9 +482,9 @@ export default function DefinitionsPage() {
                       label="Submissions End Date"
                       name="confendsubmission"
                       type="date"
-                      value={formatDate(newSubmissionsEnd)}
+                      value={newSubmissionsEnd}
                       disabled={!editModeActive}
-                      onChange={(e) => setNewSubmissionEnd(e.target.value)}
+                      onChange={(e) => setNewSubmissionEnd(formatDate(e.target.value))}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
                   </Grid>
@@ -424,9 +496,9 @@ export default function DefinitionsPage() {
                       label="Bidding Start Date"
                       name="confstartbidding"
                       type="date"
-                      value={formatDate(newBiddingStart)}
+                      value={newBiddingStart}
                       disabled={!editModeActive}
-                      onChange={(e) => setNewBiddingStart(e.target.value)}
+                      onChange={(e) => setNewBiddingStart(formatDate(e.target.value))}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
                   </Grid>
@@ -438,9 +510,9 @@ export default function DefinitionsPage() {
                       label="Bidding End Date"
                       name="confendbidding"
                       type="date"
-                      value={formatDate(newBiddingEnd)}
+                      value={newBiddingEnd}
                       disabled={!editModeActive}
-                      onChange={(e) => setNewBiddingEnd(e.target.value)}
+                      onChange={(e) => setNewBiddingEnd(formatDate(e.target.value))}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
                   </Grid>
@@ -452,9 +524,9 @@ export default function DefinitionsPage() {
                       label="Reviews Start Date"
                       name="confstartreview"
                       type="date"
-                      value={formatDate(newReviewStart)}
+                      value={newReviewStart}
                       disabled={!editModeActive}
-                      onChange={(e) => setNewReviewStart(e.target.value)}
+                      onChange={(e) => setNewReviewStart(formatDate(e.target.value))}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
                   </Grid>
@@ -466,9 +538,9 @@ export default function DefinitionsPage() {
                       label="Reviews End Date"
                       name="confendreview"
                       type="date"
-                      value={formatDate(newReviewEnd)}
+                      value={newReviewEnd}
                       disabled={!editModeActive}
-                      onChange={(e) => setNewReviewEnd(e.target.value)}
+                      onChange={(e) => setNewReviewEnd(formatDate(e.target.value))}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
                   </Grid>
@@ -480,9 +552,9 @@ export default function DefinitionsPage() {
                       label="Conferance Start Date"
                       name="confstartdate"
                       type="date"
-                      value={formatDate(newConfStart)}
+                      value={newConfStart}
                       disabled={!editModeActive}
-                      onChange={(e) => setNewConfStart(e.target.value)}
+                      onChange={(e) => setNewConfStart(formatDate(e.target.value))}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
                   </Grid>
@@ -494,9 +566,9 @@ export default function DefinitionsPage() {
                       label="Conference End Date"
                       name="confenddate"
                       type="date"
-                      value={formatDate(newConfEnd)}
+                      value={newConfEnd}
                       disabled={!editModeActive}
-                      onChange={(e) => setNewConfEnd(e.target.value)}
+                      onChange={(e) => setNewConfEnd(formatDate(e.target.value))}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
                   </Grid>

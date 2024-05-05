@@ -10,6 +10,47 @@ import MDTypography from "components/MDTypography";
 
 export default function CreateSubmission() {
   const { confID, userRole } = useContext(ConferenceContext);
+  const [file, setFile] = useState({});
+
+  async function uploadFile(event) {
+    event.preventDefault();
+
+    const formData = new FormData();
+    formData.append("file", file);
+    fetch("http://localhost:8003/uploadFile", {
+      method: "POST",
+      body: formData,
+    });
+  }
+
+  async function handleDownload() {
+    try {
+      const response = await fetch("http://localhost:8003/downloadFile", {
+        method: "POST",
+        body: JSON.stringify({ fileid: 10 }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `${"filename"}`);
+        document.body.appendChild(link);
+        link.click();
+        window.URL.revokeObjectURL(url);
+      } else {
+        const errorText = await response.text();
+        console.error("Erro ao baixar o arquivo:", errorText);
+      }
+    } catch (error) {
+      console.error("Erro ao baixar o arquivo:", error);
+    }
+  }
 
   return (
     <DashboardLayout>
@@ -24,6 +65,27 @@ export default function CreateSubmission() {
               <MDTypography ml={2} variant="body2">
                 text goes here
               </MDTypography>
+            </Card>
+
+            <Card sx={{ mt: 2 }}>
+              <div className="form-group">
+                <label>file</label>
+                <input
+                  type="file"
+                  className="form-control"
+                  placeholder="file"
+                  onChange={(e) => {
+                    setFile(e.target.files[0]);
+                  }}
+                  id="file"
+                  name="file"
+                />
+                <button onClick={(event) => uploadFile(event)}>Upload</button>
+              </div>
+            </Card>
+
+            <Card sx={{ mt: 2 }}>
+              <button onClick={handleDownload}>Download Ficheiro</button>
             </Card>
           </MDBox>
         </MDBox>
