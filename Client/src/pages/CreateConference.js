@@ -111,6 +111,58 @@ export default function CreateConference() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const formData = Object.fromEntries(data.entries());
+    
+    const requiredFields = [
+      "title",
+      "startDate",
+      "endDate",
+      "submissionStartDate",
+      "submissionEndDate",
+      "reviewStartDate",
+      "reviewEndDate",
+      "biddingStartDate",
+      "biddingEndDate",
+      "description",
+      "country",
+      "city",
+      "numberMinReviewrs",
+      "numberMaxReviewrs",
+      "numberMaxSubmissions",
+      "confLink"
+    ];
+  
+    const fieldMappings = {
+      title: "Title",
+      startDate: "Conference Start Date",
+      endDate: "Conference End Date",
+      submissionStartDate: "Submission Start Date",
+      submissionEndDate: "Submission End Date",
+      reviewStartDate: "Review Start Date",
+      reviewEndDate: "Review End Date",
+      biddingStartDate: "Bidding Start Date",
+      biddingEndDate: "Bidding End Date",
+      description: "Description",
+      country: "Country",
+      city: "City",
+      numberMinReviewrs: "Nº min Reviewrs",
+      numberMaxReviewrs: "Nº max reviewrs",
+      numberMaxSubmissions: "Nº max Submissions",
+      confLink: "Conference Webpage"
+    };
+  
+    const missingFields = requiredFields
+      .filter(field => !formData[field])
+      .map(field => fieldMappings[field] || field); 
+
+    // If there are missing fields, display an alert message
+    if (missingFields.length > 0) {
+      const missingFieldsMessage = `Please provide values for the following fields: ${missingFields.join(", ")}`;
+      setMessage(<Alert severity="error">{missingFieldsMessage}</Alert>);
+      return; 
+    }
+  
+  
+    
     const {
       title,
       startDate,
