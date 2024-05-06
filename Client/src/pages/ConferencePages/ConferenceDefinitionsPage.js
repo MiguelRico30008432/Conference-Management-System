@@ -374,6 +374,13 @@ export default function DefinitionsPage() {
     return dateToCompare < currentDate;
   }
 
+  function addOneDay(dateToAdd){
+    const date = new Date(dateToAdd);
+    date.setDate(date.getDate() + 1);
+    const updatedDate = formatDate(date);
+    return updatedDate;
+  }
+
   return (
     <>
     {openLoading && <LoadingCircle />}
@@ -527,8 +534,8 @@ export default function DefinitionsPage() {
                       label="Submissions End Date"
                       name="confendsubmission"
                       type="date"
-                      InputLabelProps={{ shrink: true }}
-                      inputProps={{ min: currentDate }}
+                      InputLabelProps={{ shrink: true }} 
+                      inputProps={{ min: addOneDay(newSubmissionsStart)}}
                       value={newSubmissionsEnd}
                       disabled={!editModeActive || isDatePast(submissionsEnd)}
                       onChange={(e) => setNewSubmissionEnd(formatDate(e.target.value))}
@@ -544,7 +551,7 @@ export default function DefinitionsPage() {
                       name="confstartbidding"
                       type="date"
                       InputLabelProps={{ shrink: true }}
-                      inputProps={{ min: currentDate }}
+                      inputProps={{ min: addOneDay(newSubmissionsEnd) }}
                       value={newBiddingStart}
                       disabled={!editModeActive || isDatePast(biddingStart)}
                       onChange={(e) => setNewBiddingStart(formatDate(e.target.value))}
@@ -560,7 +567,7 @@ export default function DefinitionsPage() {
                       name="confendbidding"
                       type="date"
                       InputLabelProps={{ shrink: true }}
-                      inputProps={{ min: currentDate }}
+                      inputProps={{ min: addOneDay(newBiddingStart) }}
                       value={newBiddingEnd}
                       disabled={!editModeActive || isDatePast(biddingEnd)}
                       onChange={(e) => setNewBiddingEnd(formatDate(e.target.value))}
@@ -576,7 +583,7 @@ export default function DefinitionsPage() {
                       name="confstartreview"
                       type="date"
                       InputLabelProps={{ shrink: true }}
-                      inputProps={{ min: currentDate }}
+                      inputProps={{ min: addOneDay(newBiddingEnd) }}
                       value={newReviewStart}
                       disabled={!editModeActive || isDatePast(reviewStart)}
                       onChange={(e) => setNewReviewStart(formatDate(e.target.value))}
@@ -592,7 +599,7 @@ export default function DefinitionsPage() {
                       name="confendreview"
                       type="date"
                       InputLabelProps={{ shrink: true }}
-                      inputProps={{ min: currentDate }}
+                      inputProps={{ min: addOneDay(newReviewStart) }}
                       value={newReviewEnd}
                       disabled={!editModeActive || isDatePast(reviewEnd)}
                       onChange={(e) => setNewReviewEnd(formatDate(e.target.value))}
@@ -608,7 +615,7 @@ export default function DefinitionsPage() {
                       name="confstartdate"
                       type="date"
                       InputLabelProps={{ shrink: true }}
-                      inputProps={{ min: currentDate }}
+                      inputProps={{ min: addOneDay(newReviewEnd) }}
                       value={newConfStart}
                       disabled={!editModeActive || isDatePast(confStart)}
                       onChange={(e) => setNewConfStart(formatDate(e.target.value))}
@@ -624,7 +631,7 @@ export default function DefinitionsPage() {
                       name="confenddate"
                       type="date"
                       InputLabelProps={{ shrink: true }}
-                      inputProps={{ min: currentDate }}
+                      inputProps={{ min: addOneDay(newConfStart) }}
                       value={newConfEnd}
                       disabled={!editModeActive || isDatePast(confEnd)}
                       onChange={(e) => setNewConfEnd(formatDate(e.target.value))}
