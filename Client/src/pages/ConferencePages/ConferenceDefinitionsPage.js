@@ -24,6 +24,8 @@ export default function DefinitionsPage() {
   const { confID } = useContext(ConferenceContext);
   const { isLoggedIn } = useContext(AuthContext);
 
+  const currentDate = new Date().toISOString().split('T')[0]; // Valor base para a data minima que o calendário vai mostrar
+
   const [openLoading, setOpenLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [editModeActive, setEditModeActive] = useState(false);
@@ -116,8 +118,8 @@ export default function DefinitionsPage() {
           setConfStart(formatDate(jsonResponse[0].confstartdate))
           setNewConfStart(formatDate(jsonResponse[0].confstartdate))
 
-          setConfEnd(jsonResponse[0].confenddate)
-          setNewConfEnd(jsonResponse[0].confenddate)
+          setConfEnd(formatDate(jsonResponse[0].confenddate))
+          setNewConfEnd(formatDate(jsonResponse[0].confenddate))
 
           setMinReviewers(jsonResponse[0].confminreviewers)
           setNewMinReviewers(jsonResponse[0].confminreviewers)
@@ -147,19 +149,48 @@ export default function DefinitionsPage() {
   }, [isLoggedIn, confID])
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const formattedDate = date.toISOString().split('T')[0];
-    return formattedDate;
+    try{
+      const date = new Date(dateString);
+      const formattedDate = date.toISOString().split('T')[0];
+      return formattedDate;
+    } catch (error){
+       return dateString;
+    }
   };
+
+  function reviewersVerification(){
+    if (newMinReviewers < 1){
+      setMessage(
+        <Alert severity="error">
+          You must set, at least, 1 reviewer (minimum)
+        </Alert>
+      );
+      return false;
+    }
+    if (newMaxReviewers > 10){
+      setMessage(
+        <Alert severity="error">
+          You must  not set more than 10 reviewers (maximum)
+        </Alert>
+      );
+      return false;
+    }
+    if (newMaxReviewers < newMinReviewers){
+      setMessage(
+        <Alert severity="error">
+          Maximum number of reviewers cannot be lower than the minimum number of reviewers 
+        </Alert>
+      );
+      return false;
+    }
+    return true;
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
-    if (makeRequest()) {
-      if (valideInputs()) {
-        if(datesVerifications()){            
-          await saveUserData();
-        } 
-      }
+    if (makeRequest() && valideInputs() && datesBetweenStarEndVerifications() && reviewersVerification()) {
+      setEditModeActive(false);
+      await saveUserData();
     }
   }
 
@@ -184,15 +215,18 @@ export default function DefinitionsPage() {
     ) {
       return true;
     } else {
-      <Alert severity="error">
-        No changes were registered!
-      </Alert>
+      setMessage(
+        <Alert severity="error">
+          No changes were registered!
+        </Alert>
+      );
       return false;
     }
   }
 
   function valideInputs() {
     if (newName === "" || newCity === "" || newCountry === "" || newContact === "" || newSubmissionsStart === "" || newSubmissionsEnd === "" || newBiddingStart === "" || newBiddingEnd === "" || newReviewStart === "" || newReviewEnd === "" || newConfStart === "" || newConfEnd === "" || newReviewEnd === "" || newMinReviewers === "" || newMaxReviewers === "" || newSubmissionUpdate === ""){
+      console.log(newSubmissionsStart)
       setMessage(
         <Alert severity="error">All fields marked with * are required.</Alert>
       );
@@ -269,7 +303,7 @@ export default function DefinitionsPage() {
     setOpenLoading(false);
   }
 
-  function datesVerifications(){
+  function datesBetweenStarEndVerifications(){
     //---------------------Submissions------------------//
     if (newSubmissionsEnd <= newSubmissionsStart){
       setMessage(
@@ -333,8 +367,11 @@ export default function DefinitionsPage() {
       );
       return false;
     }
-
     return true;
+  }
+
+  function isDatePast(dateToCompare){
+    return dateToCompare < currentDate;
   }
 
   return (
@@ -381,6 +418,7 @@ export default function DefinitionsPage() {
                       id="confname"
                       label="Conference Name"
                       autoFocus
+                      InputLabelProps={{ shrink: true }}
                       value={newName}
                       onChange={(e) => setNewName(e.target.value)}
                       disabled={!editModeActive}
@@ -393,6 +431,7 @@ export default function DefinitionsPage() {
                       id="confwebpage"
                       label="Conference Web Page"
                       name="confwebpage"
+                      InputLabelProps={{ shrink: true }}
                       value={newWebpage}
                       onChange={(e) => setNewWebpage(e.target.value)}
                       disabled={!editModeActive}
@@ -406,6 +445,7 @@ export default function DefinitionsPage() {
                       id="confcity"
                       label="City"
                       name="confcity"
+                      InputLabelProps={{ shrink: true }}
                       value={newCity}
                       onChange={(e) => setNewCity(e.target.value)}
                       disabled={!editModeActive}
@@ -419,6 +459,7 @@ export default function DefinitionsPage() {
                       id="confcountry"
                       label="Country"
                       name="confcountry"
+                      InputLabelProps={{ shrink: true }}
                       value={newCountry}
                       onChange={(e) => setNewCountry(e.target.value)}
                       disabled={!editModeActive}
@@ -432,6 +473,7 @@ export default function DefinitionsPage() {
                       id="confcontact"
                       label="Support Contact"
                       name="confcontact"
+                      InputLabelProps={{ shrink: true }}
                       value={newContact}
                       disabled={!editModeActive}
                       onChange={(e) => setNewContact(e.target.value)}
@@ -450,6 +492,7 @@ export default function DefinitionsPage() {
                         labelId="confsubupdate"
                         label="Submissions Update"
                         id="confsubupdate"
+                        InputLabelProps={{ shrink: true }}
                         value={newSubmissionUpdate}
                         disabled={!editModeActive}
                         onChange={(e) => setNewSubmissionUpdate(e.target.value)}
@@ -468,8 +511,10 @@ export default function DefinitionsPage() {
                       label="Submissions Start Date"
                       name="confstartsubmission"
                       type="date"
+                      InputLabelProps={{ shrink: true }}
+                      inputProps={{ min: currentDate }}
                       value={newSubmissionsStart}
-                      disabled={!editModeActive}
+                      disabled={!editModeActive || isDatePast(submissionsStart)}
                       onChange={(e) => setNewSubmissionStart(formatDate(e.target.value))}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
@@ -482,8 +527,10 @@ export default function DefinitionsPage() {
                       label="Submissions End Date"
                       name="confendsubmission"
                       type="date"
+                      InputLabelProps={{ shrink: true }}
+                      inputProps={{ min: currentDate }}
                       value={newSubmissionsEnd}
-                      disabled={!editModeActive}
+                      disabled={!editModeActive || isDatePast(submissionsEnd)}
                       onChange={(e) => setNewSubmissionEnd(formatDate(e.target.value))}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
@@ -496,8 +543,10 @@ export default function DefinitionsPage() {
                       label="Bidding Start Date"
                       name="confstartbidding"
                       type="date"
+                      InputLabelProps={{ shrink: true }}
+                      inputProps={{ min: currentDate }}
                       value={newBiddingStart}
-                      disabled={!editModeActive}
+                      disabled={!editModeActive || isDatePast(biddingStart)}
                       onChange={(e) => setNewBiddingStart(formatDate(e.target.value))}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
@@ -510,8 +559,10 @@ export default function DefinitionsPage() {
                       label="Bidding End Date"
                       name="confendbidding"
                       type="date"
+                      InputLabelProps={{ shrink: true }}
+                      inputProps={{ min: currentDate }}
                       value={newBiddingEnd}
-                      disabled={!editModeActive}
+                      disabled={!editModeActive || isDatePast(biddingEnd)}
                       onChange={(e) => setNewBiddingEnd(formatDate(e.target.value))}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
@@ -524,8 +575,10 @@ export default function DefinitionsPage() {
                       label="Reviews Start Date"
                       name="confstartreview"
                       type="date"
+                      InputLabelProps={{ shrink: true }}
+                      inputProps={{ min: currentDate }}
                       value={newReviewStart}
-                      disabled={!editModeActive}
+                      disabled={!editModeActive || isDatePast(reviewStart)}
                       onChange={(e) => setNewReviewStart(formatDate(e.target.value))}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
@@ -538,8 +591,10 @@ export default function DefinitionsPage() {
                       label="Reviews End Date"
                       name="confendreview"
                       type="date"
+                      InputLabelProps={{ shrink: true }}
+                      inputProps={{ min: currentDate }}
                       value={newReviewEnd}
-                      disabled={!editModeActive}
+                      disabled={!editModeActive || isDatePast(reviewEnd)}
                       onChange={(e) => setNewReviewEnd(formatDate(e.target.value))}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
@@ -552,8 +607,10 @@ export default function DefinitionsPage() {
                       label="Conferance Start Date"
                       name="confstartdate"
                       type="date"
+                      InputLabelProps={{ shrink: true }}
+                      inputProps={{ min: currentDate }}
                       value={newConfStart}
-                      disabled={!editModeActive}
+                      disabled={!editModeActive || isDatePast(confStart)}
                       onChange={(e) => setNewConfStart(formatDate(e.target.value))}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
@@ -566,8 +623,10 @@ export default function DefinitionsPage() {
                       label="Conference End Date"
                       name="confenddate"
                       type="date"
+                      InputLabelProps={{ shrink: true }}
+                      inputProps={{ min: currentDate }}
                       value={newConfEnd}
-                      disabled={!editModeActive}
+                      disabled={!editModeActive || isDatePast(confEnd)}
                       onChange={(e) => setNewConfEnd(formatDate(e.target.value))}
                       sx={{ ml: 2, mt: 2, width: "90%" }}
                     />
@@ -579,6 +638,7 @@ export default function DefinitionsPage() {
                       id="confminreviewers"
                       label="Minimun Number of Reviews"
                       name="confminreviewers"
+                      InputLabelProps={{ shrink: true }}
                       value={newMinReviewers}
                       disabled={!editModeActive}
                       onChange={(e) => setNewMinReviewers(e.target.value)}
@@ -592,6 +652,7 @@ export default function DefinitionsPage() {
                       id="confmaxreviewers"
                       label="Maximum Number of Reviews"
                       name="confmaxreviewers"
+                      InputLabelProps={{ shrink: true }}
                       value={newMaxReviewers}
                       disabled={!editModeActive}
                       onChange={(e) => setNewMaxReviewers(e.target.value)}
@@ -609,7 +670,6 @@ export default function DefinitionsPage() {
                     mb: 2,
                     display: editModeActive ? "block" : "none",
                   }}
-                  onClick={() => setEditModeActive(false)}
                 >
                   Save Changes
                 </MDButton>
