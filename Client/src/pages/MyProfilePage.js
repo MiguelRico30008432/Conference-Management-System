@@ -16,12 +16,15 @@ import Alert from "@mui/material/Alert";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
 
 export default function MyProfilePage() {
+  const { user, isLoggedIn } = useContext(AuthContext);
+
   const [editModeActive, setEditModeActive] = useState(false);
-  const [changePassActive, setChangePassActive] = useState(false);
+  const [passwordModeActive, setPasswordModeActive] = useState(false);
   const [openEmailChangeDialog, setOpenEmailChangeDialog] = useState(false);
   const [openLoading, setOpenLoading] = useState(false);
   const [message, setMessage] = useState(null);
-  const { user, isLoggedIn } = useContext(AuthContext);
+  const [passwordMessage, setPasswordMessage] = useState(null);
+  const [inviteMessage, setInviteMessage] = useState(null);
 
   const [firstName, setFirstName] = useState("");
   const [originalFirstName, setOriginalFirstName] = useState("");
@@ -36,6 +39,8 @@ export default function MyProfilePage() {
 
   const [password, setPasword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
+
+  const [inviteCode, setInviteCode] = useState("");
 
   useEffect(() => {
     async function getUserData() {
@@ -81,9 +86,7 @@ export default function MyProfilePage() {
     }
   }, [isLoggedIn]);
 
-  async function handleSubmit(event) {
-    event.preventDefault();
-
+  async function changeUserData() {
     if (makeRequest()) {
       if (valideInputs()) {
         if (originalEmail !== email) {
@@ -99,15 +102,13 @@ export default function MyProfilePage() {
     }
   }
 
-  async function handleSubmitForPassword(event) {
-    event.preventDefault();
-
+  async function changePassword() {
     if (password.length === 0 || repeatPassword.length === 0) {
-      setMessage(
+      setPasswordMessage(
         <Alert severity="error">Please fill in the password field.</Alert>
       );
     } else if (password !== repeatPassword) {
-      setMessage(
+      setPasswordMessage(
         <Alert severity="error">
           The first password does not match with the second one.
         </Alert>
@@ -196,12 +197,12 @@ export default function MyProfilePage() {
       const jsonResponse = await response.json();
 
       if (response.status === 200) {
-        setMessage(<Alert severity="success">Password changed</Alert>);
+        setPasswordMessage(<Alert severity="success">Password changed</Alert>);
       } else {
-        setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
+        setPasswordMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
       }
     } catch (error) {
-      setMessage(
+      setPasswordMessage(
         <Alert severity="error">
           Something went wrong when obtaining your informations
         </Alert>
@@ -213,199 +214,293 @@ export default function MyProfilePage() {
   return (
     <>
       {openLoading && <LoadingCircle />}
+      <PopUpWithMessage
+        open={openEmailChangeDialog}
+        handleClose={() => setOpenEmailChangeDialog(false)}
+        handleConfirm={async () => {
+          saveUserData();
+          setOpenEmailChangeDialog(false);
+        }}
+        title={"Confirm Email Change"}
+        text={
+          "Are you sure you want to change your email address? Changing your email address will affect your login."
+        }
+      />
+
       <DashboardLayout>
         <UpperNavBar />
-        <MDTypography variant="h6">
-          Feel free to change your data by clicking on edit profile or change
-          your password
-        </MDTypography>
-
-        {message}
-
-        <MDButton
-          variant="gradient"
-          color="info"
-          sx={{ mt: 2, mb: 2 }}
-          onClick={() => {
-            setEditModeActive(true);
-            setChangePassActive(false);
-            setMessage(null);
-          }}
-        >
-          Edit Profile
-        </MDButton>
-
-        <MDButton
-          variant="gradient"
-          color="info"
-          sx={{ mt: 2, mb: 2, ml: 1 }}
-          onClick={() => {
-            setEditModeActive(false);
-            setChangePassActive(true);
-          }}
-        >
-          Change Password
-        </MDButton>
-
-        <PopUpWithMessage
-          open={openEmailChangeDialog}
-          handleClose={() => setOpenEmailChangeDialog(false)}
-          handleConfirm={async () => {
-            saveUserData();
-            setOpenEmailChangeDialog(false);
-          }}
-          title={"Confirm Email Change"}
-          text={
-            "Are you sure you want to change your email address? Changing your email address will affect your login."
-          }
-        />
-
-        {!changePassActive ? (
-          <Card sx={{ maxWidth: 1400 }}>
-            <MDBox mt={1} mb={1} textAlign="center"></MDBox>
-            <Box component="form" noValidate onSubmit={handleSubmit}>
-              <Grid container spacing={1}>
-                <Grid item xs={12} sm={5}>
-                  <TextField
-                    autoComplete="given-name"
-                    name="firstName"
-                    required
-                    fullWidth
-                    id="firstName"
-                    label="First Name"
-                    autoFocus
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    disabled={!editModeActive}
-                    sx={{ ml: 2, mt: 2, width: "90%" }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={5}>
-                  <TextField
-                    required
-                    fullWidth
-                    id="lastName"
-                    label="Last Name"
-                    name="lastName"
-                    autoComplete="family-name"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    disabled={!editModeActive}
-                    sx={{ ml: 2, mt: 2, width: "90%" }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={5}>
-                  <TextField
-                    required
-                    fullWidth
-                    id="affiliation"
-                    label="affiliation"
-                    name="affiliation"
-                    value={affiliation}
-                    onChange={(e) => setAffiliation(e.target.value)}
-                    disabled={!editModeActive}
-                    sx={{ ml: 2, mt: 2, width: "90%" }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={5}>
-                  <TextField
-                    required
-                    fullWidth
-                    id="email"
-                    label="Email Address"
-                    name="email"
-                    autoComplete="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={!editModeActive}
-                    sx={{ ml: 2, mt: 2, width: "90%" }}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    fullWidth
-                    id="phone"
-                    label="Phone Number"
-                    name="phone"
-                    autoComplete="phone"
-                    value={phone}
-                    disabled={!editModeActive}
-                    onChange={(e) => setPhone(e.target.value)}
-                    sx={{ ml: 2, mt: 2, width: "35%" }}
-                  />
-                </Grid>
-              </Grid>
-              <MDButton
-                type="submit"
-                variant="gradient"
-                color="info"
-                sx={{
-                  ml: 2,
-                  mt: 2,
-                  mb: 2,
-                  display: editModeActive ? "block" : "none",
-                }}
-                onClick={() => setEditModeActive(false)}
-              >
-                Save Changes
-              </MDButton>
-              <MDBox mt={3} mb={1} textAlign="center"></MDBox>
-            </Box>
+        <MDBox mb={3} textAlign="left">
+          <Card>
+            <MDTypography ml={2} variant="h6">
+              My Profile
+            </MDTypography>
+            <MDTypography ml={2} variant="body2">
+              Feel free to change your data by clicking on edit profile or
+              change your password
+            </MDTypography>
           </Card>
-        ) : (
-          <Card sx={{ maxWidth: 1400 }}>
-            <MDBox mt={1} mb={1} textAlign="center"></MDBox>
-            <Box component="form" noValidate onSubmit={handleSubmitForPassword}>
-              <Grid container spacing={1}>
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    fullWidth
-                    name="password"
-                    label="Password"
-                    type="password"
-                    id="password"
-                    autoComplete="new-password"
-                    value={password}
-                    onChange={(e) => setPasword(e.target.value)}
-                    sx={{ ml: 2, mt: 2, width: "50%" }}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    fullWidth
-                    name="password"
-                    label="Repeat Password"
-                    type="password"
-                    id="password"
-                    autoComplete="new-password"
-                    value={repeatPassword}
-                    onChange={(e) => setRepeatPassword(e.target.value)}
-                    sx={{ ml: 2, mt: 2, width: "50%" }}
-                  />
-                </Grid>
-              </Grid>
-              <MDButton
-                type="submit"
-                variant="gradient"
-                color="info"
-                sx={{
-                  ml: 2,
-                  mt: 2,
-                  mb: 2,
-                }}
-                onClick={() => setEditModeActive(false)}
-              >
-                Save Changes
-              </MDButton>
-              <MDBox mt={3} mb={1} textAlign="center"></MDBox>
-            </Box>
-          </Card>
-        )}
+        </MDBox>
 
-        <MDBox mt={3} mb={1} textAlign="center"></MDBox>
+        <MDBox mb={3} textAlign="left">
+          <Card>{message}</Card>
+        </MDBox>
+
+        <MDBox mb={3}>
+          <Card>
+            <MDTypography ml={2} mb={2} mt={2} variant="body2">
+              Change your informations
+            </MDTypography>
+
+            <Grid container spacing={1}>
+              <Grid item xs={12} sm={5}>
+                <TextField
+                  autoComplete="given-name"
+                  name="firstName"
+                  required
+                  fullWidth
+                  id="firstName"
+                  label="First Name"
+                  autoFocus
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  disabled={!editModeActive}
+                  sx={{ ml: 2, mt: 2, width: "90%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={5}>
+                <TextField
+                  required
+                  fullWidth
+                  id="lastName"
+                  label="Last Name"
+                  name="lastName"
+                  autoComplete="family-name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  disabled={!editModeActive}
+                  sx={{ ml: 2, mt: 2, width: "90%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={5}>
+                <TextField
+                  required
+                  fullWidth
+                  id="affiliation"
+                  label="affiliation"
+                  name="affiliation"
+                  value={affiliation}
+                  onChange={(e) => setAffiliation(e.target.value)}
+                  disabled={!editModeActive}
+                  sx={{ ml: 2, mt: 2, width: "90%" }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={5}>
+                <TextField
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={!editModeActive}
+                  sx={{ ml: 2, mt: 2, width: "90%" }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  id="phone"
+                  label="Phone Number"
+                  name="phone"
+                  autoComplete="phone"
+                  value={phone}
+                  disabled={!editModeActive}
+                  onChange={(e) => setPhone(e.target.value)}
+                  sx={{ ml: 2, mt: 2, width: 150 }}
+                />
+              </Grid>
+            </Grid>
+
+            <MDBox style={{ display: "flex", gap: 1 }}>
+              {!editModeActive && (
+                <MDButton
+                  variant="gradient"
+                  color="info"
+                  sx={{
+                    maxWidth: "200px",
+                    maxHeight: "30px",
+                    minWidth: "5px",
+                    minHeight: "30px",
+                    mt: 2,
+                    ml: 2,
+                    mb: 2,
+                  }}
+                  onClick={() => {
+                    setEditModeActive(true);
+                    setMessage(null);
+                  }}
+                >
+                  Edit Profile
+                </MDButton>
+              )}
+
+              {editModeActive && (
+                <MDButton
+                  variant="gradient"
+                  color="success"
+                  sx={{
+                    maxWidth: "200px",
+                    maxHeight: "30px",
+                    minWidth: "5px",
+                    minHeight: "30px",
+                    mt: 2,
+                    ml: 2,
+                    mb: 2,
+                  }}
+                  onClick={() => {
+                    setEditModeActive(false);
+                    changeUserData();
+                  }}
+                >
+                  Save Changes
+                </MDButton>
+              )}
+            </MDBox>
+          </Card>
+        </MDBox>
+
+        <MDBox mb={3} textAlign="left">
+          <Card>{passwordMessage}</Card>{" "}
+        </MDBox>
+
+        <MDBox mb={3}>
+          <Card>
+            <MDTypography ml={2} mb={2} mt={2} variant="body2">
+              Change Your Password
+            </MDTypography>
+
+            <TextField
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              disabled={!passwordModeActive}
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPasword(e.target.value)}
+              sx={{ ml: 2, width: 300 }}
+            />
+
+            <TextField
+              required
+              fullWidth
+              name="password"
+              label="Repeat Password"
+              type="password"
+              id="password"
+              disabled={!passwordModeActive}
+              autoComplete="new-password"
+              value={repeatPassword}
+              onChange={(e) => setRepeatPassword(e.target.value)}
+              sx={{ mt: 2, ml: 2, width: 300 }}
+            />
+
+            <MDBox style={{ display: "flex", gap: 1 }}>
+              {!passwordModeActive && (
+                <MDButton
+                  variant="gradient"
+                  color="info"
+                  sx={{
+                    maxWidth: "170px",
+                    maxHeight: "30px",
+                    minWidth: "5px",
+                    minHeight: "30px",
+                    mt: 2,
+                    ml: 2,
+                    mb: 2,
+                  }}
+                  onClick={() => {
+                    setPasswordMessage(null);
+                    setPasswordModeActive(true);
+                  }}
+                >
+                  Change Password
+                </MDButton>
+              )}
+
+              {passwordModeActive && (
+                <MDButton
+                  variant="gradient"
+                  color="success"
+                  sx={{
+                    maxWidth: "150px",
+                    maxHeight: "30px",
+                    minWidth: "5px",
+                    minHeight: "30px",
+                    ml: 2,
+                    mt: 2,
+                    mb: 2,
+                  }}
+                  onClick={() => {
+                    setPasswordModeActive(false);
+                    changePassword();
+                  }}
+                >
+                  Save Changes
+                </MDButton>
+              )}
+            </MDBox>
+          </Card>
+        </MDBox>
+
+        <MDBox mb={3} textAlign="left">
+          <Card>{inviteMessage}</Card>
+        </MDBox>
+
+        <MDBox mb={3}>
+          <Card>
+            <MDTypography ml={2} mb={2} mt={2} variant="body2">
+              "Do you have a conference invitation?"
+            </MDTypography>
+
+            <TextField
+              autoComplete="given-name"
+              name="code"
+              fullWidth
+              id="code"
+              label="Intivation Code"
+              autoFocus
+              value={inviteCode}
+              onChange={(e) => setInviteCode(e.target.value)}
+              sx={{ ml: 2, width: 150 }}
+            />
+
+            <MDButton
+              variant="gradient"
+              color="info"
+              sx={{
+                maxWidth: "170px",
+                maxHeight: "30px",
+                minWidth: "5px",
+                minHeight: "30px",
+                mt: 2,
+                ml: 2,
+                mb: 2,
+              }}
+              onClick={() => {
+                setMessage(null);
+              }}
+            >
+              Join Conference
+            </MDButton>
+          </Card>
+        </MDBox>
+
         <Footer />
       </DashboardLayout>
     </>

@@ -22,9 +22,11 @@ export default function CreateSubmission() {
   const [openLoading, setOpenLoading] = useState(false);
   const [message, setMessage] = useState(null);
 
-  const [authors, setAuthors] = useState([{ firstName: '', lastName: '', email: '', affiliation: '' }]);
-  const [title, setTitle] = useState('');
-  const [abstract, setAbstract] = useState('');
+  const [authors, setAuthors] = useState([
+    { firstName: "", lastName: "", email: "", affiliation: "" },
+  ]);
+  const [title, setTitle] = useState("");
+  const [abstract, setAbstract] = useState("");
   const [file, setFile] = useState({});
 
   async function uploadFile(event) {
@@ -43,7 +45,7 @@ export default function CreateSubmission() {
       formData.append(`author[${index}][lastName]`, author.lastName);
       formData.append(`author[${index}][email]`, author.email);
       formData.append(`author[${index}][affiliation]`, author.affiliation);
-    }); 
+    });
 
     try {
       const response = await fetch("http://localhost:8003/createSubmission", {
@@ -73,7 +75,10 @@ export default function CreateSubmission() {
   }
 
   const addAuthor = () => {
-    setAuthors([...authors, { firstName: '', lastName: '', email: '', affiliation: '' }]);
+    setAuthors([
+      ...authors,
+      { firstName: "", lastName: "", email: "", affiliation: "" },
+    ]);
   };
 
   const handleInputChange = (index, field, value) => {
@@ -115,14 +120,16 @@ export default function CreateSubmission() {
                   </MDTypography>
 
                   <TextField
-                  name={`firstName${index}`}
-                  required
-                  fullWidth
-                  label="First Name"
-                  autoFocus
-                  value={author.firstName}
-                  onChange={(e) => handleInputChange(index, 'firstName', e.target.value)}
-                  sx={{ ml: 2, mb: 2, width: '30%' }}
+                    name={`firstName${index}`}
+                    required
+                    fullWidth
+                    label="First Name"
+                    autoFocus
+                    value={author.firstName}
+                    onChange={(e) =>
+                      handleInputChange(index, "firstName", e.target.value)
+                    }
+                    sx={{ ml: 2, mb: 2, width: "30%" }}
                   />
 
                   <TextField
@@ -132,7 +139,9 @@ export default function CreateSubmission() {
                     label="Last Name"
                     autoFocus
                     value={author.lastName}
-                    onChange={(e) => handleInputChange(index, 'lastName', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(index, "lastName", e.target.value)
+                    }
                     sx={{ ml: 2, mb: 2, width: "30%" }}
                   />
 
@@ -143,7 +152,9 @@ export default function CreateSubmission() {
                     label="Email"
                     autoComplete="email"
                     autoFocus
-                    onChange={(e) => handleInputChange(index, 'email', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(index, "email", e.target.value)
+                    }
                     sx={{ ml: 2, mb: 2, width: "30%" }}
                   />
 
@@ -153,15 +164,17 @@ export default function CreateSubmission() {
                     fullWidth
                     label="Affiliation"
                     autoFocus
-                    onChange={(e) => handleInputChange(index, 'affiliation', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(index, "affiliation", e.target.value)
+                    }
                     sx={{ ml: 2, mb: 2, width: "30%" }}
                   />
 
                   <MDButton
-                  variant="outlined"
-                  color="error"
-                  onClick={() => removeAuthor(index)}
-                  sx={{ mt: 2, ml: 2, mb: 2, width: "30%" }}
+                    variant="outlined"
+                    color="error"
+                    onClick={() => removeAuthor(index)}
+                    sx={{ mt: 2, ml: 2, mb: 2, width: "30%" }}
                   >
                     Remove Author
                   </MDButton>
@@ -172,8 +185,15 @@ export default function CreateSubmission() {
                 variant="gradient"
                 color="info"
                 onClick={addAuthor}
-                sx={{mt: 2, mb: 2}}
-                >
+                sx={{
+                  maxWidth: "130px",
+                  maxHeight: "35px",
+                  minWidth: "1px",
+                  minHeight: "30px",
+                  mt: 2,
+                  mb: 2,
+                }}
+              >
                 Add Author
               </MDButton>
 
