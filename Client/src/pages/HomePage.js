@@ -69,12 +69,12 @@ export default function HomePage() {
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              cursor: "pointer",
+              // cursor: "pointer",
             }}
             onClick={() =>
               handleImageClick(images[currentImageIndex].sectionId)
             }
-            title="Click to discover more"
+            // title="Click to discover more"
           />
           <div
             ref={targetRef}
@@ -135,7 +135,7 @@ export default function HomePage() {
             <p>
               Organize, manage, and coordinate with authors and reviewers.
               <br></br>
-              UAL Conf simplifies the creation, organization and management of
+              <strong>UAL Conf</strong> simplifies the creation, organization and management of
               your conference.
             </p>
           </div>
@@ -157,8 +157,8 @@ export default function HomePage() {
             </h2>
             <p>
               Submit your papers effortlessly. <br></br>
-              UAL Conf simplifies the submition of all the necessary documents
-              for the conference.
+              <strong>UAL Conf</strong> simplifies the submition of all the necessary documents
+              for your conference.
             </p>
           </div>
         </div>
@@ -180,8 +180,7 @@ export default function HomePage() {
             <p>
               Efficiently review papers and manage the entire review process.
               <br></br>
-              UAL Conf simplifies the review, and control of the different
-              versions, to achieve a final version of your conference.
+              <strong>UAL Conf</strong> simplifies the review process, from day one until the final version of your conference.
             </p>
           </div>
         </div>

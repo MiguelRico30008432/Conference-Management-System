@@ -17,6 +17,7 @@ import Alert from "@mui/material/Alert";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import MDTypography from "components/MDTypography";
+import moment from 'moment';
 
 export default function CreateConference() {
   const navigate = useNavigate();
@@ -36,87 +37,6 @@ export default function CreateConference() {
   const [conferenceAreas, setConferenceAreas] = useState([]);
   const { user, isLoggedIn } = useContext(AuthContext);
 
-
-//Handles the disclaimers in the Date picker
-  const handleConfDate = (event) => {
-    const newStartDate = new Date(event.target.value);
-    const todayDate = new Date();
-    todayDate.setDate(todayDate.getDate() + 10);
-    if (newStartDate <= todayDate) {
-      setDisclaimer("Conference Start Date in minimum 10days.");
-    } else {
-      setDisclaimer("");
-    }
-  };
-
-  const startDateChange = (event, disclaimerMessage) => {
-    const newstartDate = event.target.value;
-    if (newstartDate >= startDate) {
-      setDisclaimer(disclaimerMessage);
-    } else {
-      setDisclaimer("");
-    }
-  };
-
-  const endDateChange = (event, startDate, setEndDate, disclaimerMessage) => {
-    const newEndDate = event.target.value;
-    setEndDate(newEndDate);
-    if (newEndDate < startDate) {
-      setDisclaimer(disclaimerMessage);
-    } else {
-      setDisclaimer("");
-    }
-  };
-
-  const startDateComparison = (event, endDate, setStartDate, disclaimerMessage) => {
-    const newStartDate = event.target.value;
-    setStartDate(newStartDate);
-    if (newStartDate <= endDate) {
-      setDisclaimer(disclaimerMessage);
-    } else {
-      setDisclaimer("");
-    }
-  };
-
-  const confDateChange = (event) => {
-    endDateChange(event, startDate, setEndDate, "Conference end date cannot be earlier than Conference start date.");
-  };
-
-  const submissionStartDateChange = (event) => {
-    startDateChange(event, "Submission start date cannot be superior or equal to the Conference start date.");
-  };
-  
-  const submissionEndDateChange = (event) => {
-    endDateChange(event, submissionStartDate, setSubmissionEndDate, "Submission end date cannot be earlier than Submission start date.");
-  };
-
-  const submissionEndDateComparison = (event) => {
-    startDateChange(event, "Submission end date cannot be superior than Conference start date.");
-  };
-
-  const biddingStartDateChange = (event) => {
-    startDateComparison(event, submissionEndDate, setBiddingStartDate, "Bidding start date cannot be inferior or equal to the Submission end date.");
-  };
-
-  const biddingEndDateChange = (event) => {
-    endDateChange(event, biddingStartDate, setBiddingEndDate, "Bidding end date cannot be earlier than Bidding start date.");
-  };
-
-  const biddingEndDateComparison = (event) => {
-    startDateChange(event, "Bidding end date cannot be superior than Conference start date.");
-  };
-
-  const reviewStartDateChange = (event) => {
-    startDateComparison(event, biddingEndDate, setReviewStartDate, "Review start date cannot be inferior or equal to the Bidding end date.");
-  };
-
-  const reviewEndDateChange = (event) => {
-    endDateChange(event, reviewStartDate, setReviewEndDate, "Review end date cannot be earlier than Review start date.");
-  };
-
-  const reviewEndDateComparison = (event) => {
-    startDateChange(event, "Review end date cannot be superior than Conference start date.");
-  };
 
   //Handles the Dropdown menus
   const handleTypeChange = (event) => {
@@ -338,6 +258,15 @@ export default function CreateConference() {
     }
   };
 
+  const today = moment().format('YYYY-MM-DD');
+  const minStartDate = moment().add(5, 'days').format('YYYY-MM-DD');
+  const previousDay = moment(startDate).subtract(1, 'days').format('YYYY-MM-DD');
+  const minDate = moment(submissionStartDate).format('YYYY-MM-DD');
+  const nextDay = moment(submissionEndDate).add(1, 'days').format('YYYY-MM-DD');
+  const minDateBidding = moment(biddingStartDate).format('YYYY-MM-DD');
+  const minDateReview = moment(reviewStartDate).format('YYYY-MM-DD');
+  const nextDayBidding = moment(biddingEndDate).add(1, 'days').format('YYYY-MM-DD');
+
   return (
     // <DashboardLayout>
     <DashboardLayout>
@@ -487,26 +416,26 @@ export default function CreateConference() {
                           type="date"
                           id="startDate"
                           InputLabelProps={{ shrink: true }}
+                          inputProps={{ min: minStartDate }}
                           onChange={(event) => {
                             setStartDate(event.target.value);
-                            handleConfDate(event);
                           }}
                         />
                       </Grid>
                       <Grid item xs={11.5} md={6}>
-                        <TextField
-                          required
-                          fullWidth
-                          name="endDate"
-                          label="Conference End Date"
-                          type="date"
-                          id="endDate"
-                          InputLabelProps={{ shrink: true }}
-                          onChange={(event) => {
-                            setEndDate(event.target.value);
-                            confDateChange(event);
-                          }}
-                        />
+                      <TextField
+                        required
+                        fullWidth
+                        name="endDate"
+                        label="Conference End Date"
+                        type="date"
+                        id="endDate"
+                        InputLabelProps={{ shrink: true }}
+                        inputProps={{ min: startDate }}
+                        onChange={(event) => {
+                          setEndDate(event.target.value);
+                        }}
+                      />
                       </Grid>
                       <Grid item xs={11.5} md={6}>
                         <TextField
@@ -517,42 +446,41 @@ export default function CreateConference() {
                           type="date"
                           id="submissionStartDate"
                           InputLabelProps={{ shrink: true }}
+                          inputProps={{ max: previousDay }}
                           onChange={(event) => {
                             setSubmissionStartDate(event.target.value);
-                            submissionStartDateChange(event);
                           }}
                         />
                       </Grid>
                       <Grid item xs={11.5} md={6}>
-                        <TextField
-                          required
-                          fullWidth
-                          name="submissionEndDate"
-                          label="Submission End Date"
-                          type="date"
-                          id="submissionEndDate"
-                          InputLabelProps={{ shrink: true }}
-                          onChange={(event) => {
-                            setSubmissionEndDate(event.target.value);
-                            submissionEndDateChange(event);
-                            submissionEndDateComparison(event);
-                          }}
-                        />
+                      <TextField
+                        required
+                        fullWidth
+                        name="submissionEndDate"
+                        label="Submission End Date"
+                        type="date"
+                        id="submissionEndDate"
+                        InputLabelProps={{ shrink: true }}
+                        inputProps={{ min: minDate, max: previousDay }}
+                        onChange={(event) => {
+                          setSubmissionEndDate(event.target.value);
+                        }}
+                      />
                       </Grid>
                       <Grid item xs={11.5} md={6}>
-                        <TextField
-                          required
-                          fullWidth
-                          name="biddingStartDate"
-                          label="Bidding Start Date"
-                          type="date"
-                          id="biddingStartDate"
-                          InputLabelProps={{ shrink: true }}
-                          onChange={(event) => {
-                            setBiddingStartDate(event.target.value);
-                            biddingStartDateChange(event);
-                          }}
-                        />
+                      <TextField
+                        required
+                        fullWidth
+                        name="biddingStartDate"
+                        label="Bidding Start Date"
+                        type="date"
+                        id="biddingStartDate"
+                        InputLabelProps={{ shrink: true }}
+                        inputProps={{ min: nextDay, max: previousDay }} 
+                        onChange={(event) => {
+                          setBiddingStartDate(event.target.value);
+                        }}
+                      />
                       </Grid>
                       <Grid item xs={11.5} md={6}>
                         <TextField
@@ -563,10 +491,9 @@ export default function CreateConference() {
                           type="date"
                           id="biddingEndDate"
                           InputLabelProps={{ shrink: true }}
+                          inputProps={{ min: minDateBidding, max: previousDay }}
                           onChange={(event) => {
                             setBiddingEndDate(event.target.value);
-                            biddingEndDateChange(event);
-                            biddingEndDateComparison(event);
                           }}
                         />
                       </Grid>
@@ -579,9 +506,9 @@ export default function CreateConference() {
                           type="date"
                           id="reviewStartDate"
                           InputLabelProps={{ shrink: true }}
+                          inputProps={{ min: nextDayBidding, max: previousDay }}
                           onChange={(event) => {
                             setReviewStartDate(event.target.value);
-                            reviewStartDateChange(event);
                           }}
                         />
                       </Grid>
@@ -595,10 +522,9 @@ export default function CreateConference() {
                           id="reviewEndDate"
                           InputLabelProps={{ shrink: true }}
                           sx={{ mb: "15px" }}
+                          inputProps={{ min: minDateReview, max: previousDay }}
                           onChange={(event) => {
                             setReviewEndDate(event.target.value);
-                            reviewEndDateChange(event);
-                            reviewEndDateComparison(event);
                           }}
                         />
                       </Grid>
