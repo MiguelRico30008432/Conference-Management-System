@@ -13,8 +13,6 @@ import LoadingCircle from "OurComponents/loading/LoadingCircle";
 import Alert from "@mui/material/Alert";
 import MDButton from "components/MDButton";
 import TextField from "@mui/material/TextField";
-import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
 import MDInput from "components/MDInput";
 
 export default function CreateSubmission() {
@@ -24,13 +22,9 @@ export default function CreateSubmission() {
   const [openLoading, setOpenLoading] = useState(false);
   const [message, setMessage] = useState(null);
 
-  const [firstName, setFirstName] = useState(null);
-  const [lastName, setLastName] = useState(null);
-  const [email, setEmail] = useState(null);
-  const [affiliation, setAffiliation] = useState(null);
-  const [title, setTitle] = useState(null);
-  const [absctract, setAbsctract] = useState(null);
-
+  const [authors, setAuthors] = useState([{ firstName: '', lastName: '', email: '', affiliation: '' }]);
+  const [title, setTitle] = useState('');
+  const [abstract, setAbstract] = useState('');
   const [file, setFile] = useState({});
 
   async function uploadFile(event) {
@@ -41,13 +35,15 @@ export default function CreateSubmission() {
     const formData = new FormData();
     formData.append("confID", confID);
     formData.append("userid", user);
-    formData.append("file", file);
-    formData.append("firstName", firstName);
-    formData.append("lastName", lastName);
-    formData.append("email", email);
-    formData.append("affiliation", affiliation);
     formData.append("title", title);
-    formData.append("absctract", absctract);
+    formData.append("abstract", abstract);
+    formData.append("file", file);
+    authors.forEach((author, index) => {
+      formData.append(`author[${index}][firstName]`, author.firstName);
+      formData.append(`author[${index}][lastName]`, author.lastName);
+      formData.append(`author[${index}][email]`, author.email);
+      formData.append(`author[${index}][affiliation]`, author.affiliation);
+    }); 
 
     try {
       const response = await fetch("http://localhost:8003/createSubmission", {
@@ -57,6 +53,7 @@ export default function CreateSubmission() {
       });
 
       const jsonResponse = await response.json();
+
       if (response.status === 200) {
         setMessage(
           <Alert severity="success">Subimission created with success</Alert>
@@ -74,6 +71,22 @@ export default function CreateSubmission() {
 
     setOpenLoading(false);
   }
+
+  const addAuthor = () => {
+    setAuthors([...authors, { firstName: '', lastName: '', email: '', affiliation: '' }]);
+  };
+
+  const handleInputChange = (index, field, value) => {
+    const newAuthors = [...authors];
+    newAuthors[index][field] = value;
+    setAuthors(newAuthors);
+  };
+
+  const removeAuthor = (index) => {
+    const newAuthors = [...authors];
+    newAuthors.splice(index, 1);
+    setAuthors(newAuthors);
+  };
 
   return (
     <>
@@ -95,56 +108,74 @@ export default function CreateSubmission() {
               <Card sx={{ mt: 2 }}>{message}</Card>
 
               {/*Author Information*/}
-              <Card sx={{ mt: 2 }}>
-                <MDTypography ml={2} mt={1} mb={2} variant="body2">
-                  Author Information
-                </MDTypography>
+              {authors.map((author, index) => (
+                <Card key={index} sx={{ mt: 2 }}>
+                  <MDTypography ml={2} mt={1} mb={2} variant="body2">
+                    Author {index + 1} Information
+                  </MDTypography>
 
-                <TextField
-                  name="firstName"
+                  <TextField
+                  name={`firstName${index}`}
                   required
                   fullWidth
-                  id="firstName"
                   label="First Name"
                   autoFocus
-                  onChange={(e) => setFirstName(e.target.value)}
-                  sx={{ ml: 2, mb: 2, width: "30%" }}
-                />
+                  value={author.firstName}
+                  onChange={(e) => handleInputChange(index, 'firstName', e.target.value)}
+                  sx={{ ml: 2, mb: 2, width: '30%' }}
+                  />
 
-                <TextField
-                  name="lastName"
-                  required
-                  fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  autoFocus
-                  onChange={(e) => setLastName(e.target.value)}
-                  sx={{ ml: 2, mb: 2, width: "30%" }}
-                />
+                  <TextField
+                    name={`lastName${index}`}
+                    required
+                    fullWidth
+                    label="Last Name"
+                    autoFocus
+                    value={author.lastName}
+                    onChange={(e) => handleInputChange(index, 'lastName', e.target.value)}
+                    sx={{ ml: 2, mb: 2, width: "30%" }}
+                  />
 
-                <TextField
-                  name="email"
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email"
-                  autoComplete="email"
-                  autoFocus
-                  onChange={(e) => setEmail(e.target.value)}
-                  sx={{ ml: 2, mb: 2, width: "30%" }}
-                />
+                  <TextField
+                    name={`email${index}`}
+                    required
+                    fullWidth
+                    label="Email"
+                    autoComplete="email"
+                    autoFocus
+                    onChange={(e) => handleInputChange(index, 'email', e.target.value)}
+                    sx={{ ml: 2, mb: 2, width: "30%" }}
+                  />
 
-                <TextField
-                  name="affiliation"
-                  required
-                  fullWidth
-                  id="affiliation"
-                  label="Affiliation"
-                  autoFocus
-                  onChange={(e) => setAffiliation(e.target.value)}
-                  sx={{ ml: 2, mb: 2, width: "20%" }}
-                />
-              </Card>
+                  <TextField
+                    name={`affiliation${index}`}
+                    required
+                    fullWidth
+                    label="Affiliation"
+                    autoFocus
+                    onChange={(e) => handleInputChange(index, 'affiliation', e.target.value)}
+                    sx={{ ml: 2, mb: 2, width: "30%" }}
+                  />
+
+                  <MDButton
+                  variant="outlined"
+                  color="error"
+                  onClick={() => removeAuthor(index)}
+                  sx={{ mt: 2, ml: 2, mb: 2, width: "30%" }}
+                  >
+                    Remove Author
+                  </MDButton>
+                </Card>
+              ))}
+
+              <MDButton
+                variant="gradient"
+                color="info"
+                onClick={addAuthor}
+                sx={{mt: 2, mb: 2}}
+                >
+                Add Author
+              </MDButton>
 
               {/*Title and abstract*/}
               <Card sx={{ mt: 2 }}>
@@ -181,7 +212,7 @@ export default function CreateSubmission() {
                   <textarea
                     id="subject"
                     placeholder="Enter your abstract here*"
-                    onChange={(e) => setAbsctract(e.target.value)}
+                    onChange={(e) => setAbstract(e.target.value)}
                   />
                 </MDBox>
               </Card>

@@ -270,7 +270,7 @@ export default function DefinitionsPage() {
 
       if (response.status === 200) {
         setMessage(
-          <Alert severity="success">{"Your data was saved with success"}</Alert>
+          <Alert severity="success">{"Your conference definitions were saved."}</Alert>
         );
 
         setName(newName);
