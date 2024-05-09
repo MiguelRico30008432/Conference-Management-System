@@ -33,44 +33,52 @@ export default function CreateSubmission() {
     event.preventDefault();
 
     setOpenLoading(true);
+    
+    if(validateInputs()){
+      const formData = new FormData();
+      formData.append("confID", confID);
+      formData.append("userid", user);
+      formData.append("title", title);
+      formData.append("abstract", abstract);
+      formData.append("file", file);
+      authors.forEach((author, index) => {
+        formData.append(`author[${index}][firstName]`, author.firstName);
+        formData.append(`author[${index}][lastName]`, author.lastName);
+        formData.append(`author[${index}][email]`, author.email);
+        formData.append(`author[${index}][affiliation]`, author.affiliation);
+      });   
 
-    const formData = new FormData();
-    formData.append("confID", confID);
-    formData.append("userid", user);
-    formData.append("title", title);
-    formData.append("abstract", abstract);
-    formData.append("file", file);
-    authors.forEach((author, index) => {
-      formData.append(`author[${index}][firstName]`, author.firstName);
-      formData.append(`author[${index}][lastName]`, author.lastName);
-      formData.append(`author[${index}][email]`, author.email);
-      formData.append(`author[${index}][affiliation]`, author.affiliation);
-    });
+      try {
+        const response = await fetch("http://localhost:8003/createSubmission", {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        });
 
-    try {
-      const response = await fetch("http://localhost:8003/createSubmission", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
+        const jsonResponse = await response.json();
 
-      const jsonResponse = await response.json();
-
-      if (response.status === 200) {
+        if (response.status === 200) {
+          setMessage(
+            <Alert severity="success">Subimission created with success</Alert>
+          );
+          //Falta apagar os campos quando é criada a submissão       
+        } else {
+          setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
+        }
+      } catch (error) {
         setMessage(
-          <Alert severity="success">Subimission created with success</Alert>
+          <Alert severity="error">
+            Something went wrong when obtaining your informations
+          </Alert>
         );
-      } else {
-        setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
       }
-    } catch (error) {
+    } else {
       setMessage(
         <Alert severity="error">
-          Something went wrong when obtaining your informations
+          All fields marked with * are required.
         </Alert>
       );
     }
-
     setOpenLoading(false);
   }
 
@@ -91,6 +99,21 @@ export default function CreateSubmission() {
     const newAuthors = [...authors];
     newAuthors.splice(index, 1);
     setAuthors(newAuthors);
+  };
+
+  function validateInputs(){
+    for (let i = 0; i < authors.length; i++) {
+      const author = authors[i];
+      if (author.firstName === "" || author.lastName === "" || author.email === "" || author.affiliation === "") {
+        return false;
+      }
+    }
+
+    if (title === "" || abstract === "" || file === ""){
+      return false;
+    };
+      
+    return true;
   };
 
   return (

@@ -32,9 +32,30 @@ router.post(
       );
 
       //insert authors
-      //await db.fetchDataCst(
-      // `INSERT INTO files (fileName, file, submissionID) VALUES ('${file.originalname}', '${base64File}', 2)`
-      //);s
+      req.body.author.forEach(async author => {
+        const firstName = author.firstName;
+        const lastName = author.lastName;
+        const email = author.email;
+        const affiliation = author.affiliation;
+        
+        const userRegistered = await db.fetchDataCst(
+          `SELECT * FROM users WHERE useremail = ${email}`
+        )
+        console.log(userRegistered)
+        if (!userRegistered || userRegistered.length === 0){
+          console.log("sem registo")
+          await db.fetchDataCst(
+            `INSERT INTO authors (authorAffiliation, authorEmail, authorFirstName, authorLastName, submissionID, userID) 
+            VALUES (${affiliation}, ${email}, ${firstName}, ${lastName}, ${submissionid}, ${null})`
+          )
+        } else {
+          console.log("com registo")
+          await db.fetchDataCst(
+            `INSERT INTO authors (authorAffiliation, authorEmail, authorFirstName, authorLastName, submissionID, userID) 
+            VALUES (${userRegistered[0].useraffiliation}, ${userRegistered[0].useremail}, ${userRegistered[0].userfirstname}, ${userRegistered[0].userlastname}, ${submissionid}, ${userRegistered[0].userid})`
+          )
+        }
+      });
 
       //insert file
       await db.fetchDataCst(
