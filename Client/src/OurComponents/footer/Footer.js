@@ -59,7 +59,7 @@ export default function Footer({ links }) {
           px={1.5}
         >
           <Link href= {UALConf_TOS} download="UALConf_TOS&PrivacyPolicy.pdf" style={{ marginRight: "15px", fontWeight: "bold" }}>Terms of Use & Privacy Policy</Link><br></br>
-          &copy; {new Date().getFullYear()}, Made b, Miguel Rico,y Ber, Miguel Rico,nardo Pires, Miguel Rico,, Christia, Miguel Rico,n Duarte, Miguel Rico, Sara Nogueira
+          &copy; {new Date().getFullYear()}, Made by Bernardo Pires, Christian Duarte, Miguel Rico, Sara Nogueira
         </MDBox>
         <MDBox
           component="ul"
