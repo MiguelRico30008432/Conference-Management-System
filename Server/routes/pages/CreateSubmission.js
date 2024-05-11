@@ -22,12 +22,12 @@ router.post(
       const base64File = file.buffer.toString("base64");
 
       //insert submission
-      const result = await db.fetchDataCst(
+      await db.fetchDataCst(
         `INSERT INTO submissions (submissionconfID, submissionMainAuthor) VALUES (${req.body.confID}, ${req.body.userid})`
       );
 
-      const submissionid = await db.fetchDataCst(
-        `SELECT MAX(submissionid) FROM submissions WHERE submissionconfID = '${file.confID} AND submissionMainAuthor = ${req.body.userid}`
+      const submissionid  = await db.fetchDataCst(
+        `SELECT MAX(submissionid) FROM submissions WHERE submissionconfid = '${req.body.confID}' AND submissionmainauthor = ${req.body.userid}`
       );
 
       //insert authors
@@ -37,18 +37,17 @@ router.post(
         const email = author.email;
         const affiliation = author.affiliation;
         
-        const userRegistered = await db.fetchDataCst(
-          `SELECT * FROM users WHERE useremail = ${email}`
-        )
+        const userRegistered = await db.fetchData("users", "useremail", email)
+        
         if (!userRegistered || userRegistered.length === 0){
           await db.fetchDataCst(
-            `INSERT INTO authors (authorAffiliation, authorEmail, authorFirstName, authorLastName, submissionID, userID) 
-            VALUES (${affiliation}, ${email}, ${firstName}, ${lastName}, ${submissionid}, ${null})`
+            `INSERT INTO authors (authorAffiliation, authorEmail, authorFirstName, authorLastName, submissionID, userid) 
+            VALUES ('${affiliation}', '${email}', '${firstName}', '${lastName}', ${submissionid[0].max}, null)`
           )
         } else {
           await db.fetchDataCst(
-            `INSERT INTO authors (authorAffiliation, authorEmail, authorFirstName, authorLastName, submissionID, userID) 
-            VALUES (${userRegistered[0].useraffiliation}, ${userRegistered[0].useremail}, ${userRegistered[0].userfirstname}, ${userRegistered[0].userlastname}, ${submissionid}, ${userRegistered[0].userid})`
+            `INSERT INTO authors (authorAffiliation, authorEmail, authorFirstName, authorLastName, submissionID, userid) 
+            VALUES ('${userRegistered[0].useraffiliation}', '${userRegistered[0].useremail}', '${userRegistered[0].userfirstname}', '${userRegistered[0].userlastname}', ${submissionid[0].max}, ${userRegistered[0].userid})`
           )
         }
       });
