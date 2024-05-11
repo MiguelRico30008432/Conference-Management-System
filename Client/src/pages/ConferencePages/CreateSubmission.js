@@ -4,7 +4,7 @@ import { ConferenceContext } from "conference.context";
 import { AuthContext } from "auth.context";
 
 import * as React from "react";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import Card from "@mui/material/Card";
 import Container from "@mui/material/Container";
 import MDBox from "components/MDBox";
@@ -17,17 +17,56 @@ import MDInput from "components/MDInput";
 
 export default function CreateSubmission() {
   const { confID } = useContext(ConferenceContext);
-  const { user } = useContext(AuthContext);
+  const { user, isLoggedIn } = useContext(AuthContext);
 
   const [openLoading, setOpenLoading] = useState(false);
   const [message, setMessage] = useState(null);
-
+ 
   const [authors, setAuthors] = useState([
     { firstName: "", lastName: "", email: "", affiliation: "" },
   ]);
   const [title, setTitle] = useState("");
   const [abstract, setAbstract] = useState("");
   const [file, setFile] = useState({});
+
+
+  useEffect(() => {
+    async function getAuthorData() {
+      
+      setOpenLoading(true);
+      
+      try{
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/getAuthorData`, {
+          method: "POST",
+          body: JSON.stringify({ userID: user }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+        });
+
+        const jsonResponse = await response.json();
+
+        if(response.status === 200){
+          setAuthors([{ firstName: jsonResponse[0].userfirstname, lastName: jsonResponse[0].userlastname, email: jsonResponse[0].useremail, affiliation: jsonResponse[0].useraffiliation }]);
+        } else {
+          setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
+        }
+
+      } catch {
+        setMessage(
+          <Alert severity="error">
+            Something went wrong when obtaining your informations
+          </Alert>
+        );
+      }
+      setOpenLoading(false);
+    }
+
+    if (isLoggedIn && confID) {
+      getAuthorData();
+    }
+  }, [isLoggedIn, confID])
 
   async function uploadFile(event) {
     event.preventDefault();
@@ -137,72 +176,124 @@ export default function CreateSubmission() {
 
               {/*Author Information*/}
               {authors.map((author, index) => (
-                <Card key={index} sx={{ mt: 2 }}>
-                  <MDTypography ml={2} mt={1} mb={2} variant="body2">
-                    Author {index + 1} Information
-                  </MDTypography>
+                index === 0 ? (
+                  <Card key={index} sx={{ mt: 2 }}>
+                    <MDTypography ml={2} mt={1} mb={2} variant="body2">
+                      Author {index + 1} Information
+                    </MDTypography>
+                
+                    <TextField
+                      name={`firstName${index}`}
+                      required
+                      fullWidth
+                      label="First Name"
+                      autoFocus
+                      value={author.firstName}
+                      disabled={true}
+                      sx={{ ml: 2, mb: 2, width: "30%" }}
+                    />
+  
+                    <TextField
+                      name={`lastName${index}`}
+                      required
+                      fullWidth
+                      label="Last Name"
+                      autoFocus
+                      value={author.lastName}
+                      disabled={true}
+                      sx={{ ml: 2, mb: 2, width: "30%" }}
+                    />
+  
+                    <TextField
+                      name={`email${index}`}
+                      required
+                      fullWidth
+                      label="Email"
+                      autoComplete="email"
+                      autoFocus
+                      value={author.email}
+                      disabled={true}
+                      sx={{ ml: 2, mb: 2, width: "30%" }}
+                    />
+  
+                    <TextField
+                      name={`affiliation${index}`}
+                      required
+                      fullWidth
+                      label="Affiliation"
+                      autoFocus
+                      value={author.affiliation}
+                      disabled={true}
+                      sx={{ ml: 2, mb: 2, width: "30%" }}
+                    />
+                  </Card>
+                ) : (
+                  <Card key={index} sx={{ mt: 2 }}>
+                    <MDTypography ml={2} mt={1} mb={2} variant="body2">
+                      Author {index + 1} Information
+                    </MDTypography>
 
-                  <TextField
-                    name={`firstName${index}`}
-                    required
-                    fullWidth
-                    label="First Name"
-                    autoFocus
-                    value={author.firstName}
-                    onChange={(e) =>
-                      handleInputChange(index, "firstName", e.target.value)
-                    }
-                    sx={{ ml: 2, mb: 2, width: "30%" }}
-                  />
+                    <TextField
+                      name={`firstName${index}`}
+                      required
+                      fullWidth
+                      label="First Name"
+                      autoFocus
+                      value={author.firstName}
+                      onChange={(e) =>
+                        handleInputChange(index, "firstName", e.target.value)
+                      }
+                      sx={{ ml: 2, mb: 2, width: "30%" }}
+                    />
 
-                  <TextField
-                    name={`lastName${index}`}
-                    required
-                    fullWidth
-                    label="Last Name"
-                    autoFocus
-                    value={author.lastName}
-                    onChange={(e) =>
-                      handleInputChange(index, "lastName", e.target.value)
-                    }
-                    sx={{ ml: 2, mb: 2, width: "30%" }}
-                  />
+                    <TextField
+                      name={`lastName${index}`}
+                      required
+                      fullWidth
+                      label="Last Name"
+                      autoFocus
+                      value={author.lastName}
+                      onChange={(e) =>
+                        handleInputChange(index, "lastName", e.target.value)
+                      }
+                      sx={{ ml: 2, mb: 2, width: "30%" }}
+                    />
 
-                  <TextField
-                    name={`email${index}`}
-                    required
-                    fullWidth
-                    label="Email"
-                    autoComplete="email"
-                    autoFocus
-                    onChange={(e) =>
-                      handleInputChange(index, "email", e.target.value)
-                    }
-                    sx={{ ml: 2, mb: 2, width: "30%" }}
-                  />
+                    <TextField
+                      name={`email${index}`}
+                      required
+                      fullWidth
+                      label="Email"
+                      autoComplete="email"
+                      autoFocus
+                      onChange={(e) =>
+                        handleInputChange(index, "email", e.target.value)
+                      }
+                      sx={{ ml: 2, mb: 2, width: "30%" }}
+                    />
 
-                  <TextField
-                    name={`affiliation${index}`}
-                    required
-                    fullWidth
-                    label="Affiliation"
-                    autoFocus
-                    onChange={(e) =>
-                      handleInputChange(index, "affiliation", e.target.value)
-                    }
-                    sx={{ ml: 2, mb: 2, width: "30%" }}
-                  />
+                    <TextField
+                      name={`affiliation${index}`}
+                      required
+                      fullWidth
+                      label="Affiliation"
+                      autoFocus
+                      onChange={(e) =>
+                        handleInputChange(index, "affiliation", e.target.value)
+                      }
+                      sx={{ ml: 2, mb: 2, width: "30%" }}
+                    />
 
-                  <MDButton
-                    variant="outlined"
-                    color="error"
-                    onClick={() => removeAuthor(index)}
-                    sx={{ mt: 2, ml: 2, mb: 2, width: "30%" }}
-                  >
-                    Remove Author
-                  </MDButton>
-                </Card>
-              ))}
+                    <MDButton
+                      variant="outlined"
+                      color="error"
+                      onClick={() => removeAuthor(index)}
+                      sx={{ mt: 2, ml: 2, mb: 2, width: "30%" }}
+                    >
+                      Remove Author
+                    </MDButton>
+                  </Card>
+              )))}
 
               <MDButton
                 variant="gradient"
