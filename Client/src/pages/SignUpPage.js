@@ -61,7 +61,7 @@ export default function SignUpPage() {
   ) {
     setOpenLoading(true);
     try {
-      const response = await fetch("http://localhost:8003/signUp", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/signUp`, {
         method: "POST",
         body: JSON.stringify({
           firstName: firstName,

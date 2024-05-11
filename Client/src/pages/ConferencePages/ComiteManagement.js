@@ -40,7 +40,7 @@ export default function ComitteeManagementPage() {
     async function getRows() {
       setOpenLoading(true);
       try {
-        const response = await fetch("http://localhost:8003/comite", {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/comite`, {
           method: "POST",
           body: JSON.stringify({ confid: confID }),
           headers: {
@@ -220,7 +220,7 @@ export default function ComitteeManagementPage() {
 
   async function deleteMember() {
     try {
-      const response = await fetch("http://localhost:8003/removePCMember", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/removePCMember`, {
         method: "POST",
         body: JSON.stringify({
           userid: memberID,
@@ -245,7 +245,7 @@ export default function ComitteeManagementPage() {
 
   async function changeMemberRole() {
     try {
-      const response = await fetch("http://localhost:8003/updateRoleMember", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/updateRoleMember`, {
         method: "POST",
         body: JSON.stringify({
           userid: memberID,

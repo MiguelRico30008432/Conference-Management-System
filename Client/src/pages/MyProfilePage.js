@@ -46,7 +46,7 @@ export default function MyProfilePage() {
     async function getUserData() {
       setOpenLoading(true);
       try {
-        const response = await fetch("http://localhost:8003/userData", {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/userData`, {
           method: "POST",
           body: JSON.stringify({ userID: user }),
           headers: {
@@ -141,7 +141,7 @@ export default function MyProfilePage() {
   async function saveUserData() {
     setOpenLoading(true);
     try {
-      const response = await fetch("http://localhost:8003/saveUserData", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/saveUserData`, {
         method: "POST",
         body: JSON.stringify({
           userID: user,
@@ -185,7 +185,7 @@ export default function MyProfilePage() {
   async function saveUserPassword() {
     setOpenLoading(true);
     try {
-      const response = await fetch("http://localhost:8003/saveUserPassword", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/saveUserPassword`, {
         method: "POST",
         body: JSON.stringify({ userID: user, userPassword: password }),
         headers: {

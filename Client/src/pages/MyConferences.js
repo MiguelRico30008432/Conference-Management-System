@@ -27,7 +27,7 @@ export default function MyConferences() {
     async function getMyConferences() {
       setOpenLoading(true);
       try {
-        const response = await fetch("http://localhost:8003/myConferences", {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/myConferences`, {
           method: "POST",
           body: JSON.stringify({ userid: user }),
           headers: {
@@ -112,7 +112,7 @@ export default function MyConferences() {
 
   async function saveConfIDOnUser(confID) {
     try {
-      const response = await fetch("http://localhost:8003/updateConfContext", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/updateConfContext`, {
         method: "POST",
         body: JSON.stringify({ userid: user, confid: confID }),
         headers: {

@@ -43,7 +43,7 @@ export default function SignInPage() {
   const login = async (email, password) => {
     setOpenLoading(true);
     try {
-      const response = await fetch("http://localhost:8003/signIn", {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/signIn`, {
         method: "POST",
         body: JSON.stringify({ email: email, password: password }),
         headers: {

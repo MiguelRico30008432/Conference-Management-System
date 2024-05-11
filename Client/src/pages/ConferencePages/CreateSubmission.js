@@ -49,7 +49,7 @@ export default function CreateSubmission() {
       });   
 
       try {
-        const response = await fetch("http://localhost:8003/createSubmission", {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/createSubmission`, {    
           method: "POST",
           body: formData,
           credentials: "include",

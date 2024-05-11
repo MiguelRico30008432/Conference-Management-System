@@ -22,9 +22,7 @@ export default function PendingConferencesPage() {
   useEffect(() => {
     async function getRows() {
       try {
-        const response = await fetch(
-          "http://localhost:8003/pendingConferences",
-          {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/pendingConferences`, {
             method: "GET",
             headers: {
               "Content-type": "application/json; charset=UTF-8",
@@ -58,9 +56,7 @@ export default function PendingConferencesPage() {
 
   async function acceptOrRejectConference(id, accept, owner, name) {
     try {
-      const response = await fetch(
-        "http://localhost:8003/acceptOrRejectConference",
-        {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/acceptOrRejectConference`, {
           method: "POST",
           headers: {
             "Content-type": "application/json; charset=UTF-8",

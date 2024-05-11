@@ -29,8 +29,7 @@ export default function Compose() {
 
   useEffect(() => {
     async function getData() {
-      // Make a request to backend to check for committee members
-      await fetch(`http://localhost:8003/checkCommitteeMembers?confID=${confID}`, {
+      await fetch(`${process.env.REACT_APP_API_URL}/checkCommitteeMembers?confID=${confID}`, {
         method: "GET",
         headers: {
           "Content-type": "application/json; charset=UTF-8",
@@ -67,7 +66,7 @@ export default function Compose() {
     }
   
     try {
-      const response = await fetch("http://localhost:8003/sendComposeEmail", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/sendComposeEmail`, {
         method: "POST",
         body: JSON.stringify({ 
           recipient, 

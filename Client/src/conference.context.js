@@ -14,7 +14,7 @@ function ConferenceProviderWrapper(props) {
   useEffect(() => {
     async function getConfData() {
       try {
-        const response = await fetch("http://localhost:8003/confContext", {
+          const response = await fetch(`${process.env.REACT_APP_API_URL}/confContext`, {
           method: "POST",
           body: JSON.stringify({ userid: user }),
           headers: {

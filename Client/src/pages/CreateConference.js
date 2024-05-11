@@ -48,7 +48,8 @@ export default function CreateConference() {
   };
 
   const fetchConferenceTypes = async () => {
-    const response = await fetch("http://localhost:8003/getConfTypes", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/getConfTypes`, {
+      
       method: "GET",
       headers: {
         "Content-type": "application/json; charset=UTF-8",
@@ -60,7 +61,7 @@ export default function CreateConference() {
   };
 
   const fetchConferenceAreas = async () => {
-    const response = await fetch("http://localhost:8003/getConfAreas", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/getConfAreas`, {
       method: "GET",
       headers: {
         "Content-type": "application/json; charset=UTF-8",
@@ -216,7 +217,7 @@ export default function CreateConference() {
     confLink
   ) => {
     try {
-      const response = await fetch("http://localhost:8003/createConference", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/createConference`, {
         method: "POST",
         body: JSON.stringify({
           title: title,

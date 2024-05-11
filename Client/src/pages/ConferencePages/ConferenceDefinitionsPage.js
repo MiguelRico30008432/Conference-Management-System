@@ -70,7 +70,7 @@ export default function DefinitionsPage() {
     async function getConfData() {
       setOpenLoading(true);
       try {
-        const response = await fetch("http://localhost:8003/confDefinitions", {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/confDefinitions`, {    
           method: "POST",
           body: JSON.stringify({ confid: confID}),
           headers: {
@@ -239,7 +239,7 @@ export default function DefinitionsPage() {
   async function saveUserData() {
     setOpenLoading(true);
     try {
-      const response = await fetch("http://localhost:8003/saveConfDefinitions", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/saveConfDefinitions`, {
         method: "POST",
         body: JSON.stringify({
           confid: confID, 

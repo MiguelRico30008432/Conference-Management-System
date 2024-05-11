@@ -9,7 +9,7 @@ export default function Logout() {
 
   useEffect(() => {
     async function logout() {
-      await fetch("http://localhost:8003/logOut", {
+      await fetch(`${process.env.REACT_APP_API_URL}/logOut`, {
         method: "POST",
         headers: {
           "Content-type": "application/json; charset=UTF-8",

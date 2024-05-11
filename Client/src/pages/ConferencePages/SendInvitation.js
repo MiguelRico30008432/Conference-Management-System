@@ -73,7 +73,7 @@ export default function SendInvitation() {
 
   const getData = async () => {
     try {
-      const response = await fetch(`http://localhost:8003/checkInvitations?confID=${confID}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/checkInvitations?confID=${confID}`, {    
         method: "GET",
         headers: {
           "Content-type": "application/json; charset=UTF-8",
@@ -114,7 +114,7 @@ export default function SendInvitation() {
 
   const handleDeleteInvitation = async (invitationId) => {
     try {
-      const response = await fetch('http://localhost:8003/deleteInvitation', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/deleteInvitation`, {    
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -165,7 +165,7 @@ export default function SendInvitation() {
   
     // Send the list of emails to the backend
     try {
-      const response = await fetch('http://localhost:8003/sendNewInvitation', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/sendNewInvitation`, {    
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
