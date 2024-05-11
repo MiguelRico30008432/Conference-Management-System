@@ -5,20 +5,40 @@ import imageroom from "../assets/images/imageroom.jpg";
 import imageroom1 from "../assets/images/imageroom1.jpg";
 import imageroom2 from "../assets/images/imageroom2.jpg";
 
+// @material-ui core components
+import IconButton from "@mui/material/IconButton";
+import Icon from "@mui/material/Icon";
+
+// Custom styles for DashboardNavbar
+import {
+  navbarMobileMenu,
+} from "examples/Navbars/DashboardNavbar/styles";
+
+// Material Dashboard 2 React example components
+import MDTypography from "components/MDTypography";
+
+// Material Dashboard 2 React context
+import {
+  useMaterialUIController,
+  setMiniSidenav
+} from "context";
+
 export default function HomePage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const targetRef = useRef(null);
   const conferenceManagementRef = useRef(null);
   const submitPapersRef = useRef(null);
   const reviewProcessRef = useRef(null);
-
+  const [controller, dispatch] = useMaterialUIController();
+  const { miniSidenav } = controller;
+  const durationInSeconds = 4;
   const images = [
     { src: imageroom, text: "", sectionId: "conference-management" },
     { src: imageroom2, text: "", sectionId: "submit-papers" },
     { src: imageroom1, text: "", sectionId: "review-process" },
   ];
 
-  const durationInSeconds = 4;
+  const handleMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -58,9 +78,29 @@ export default function HomePage() {
 
   return (
     <DashboardLayout>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+    <IconButton
+      size="small"
+      disableRipple
+      color="inherit"
+      sx={navbarMobileMenu}
+      onClick={() => handleMiniSidenav()}
+    >
+      <Icon fontSize="medium">
+        {miniSidenav ? "menu_open" : "menu"}
+      </Icon>
+      <MDTypography variant="body2" color="text"> Menu </MDTypography>
+    </IconButton>
+  </div>
       <div style={{ position: "relative", textAlign: "center" }}>
         <div
-          style={{ height: "400px", overflow: "hidden", position: "relative" }}
+          style={{ 
+            display: "flex",
+            justifyContent: "flex-end", 
+            height: "400px",
+            overflow: "hidden",
+            position: "relative" 
+          }}
         >
           <img
             src={images[currentImageIndex].src}
@@ -69,12 +109,12 @@ export default function HomePage() {
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              // cursor: "pointer",
+              cursor: "pointer",
             }}
             onClick={() =>
               handleImageClick(images[currentImageIndex].sectionId)
             }
-            // title="Click to discover more"
+            title="Click to discover more"
           />
           <div
             ref={targetRef}
@@ -112,7 +152,7 @@ export default function HomePage() {
                 backgroundColor: currentImageIndex === index ? "#000" : "#ccc",
                 margin: "0 5px",
                 cursor: "pointer",
-                opacity: 0.6, // Apply opacity to dots
+                opacity: 0.6
               }}
             />
           ))}

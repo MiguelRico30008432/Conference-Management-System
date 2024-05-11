@@ -1,19 +1,4 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 // react-router-dom components
 import { useLocation } from "react-router-dom";
@@ -31,23 +16,28 @@ function DashboardLayout({ children }) {
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav } = controller;
   const { pathname } = useLocation();
+  const [showMiniSidenav, setShowMiniSidenav] = useState(miniSidenav);
 
   useEffect(() => {
     setLayout(dispatch, "dashboard");
-  }, [pathname]);
+  }, [dispatch]);
+
+  useEffect(() => {
+    setShowMiniSidenav(miniSidenav);
+  }, [miniSidenav]);
 
   return (
     <MDBox
       sx={({ breakpoints, transitions, functions: { pxToRem } }) => ({
         p: 3,
         position: "relative",
-
+        marginLeft: showMiniSidenav ? pxToRem(0) : pxToRem(274),
+        transition: transitions.create(["margin-left", "margin-right"], {
+          easing: transitions.easing.easeInOut,
+          duration: transitions.duration.standard,
+        }),
         [breakpoints.up("xl")]: {
-          marginLeft: miniSidenav ? pxToRem(120) : pxToRem(274),
-          transition: transitions.create(["margin-left", "margin-right"], {
-            easing: transitions.easing.easeInOut,
-            duration: transitions.duration.standard,
-          }),
+          marginLeft: showMiniSidenav ? pxToRem(120) : pxToRem(274),
         },
       })}
     >

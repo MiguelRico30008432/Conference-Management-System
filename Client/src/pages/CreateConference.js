@@ -19,6 +19,12 @@ import MenuItem from "@mui/material/MenuItem";
 import MDTypography from "components/MDTypography";
 import moment from 'moment';
 
+// Material Dashboard 2 React context
+import {
+  useMaterialUIController,
+  setMiniSidenav
+} from "context";
+
 export default function CreateConference() {
   const navigate = useNavigate();
   const [startDate, setStartDate] = React.useState("");
@@ -532,7 +538,7 @@ export default function CreateConference() {
                     )}
                   </div>
                   <Grid container spacing={2} ml={0} mr={0}>
-                    <Grid item xs={4} md={4}>
+                    <Grid item xs={4} md={6}>
                       <TextField
                         required
                         fullWidth
@@ -543,7 +549,7 @@ export default function CreateConference() {
                         inputProps={{ min: 0 }}
                       />
                     </Grid>
-                    <Grid item xs={4} md={4}>
+                    <Grid item xs={4} md={6}>
                       <TextField
                         required
                         fullWidth
