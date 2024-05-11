@@ -13,10 +13,15 @@ const app = express();
 const PORT = process.env.PORT;
 const SECRET = process.env.SECRET;
 
+const allowedOrigins = [
+  "https://final-project-cms.vercel.app",
+  "http://localhost:3000"
+];
+
 const corsOptions = {
-  origin: "http://localhost:3000", // This should match the URL of your front-end application
-  credentials: true, // This is important as it allows the server to send cookies in CORS requests
-  optionsSuccessStatus: 200, // For legacy browsers like IE11
+  origin: allowedOrigins,
+  credentials: true,
+  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
@@ -47,14 +52,6 @@ app.get("/", (request, response) => {
   return response.sendStatus(200);
 });
 
-//app.get("/api/auth/status", ensureAuthenticated, (req, res) => {
-//    //console.log("auth/status");
-//    console.log(req.user);
-//console.log(req.session);
-//    res.send(200);
-//});
-
-//-----------Zona de Testes-------------//
 
 //Send mail
 app.post("/sendMail", async (req, res) => {
