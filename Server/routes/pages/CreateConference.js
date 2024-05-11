@@ -23,7 +23,6 @@ router.post("/createConference", auth.ensureAuthenticated, async (req, res) => {
       city,
       numberMinReviewrs,
       numberMaxReviewrs,
-      numberMaxSubmissions,
       confLink,
     } = req.body;
 
@@ -59,7 +58,6 @@ router.post("/createConference", auth.ensureAuthenticated, async (req, res) => {
       confcity: city,
       confmaxreviewers: numberMaxReviewrs,
       confminreviewers: numberMinReviewrs,
-      confmaxsubmissions: numberMaxSubmissions,
       confwebpage: confLink,
     });
 
@@ -76,7 +74,7 @@ router.post("/createConference", auth.ensureAuthenticated, async (req, res) => {
       userid: user,
       userrole: "Owner",
       confid: addedConfID[0].confid,
-    });
+    }); 
 
     return res.status(200).send({ msg: "Conferência criada com sucesso" });
   } catch (error) {

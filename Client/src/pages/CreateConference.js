@@ -37,87 +37,6 @@ export default function CreateConference() {
   const [conferenceAreas, setConferenceAreas] = useState([]);
   const { user, isLoggedIn } = useContext(AuthContext);
 
-  //Handles the disclaimers in the Date picker
-  const handleConfDate = (event) => {
-    const newStartDate = new Date(event.target.value);
-    const todayDate = new Date();
-    todayDate.setDate(todayDate.getDate() + 10);
-    if (newStartDate <= todayDate) {
-      setDisclaimer("Conference Start Date in minimum 10days.");
-    } else {
-      setDisclaimer("");
-    }
-  };
-
-  const startDateChange = (event, disclaimerMessage) => {
-    const newstartDate = event.target.value;
-    if (newstartDate >= startDate) {
-      setDisclaimer(disclaimerMessage);
-    } else {
-      setDisclaimer("");
-    }
-  };
-
-  const endDateChange = (event, startDate, setEndDate, disclaimerMessage) => {
-    const newEndDate = event.target.value;
-    setEndDate(newEndDate);
-    if (newEndDate < startDate) {
-      setDisclaimer(disclaimerMessage);
-    } else {
-      setDisclaimer("");
-    }
-  };
-
-  const startDateComparison = (event, endDate, setStartDate, disclaimerMessage) => {
-    const newStartDate = event.target.value;
-    setStartDate(newStartDate);
-    if (newStartDate <= endDate) {
-      setDisclaimer(disclaimerMessage);
-    } else {
-      setDisclaimer("");
-    }
-  };
-
-  const confDateChange = (event) => {
-    endDateChange(event, startDate, setEndDate, "Conference end date cannot be earlier than Conference start date.");
-  };
-
-  const submissionStartDateChange = (event) => {
-    startDateChange(event, "Submission start date cannot be superior or equal to the Conference start date.");
-  };
-  
-  const submissionEndDateChange = (event) => {
-    endDateChange(event, submissionStartDate, setSubmissionEndDate, "Submission end date cannot be earlier than Submission start date.");
-  };
-
-  const submissionEndDateComparison = (event) => {
-    startDateChange(event, "Submission end date cannot be superior than Conference start date.");
-  };
-
-  const biddingStartDateChange = (event) => {
-    startDateComparison(event, submissionEndDate, setBiddingStartDate, "Bidding start date cannot be inferior or equal to the Submission end date.");
-  };
-
-  const biddingEndDateChange = (event) => {
-    endDateChange(event, biddingStartDate, setBiddingEndDate, "Bidding end date cannot be earlier than Bidding start date.");
-  };
-
-  const biddingEndDateComparison = (event) => {
-    startDateChange(event, "Bidding end date cannot be superior than Conference start date.");
-  };
-
-  const reviewStartDateChange = (event) => {
-    startDateComparison(event, biddingEndDate, setReviewStartDate, "Review start date cannot be inferior or equal to the Bidding end date.");
-  };
-
-  const reviewEndDateChange = (event) => {
-    endDateChange(event, reviewStartDate, setReviewEndDate, "Review end date cannot be earlier than Review start date.");
-  };
-
-  const reviewEndDateComparison = (event) => {
-    startDateChange(event, "Review end date cannot be superior than Conference start date.");
-  };
-
   //Handles the Dropdown menus
   const handleTypeChange = (event) => {
     setConfType(event.target.value);
@@ -200,7 +119,6 @@ export default function CreateConference() {
     "city",
     "numberMinReviewrs",
     "numberMaxReviewrs",
-    "numberMaxSubmissions",
     "confLink"
   ];
 
@@ -219,7 +137,6 @@ export default function CreateConference() {
     city: "City",
     numberMinReviewrs: "Nº min Reviewrs",
     numberMaxReviewrs: "Nº max reviewrs",
-    numberMaxSubmissions: "Nº max Submissions",
     confLink: "Conference Webpage"
   };
 
@@ -248,7 +165,6 @@ export default function CreateConference() {
       city,
       numberMinReviewrs,
       numberMaxReviewrs,
-      numberMaxSubmissions,
       confLink,
     } = formData;
 
@@ -270,7 +186,6 @@ export default function CreateConference() {
       city,
       numberMinReviewrs,
       numberMaxReviewrs,
-      numberMaxSubmissions,
       confLink
     );
   };
@@ -293,7 +208,6 @@ export default function CreateConference() {
     city,
     numberMinReviewrs,
     numberMaxReviewrs,
-    numberMaxSubmissions,
     confLink
   ) => {
     try {
@@ -317,7 +231,6 @@ export default function CreateConference() {
           city: city,
           numberMinReviewrs: numberMinReviewrs,
           numberMaxReviewrs: numberMaxReviewrs,
-          numberMaxSubmissions: numberMaxSubmissions,
           confLink: confLink,
         }),
         headers: {
@@ -339,13 +252,15 @@ export default function CreateConference() {
     }
   };
 
+  //Handles the disclaimers in the Date picker
   const today = moment().format('YYYY-MM-DD');
-  const minStartDate = moment().add(5, 'days').format('YYYY-MM-DD');
+  const minStartDate = moment().add(9, 'days').format('YYYY-MM-DD');
   const previousDay = moment(startDate).subtract(1, 'days').format('YYYY-MM-DD');
-  const minDate = moment(submissionStartDate).format('YYYY-MM-DD');
+  const minDate = moment(submissionStartDate).add(1, 'days').format('YYYY-MM-DD');
   const nextDay = moment(submissionEndDate).add(1, 'days').format('YYYY-MM-DD');
-  const minDateBidding = moment(biddingStartDate).format('YYYY-MM-DD');
-  const minDateReview = moment(reviewStartDate).format('YYYY-MM-DD');
+  const minDateSubmission = moment(today).add(3, 'days').format('YYYY-MM-DD');
+  const minDateBidding = moment(biddingStartDate).add(1, 'days').format('YYYY-MM-DD');
+  const minDateReview = moment(reviewStartDate).add(1, 'days').format('YYYY-MM-DD');
   const nextDayBidding = moment(biddingEndDate).add(1, 'days').format('YYYY-MM-DD');
 
   return (
@@ -500,7 +415,6 @@ export default function CreateConference() {
                           inputProps={{ min: minStartDate }}
                           onChange={(event) => {
                             setStartDate(event.target.value);
-                            handleConfDate(event);
                           }}
                         />
                       </Grid>
@@ -516,7 +430,6 @@ export default function CreateConference() {
                         inputProps={{ min: startDate }}
                         onChange={(event) => {
                           setEndDate(event.target.value);
-                          confDateChange(event);
                         }}
                       />
                       </Grid>
@@ -529,10 +442,9 @@ export default function CreateConference() {
                           type="date"
                           id="submissionStartDate"
                           InputLabelProps={{ shrink: true }}
-                          inputProps={{ max: previousDay }}
+                          inputProps={{ min: minDateSubmission, max: previousDay }}
                           onChange={(event) => {
                             setSubmissionStartDate(event.target.value);
-                            submissionStartDateChange(event);
                           }}
                         />
                       </Grid>
@@ -548,8 +460,6 @@ export default function CreateConference() {
                         inputProps={{ min: minDate, max: previousDay }}
                         onChange={(event) => {
                           setSubmissionEndDate(event.target.value);
-                          submissionEndDateChange(event);
-                          submissionEndDateComparison(event);
                         }}
                       />
                       </Grid>
@@ -565,7 +475,6 @@ export default function CreateConference() {
                         inputProps={{ min: nextDay, max: previousDay }} 
                         onChange={(event) => {
                           setBiddingStartDate(event.target.value);
-                          biddingStartDateChange(event);
                         }}
                       />
                       </Grid>
@@ -581,8 +490,6 @@ export default function CreateConference() {
                           inputProps={{ min: minDateBidding, max: previousDay }}
                           onChange={(event) => {
                             setBiddingEndDate(event.target.value);
-                            biddingEndDateChange(event);
-                            biddingEndDateComparison(event);
                           }}
                         />
                       </Grid>
@@ -598,7 +505,6 @@ export default function CreateConference() {
                           inputProps={{ min: nextDayBidding, max: previousDay }}
                           onChange={(event) => {
                             setReviewStartDate(event.target.value);
-                            reviewStartDateChange(event);
                           }}
                         />
                       </Grid>
@@ -615,8 +521,6 @@ export default function CreateConference() {
                           inputProps={{ min: minDateReview, max: previousDay }}
                           onChange={(event) => {
                             setReviewEndDate(event.target.value);
-                            reviewEndDateChange(event);
-                            reviewEndDateComparison(event);
                           }}
                         />
                       </Grid>
@@ -647,17 +551,6 @@ export default function CreateConference() {
                         label="Nº max Reviewers"
                         type="number"
                         id="numberMaxReviewrs"
-                        inputProps={{ min: 0 }}
-                      />
-                    </Grid>
-                    <Grid item xs={4} md={4}>
-                      <TextField
-                        required
-                        fullWidth
-                        name="numberMaxSubmissions"
-                        label="Nº max Submissions"
-                        type="number"
-                        id="numberMaxSubmissions"
                         inputProps={{ min: 0 }}
                       />
                     </Grid>
