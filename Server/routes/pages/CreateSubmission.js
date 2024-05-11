@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../../utility/database");
 const auth = require("../../utility/verifications");
+const log = require("../../logs/logsManagement");
 const multer = require("multer");
 const fs = require("fs");
 const storage = multer.memoryStorage();
@@ -59,11 +60,23 @@ router.post(
 
       return res.status(200).send({ msg: "" });
     } catch (error) {
+      log.addLog(err, "database", "CreateSubmissions -> /createSubmission");
       return res.status(500).send({ msg: error });
     }
   }
 );
 
+router.post("/getAuthorData", auth.ensureAuthenticated, async (req, res) => {
+  try{
+    const userRecords = await db.fetchData("users", "userid", req.body.userID);
+    console.log(userRecords)
+    return res.status(200).send(userRecords);
+  } catch {
+    log.addLog(err, "database", "CreateSubmissions -> /getAuthorData");
+    return res.status(500);
+
+  }
+})
 //router.post("/downloadFile", auth.ensureAuthenticated, async (req, res) => {
 //  try {
 //    const fileId = req.body.fileid;
