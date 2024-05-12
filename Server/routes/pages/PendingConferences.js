@@ -25,7 +25,6 @@ router.get(
         confAreas.confareaname,
         conferences.confmaxreviewers,
         conferences.confminreviewers,
-        conferences.confmaxsubmissions,
         conferences.confadddate,
         conferences.confapproved,
         conferences.confOwner
