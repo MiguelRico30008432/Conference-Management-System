@@ -13,6 +13,7 @@ const emailsPage = require("./pages/EmailsPage");
 const conferenceDefinitions = require("./pages/ConferenceDefinitions");
 const createSubmission = require("./pages/CreateSubmission");
 const sendInvitations = require("./pages/SendInvitations");
+const mySubmissions = require("./pages/MySubmissions");
 
 router.use(logInLogoutRouter);
 router.use(emailsPage);
@@ -26,5 +27,6 @@ router.use(ConferenceContext);
 router.use(ComitteeManagementPage);
 router.use(conferenceDefinitions);
 router.use(createSubmission);
+router.use(mySubmissions);
 
 module.exports = router;
