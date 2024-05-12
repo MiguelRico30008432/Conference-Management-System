@@ -15,6 +15,11 @@ import SubmissionsDetails from "OurComponents/Info/SubmissionDetails";
 import { AuthContext } from "auth.context";
 import { ConferenceContext } from "conference.context";
 
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB');
+}
+
 export default function MySubmissionsPage() {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [dataForDetails, setDataForDetails] = useState({});
@@ -24,8 +29,8 @@ export default function MySubmissionsPage() {
   const { confID } = useContext(ConferenceContext);
 
   useEffect(() => {
-    if (confID && user) {
-      async function fetchSubmissions() {
+    async function fetchSubmissions() {
+      if (confID && user) {
         try {
           const response = await fetch(`${process.env.REACT_APP_API_URL}/mySubmissions`, {
             method: "POST",
@@ -46,8 +51,8 @@ export default function MySubmissionsPage() {
               id: submission.id,
               title: submission.title,
               authors: submission.authors,
-              status: submission.status ? 'Accepted' : 'Pending', 
-              addDate: submission.adddate,
+              status: submission.status ? 'Accepted' : 'Pending',
+              addDate: formatDate(submission.adddate),
               abstract: submission.abstract
             }));
             setRows(transformedData);
@@ -56,12 +61,11 @@ export default function MySubmissionsPage() {
           }
         } catch (error) {
           setError("Network error: Could not fetch submissions");
-          console.error("Fetch error:", error);
         }
       }
-
-      fetchSubmissions();
     }
+
+    fetchSubmissions();
   }, [confID, user]);
 
   const columns = [
@@ -109,8 +113,6 @@ export default function MySubmissionsPage() {
               Here you can view and manage your submissions.
             </MDTypography>
           </Card>
-          <br></br>
-
           <MDBox mb={3} textAlign="left">
             {error && <Alert severity="error">{error}</Alert>}
             <Card>
@@ -130,7 +132,6 @@ export default function MySubmissionsPage() {
           onClose={() => setDetailsOpen(false)}
         />
       )}
-      <br></br>
       <Footer />
     </DashboardLayout>
   );

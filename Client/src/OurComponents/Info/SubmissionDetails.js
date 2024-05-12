@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import MDButton from "components/MDButton";
 import MDTypography from "components/MDTypography";
 import { Box, Card, Container } from "@mui/material";
@@ -25,20 +25,17 @@ export default function SubmissionDetails({ onClose, submission }) {
             {submission.title}
           </MDTypography>
 
-          {/* All Submission Details in a single view */}
-          <Box sx={{ mb: 2 }}>
-            <MDTypography variant="h6">Authors:</MDTypography>
-            <MDTypography variant="body2">{submission.authors}</MDTypography>
+          <MDTypography variant="h6">Authors:</MDTypography>
+          <MDTypography variant="body2">{submission.authors}</MDTypography>
 
-            <MDTypography variant="h6" sx={{ mt: 2 }}>Status:</MDTypography>
-            <MDTypography variant="body2">{submission.status ? 'Accepted' : 'Pending'}</MDTypography>
+          <MDTypography variant="h6" sx={{ mt: 2 }}>Status:</MDTypography>
+          <MDTypography variant="body2">{submission.status}</MDTypography>
 
-            <MDTypography variant="h6" sx={{ mt: 2 }}>Submission Date:</MDTypography>
-            <MDTypography variant="body2">{submission.addDate}</MDTypography>
+          <MDTypography variant="h6" sx={{ mt: 2 }}>Submission Date:</MDTypography>
+          <MDTypography variant="body2">{submission.addDate}</MDTypography>
 
-            <MDTypography variant="h6" sx={{ mt: 2 }}>Abstract:</MDTypography>
-            <MDTypography variant="body2">{submission.abstract}</MDTypography>
-          </Box>
+          <MDTypography variant="h6" sx={{ mt: 2 }}>Abstract:</MDTypography>
+          <MDTypography variant="body2">{submission.abstract}</MDTypography>
 
           <MDButton
             variant="gradient"
