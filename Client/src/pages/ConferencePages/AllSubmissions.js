@@ -108,36 +108,39 @@ const columns = [
     {openLoading && <LoadingCircle />}
     <DashboardLayout>
       <ConfNavbar />
-      <Container maxWidth="sm">
-        <MDBox mt={8} mb={2} textAlign="left">
-          <MDBox mb={3} textAlign="left">
-            <Card>
-              <MDTypography ml={2} variant="h6">
-                AllSubmissions
-              </MDTypography>
-              <MDTypography ml={2} variant="body2">
-                text goes here
-              </MDTypography>
-            </Card>
-            <MDBox mb={3} mt={2} textAlign="left">
-              {message && <Alert severity="error">{message}</Alert>}
+      {!detailsOpen ? (
+        <Container maxWidth="sm">
+          <MDBox mt={8} mb={2} textAlign="left">
+            <MDBox mb={3} textAlign="left">
               <Card>
-                <CompleteTable
-                  columns={columns}
-                  rows={rows}
-                  numberOfRowsPerPage={100}
-                  height={200}
-                />
+                <MDTypography ml={2} variant="h6">
+                  AllSubmissions
+                </MDTypography>
+                <MDTypography ml={2} variant="body2">
+                  text goes here
+                </MDTypography>
               </Card>
+              <MDBox mb={3} mt={2} textAlign="left">
+                {message && <Alert severity="error">{message}</Alert>}
+                <Card>
+                  <CompleteTable
+                    columns={columns}
+                    rows={rows}
+                    numberOfRowsPerPage={100}
+                    height={200}
+                  />
+                </Card>
+              </MDBox>
             </MDBox>
           </MDBox>
-        </MDBox>
-      </Container>
-      {!detailsOpen ? null : (
-        <AllSubmissionsDetails
-          submission={dataForDetails}
-          onClose={() => setDetailsOpen(false)}
-        />
+        </Container>
+      ) : (
+        <Container maxWidth="sm">
+          <AllSubmissionsDetails 
+            submission={dataForDetails}
+            onClose={() => setDetailsOpen(false)}
+          />
+        </Container>
       )}
       <Footer />
     </DashboardLayout>

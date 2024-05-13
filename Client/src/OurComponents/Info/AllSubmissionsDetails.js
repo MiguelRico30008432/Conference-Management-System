@@ -5,11 +5,11 @@ import { Box, Card, Container } from "@mui/material";
 
 export default function allSubmissionDetails({ onClose, submission }) {
   return (
-    <Card>
-      <Container component="main" maxWidth="xs">
+    <Card sx={{ marginTop: 10, marginBottom: 5 }}>
+      <Container component="main" maxWidth="sm"  >
         <Box
           sx={{
-            mt: 2,
+            mt: 1,
             display: "flex",
             flexDirection: "column",
             alignItems: "left",

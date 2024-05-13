@@ -25,7 +25,6 @@ import SubmissionsDecision from "pages/ConferencePages/SubmissionsDecision";
 
 //Details
 import ConferenceDescription from "pages/ConferencePages/ConferenceDescription";
-import ConferenceDates from "pages/ConferencePages/ConferenceDates";
 import Events from "pages/ConferencePages/Events";
 
 const ConfRoutes = [
@@ -37,18 +36,10 @@ const ConfRoutes = [
   },
   {
     type: "collapse", //Done
-    name: "Description",
+    name: "Details",
     submenu: "Details",
     route: "/MyConferences/ConferenceDescription",
     component: <ConferenceDescription />,
-    permissions: ["All"],
-  },
-  {
-    type: "collapse", //Done
-    name: "Dates",
-    submenu: "Details",
-    route: "/MyConferences/ConferenceDates",
-    component: <ConferenceDates />,
     permissions: ["All"],
   },
   {
