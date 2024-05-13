@@ -5,6 +5,7 @@ import Card from "@mui/material/Card";
 import Container from "@mui/material/Container";
 import MDTypography from "components/MDTypography";
 import MDBox from "components/MDBox";
+import LoadingCircle from "OurComponents/loading/LoadingCircle";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "OurComponents/footer/Footer";
@@ -23,6 +24,7 @@ function formatDate(dateString) {
 export default function MySubmissionsPage() {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [dataForDetails, setDataForDetails] = useState({});
+  const [openLoading, setOpenLoading] = useState(false);
   const [rows, setRows] = useState([]);
   const [error, setError] = useState(null);
   const { user } = useContext(AuthContext);
@@ -30,6 +32,8 @@ export default function MySubmissionsPage() {
 
   useEffect(() => {
     async function fetchSubmissions() {
+      setOpenLoading(true);
+
       if (confID && user) {
         try {
           const response = await fetch(`${process.env.REACT_APP_API_URL}/mySubmissions`, {
@@ -63,6 +67,7 @@ export default function MySubmissionsPage() {
           setError("Network error: Could not fetch submissions");
         }
       }
+      setOpenLoading(false);
     }
 
     fetchSubmissions();
@@ -101,6 +106,8 @@ export default function MySubmissionsPage() {
   ];
 
   return (
+    <>
+    {openLoading && <LoadingCircle />}
     <DashboardLayout>
       <ConferenceNavBar />
       <Container maxWidth="sm">
@@ -134,5 +141,6 @@ export default function MySubmissionsPage() {
       )}
       <Footer />
     </DashboardLayout>
+    </>
   );
 }
