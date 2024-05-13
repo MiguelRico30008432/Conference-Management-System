@@ -29,7 +29,7 @@ router.post("/allSubmissions", auth.ensureAuthenticated, async (req, res) => {
         if (allSubmissions.length === 0) {
             return res.status(200).json([]);
         }
-        console.log(allSubmissions)
+        
         return res.status(200).json(allSubmissions);
     } catch (error) {
         log.addLog(error, "database", "AllSubmissions -> /allSubmissions");

@@ -54,10 +54,18 @@ export default function AllSubmissions() {
           setRows(transformedData);
 
         } else {
-          setMessage("Failed to fetch submissions: " + jsonResponse.message);
+          setMessage(
+            <Alert severity="error">
+              Failed to fetch submissions:: {jsonResponse.message}
+            </Alert>
+          );
         }
       } catch (error) {
-        setMessage("Network error: Could not fetch submissions");
+        setMessage(
+          <Alert severity="error">
+            Failed to fetch conference details!
+          </Alert>
+        );
       }
       setOpenLoading(false);
     }
