@@ -7,12 +7,12 @@ import AllSubmissions from "pages/ConferencePages/AllSubmissions";
 
 //Bidding
 import Bidding from "pages/ConferencePages/BiddingPage";
-import Assignements from "pages/ConferencePages/Assignements";
 import Conflicts from "pages/ConferencePages/Conflicts";
 
 //Reviews
 import MyReviews from "pages/ConferencePages/MyReviews";
 import AllReviews from "pages/ConferencePages/AllReviews";
+import Assignements from "pages/ConferencePages/Assignements";
 
 //Emails
 import Compose from "pages/ConferencePages/Compose";
@@ -96,14 +96,6 @@ const ConfRoutes = [
   },
   {
     type: "collapse", //Done
-    name: "Assignements",
-    submenu: "Bidding",
-    route: "/MyConferences/Conference/Assignements",
-    component: <Assignements />,
-    permissions: ["Owner", "Chair", "Committee"],
-  },
-  {
-    type: "collapse", //Done
     name: "Conflicts Of Interest",
     submenu: "Bidding",
     route: "/MyConferences/Conference/ConflictsOfInterest",
@@ -122,6 +114,14 @@ const ConfRoutes = [
     submenu: "Reviews",
     route: "/MyConferences/Conference/AllReviews",
     component: <AllReviews />,
+    permissions: ["Owner", "Chair", "Committee"],
+  },
+  {
+    type: "collapse", //Done
+    name: "Assignements",
+    submenu: "Reviews",
+    route: "/MyConferences/Conference/Assignements",
+    component: <Assignements />,
     permissions: ["Owner", "Chair", "Committee"],
   },
   {

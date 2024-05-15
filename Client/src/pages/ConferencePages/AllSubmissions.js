@@ -78,7 +78,7 @@ export default function AllSubmissions() {
   function formatDate(dateString) {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-GB');
-}
+  }
 
 const columns = [
   { field: "title", headerName: "Title", width: 200 },
