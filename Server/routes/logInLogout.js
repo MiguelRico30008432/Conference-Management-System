@@ -33,14 +33,6 @@ router.post("/signIn", (req, res, next) => {
         });
       }
       console.log("Authentication successful, user:", user);
-      console.log("Session data:", req.session);
-      res.cookie("testCookie", "testValue", {
-        maxAge: 60000 * 60 * 3,
-        sameSite: 'None',
-        secure: true,
-        httpOnly: true,
-      });
-      console.log("Cookies: ", res.get('Set-Cookie'));
       return res.status(200).send({
         userid: user.userid,
         useremail: user.useremail,
