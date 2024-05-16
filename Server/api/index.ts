@@ -10,8 +10,9 @@ const cors = require("cors");
 const db = require("../utility/database");
 const PgSession = require('connect-pg-simple')(session);
 
+
 const app = express();
-const PORT = process.env.PORT || 8003;  // Default to 8003 if PORT is not set
+const PORT = process.env.PORT;
 const SECRET = process.env.SECRET;
 
 const allowedOrigins = [
@@ -30,15 +31,6 @@ app.options("*", cors(corsOptions));
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
-// Middleware to force HTTPS
-app.use((req, res, next) => {
-  if (req.headers["x-forwarded-proto"] !== "https") {
-    return res.redirect(`https://${req.headers.host}${req.url}`);
-  }
-  next();
-});
-
 app.use(
   session({
     store: new PgSession({
@@ -49,10 +41,7 @@ app.use(
     saveUninitialized: false,
     resave: false,
     cookie: {
-      maxAge: 60000 * 60 * 3,
-      sameSite: 'None',  // Allow cross-site cookies
-      secure: true,      // Ensure the cookie is only sent over HTTPS
-      httpOnly: true     // Prevent client-side JavaScript from accessing the cookie
+      maxAge: 60000 * 60 * 3
     },
   })
 );
