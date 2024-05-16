@@ -1,11 +1,12 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const passport = require("passport");
-const session = require("express-session");
-const PgSession = require("connect-pg-simple")(session);
-const cors = require("cors");
-const routes = require("./routes/index");
-const db = require("./utility/database");
+import express from 'express';
+import bodyParser from 'body-parser';
+import passport from 'passport';
+import session from 'express-session';
+import PgSession from 'connect-pg-simple';
+import cors from 'cors';
+import routes from '../routes/index';
+import db from '../utility/database';
+import '../passportStrategies/localStrategy';
 
 const app = express();
 const PORT = process.env.PORT || 8003;
@@ -46,7 +47,7 @@ app.use((req, res, next) => {
 
 app.use(
   session({
-    store: new PgSession({
+    store: new (PgSession(session))({
       pool: db.pool,
       tableName: 'session'
     }),
@@ -75,9 +76,10 @@ app.options('*', (req, res) => {
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
+  console.log("Preflight response headers set");
   res.sendStatus(204); // No Content
 });
 
 app.listen(PORT, () => console.log(`Server is running on ${PORT}`));
 
-module.exports = app;
+export default app;
