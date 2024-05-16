@@ -1,15 +1,18 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import passport from 'passport';
-import session from 'express-session';
-import PgSession from 'connect-pg-simple';
-import cors from 'cors';
-import routes from '../routes/index';
-import db from '../utility/database';
-import '../passportStrategies/localStrategy';
+const express = require("express");
+const bodyParser = require("body-parser");
+const passport = require("passport");
+const session = require("express-session");
+const routes = require("../routes/index")
+const ver = require("../utility/verifications");
+const log = require("../logs/logsManagement");
+require("../passportStrategies/localStrategy");
+const cors = require("cors");
+const db = require("../utility/database");
+const PgSession = require('connect-pg-simple')(session);
+
 
 const app = express();
-const PORT = process.env.PORT || 8003;
+const PORT = process.env.PORT;
 const SECRET = process.env.SECRET;
 
 const allowedOrigins = [
@@ -18,36 +21,19 @@ const allowedOrigins = [
 ];
 
 const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
+  origin: allowedOrigins,
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
   optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // Pre-flight requests
+app.options("*", cors(corsOptions));
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
-// Middleware to force HTTPS
-app.use((req, res, next) => {
-  if (req.headers["x-forwarded-proto"] !== "https") {
-    return res.redirect(`https://${req.headers.host}${req.url}`);
-  }
-  next();
-});
-
 app.use(
   session({
-    store: new (PgSession(session))({
+    store: new PgSession({
       pool: db.pool,
       tableName: 'session'
     }),
@@ -55,10 +41,7 @@ app.use(
     saveUninitialized: false,
     resave: false,
     cookie: {
-      maxAge: 60000 * 60 * 3,
-      sameSite: 'None',
-      secure: true,
-      httpOnly: true,
+      maxAge: 60000 * 60 * 3
     },
   })
 );
@@ -70,16 +53,6 @@ app.use(routes);
 
 app.get("/", (req, res) => res.send("Express on Vercel"));
 
-// Additional Preflight Request Handling
-app.options('*', (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  console.log("Preflight response headers set");
-  res.sendStatus(204); // No Content
-});
-
 app.listen(PORT, () => console.log(`Server is running on ${PORT}`));
 
-export default app;
+module.exports = app;
