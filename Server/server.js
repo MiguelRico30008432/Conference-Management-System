@@ -8,13 +8,13 @@ const log = require("./logs/logsManagement");
 require("./passportStrategies/localStrategy");
 const cors = require("cors");
 const db = require("./utility/database");
+const PgSession = require('connect-pg-simple')(session);
 
 const app = express();
 const PORT = process.env.PORT;
 const SECRET = process.env.SECRET;
 
 const allowedOrigins = [
-  "https://final-project-cms.vercel.app",
   "http://localhost:3000"
 ];
 
@@ -31,6 +31,10 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
   session({
+    store: new PgSession({
+      pool: db.pool,
+      tableName: 'session'
+    }),
     secret: SECRET,
     saveUninitialized: false,
     resave: false,
@@ -45,23 +49,12 @@ app.use(passport.session());
 
 app.use(routes);
 
-//-----------Zona de Testes-------------//
 
 app.get("/", (request, response) => {
   request.session.visited = true;
   return response.sendStatus(200);
 });
 
-
-//Send mail
-app.post("/sendMail", async (req, res) => {
-  try {
-    mail.sendEmail(req.mail, req.subject, req.content);
-    return res.status(200).send({ msg: "" });
-  } catch (error) {
-    return res.status(500).send({ msg: "Internal Server Error" });
-  }
-});
 
 app.use(express.static("public"));
 app.listen(PORT, () => {

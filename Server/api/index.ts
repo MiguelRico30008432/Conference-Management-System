@@ -8,12 +8,15 @@ const log = require("../logs/logsManagement");
 require("../passportStrategies/localStrategy");
 const cors = require("cors");
 const db = require("../utility/database");
+const PgSession = require('connect-pg-simple')(session);
+
+
 const app = express();
 const PORT = process.env.PORT;
 const SECRET = process.env.SECRET;
 
 const allowedOrigins = [
-  "https://final-project-cms.vercel.app",
+  "https://ualconf.vercel.app",
   "http://localhost:3000"
 ];
 
@@ -30,11 +33,15 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
   session({
+    store: new PgSession({
+      pool: db.pool,
+      tableName: 'session'
+    }),
     secret: SECRET,
     saveUninitialized: false,
     resave: false,
     cookie: {
-      maxAge: 60000 * 60 * 3
+      maxAge: 60000 * 60 * 3,
     },
   })
 );

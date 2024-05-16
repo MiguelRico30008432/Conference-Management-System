@@ -129,6 +129,7 @@ async function fetchAllEmailData(mainTable, joinTable, joinCondition, joinSecond
 }
 
 module.exports = {
+  pool,
   fetchData,
   fetchDataCst,
   addData,
