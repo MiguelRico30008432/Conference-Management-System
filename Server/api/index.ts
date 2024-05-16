@@ -2,16 +2,13 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const passport = require("passport");
 const session = require("express-session");
-const routes = require("../routes/index")
-const ver = require("../utility/verifications");
-const log = require("../logs/logsManagement");
-require("../passportStrategies/localStrategy");
+const PgSession = require("connect-pg-simple")(session);
 const cors = require("cors");
-const db = require("../utility/database");
-const PgSession = require('connect-pg-simple')(session);
+const routes = require("./routes/index");
+const db = require("./utility/database");
 
 const app = express();
-const PORT = process.env.PORT || 8003;  // Default to 8003 if PORT is not set
+const PORT = process.env.PORT || 8003;
 const SECRET = process.env.SECRET;
 
 const allowedOrigins = [
@@ -50,9 +47,9 @@ app.use(
     resave: false,
     cookie: {
       maxAge: 60000 * 60 * 3,
-      sameSite: 'None',  // Allow cross-site cookies
-      secure: true,      // Ensure the cookie is only sent over HTTPS
-      httpOnly: true     // Prevent client-side JavaScript from accessing the cookie
+      sameSite: 'None',
+      secure: true,
+      httpOnly: true,
     },
   })
 );

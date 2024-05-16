@@ -10,33 +10,29 @@ const passport = require("passport");
 router.post("/signIn", (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) {
+      console.error("Authentication error:", err);
       return res.status(500).send({
         success: false,
         message: "An error occurred during authentication.",
       });
     }
     if (!user) {
-      // Check the message from Passport to determine the reason for failure
-      if (info.message === "User Not Found") {
-        return res
-          .status(404)
-          .send({ success: false, message: "User not found." });
-      } else {
-        return res.status(401).send({
-          success: false,
-          message: "Unauthorized. Invalid credentials.",
-        });
-      }
+      console.log("Authentication failed:", info.message);
+      return res.status(401).send({
+        success: false,
+        message: info.message,
+      });
     }
 
-    // If this function gets called, authentication was successful
     req.logIn(user, (loginErr) => {
       if (loginErr) {
-        return res
-          .status(500)
-          .send({ success: false, message: "Failed to establish a session." });
+        console.error("Login error:", loginErr);
+        return res.status(500).send({
+          success: false,
+          message: "Failed to establish a session.",
+        });
       }
-      // Successful authentication, send user details
+      console.log("Authentication successful, user:", user);
       return res.status(200).send({
         userid: user.userid,
         useremail: user.useremail,
