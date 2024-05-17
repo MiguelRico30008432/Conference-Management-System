@@ -43,7 +43,7 @@ app.use(
     resave: false,
     cookie: {
       maxAge : null, 
-      sameSite: 'Lax'
+      sameSite: 'none'
     },
   })
 );
