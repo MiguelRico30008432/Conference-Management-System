@@ -31,7 +31,8 @@ passport.use(new LocalStrategy({
         try {
             console.log('debug')
             const findUser = await db.fetchData("users", "useremail", email); 
-            return done(null, findUser[0]);
+            consoel.log(email,password , findUser)
+            done(null, findUser[0]);
         } catch (err) {
             done(err);
         }
