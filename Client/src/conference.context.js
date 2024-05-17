@@ -21,6 +21,7 @@ function ConferenceProviderWrapper(props) {
             "Content-type": "application/json; charset=UTF-8",
           },
           credentials: "include",
+          withCredentials: true,
         });
 
         if (response.ok) {
