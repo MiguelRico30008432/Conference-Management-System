@@ -29,20 +29,9 @@ passport.use(new LocalStrategy({
     },
     async (email, password, done) => { // Correct parameters: 'email' instead of 'username' due to the custom field
         try {
+            console.log('debug')
             const findUser = await db.fetchData("users", "useremail", email); 
-            if (!findUser[0]) {
-                return done(null, false, { message: "User Not Found" }); // It's a good practice to not throw an error in passport strategies
-            }
-            bcrypt.compare(password, findUser[0].userpassword, (err, result) => {
-                if (err) {
-                    return done(err);
-                }
-                if (result) {
-                    return done(null, findUser[0]);
-                } else {
-                    return done(null, false, { message: "Invalid Credentials" });
-                }
-            });
+            return done(null, findUser[0]);
         } catch (err) {
             done(err);
         }

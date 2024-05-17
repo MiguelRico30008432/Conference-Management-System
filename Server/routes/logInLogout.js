@@ -10,7 +10,6 @@ const passport = require("passport");
 
 router.post("/signIn", passport.authenticate("local"), (req, res) => {
   res.status(200).json({msg:"login"})
- 
 });
 
 //User Registration
