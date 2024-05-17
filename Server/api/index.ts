@@ -17,6 +17,7 @@ const SECRET = process.env.SECRET;
 
 const allowedOrigins = [
   "https://ualconf.vercel.app",
+  "https://ualconfapiprod.vercel.app",
   "http://localhost:3000"
 ];
 
