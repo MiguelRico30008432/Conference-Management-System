@@ -32,20 +32,20 @@ app.options("*", cors(corsOptions));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
-  session({
-    store: new PgSession({
-      pool: db.pool,
-      tableName: 'session'
-    }),
-    secret: SECRET,
-    saveUninitialized: false,
-    resave: false,
-    cookie: {
-      maxAge: 60000 * 60 * 3,
-      sameSite: 'none',
-      secure: true,
-      httpOnly : true
-    },
+  session(
+  {
+      secret: SECRET,
+      saveUninitialized: false,
+      resave: false,
+      cookie: 
+      {
+        maxAge: 60000 * 60 * 3
+      },
+      store: new PgSession
+      ({
+        pool: db.pool,
+        tableName: 'session'
+      })
   })
 );
 
