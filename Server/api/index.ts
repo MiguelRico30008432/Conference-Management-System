@@ -17,7 +17,6 @@ const SECRET = process.env.SECRET;
 
 const allowedOrigins = [
   "https://ualconf.vercel.app",
-  "https://ualconfapiprod.vercel.app",
   "http://localhost:3000"
 ];
 
@@ -42,9 +41,7 @@ app.use(
     saveUninitialized: false,
     resave: false,
     cookie: {
-      maxAge : null, 
-      secure:true,
-      sameSite: 'None'
+      maxAge: 60000 * 60 * 3
     },
   })
 );
@@ -56,5 +53,6 @@ app.use(routes);
 
 app.get("/", (req, res) => res.send("Express on Vercel"));
 
+app.listen(PORT, () => console.log(`Server is running on ${PORT}`));
 
 module.exports = app;
