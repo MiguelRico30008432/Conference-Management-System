@@ -43,8 +43,7 @@ app.use(
     resave: false,
     cookie: {
       maxAge : null, 
-      sameSite: 'none',
-      secure : false
+      secure:true
     },
   })
 );
@@ -56,6 +55,5 @@ app.use(routes);
 
 app.get("/", (req, res) => res.send("Express on Vercel"));
 
-app.listen(PORT, () => console.log(`Server is running on ${PORT}`));
 
 module.exports = app;
