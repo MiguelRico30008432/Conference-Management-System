@@ -88,6 +88,7 @@ export default function CreateSubmission() {
       });   
 
       try {
+        console.log(formData)
         const response = await fetch(`${process.env.REACT_APP_API_URL}/createSubmission`, {    
           method: "POST",
           body: formData,

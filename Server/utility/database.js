@@ -1,8 +1,9 @@
 const { Pool } = require("pg");
 const log = require("../logs/logsManagement");
 require("dotenv").config();
+const { createClient } = require('@supabase/supabase-js')
 
-const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
+const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, SUPABASEURL, SUPABASEKEY } = process.env;
 
 const pool = new Pool({
   host: PGHOST,
@@ -14,6 +15,8 @@ const pool = new Pool({
     require: true,
   },
 });
+
+const supabase = createClient(SUPABASEURL, SUPABASEKEY)
 
 async function fetchData(table, collum, comparisonValue) {
   // utilizada para qualquer tipo de search onde recebe o nome da tabela, da coluna e do parametro de comparação
@@ -130,6 +133,7 @@ async function fetchAllEmailData(mainTable, joinTable, joinCondition, joinSecond
 
 module.exports = {
   pool,
+  supabase,
   fetchData,
   fetchDataCst,
   addData,

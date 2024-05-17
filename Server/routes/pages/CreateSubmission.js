@@ -1,26 +1,24 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../../utility/database");
+const supabase = require("../../utility/database");
 const auth = require("../../utility/verifications");
 const log = require("../../logs/logsManagement");
-const multer = require("multer");
-const fs = require("fs");
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const { v4: uuidv4 } = require("uuid");
 
 router.post(
   "/createSubmission",
-  upload.single("file"),
   auth.ensureAuthenticated,
   async (req, res) => {
     try {
-      const file = req.file;
-
+      const file = req.body.file;
+      console.log(file)
+      console.log(req.body)
+      console.log(req.body.file)
+      
       if (!file) {
         return res.status(400).send({ msg: "File Not Received" });
       }
-
-      const base64File = file.buffer.toString("base64");
 
       //insert submission
       await db.fetchDataCst(
@@ -54,13 +52,17 @@ router.post(
       });
 
       //insert file
-      await db.fetchDataCst(
-        `INSERT INTO files (fileName, file, submissionID) VALUES ('${file.originalname}', '${base64File}', 2)`
-      );
+      //https://www.youtube.com/watch?v=HvOvdD2nX1k
+      //https://www.youtube.com/watch?v=73SpYrjsNlk --->  file
+
+      const { data , error } = await supabase
+        .storage
+        .from('submission_files')
+        .upload( req.body.confID + "/" + req.body.userID + "/" + uuidv4(), file)
 
       return res.status(200).send({ msg: "" });
     } catch (error) {
-      log.addLog(err, "database", "CreateSubmissions -> /createSubmission");
+      log.addLog(error, "database", "CreateSubmissions -> /createSubmission");
       return res.status(500).send({ msg: error });
     }
   }
@@ -70,12 +72,13 @@ router.post("/getAuthorData", auth.ensureAuthenticated, async (req, res) => {
   try{
     const userRecords = await db.fetchData("users", "userid", req.body.userID);
     return res.status(200).send(userRecords);
-  } catch {
-    log.addLog(err, "database", "CreateSubmissions -> /getAuthorData");
+  } catch (error){
+    log.addLog(error, "database", "CreateSubmissions -> /getAuthorData");
     return res.status(500);
 
   }
 })
+
 //router.post("/downloadFile", auth.ensureAuthenticated, async (req, res) => {
 //  try {
 //    const fileId = req.body.fileid;
