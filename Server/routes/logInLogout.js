@@ -7,43 +7,10 @@ const bcrypt = require("bcrypt");
 const passport = require("passport");
 
 //Login
-router.post("/signIn", (req, res, next) => {
-  passport.authenticate("local", (err, user, info) => {
-    if (err) {
-      return res.status(500).send({
-        success: false,
-        message: "An error occurred during authentication.",
-      });
-    }
-    if (!user) {
-      // Check the message from Passport to determine the reason for failure
-      if (info.message === "User Not Found") {
-        return res
-          .status(404)
-          .send({ success: false, message: "User not found." });
-      } else {
-        return res.status(401).send({
-          success: false,
-          message: "Unauthorized. Invalid credentials.",
-        });
-      }
-    }
 
-    // If this function gets called, authentication was successful
-    req.logIn(user, (loginErr) => {
-      if (loginErr) {
-        return res
-          .status(500)
-          .send({ success: false, message: "Failed to establish a session." });
-      }
-      // Successful authentication, send user details
-      return res.status(200).send({
-        userid: user.userid,
-        useremail: user.useremail,
-        useradmin: user.useradmin,
-      });
-    });
-  })(req, res, next);
+router.post("/signIn", passport.authenticate("local"), (req, res) => {
+  res.status(200).json({msg:"login"})
+ 
 });
 
 //User Registration
