@@ -44,7 +44,7 @@ app.use(
     cookie: {
       maxAge : null, 
       sameSite: 'none',
-      secure : true
+      secure : false
     },
   })
 );
