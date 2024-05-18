@@ -83,7 +83,7 @@ export default function CreateSubmission() {
     if (validateInputs()) {
       const formData = new FormData();
       formData.append("confID", confID);
-      formData.append("userid", user.trim());
+      formData.append("userid", user);
       formData.append("title", title.trim());
       formData.append("abstract", abstract.trim());
       formData.append("file", fileInput.current.files[0]);
@@ -110,6 +110,7 @@ export default function CreateSubmission() {
           setMessage(
             <Alert severity="success">Subimission created with success</Alert>
           );
+          window.scrollTo({ top: 0, behavior: 'smooth' });
           //Falta apagar os campos quando é criada a submissão
         } else {
           setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);

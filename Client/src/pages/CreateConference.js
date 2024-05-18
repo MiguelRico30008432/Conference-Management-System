@@ -141,8 +141,7 @@ export default function CreateConference() {
     country: "Country",
     city: "City",
     numberMinReviewrs: "Nº min Reviewrs",
-    numberMaxReviewrs: "Nº max reviewrs",
-    confLink: "Conference Webpage"
+    numberMaxReviewrs: "Nº max reviewrs"
   };
 
   const missingFields = requiredFields
@@ -175,7 +174,7 @@ export default function CreateConference() {
 
     await createConference(
       title.trim(),
-      user.trim(),
+      user,
       confType,
       confArea,
       startDate,
@@ -247,7 +246,7 @@ export default function CreateConference() {
       const jsonResponse = await response.json();
       if (response.status === 200) {
         setMessage(
-          <Alert severity="success">{"Your conference submission will undergo a careful review for acceptance or rejection. Within two days, you will be notified of our decision, via email."}</Alert>
+          <Alert severity="success">{"Your conference submission will undergo a review for acceptance or rejection. Within two days, you will be notified of our decision, via email."}</Alert>
         );
       } else {
         setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
