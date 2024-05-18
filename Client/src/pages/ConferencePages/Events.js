@@ -96,7 +96,9 @@ export default function Events() {
               </Card>
             </MDBox>
 
-            <Card sx={{ mt: 2 }}>{error}</Card>
+            <MDBox mb={3} textAlign="left">
+              <Card>{error}</Card>
+            </MDBox>
 
             <MDBox mb={3}>
               <Card>

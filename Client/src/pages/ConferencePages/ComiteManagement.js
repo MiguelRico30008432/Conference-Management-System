@@ -317,10 +317,13 @@ export default function ComitteeManagementPage() {
               </Card>
             </MDBox>
 
+            <MDBox mb={3} textAlign="left">
+              <Card>{error}</Card>
+            </MDBox>
+
             {/* Tabela principal */}
             <MDBox mb={3}>
               <Card>
-                {error}
                 <CompleteTable
                   columns={columns}
                   rows={rows}
