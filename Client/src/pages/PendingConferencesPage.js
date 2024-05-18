@@ -65,8 +65,8 @@ export default function PendingConferencesPage() {
           body: JSON.stringify({
             confid: id,
             acceptOrReject: accept,
-            confowner: owner.trim(),
-            confname: name.trim(),
+            confowner: owner,
+            confname: name,
           }),
         }
       );

@@ -124,7 +124,8 @@ export default function CreateConference() {
     "country",
     "city",
     "numberMinReviewrs",
-    "numberMaxReviewrs"
+    "numberMaxReviewrs",
+    "confLink"
   ];
 
   const fieldMappings = {
