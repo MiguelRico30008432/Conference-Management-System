@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "connect-pg-simple": "^9.0.1",
-    "express-session": "^1.18.0"
-  }
-}
