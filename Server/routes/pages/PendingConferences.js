@@ -48,6 +48,16 @@ router.post("/acceptOrRejectConference", async function (req, res) {
       { confapproved: req.body.acceptOrReject },
       { confid: req.body.confid }
     );
+
+    //Create new event to show on events page
+    if (req.body.acceptOrReject === 2) {
+      await db.createEvent(
+        req.body.confid,
+        1, //admin
+        "The conference has been accepted"
+      );
+    }
+
     // Fetch the user's email
     const userRecords = await db.fetchData(
       "users",
@@ -68,7 +78,12 @@ router.post("/acceptOrRejectConference", async function (req, res) {
       additionalInfo: "For more information, please contact our support team.",
     };
 
-    email.sendEmail(userEmail, emailSubject, emailReplacements, 'emailAcceptReject.html');
+    email.sendEmail(
+      userEmail,
+      emailSubject,
+      emailReplacements,
+      "emailAcceptReject.html"
+    );
 
     return res.status(200).send({ msg: `Email notification sent.` });
   } catch (error) {

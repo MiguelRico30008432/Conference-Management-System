@@ -144,10 +144,12 @@ Table Events
 
 CREATE TABLE events(
     eventID SERIAL primary KEY,
-    confID INT,
-    FOREIGN KEY (confID) REFERENCES conferences(confID),
-    eventName VARCHAR(200)
+    eventconfid INT,FOREIGN KEY (eventconfid) REFERENCES conferences(confID),
+    eventName VARCHAR(200),
+    eventuserid INT,FOREIGN KEY (eventuserid) REFERENCES users(userid),
+    eventAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
+
 
 
 

@@ -120,3 +120,7 @@
 {"originFile":"database.js","time":"2024-05-11 21:05:27","function":"addData","mensagem":{"length":143,"name":"error","severity":"ERROR","code":"42703","position":"279","file":"parse_target.c","line":"1052","routine":"checkInsertTargets"}}
 {"originFile":"database.js","time":"2024-05-11 21:14:39","function":"addData","mensagem":{"length":143,"name":"error","severity":"ERROR","code":"42703","position":"279","file":"parse_target.c","line":"1052","routine":"checkInsertTargets"}}
 {"originFile":"database.js","time":"2024-05-11 21:17:32","function":"addData","mensagem":{"length":143,"name":"error","severity":"ERROR","code":"42703","position":"279","file":"parse_target.c","line":"1052","routine":"checkInsertTargets"}}
+{"originFile":"database.js","time":"2024-05-18 12:20:25","function":"createEvent","mensagem":{}}
+{"originFile":"database.js","time":"2024-05-18 12:21:20","function":"fetchDataCst","mensagem":{"length":98,"name":"error","severity":"ERROR","code":"42601","position":"90","file":"scan.l","line":"1241","routine":"scanner_yyerror"}}
+{"originFile":"database.js","time":"2024-05-18 12:22:04","function":"fetchDataCst","mensagem":{"length":91,"name":"error","severity":"ERROR","code":"42601","position":"108","file":"scan.l","line":"1241","routine":"scanner_yyerror"}}
+{"originFile":"database.js","time":"2024-05-18 12:46:03","function":"fetchDataCst","mensagem":{"length":114,"name":"error","severity":"ERROR","code":"42703","position":"83","file":"parse_relation.c","line":"3713","routine":"errorMissingColumn"}}
