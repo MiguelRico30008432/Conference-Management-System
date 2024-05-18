@@ -174,8 +174,8 @@ export default function CreateConference() {
     } = formData;
 
     await createConference(
-      title,
-      user,
+      title.trim(),
+      user.trim(),
       confType,
       confArea,
       startDate,
@@ -186,12 +186,12 @@ export default function CreateConference() {
       reviewEndDate,
       biddingStartDate,
       biddingEndDate,
-      description,
-      country,
-      city,
+      description.trim(),
+      country.trim(),
+      city.trim(),
       numberMinReviewrs,
       numberMaxReviewrs,
-      confLink
+      confLink.trim()
     );
   };
 
