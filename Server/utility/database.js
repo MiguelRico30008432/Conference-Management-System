@@ -1,9 +1,9 @@
 const { Pool } = require("pg");
 const log = require("../logs/logsManagement");
 require("dotenv").config();
-const { createClient } = require('@supabase/supabase-js')
+const { createClient } = require("@supabase/supabase-js");
 
-const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, SUPABASEURL, SUPABASEKEY } = process.env;
+const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
 
 const pool = new Pool({
   host: PGHOST,
@@ -15,8 +15,6 @@ const pool = new Pool({
     require: true,
   },
 });
-
-const supabase = createClient(SUPABASEURL, SUPABASEKEY)
 
 async function fetchData(table, collum, comparisonValue) {
   // utilizada para qualquer tipo de search onde recebe o nome da tabela, da coluna e do parametro de comparação
@@ -95,7 +93,16 @@ async function fetchDataCst(select) {
   }
 }
 
-async function fetchDataWithJoin(mainTable, joinTable, joinCondition, joinSecondCondition, filterColumn, filterSecondColumn, filterValue, filterSecondValue) {
+async function fetchDataWithJoin(
+  mainTable,
+  joinTable,
+  joinCondition,
+  joinSecondCondition,
+  filterColumn,
+  filterSecondColumn,
+  filterValue,
+  filterSecondValue
+) {
   try {
     const queryText = `
       SELECT ${filterColumn}
@@ -105,7 +112,7 @@ async function fetchDataWithJoin(mainTable, joinTable, joinCondition, joinSecond
     `;
     const result = await pool.query(queryText);
     // Extract just the email values from the result set
-    const emails = result.rows.map(row => row.useremail);
+    const emails = result.rows.map((row) => row.useremail);
     return emails;
   } catch (err) {
     log.addLog(err, "database", "fetchDataWithJoin");
@@ -113,17 +120,28 @@ async function fetchDataWithJoin(mainTable, joinTable, joinCondition, joinSecond
   }
 }
 
-async function fetchAllEmailData(mainTable, joinTable, joinCondition, joinSecondCondition, filterColumn, filterSecondColumn, filterValue, filterSecondValue) {
+async function fetchAllEmailData(
+  mainTable,
+  joinTable,
+  joinCondition,
+  joinSecondCondition,
+  filterColumn,
+  filterSecondColumn,
+  filterValue,
+  filterSecondValue
+) {
   try {
     const queryText = `
       SELECT ${filterColumn}
       FROM ${mainTable}
       JOIN ${joinTable} ON ${mainTable}.${joinCondition} = ${joinTable}.${joinCondition}
-      WHERE ${joinTable}.${joinSecondCondition} = '${filterValue}' AND ${joinTable}.${filterSecondColumn} IN (${filterSecondValue.map(value => `'${value}'`).join(', ')});
+      WHERE ${joinTable}.${joinSecondCondition} = '${filterValue}' AND ${joinTable}.${filterSecondColumn} IN (${filterSecondValue
+      .map((value) => `'${value}'`)
+      .join(", ")});
     `;
     const result = await pool.query(queryText);
     // Extract just the email values from the result set
-    const emails = result.rows.map(row => row.useremail);
+    const emails = result.rows.map((row) => row.useremail);
     return emails;
   } catch (err) {
     log.addLog(err, "database", "fetchDataWithJoin");
@@ -133,7 +151,6 @@ async function fetchAllEmailData(mainTable, joinTable, joinCondition, joinSecond
 
 module.exports = {
   pool,
-  supabase,
   fetchData,
   fetchDataCst,
   addData,
