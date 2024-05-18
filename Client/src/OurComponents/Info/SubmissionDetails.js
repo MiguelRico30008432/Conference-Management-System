@@ -6,7 +6,7 @@ import { Box, Card, Container } from "@mui/material";
 export default function SubmissionDetails({ onClose, submission }) {
   return (
     <Card>
-      <Container component="main" maxWidth="xs">
+      <Container component="main" maxWidth="sm">
         <Box
           sx={{
             mt: 2,
@@ -28,13 +28,19 @@ export default function SubmissionDetails({ onClose, submission }) {
           <MDTypography variant="h6">Authors:</MDTypography>
           <MDTypography variant="body2">{submission.authors}</MDTypography>
 
-          <MDTypography variant="h6" sx={{ mt: 2 }}>Status:</MDTypography>
+          <MDTypography variant="h6" sx={{ mt: 2 }}>
+            Status:
+          </MDTypography>
           <MDTypography variant="body2">{submission.status}</MDTypography>
 
-          <MDTypography variant="h6" sx={{ mt: 2 }}>Submission Date:</MDTypography>
+          <MDTypography variant="h6" sx={{ mt: 2 }}>
+            Submission Date:
+          </MDTypography>
           <MDTypography variant="body2">{submission.addDate}</MDTypography>
 
-          <MDTypography variant="h6" sx={{ mt: 2 }}>Abstract:</MDTypography>
+          <MDTypography variant="h6" sx={{ mt: 2 }}>
+            Abstract:
+          </MDTypography>
           <MDTypography variant="body2">{submission.abstract}</MDTypography>
 
           <MDButton

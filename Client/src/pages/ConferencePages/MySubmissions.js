@@ -12,18 +12,21 @@ import Footer from "OurComponents/footer/Footer";
 import ConferenceNavBar from "OurComponents/navBars/ConferenceNavBar";
 import CompleteTable from "OurComponents/Table/CompleteTable";
 import SubmissionsDetails from "OurComponents/Info/SubmissionDetails";
+import UpdateSubmission from "OurComponents/Info/updateSubmission";
 
 import { AuthContext } from "auth.context";
 import { ConferenceContext } from "conference.context";
 
 function formatDate(dateString) {
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-GB');
+  return date.toLocaleDateString("en-GB");
 }
 
 export default function MySubmissionsPage() {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [dataForDetails, setDataForDetails] = useState({});
+  const [dataForUpdate, setDataForUpdate] = useState({});
+  const [update, setUpdate] = useState(false);
   const [openLoading, setOpenLoading] = useState(false);
   const [rows, setRows] = useState([]);
   const [error, setError] = useState(null);
@@ -36,28 +39,31 @@ export default function MySubmissionsPage() {
 
       if (confID && user) {
         try {
-          const response = await fetch(`${process.env.REACT_APP_API_URL}/mySubmissions`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json; charset=UTF-8",
-            },
-            credentials: "include",
-            body: JSON.stringify({
-              userID: user,
-              confID: confID
-            })
-          });
+          const response = await fetch(
+            `${process.env.REACT_APP_API_URL}/mySubmissions`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json; charset=UTF-8",
+              },
+              credentials: "include",
+              body: JSON.stringify({
+                userID: user,
+                confID: confID,
+              }),
+            }
+          );
 
           const jsonResponse = await response.json();
 
           if (response.ok) {
-            const transformedData = jsonResponse.map(submission => ({
+            const transformedData = jsonResponse.map((submission) => ({
               id: submission.id,
               title: submission.title,
               authors: submission.authors,
-              status: submission.status ? 'Accepted' : 'Pending',
+              status: submission.status ? "Accepted" : "Pending",
               addDate: formatDate(submission.addDate),
-              abstract: submission.abstract
+              abstract: submission.abstract,
             }));
             setRows(transformedData);
           } else {
@@ -73,11 +79,6 @@ export default function MySubmissionsPage() {
     fetchSubmissions();
   }, [confID, user]);
 
-  const handleEdit = (submission) => {
-    console.log("Edit submission:", submission);
-    // Implement edit functionality here
-  };
-
   const handleDelete = (submission) => {
     console.log("Delete submission:", submission);
     // Implement delete functionality here
@@ -88,12 +89,12 @@ export default function MySubmissionsPage() {
     { field: "status", headerName: "Status", width: 120 },
     { field: "authors", headerName: "Authors", width: 400 },
     {
-      field: "actions",
-      headerName: "",  // No title for actions column
+      field: "details",
+      headerName: "", // No title for actions column
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
-      width: 350,
+      width: 150,
       renderCell: (params) => (
         <>
           <MDButton
@@ -113,10 +114,25 @@ export default function MySubmissionsPage() {
           >
             Details
           </MDButton>
+        </>
+      ),
+    },
+    {
+      field: "edit",
+      headerName: "", // No title for actions column
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      width: 150,
+      renderCell: (params) => (
+        <>
           <MDButton
             variant="gradient"
             color="success"
-            onClick={() => handleEdit(params.row)}
+            onClick={() => {
+              setDataForUpdate(params.row.id);
+              setUpdate(true);
+            }}
             sx={{
               maxWidth: "80px",
               maxHeight: "30px",
@@ -127,6 +143,18 @@ export default function MySubmissionsPage() {
           >
             Edit
           </MDButton>
+        </>
+      ),
+    },
+    {
+      field: "delete",
+      headerName: "", // No title for actions column
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      width: 150,
+      renderCell: (params) => (
+        <>
           <MDButton
             variant="gradient"
             color="error"
@@ -138,7 +166,7 @@ export default function MySubmissionsPage() {
               minHeight: "30px",
             }}
           >
-            Delete Submission
+            Delete
           </MDButton>
         </>
       ),
@@ -150,33 +178,42 @@ export default function MySubmissionsPage() {
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
         <ConferenceNavBar />
-        <Container maxWidth="sm">
-          <MDBox mt={10} mb={2} textAlign="left">
-            <Card>
-              <MDTypography ml={2} variant="h6">
-                My Submissions
-              </MDTypography>
-              <MDTypography ml={2} variant="body2">
-                Here you can view and manage your submissions.
-              </MDTypography>
-            </Card>
-            <MDBox mb={3} textAlign="left">
-              {error && <Alert severity="error">{error}</Alert>}
-              <Card>
-                <CompleteTable
-                  columns={columns}
-                  rows={rows}
-                  numberOfRowsPerPage={100}
-                  height={200}
-                />
-              </Card>
-            </MDBox>
-          </MDBox>
-        </Container>
-        {!detailsOpen ? null : (
-          <SubmissionsDetails
-            submission={dataForDetails}
-            onClose={() => setDetailsOpen(false)}
+        {!update ? (
+          <>
+            <Container maxWidth="sm">
+              <MDBox mt={10} mb={2} textAlign="left">
+                <Card>
+                  <MDTypography ml={2} variant="h6">
+                    My Submissions
+                  </MDTypography>
+                  <MDTypography ml={2} variant="body2">
+                    Here you can view and manage your submissions.
+                  </MDTypography>
+                </Card>
+                <MDBox mb={3} textAlign="left">
+                  {error && <Alert severity="error">{error}</Alert>}
+                  <Card>
+                    <CompleteTable
+                      columns={columns}
+                      rows={rows}
+                      numberOfRowsPerPage={100}
+                      height={200}
+                    />
+                  </Card>
+                </MDBox>
+              </MDBox>
+            </Container>
+            {!detailsOpen ? null : (
+              <SubmissionsDetails
+                submission={dataForDetails}
+                onClose={() => setDetailsOpen(false)}
+              />
+            )}
+          </>
+        ) : (
+          <UpdateSubmission
+            submission={dataForUpdate}
+            onClose={() => setUpdate(false)}
           />
         )}
         <Footer />
