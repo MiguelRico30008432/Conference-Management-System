@@ -45,7 +45,7 @@ export default function SignInPage() {
     try {
         const response = await fetch(`${process.env.REACT_APP_API_URL}/signIn`, {
         method: "POST",
-        body: JSON.stringify({ email: email, password: password }),
+        body: JSON.stringify({ email: email.trim(), password: password.trim() }),
         headers: {
           "Content-type": "application/json; charset=UTF-8",
         },

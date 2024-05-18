@@ -145,11 +145,11 @@ export default function MyProfilePage() {
         method: "POST",
         body: JSON.stringify({
           userID: user,
-          firstName: firstName,
-          lastName: lastName,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
           affiliation: affiliation,
-          email: email,
-          phone: phone,
+          email: email.trim(),
+          phone: phone.trim(),
         }),
         headers: {
           "Content-type": "application/json; charset=UTF-8",

@@ -41,10 +41,10 @@ router.post("/createConference", auth.ensureAuthenticated, async (req, res) => {
     const [{ confareaid }] = findAreaId;
 
     await db.addData("conferences", {
-      confname: title,
-      confowner: user,
-      conftype: conftypeid,
-      confareaid: confareaid,
+      confname: title.trim(),
+      confowner: user.trim(),
+      conftype: conftypeid.trim(),
+      confareaid: confareaid.trim(),
       confstartdate: startDate,
       confenddate: endDate,
       confstartsubmission: submissionStartDate,
@@ -53,12 +53,12 @@ router.post("/createConference", auth.ensureAuthenticated, async (req, res) => {
       confendreview: reviewEndDate,
       confstartbidding: biddingStartDate,
       confendbidding: biddingEndDate,
-      confdescription: description,
-      confcountry: country,
-      confcity: city,
+      confdescription: description.trim(),
+      confcountry: country.trim(),
+      confcity: city.trim(),
       confmaxreviewers: numberMaxReviewrs,
       confminreviewers: numberMinReviewrs,
-      confwebpage: confLink,
+      confwebpage: confLink.trim(),
     });
 
     const query = `

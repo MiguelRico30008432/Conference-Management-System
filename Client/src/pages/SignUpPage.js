@@ -64,11 +64,11 @@ export default function SignUpPage() {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/signUp`, {
         method: "POST",
         body: JSON.stringify({
-          firstName: firstName,
-          lastName: lastName,
-          email: email,
-          phone: phone,
-          password: password,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          email: email.trim(),
+          phone: phone.trim(),
+          password: password.trim(),
           affiliation: affiliation,
         }),
         headers: {
