@@ -120,3 +120,25 @@
 {"originFile":"database.js","time":"2024-05-11 21:05:27","function":"addData","mensagem":{"length":143,"name":"error","severity":"ERROR","code":"42703","position":"279","file":"parse_target.c","line":"1052","routine":"checkInsertTargets"}}
 {"originFile":"database.js","time":"2024-05-11 21:14:39","function":"addData","mensagem":{"length":143,"name":"error","severity":"ERROR","code":"42703","position":"279","file":"parse_target.c","line":"1052","routine":"checkInsertTargets"}}
 {"originFile":"database.js","time":"2024-05-11 21:17:32","function":"addData","mensagem":{"length":143,"name":"error","severity":"ERROR","code":"42703","position":"279","file":"parse_target.c","line":"1052","routine":"checkInsertTargets"}}
+{"originFile":"database.js","time":"2024-05-17 19:09:11","function":"fetchData","mensagem":{"code":"ETIMEDOUT"}}
+{"originFile":"database.js","time":"2024-05-17 19:20:10","function":"CreateSubmissions -> /createSubmission","mensagem":{}}
+{"originFile":"database.js","time":"2024-05-17 19:24:54","function":"CreateSubmissions -> /createSubmission","mensagem":{}}
+{"originFile":"database.js","time":"2024-05-17 19:28:13","function":"CreateSubmissions -> /createSubmission","mensagem":{}}
+{"originFile":"database.js","time":"2024-05-17 19:35:27","function":"CreateSubmissions -> /createSubmission","mensagem":{}}
+{"originFile":"database.js","time":"2024-05-17 19:36:34","function":"CreateSubmissions -> /createSubmission","mensagem":{}}
+{"originFile":"database.js","time":"2024-05-17 19:38:35","function":"CreateSubmissions -> /createSubmission","mensagem":{}}
+{"originFile":"database.js","time":"2024-05-17 19:39:33","function":"CreateSubmissions -> /createSubmission","mensagem":{}}
+{"originFile":"database.js","time":"2024-05-17 19:40:03","function":"CreateSubmissions -> /createSubmission","mensagem":{}}
+{"originFile":"database.js","time":"2024-05-17 19:42:53","function":"CreateSubmissions -> /createSubmission","mensagem":{}}
+{"originFile":"database.js","time":"2024-05-17 19:54:05","function":"CreateSubmissions -> /createSubmission","mensagem":{}}
+{"originFile":"database.js","time":"2024-05-17 19:56:11","function":"CreateSubmissions -> /createSubmission","mensagem":{}}
+{"originFile":"database.js","time":"2024-05-17 19:56:48","function":"CreateSubmissions -> /createSubmission","mensagem":{}}
+{"originFile":"database.js","time":"2024-05-17 19:58:08","function":"CreateSubmissions -> /createSubmission","mensagem":{}}
+{"originFile":"database.js","time":"2024-05-17 19:59:19","function":"CreateSubmissions -> /createSubmission","mensagem":{}}
+{"originFile":"database.js","time":"2024-05-17 20:02:16","function":"CreateSubmissions -> /createSubmission","mensagem":{}}
+{"originFile":"database.js","time":"2024-05-17 20:04:27","function":"CreateSubmissions -> /createSubmission","mensagem":{}}
+{"originFile":"database.js","time":"2024-05-17 20:06:12","function":"CreateSubmissions -> /createSubmission","mensagem":{}}
+{"originFile":"database.js","time":"2024-05-17 20:07:50","function":"CreateSubmissions -> /createSubmission","mensagem":{}}
+{"originFile":"database.js","time":"2024-05-17 20:13:12","function":"CreateSubmissions -> /createSubmission","mensagem":{}}
+{"originFile":"database.js","time":"2024-05-17 20:14:02","function":"CreateSubmissions -> /createSubmission","mensagem":{}}
+{"originFile":"database.js","time":"2024-05-17 20:14:40","function":"CreateSubmissions -> /createSubmission","mensagem":{}}

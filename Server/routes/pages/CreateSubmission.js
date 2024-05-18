@@ -3,79 +3,100 @@ const router = express.Router();
 const db = require("../../utility/database");
 const auth = require("../../utility/verifications");
 const log = require("../../logs/logsManagement");
-const multer = require("multer");
-const fs = require("fs");
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const expressFileUpload = require("express-fileupload");
+const { v4: uuidv4 } = require("uuid");
+const fileUpload = require("express-fileupload");
+const { createClient } = require("@supabase/supabase-js");
 
-router.post(
-  "/createSubmission",
-  upload.single("file"),
-  auth.ensureAuthenticated,
-  async (req, res) => {
-    try {
-      const file = req.file;
+const { SUPABASEURL, SUPABASEKEY } = process.env;
 
-      if (!file) {
-        return res.status(400).send({ msg: "File Not Received" });
-      }
+const supabase = createClient(SUPABASEURL, SUPABASEKEY);
 
-      const base64File = file.buffer.toString("base64");
+router.use(fileUpload());
 
-      //insert submission
-      await db.fetchDataCst(
-        `INSERT INTO submissions (submissionconfID, submissionMainAuthor, submissiontitle, submissionabstract) VALUES (${req.body.confID}, ${req.body.userid}, '${req.body.title}', '${req.body.abstract}')`
-      );
+router.post("/createSubmission", auth.ensureAuthenticated, async (req, res) => {
+  try {
+    const authors = [];
+    let index = 0;
 
-      const submissionid  = await db.fetchDataCst(
-        `SELECT MAX(submissionid) FROM submissions WHERE submissionconfid = '${req.body.confID}' AND submissionmainauthor = ${req.body.userid}`
-      );
-
-      //insert authors
-      req.body.author.forEach(async author => {
-        const firstName = author.firstName;
-        const lastName = author.lastName;
-        const email = author.email;
-        const affiliation = author.affiliation;
-        
-        const userRegistered = await db.fetchData("users", "useremail", email)
-        
-        if (!userRegistered || userRegistered.length === 0){
-          await db.fetchDataCst(
-            `INSERT INTO authors (authorAffiliation, authorEmail, authorFirstName, authorLastName, submissionID, userid) 
-            VALUES ('${affiliation}', '${email}', '${firstName}', '${lastName}', ${submissionid[0].max}, null)`
-          )
-        } else {
-          await db.fetchDataCst(
-            `INSERT INTO authors (authorAffiliation, authorEmail, authorFirstName, authorLastName, submissionID, userid) 
-            VALUES ('${userRegistered[0].useraffiliation}', '${userRegistered[0].useremail}', '${userRegistered[0].userfirstname}', '${userRegistered[0].userlastname}', ${submissionid[0].max}, ${userRegistered[0].userid})`
-          )
-        }
-      });
-
-      //insert file
-      await db.fetchDataCst(
-        `INSERT INTO files (fileName, file, submissionID) VALUES ('${file.originalname}', '${base64File}', 2)`
-      );
-
-      return res.status(200).send({ msg: "" });
-    } catch (error) {
-      log.addLog(err, "database", "CreateSubmissions -> /createSubmission");
-      return res.status(500).send({ msg: error });
+    if (!req.files) {
+      return res.status(400).send({ msg: "File Not Received" });
     }
+
+    //insert submission
+    await db.fetchDataCst(
+      `INSERT INTO submissions (submissionconfID, submissionMainAuthor, submissiontitle, submissionabstract) VALUES (${req.body.confID}, ${req.body.userid}, '${req.body.title}', '${req.body.abstract}')`
+    );
+
+    const submissionid = await db.fetchDataCst(
+      `SELECT MAX(submissionid) FROM submissions WHERE submissionconfid = '${req.body.confID}' AND submissionmainauthor = ${req.body.userid}`
+    );
+
+    //insert authors
+    while (req.body[`author[${index}][firstName]`]) {
+      authors.push({
+        firstName: req.body[`author[${index}][firstName]`],
+        lastName: req.body[`author[${index}][lastName]`],
+        email: req.body[`author[${index}][email]`],
+        affiliation: req.body[`author[${index}][affiliation]`],
+      });
+      index++;
+    }
+
+    authors.forEach(async (author) => {
+      const firstName = author.firstName;
+      const lastName = author.lastName;
+      const email = author.email;
+      const affiliation = author.affiliation;
+
+      const userRegistered = await db.fetchData("users", "useremail", email);
+
+      if (!userRegistered || userRegistered.length === 0) {
+        await db.fetchDataCst(
+          `INSERT INTO authors (authorAffiliation, authorEmail, authorFirstName, authorLastName, submissionID, userid) 
+            VALUES ('${affiliation}', '${email}', '${firstName}', '${lastName}', ${submissionid[0].max}, null)`
+        );
+      } else {
+        await db.fetchDataCst(
+          `INSERT INTO authors (authorAffiliation, authorEmail, authorFirstName, authorLastName, submissionID, userid) 
+            VALUES ('${userRegistered[0].useraffiliation}', '${userRegistered[0].useremail}', '${userRegistered[0].userfirstname}', '${userRegistered[0].userlastname}', ${submissionid[0].max}, ${userRegistered[0].userid})`
+        );
+      }
+    });
+
+    //insert fil
+    const file = req.files.file;
+    const fileBuffer = file.data;
+
+    const { data, error } = await supabase.storage
+      .from("submission_files")
+      .upload(
+        req.body.confID + "/" + req.body.userid + "/" + uuidv4(),
+        fileBuffer,
+        {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: file.mimetype, // Definir o tipo de conteúdo do arquivo
+        }
+      );
+    return res.status(200).send({ msg: "Submission Created." });
+  } catch (error) {
+    console.log(error);
+    log.addLog(error, "database", "CreateSubmissions -> /createSubmission");
+    return res.status(500).send({ msg: error });
   }
-);
+});
 
 router.post("/getAuthorData", auth.ensureAuthenticated, async (req, res) => {
-  try{
+  try {
     const userRecords = await db.fetchData("users", "userid", req.body.userID);
     return res.status(200).send(userRecords);
-  } catch {
-    log.addLog(err, "database", "CreateSubmissions -> /getAuthorData");
+  } catch (error) {
+    log.addLog(error, "database", "CreateSubmissions -> /getAuthorData");
     return res.status(500);
-
   }
-})
+});
+
 //router.post("/downloadFile", auth.ensureAuthenticated, async (req, res) => {
 //  try {
 //    const fileId = req.body.fileid;

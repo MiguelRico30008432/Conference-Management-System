@@ -4,7 +4,7 @@ import { ConferenceContext } from "conference.context";
 import { AuthContext } from "auth.context";
 
 import * as React from "react";
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, createRef } from "react";
 import Card from "@mui/material/Card";
 import Container from "@mui/material/Container";
 import MDBox from "components/MDBox";
@@ -13,7 +13,6 @@ import LoadingCircle from "OurComponents/loading/LoadingCircle";
 import Alert from "@mui/material/Alert";
 import MDButton from "components/MDButton";
 import TextField from "@mui/material/TextField";
-import MDInput from "components/MDInput";
 
 export default function CreateSubmission() {
   const { confID } = useContext(ConferenceContext);
@@ -21,21 +20,21 @@ export default function CreateSubmission() {
 
   const [openLoading, setOpenLoading] = useState(false);
   const [message, setMessage] = useState(null);
- 
+
   const [authors, setAuthors] = useState([
     { firstName: "", lastName: "", email: "", affiliation: "" },
   ]);
   const [title, setTitle] = useState("");
   const [abstract, setAbstract] = useState("");
-  const [file, setFile] = useState({});
 
+  const fileInput = createRef();
 
   useEffect(() => {
     async function getAuthorData() {
-      
+
       setOpenLoading(true);
-      
-      try{
+
+      try {
         const response = await fetch(`${process.env.REACT_APP_API_URL}/getAuthorData`, {
           method: "POST",
           body: JSON.stringify({ userID: user }),
@@ -47,7 +46,7 @@ export default function CreateSubmission() {
 
         const jsonResponse = await response.json();
 
-        if(response.status === 200){
+        if (response.status === 200) {
           setAuthors([{ firstName: jsonResponse[0].userfirstname, lastName: jsonResponse[0].userlastname, email: jsonResponse[0].useremail, affiliation: jsonResponse[0].useraffiliation }]);
         } else {
           setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
@@ -56,7 +55,7 @@ export default function CreateSubmission() {
       } catch {
         setMessage(
           <Alert severity="error">
-            Something went wrong when obtaining your informations
+            Something went wrong when obtaining your information.
           </Alert>
         );
       }
@@ -72,23 +71,23 @@ export default function CreateSubmission() {
     event.preventDefault();
 
     setOpenLoading(true);
-    
-    if(validateInputs()){
+
+    if (validateInputs()) {
       const formData = new FormData();
       formData.append("confID", confID);
       formData.append("userid", user);
       formData.append("title", title);
       formData.append("abstract", abstract);
-      formData.append("file", file);
+      formData.append("file", fileInput.current.files[0]);
       authors.forEach((author, index) => {
         formData.append(`author[${index}][firstName]`, author.firstName);
         formData.append(`author[${index}][lastName]`, author.lastName);
         formData.append(`author[${index}][email]`, author.email);
         formData.append(`author[${index}][affiliation]`, author.affiliation);
-      });   
+      });
 
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/createSubmission`, {    
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/createSubmission`, {
           method: "POST",
           body: formData,
           credentials: "include",
@@ -140,7 +139,7 @@ export default function CreateSubmission() {
     setAuthors(newAuthors);
   };
 
-  function validateInputs(){
+  function validateInputs() {
     for (let i = 0; i < authors.length; i++) {
       const author = authors[i];
       if (author.firstName === "" || author.lastName === "" || author.email === "" || author.affiliation === "") {
@@ -148,10 +147,10 @@ export default function CreateSubmission() {
       }
     }
 
-    if (title === "" || abstract === "" || file === ""){
+    if (title === "" || abstract === "" || fileInput.current.files[0] === "") {
       return false;
     };
-      
+
     return true;
   };
 
@@ -181,7 +180,7 @@ export default function CreateSubmission() {
                     <MDTypography ml={2} mt={1} mb={2} variant="body2">
                       Author {index + 1} Information
                     </MDTypography>
-                
+
                     <TextField
                       name={`firstName${index}`}
                       required
@@ -192,7 +191,7 @@ export default function CreateSubmission() {
                       disabled={true}
                       sx={{ ml: 2, mb: 2, width: "30%" }}
                     />
-  
+
                     <TextField
                       name={`lastName${index}`}
                       required
@@ -203,7 +202,7 @@ export default function CreateSubmission() {
                       disabled={true}
                       sx={{ ml: 2, mb: 2, width: "30%" }}
                     />
-  
+
                     <TextField
                       name={`email${index}`}
                       required
@@ -215,7 +214,7 @@ export default function CreateSubmission() {
                       disabled={true}
                       sx={{ ml: 2, mb: 2, width: "30%" }}
                     />
-  
+
                     <TextField
                       name={`affiliation${index}`}
                       required
@@ -293,7 +292,7 @@ export default function CreateSubmission() {
                       Remove Author
                     </MDButton>
                   </Card>
-              )))}
+                )))}
 
               <MDButton
                 variant="gradient"
@@ -358,13 +357,11 @@ export default function CreateSubmission() {
                 </MDTypography>
 
                 <MDBox ml={2} mb={2} textAlign="left">
-                  <MDInput
+                  <input
                     type="file"
                     className="form-control"
                     placeholder="file"
-                    onChange={(e) => {
-                      setFile(e.target.files[0]);
-                    }}
+                    ref={fileInput}
                   />
                 </MDBox>
               </Card>
