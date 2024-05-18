@@ -149,6 +149,16 @@ async function fetchAllEmailData(
   }
 }
 
+async function createEvent(confid, userid, event) {
+  try {
+    await fetchDataCst(`
+      INSERT INTO events (eventconfid, eventuserid, eventName)
+      VALUES (${confid}, ${userid}, '${event}')`);
+  } catch (err) {
+    log.addLog(err, "database", "createEvent");
+  }
+}
+
 module.exports = {
   pool,
   fetchData,
@@ -159,4 +169,5 @@ module.exports = {
   fetchAllData,
   fetchDataWithJoin,
   fetchAllEmailData,
+  createEvent,
 };

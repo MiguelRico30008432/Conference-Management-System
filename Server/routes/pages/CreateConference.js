@@ -74,9 +74,11 @@ router.post("/createConference", auth.ensureAuthenticated, async (req, res) => {
       userid: user,
       userrole: "Owner",
       confid: addedConfID[0].confid,
-    }); 
+    });
 
-    return res.status(200).send({ msg: "Conferência criada com sucesso" });
+    createEvent(addedConfID[0].confid, user, "Conference created");
+
+    return res.status(200).send({ msg: "Conference created with success" });
   } catch (error) {
     return res.status(500).send({ msg: "Internal Error" });
   }

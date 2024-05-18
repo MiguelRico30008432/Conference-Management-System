@@ -40,14 +40,17 @@ export default function ComitteeManagementPage() {
     async function getRows() {
       setOpenLoading(true);
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/comite`, {
-          method: "POST",
-          body: JSON.stringify({ confid: confID }),
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/comite`,
+          {
+            method: "POST",
+            body: JSON.stringify({ confid: confID }),
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+            },
+            credentials: "include",
+          }
+        );
 
         const jsonResponse = await response.json();
 
@@ -220,17 +223,21 @@ export default function ComitteeManagementPage() {
 
   async function deleteMember() {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/removePCMember`, {
-        method: "POST",
-        body: JSON.stringify({
-          userid: memberID,
-          confid: confID,
-        }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-        },
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/removePCMember`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            responsibleUser: user,
+            userid: memberID,
+            confid: confID,
+          }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+        }
+      );
 
       if (response.status === 200) {
         window.location.reload();
@@ -245,18 +252,22 @@ export default function ComitteeManagementPage() {
 
   async function changeMemberRole() {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/updateRoleMember`, {
-        method: "POST",
-        body: JSON.stringify({
-          userid: memberID,
-          confid: confID,
-          role: selectValueRole,
-        }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-        },
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/updateRoleMember`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            responsibleUser: user,
+            userid: memberID,
+            confid: confID,
+            role: selectValueRole,
+          }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+        }
+      );
 
       if (response.status === 200) {
         window.location.reload();
