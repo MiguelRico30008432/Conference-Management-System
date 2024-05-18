@@ -182,9 +182,9 @@ export default function SendInvitation() {
           },
           credentials: "include",
           body: JSON.stringify({
-            userid: user,
-            role: role,
-            recipients: emailList,
+            userid: user.trim(),
+            role: role.trim(),
+            recipients: emailList.trim(),
             confID: confID,
           }),
         }
