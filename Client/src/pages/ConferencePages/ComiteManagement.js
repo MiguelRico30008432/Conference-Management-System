@@ -222,6 +222,7 @@ export default function ComitteeManagementPage() {
   ];
 
   async function deleteMember() {
+    setOpenLoading(true);
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/removePCMember`,
@@ -248,9 +249,11 @@ export default function ComitteeManagementPage() {
     } catch (error) {
       setError(<Alert severity="error">Something went wrong.</Alert>);
     }
+    setOpenLoading(false);
   }
 
   async function changeMemberRole() {
+    setOpenLoading(true);
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/updateRoleMember`,
@@ -278,6 +281,7 @@ export default function ComitteeManagementPage() {
     } catch (error) {
       setError(<Alert severity="error">Something went wrong.</Alert>);
     }
+    setOpenLoading(false);
   }
 
   return (

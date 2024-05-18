@@ -1,6 +1,7 @@
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import ConfNavbar from "../../OurComponents/navBars/ConferenceNavBar";
 import { ConferenceContext } from "conference.context";
+import { AuthContext } from "auth.context";
 import Footer from "OurComponents/footer/Footer";
 import MDButton from "components/MDButton";
 import CompleteTable from "OurComponents/Table/CompleteTable";
@@ -15,12 +16,13 @@ import Select from "@mui/material/Select";
 import FormControl from "@mui/material/FormControl";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import MDBox from "components/MDBox";
-import Alert from '@mui/material/Alert';
+import Alert from "@mui/material/Alert";
 
 // Email validation regex
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function SendInvitation() {
+  const { user } = useContext(AuthContext);
   const { confID } = useContext(ConferenceContext);
   const [role, setRole] = useState("");
   const [roleError, setRoleError] = useState("");
@@ -33,13 +35,13 @@ export default function SendInvitation() {
   const [invitationEmailSuccess, setInvitationEmailSuccess] = useState("");
 
   const columns = [
-    { field: 'recipient', headerName: 'Recipient', width: 200 },
-    { field: 'role', headerName: 'Role', width: 200 },
-    { field: 'status', headerName: 'Status', width: 200 },
-    { field: 'dateSent', headerName: 'Date Sent', width: 200 },
+    { field: "recipient", headerName: "Recipient", width: 200 },
+    { field: "role", headerName: "Role", width: 200 },
+    { field: "status", headerName: "Status", width: 200 },
+    { field: "dateSent", headerName: "Date Sent", width: 200 },
     {
-      field: 'actions',
-      headerName: '',
+      field: "actions",
+      headerName: "",
       sortable: false,
       width: 100,
       renderCell: (params) => (
@@ -51,7 +53,7 @@ export default function SendInvitation() {
             height: "100%",
           }}
         >
-          {params.row.status === 'Used' ? null : (
+          {params.row.status === "Used" ? null : (
             <MDButton
               variant="gradient"
               color="error"
@@ -68,36 +70,39 @@ export default function SendInvitation() {
           )}
         </div>
       ),
-    }
+    },
   ];
 
   const getData = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/checkInvitations?confID=${confID}`, {    
-        method: "GET",
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-        },
-        credentials: "include", // Ensure cookies are sent with the request if needed
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/checkInvitations?confID=${confID}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          credentials: "include", // Ensure cookies are sent with the request if needed
+        }
+      );
       if (!response.ok) {
-        throw new Error('Failed to fetch data');
+        throw new Error("Failed to fetch data");
       }
       const { invitationsSent } = await response.json();
 
       // Function to format date
       function formatDate(dateString) {
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-GB');
+        return date.toLocaleDateString("en-GB");
       }
 
       // Transform the data to match the column format
-      const transformedData = invitationsSent.map(invite => ({
+      const transformedData = invitationsSent.map((invite) => ({
         id: invite.invitationid,
         recipient: invite.invitationemail,
         role: invite.invitationrole,
-        status: invite.invitationcodeused ? 'Used' : 'Pending',
-        dateSent: formatDate(invite.invitationadddate)
+        status: invite.invitationcodeused ? "Used" : "Pending",
+        dateSent: formatDate(invite.invitationadddate),
       }));
       setRows(transformedData);
     } catch (error) {
@@ -114,24 +119,27 @@ export default function SendInvitation() {
 
   const handleDeleteInvitation = async (invitationId) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/deleteInvitation`, {    
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ invitationId }) // Sending invitationId in the body
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/deleteInvitation`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ invitationId }), // Sending invitationId in the body
+        }
+      );
       if (response.ok) {
-        const updatedRows = rows.filter(row => row.id !== invitationId);
+        const updatedRows = rows.filter((row) => row.id !== invitationId);
         setRows(updatedRows);
         setDeleteError(""); // Clear delete error if any
         setDeleteSuccessMessage("Invitation deleted successfully");
       } else {
-        throw new Error('Failed to delete the invitation');
+        throw new Error("Failed to delete the invitation");
       }
     } catch (error) {
-      console.error('Error deleting invitation:', error);
+      console.error("Error deleting invitation:", error);
       setDeleteError("Failed to delete the invitation. Please try again.");
     }
   };
@@ -143,51 +151,57 @@ export default function SendInvitation() {
     setInvitationError("");
     setDeleteError("");
     setInvitationEmailSuccess("");
-  
+
     if (!role) {
       setRoleError("You must select a role!");
       return;
     }
-  
+
     if (!emails) {
       setEmailError("You must enter recipients!");
       return;
     }
-  
-    const emailList = emails.split(',').map(email => email.trim());
-  
-    const invalidEmails = emailList.filter(email => !emailRegex.test(email));
-  
+
+    const emailList = emails.split(",").map((email) => email.trim());
+
+    const invalidEmails = emailList.filter((email) => !emailRegex.test(email));
+
     if (invalidEmails.length > 0) {
-      setEmailError('Invalid email format: ' + invalidEmails.join(', '));
+      setEmailError("Invalid email format: " + invalidEmails.join(", "));
       return;
     }
-  
+
     // Send the list of emails to the backend
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/sendNewInvitation`, {    
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          role: role,
-          recipients: emailList,
-          confID: confID
-        }),
-      });
-  
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/sendNewInvitation`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            userid: user,
+            role: role,
+            recipients: emailList,
+            confID: confID,
+          }),
+        }
+      );
+
       if (response.ok) {
         setInvitationEmailSuccess("Invitations sent successfully");
         // Update table data after sending invitations
         getData(); // Assuming getData function fetches updated data
       } else {
-        throw new Error('Failed to send invitations');
+        throw new Error("Failed to send invitations");
       }
     } catch (error) {
       console.error("Error sending invitations:", error);
-      setInvitationError("An error occurred while sending invitations. Please try again.");
+      setInvitationError(
+        "An error occurred while sending invitations. Please try again."
+      );
     }
   };
 
@@ -202,10 +216,19 @@ export default function SendInvitation() {
             </MDTypography>
           </Card>
           <Card sx={{ mt: 3, p: 3 }}>
-            {invitationEmailSuccess && <Alert severity="success">{invitationEmailSuccess}</Alert>}
-            {invitationError && <Alert severity="error">{invitationError}</Alert>}
+            {invitationEmailSuccess && (
+              <Alert severity="success">{invitationEmailSuccess}</Alert>
+            )}
+            {invitationError && (
+              <Alert severity="error">{invitationError}</Alert>
+            )}
             <Box component="form" onSubmit={handleSendInvitation} noValidate>
-              <FormControl fullWidth margin="normal" variant="outlined" error={Boolean(roleError)}>
+              <FormControl
+                fullWidth
+                margin="normal"
+                variant="outlined"
+                error={Boolean(roleError)}
+              >
                 <MDTypography variant="body2">Role *</MDTypography>
                 <Select
                   id="role"
@@ -216,14 +239,18 @@ export default function SendInvitation() {
                   IconComponent={ArrowDropDownIcon}
                   sx={{ height: "3rem" }}
                 >
-                  <MenuItem value="" disabled>Choose a Role</MenuItem>
+                  <MenuItem value="" disabled>
+                    Choose a Role
+                  </MenuItem>
                   <MenuItem value="chair">Chair</MenuItem>
                   <MenuItem value="committee">Committee</MenuItem>
                 </Select>
                 {roleError && <Alert severity="error">{roleError}</Alert>}
               </FormControl>
               <FormControl fullWidth error={Boolean(emailError)}>
-                <MDTypography variant="body2" sx={{ mt: 2, mb: 1 }}>Recipients *</MDTypography>
+                <MDTypography variant="body2" sx={{ mt: 2, mb: 1 }}>
+                  Recipients *
+                </MDTypography>
                 <Box
                   sx={{
                     "& textarea": {
@@ -235,7 +262,7 @@ export default function SendInvitation() {
                       borderRadius: "4px",
                       resize: "vertical",
                       marginTop: "8px",
-                    }
+                    },
                   }}
                 >
                   <textarea
@@ -252,7 +279,7 @@ export default function SendInvitation() {
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2, color: 'white !important' }}
+                sx={{ mt: 3, mb: 2, color: "white !important" }}
               >
                 Send Invitation
               </Button>
@@ -260,7 +287,9 @@ export default function SendInvitation() {
           </Card>
           <Card sx={{ mt: 3 }}>
             {deleteError && <Alert severity="error">{deleteError}</Alert>}
-            {deleteSuccessMessage && <Alert severity="success">{deleteSuccessMessage}</Alert>}
+            {deleteSuccessMessage && (
+              <Alert severity="success">{deleteSuccessMessage}</Alert>
+            )}
             <CompleteTable
               columns={columns}
               rows={rows}
