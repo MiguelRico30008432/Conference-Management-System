@@ -89,7 +89,7 @@ export default function MySubmissionsPage() {
     { field: "authors", headerName: "Authors", width: 400 },
     {
       field: "actions",
-      headerName: "Actions",
+      headerName: "",  // No title for actions column
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
