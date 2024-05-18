@@ -30,6 +30,8 @@ export default function MySubmissionsPage() {
   const [openLoading, setOpenLoading] = useState(false);
   const [rows, setRows] = useState([]);
   const [error, setError] = useState(null);
+  const [deleteError, setDeleteError] = useState("");
+  const [deleteSuccessMessage, setDeleteSuccessMessage] = useState("");
   const { user } = useContext(AuthContext);
   const { confID } = useContext(ConferenceContext);
 
@@ -64,6 +66,7 @@ export default function MySubmissionsPage() {
               status: submission.status ? "Accepted" : "Pending",
               addDate: formatDate(submission.addDate),
               abstract: submission.abstract,
+              fileUrl: submission.fileUrl, // Assuming the file URL is included
             }));
             setRows(transformedData);
           } else {
@@ -79,24 +82,96 @@ export default function MySubmissionsPage() {
     fetchSubmissions();
   }, [confID, user]);
 
-  const handleDelete = (submission) => {
-    console.log("Delete submission:", submission);
-    // Implement delete functionality here
+  const handleDelete = async (submission) => {
+    setDeleteError("");
+    setDeleteSuccessMessage("");
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/deleteSubmission`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          submissionID: submission.id,
+        }),
+      });
+
+      const jsonResponse = await response.json();
+
+      if (response.ok) {
+        setRows(rows.filter((row) => row.id !== submission.id));
+        setDeleteSuccessMessage("Submission deleted successfully");
+      } else {
+        setDeleteError("Failed to delete submission: " + jsonResponse.msg);
+      }
+    } catch (error) {
+      setDeleteError("Network error: Could not delete submission");
+    }
   };
+
+  const handleDownload = async (submission) => {
+    try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/downloadSubmissionFile`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json; charset=UTF-8",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+                submissionID: submission.id,
+            }),
+        });
+
+        if (!response.ok) {
+            const jsonResponse = await response.json();
+            setError("Failed to download file: " + jsonResponse.msg);
+            console.error("Failed to download file:", jsonResponse.msg);
+            return;
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = submission.title + ".pdf"; // Set the file name
+        a.click();
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        setError("Network error: Could not download file");
+        console.error("Network error: Could not download file", error);
+    }
+};
 
   const columns = [
     { field: "title", headerName: "Title", width: 200 },
     { field: "status", headerName: "Status", width: 120 },
-    { field: "authors", headerName: "Authors", width: 400 },
+    { field: "authors", headerName: "Authors", width: 200 },
     {
-      field: "details",
+      field: "actions",
       headerName: "", // No title for actions column
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
-      width: 150,
+      width: 400, // Increase the width to accommodate longer button labels
       renderCell: (params) => (
-        <>
+        <MDBox display="flex" justifyContent="center" alignItems="center" gap={1} width="100%" height="100%">
+          <MDButton
+            variant="gradient"
+            color="warning"
+            onClick={() => handleDownload(params.row)}
+            sx={{
+              maxWidth: "150px",
+              maxHeight: "30px",
+              minWidth: "30px",
+              minHeight: "30px",
+              fontSize: "0.75rem", // Smaller font size
+              padding: "5px", // Compact padding
+            }}
+          >
+            Download File
+          </MDButton>
           <MDButton
             variant="gradient"
             color="info"
@@ -109,23 +184,12 @@ export default function MySubmissionsPage() {
               maxHeight: "30px",
               minWidth: "30px",
               minHeight: "30px",
-              marginRight: "10px",
+              fontSize: "0.75rem", // Smaller font size
+              padding: "5px", // Compact padding
             }}
           >
             Details
           </MDButton>
-        </>
-      ),
-    },
-    {
-      field: "edit",
-      headerName: "", // No title for actions column
-      sortable: false,
-      filterable: false,
-      disableColumnMenu: true,
-      width: 150,
-      renderCell: (params) => (
-        <>
           <MDButton
             variant="gradient"
             color="success"
@@ -138,23 +202,12 @@ export default function MySubmissionsPage() {
               maxHeight: "30px",
               minWidth: "30px",
               minHeight: "30px",
-              marginRight: "10px",
+              fontSize: "0.75rem", // Smaller font size
+              padding: "5px", // Compact padding
             }}
           >
             Edit
           </MDButton>
-        </>
-      ),
-    },
-    {
-      field: "delete",
-      headerName: "", // No title for actions column
-      sortable: false,
-      filterable: false,
-      disableColumnMenu: true,
-      width: 150,
-      renderCell: (params) => (
-        <>
           <MDButton
             variant="gradient"
             color="error"
@@ -164,11 +217,13 @@ export default function MySubmissionsPage() {
               maxHeight: "30px",
               minWidth: "30px",
               minHeight: "30px",
+              fontSize: "0.75rem", // Smaller font size
+              padding: "5px", // Compact padding
             }}
           >
-            Delete
+            Delete Submission
           </MDButton>
-        </>
+        </MDBox>
       ),
     },
   ];
@@ -178,39 +233,40 @@ export default function MySubmissionsPage() {
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
         <ConferenceNavBar />
-        {!update ? (
-          <>
-            <Container maxWidth="sm">
-              <MDBox mt={10} mb={2} textAlign="left">
-                <Card>
-                  <MDTypography ml={2} variant="h6">
-                    My Submissions
-                  </MDTypography>
-                  <MDTypography ml={2} variant="body2">
-                    Here you can view and manage your submissions.
-                  </MDTypography>
-                </Card>
-                <MDBox mb={3} textAlign="left">
-                  {error && <Alert severity="error">{error}</Alert>}
-                  <Card>
-                    <CompleteTable
-                      columns={columns}
-                      rows={rows}
-                      numberOfRowsPerPage={100}
-                      height={200}
-                    />
-                  </Card>
-                </MDBox>
-              </MDBox>
-            </Container>
-            {!detailsOpen ? null : (
-              <SubmissionsDetails
-                submission={dataForDetails}
-                onClose={() => setDetailsOpen(false)}
-              />
-            )}
-          </>
-        ) : (
+        <Container maxWidth="sm">
+          <MDBox mt={10} mb={2} textAlign="left">
+            <Card>
+              <MDTypography ml={2} variant="h6">
+                My Submissions
+              </MDTypography>
+              <MDTypography ml={2} variant="body2">
+                Here you can view and manage your submissions.
+              </MDTypography>
+            </Card>
+            <MDBox mb={3} textAlign="left">
+              {error && <Alert severity="error">{error}</Alert>}
+              {deleteError && <Alert severity="error">{deleteError}</Alert>}
+              {deleteSuccessMessage && (
+                <Alert severity="success">{deleteSuccessMessage}</Alert>
+              )}
+              <Card>
+                <CompleteTable
+                  columns={columns}
+                  rows={rows}
+                  numberOfRowsPerPage={100}
+                  height={200}
+                />
+              </Card>
+            </MDBox>
+          </MDBox>
+        </Container>
+        {!detailsOpen ? null : (
+          <SubmissionsDetails
+            submission={dataForDetails}
+            onClose={() => setDetailsOpen(false)}
+          />
+        )}
+        {update && (
           <UpdateSubmission
             submission={dataForUpdate}
             onClose={() => setUpdate(false)}

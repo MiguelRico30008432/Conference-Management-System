@@ -119,12 +119,11 @@ async function getSubmissionFile(confid, submissionid, userid) {
 
     if (listError) {
       log.addLog(error, "supabase", "getSubmissionFile (list Error");
+      return null;
     }
 
     if (!existingFiles || existingFiles.length === 0) {
-      return res
-        .status(404)
-        .send({ msg: "No files found in the specified directory" });
+      return null;
     }
 
     const fileToDownload = existingFiles[0].name;
@@ -136,6 +135,7 @@ async function getSubmissionFile(confid, submissionid, userid) {
 
     if (downloadError) {
       log.addLog(error, "supabase", "getSubmissionFile (download Error");
+      return null;
     }
     //Necessário no endpoint para passar o ficheiro para o front end
     //const fileBuffer = await data.arrayBuffer();
