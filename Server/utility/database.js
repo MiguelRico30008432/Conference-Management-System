@@ -149,11 +149,18 @@ async function fetchAllEmailData(
   }
 }
 
-async function createEvent(confid, userid, event) {
+async function createEvent(confid, userid, event, date) {
   try {
-    await fetchDataCst(`
-      INSERT INTO events (eventconfid, eventuserid, eventName)
-      VALUES (${confid}, ${userid}, '${event}')`);
+    if (date) {
+      console.log("date");
+      await fetchDataCst(`
+        INSERT INTO events (eventconfid, eventuserid, eventName, eventadddate)
+        VALUES (${confid}, ${userid}, '${event}', '${date}')`);
+    } else {
+      await fetchDataCst(`
+        INSERT INTO events (eventconfid, eventuserid, eventName)
+        VALUES (${confid}, ${userid}, '${event}')`);
+    }
   } catch (err) {
     log.addLog(err, "database", "createEvent");
   }
