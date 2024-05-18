@@ -31,27 +31,35 @@ export default function CreateSubmission() {
 
   useEffect(() => {
     async function getAuthorData() {
-
       setOpenLoading(true);
 
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/getAuthorData`, {
-          method: "POST",
-          body: JSON.stringify({ userID: user }),
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/getAuthorData`,
+          {
+            method: "POST",
+            body: JSON.stringify({ userID: user }),
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+            },
+            credentials: "include",
+          }
+        );
 
         const jsonResponse = await response.json();
 
         if (response.status === 200) {
-          setAuthors([{ firstName: jsonResponse[0].userfirstname, lastName: jsonResponse[0].userlastname, email: jsonResponse[0].useremail, affiliation: jsonResponse[0].useraffiliation }]);
+          setAuthors([
+            {
+              firstName: jsonResponse[0].userfirstname,
+              lastName: jsonResponse[0].userlastname,
+              email: jsonResponse[0].useremail,
+              affiliation: jsonResponse[0].useraffiliation,
+            },
+          ]);
         } else {
           setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
         }
-
       } catch {
         setMessage(
           <Alert severity="error">
@@ -65,7 +73,7 @@ export default function CreateSubmission() {
     if (isLoggedIn && confID) {
       getAuthorData();
     }
-  }, [isLoggedIn, confID])
+  }, [isLoggedIn, confID]);
 
   async function uploadFile(event) {
     event.preventDefault();
@@ -87,11 +95,14 @@ export default function CreateSubmission() {
       });
 
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/createSubmission`, {
-          method: "POST",
-          body: formData,
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/createSubmission`,
+          {
+            method: "POST",
+            body: formData,
+            credentials: "include",
+          }
+        );
 
         const jsonResponse = await response.json();
 
@@ -99,7 +110,7 @@ export default function CreateSubmission() {
           setMessage(
             <Alert severity="success">Subimission created with success</Alert>
           );
-          //Falta apagar os campos quando é criada a submissão       
+          //Falta apagar os campos quando é criada a submissão
         } else {
           setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
         }
@@ -112,9 +123,7 @@ export default function CreateSubmission() {
       }
     } else {
       setMessage(
-        <Alert severity="error">
-          All fields marked with * are required.
-        </Alert>
+        <Alert severity="error">All fields marked with * are required.</Alert>
       );
     }
     setOpenLoading(false);
@@ -142,17 +151,22 @@ export default function CreateSubmission() {
   function validateInputs() {
     for (let i = 0; i < authors.length; i++) {
       const author = authors[i];
-      if (author.firstName === "" || author.lastName === "" || author.email === "" || author.affiliation === "") {
+      if (
+        author.firstName === "" ||
+        author.lastName === "" ||
+        author.email === "" ||
+        author.affiliation === ""
+      ) {
         return false;
       }
     }
 
     if (title === "" || abstract === "" || fileInput.current.files[0] === "") {
       return false;
-    };
+    }
 
     return true;
-  };
+  }
 
   return (
     <>
@@ -174,7 +188,7 @@ export default function CreateSubmission() {
               <Card sx={{ mt: 2 }}>{message}</Card>
 
               {/*Author Information*/}
-              {authors.map((author, index) => (
+              {authors.map((author, index) =>
                 index === 0 ? (
                   <Card key={index} sx={{ mt: 2 }}>
                     <MDTypography ml={2} mt={1} mb={2} variant="body2">
@@ -292,7 +306,8 @@ export default function CreateSubmission() {
                       Remove Author
                     </MDButton>
                   </Card>
-                )))}
+                )
+              )}
 
               <MDButton
                 variant="gradient"

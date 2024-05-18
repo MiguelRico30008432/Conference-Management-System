@@ -3,14 +3,8 @@ const router = express.Router();
 const db = require("../../utility/database");
 const auth = require("../../utility/verifications");
 const log = require("../../logs/logsManagement");
-const expressFileUpload = require("express-fileupload");
-const { v4: uuidv4 } = require("uuid");
+const sb = require("../../utility/supabase");
 const fileUpload = require("express-fileupload");
-const { createClient } = require("@supabase/supabase-js");
-
-const { SUPABASEURL, SUPABASEKEY } = process.env;
-
-const supabase = createClient(SUPABASEURL, SUPABASEKEY);
 
 router.use(fileUpload());
 
@@ -64,24 +58,18 @@ router.post("/createSubmission", auth.ensureAuthenticated, async (req, res) => {
       }
     });
 
-    //insert fil
+    //insert file
     const file = req.files.file;
-    const fileBuffer = file.data;
 
-    const { data, error } = await supabase.storage
-      .from("submission_files")
-      .upload(
-        req.body.confID + "/" + req.body.userid + "/" + uuidv4(),
-        fileBuffer,
-        {
-          cacheControl: "3600",
-          upsert: false,
-          contentType: file.mimetype, // Definir o tipo de conteúdo do arquivo
-        }
-      );
+    await sb.addSubmissionFiles(
+      file,
+      req.body.confID,
+      submissionid[0].max,
+      req.body.userid
+    );
+
     return res.status(200).send({ msg: "Submission Created." });
   } catch (error) {
-    console.log(error);
     log.addLog(error, "database", "CreateSubmissions -> /createSubmission");
     return res.status(500).send({ msg: error });
   }

@@ -1,7 +1,6 @@
 const { Pool } = require("pg");
 const log = require("../logs/logsManagement");
 require("dotenv").config();
-const { createClient } = require("@supabase/supabase-js");
 
 const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
 
