@@ -84,12 +84,12 @@ async function updateData(table, entryParameters, tableID) {
   }
 } // testado para a tabela users
 
-async function fetchDataCst(select) {
+async function queryCst(select) {
   try {
     const result = await pool.query(select);
     return result.rows;
   } catch (err) {
-    log.addLog(err, "database", "fetchDataCst");
+    log.addLog(err, "database", "queryCst");
   }
 }
 
@@ -153,11 +153,11 @@ async function createEvent(confid, userid, event, date) {
   try {
     if (date) {
       console.log("date");
-      await fetchDataCst(`
+      await queryCst(`
         INSERT INTO events (eventconfid, eventuserid, eventName, eventadddate)
         VALUES (${confid}, ${userid}, '${event}', '${date}')`);
     } else {
-      await fetchDataCst(`
+      await queryCst(`
         INSERT INTO events (eventconfid, eventuserid, eventName)
         VALUES (${confid}, ${userid}, '${event}')`);
     }
@@ -169,7 +169,7 @@ async function createEvent(confid, userid, event, date) {
 module.exports = {
   pool,
   fetchData,
-  fetchDataCst,
+  queryCst,
   addData,
   deleteData,
   updateData,

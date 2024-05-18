@@ -32,7 +32,7 @@ router.get(
       INNER JOIN confareas ON confareas.confareaid = conferences.confareaid
       WHERE confapproved = 0`;
 
-      const result = await db.fetchDataCst(queryText);
+      const result = await db.queryCst(queryText);
       return res.status(200).send(result);
     } catch (error) {
       return res.status(500).send({ msg: "Internal Error" });

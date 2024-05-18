@@ -16,7 +16,7 @@ router.post("/userData", auth.ensureAuthenticated, async (req, res) => {
     FROM users
     WHERE userid = ${req.body.userID}`;
 
-    const result = await db.fetchDataCst(query);
+    const result = await db.queryCst(query);
     return res.status(200).send(result);
   } catch (error) {
     return res.status(500).send({ msg: "Internal Error" });

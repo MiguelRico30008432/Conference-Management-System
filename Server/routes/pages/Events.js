@@ -9,7 +9,7 @@ router.post("/allEvents", auth.ensureAuthenticated, async (req, res) => {
   try {
     await verifyConferenceDates(req.body.confid);
 
-    const result = await db.fetchDataCst(`
+    const result = await db.queryCst(`
     SELECT
         CONCAT(userfirstname, ' ',userlastname) AS eventuser,
         to_char(eventadddate, 'DD-MM-YYYY') AS eventdate,
@@ -27,7 +27,7 @@ router.post("/allEvents", auth.ensureAuthenticated, async (req, res) => {
 });
 
 async function verifyConferenceDates(confid) {
-  const result = await db.fetchDataCst(`
+  const result = await db.queryCst(`
     SELECT 
       CASE 
         WHEN c.confstartsubmission <= NOW() AND c.confendsubmission >= NOW() THEN c.confstartsubmission 

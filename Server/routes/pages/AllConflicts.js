@@ -6,7 +6,7 @@ const log = require("../../logs/logsManagement");
 
 router.post("/allConflicts", auth.ensureAuthenticated, async (req, res) => {
     try {
-        const allConflicts = await db.fetchDataCst(
+        const allConflicts = await db.queryCst(
         `SELECT
             
         `
