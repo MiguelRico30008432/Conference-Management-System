@@ -1,6 +1,8 @@
 const express = require("express");
 const db = require("../../utility/database");
 const auth = require("../../utility/verifications");
+const log = require("../../logs/logsManagement");
+
 const router = express.Router();
 
 router.post("/myConferences", auth.ensureAuthenticated, async (req, res) => {
@@ -19,6 +21,7 @@ router.post("/myConferences", auth.ensureAuthenticated, async (req, res) => {
     const result = await db.fetchDataCst(query);
     return res.status(200).send(result);
   } catch (error) {
+    log.addLog(error, "endpoint", "allEvents");
     return res.status(500).send({ msg: "Internal Error" });
   }
 });
