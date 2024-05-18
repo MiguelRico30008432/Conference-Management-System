@@ -83,9 +83,9 @@ export default function CreateSubmission() {
     if (validateInputs()) {
       const formData = new FormData();
       formData.append("confID", confID);
-      formData.append("userid", user);
-      formData.append("title", title);
-      formData.append("abstract", abstract);
+      formData.append("userid", user.trim());
+      formData.append("title", title.trim());
+      formData.append("abstract", abstract.trim());
       formData.append("file", fileInput.current.files[0]);
       authors.forEach((author, index) => {
         formData.append(`author[${index}][firstName]`, author.firstName);

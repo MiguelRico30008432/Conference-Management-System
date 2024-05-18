@@ -144,12 +144,12 @@ export default function MyProfilePage() {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/saveUserData`, {
         method: "POST",
         body: JSON.stringify({
-          userID: user,
-          firstName: firstName,
-          lastName: lastName,
-          affiliation: affiliation,
-          email: email,
-          phone: phone,
+          userID: user.trim(),
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          affiliation: affiliation.trim(),
+          email: email.trim(),
+          phone: phone.trim(),
         }),
         headers: {
           "Content-type": "application/json; charset=UTF-8",
