@@ -27,7 +27,7 @@ router.post("/confDefinitions", auth.ensureAuthenticated, async (req, res) => {
       FROM conferences
       WHERE conferences.confid = ${req.body.confid}`;
 
-    const result = await db.queryCst(query);
+    const result = await db.fetchDataCst(query);
     return res.status(200).send(result);
   } catch (error) {
     log.addLog(err, "database", "ConferenceDefinitions -> /confDefinitions");

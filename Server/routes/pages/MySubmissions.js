@@ -7,7 +7,7 @@ const log = require("../../logs/logsManagement");
 router.post("/mySubmissions", auth.ensureAuthenticated, async (req, res) => {
     try {
         const { confID, userID } = req.body;
-        const submissions = await db.queryCst(
+        const submissions = await db.fetchDataCst(
             `SELECT 
             submissions.submissionid AS id, 
             submissions.submissiontitle AS title, 

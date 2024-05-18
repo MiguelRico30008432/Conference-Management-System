@@ -15,7 +15,7 @@ router.post("/confContext", auth.ensureAuthenticated, async (req, res) => {
     WHERE users.userid = ${req.body.userid}
     GROUP BY usercurrentconfid`;
 
-    const result = await db.queryCst(query);
+    const result = await db.fetchDataCst(query);
 
     return res.status(200).send(result);
   } catch (error) {
@@ -34,7 +34,7 @@ router.post(
       WHERE
         userid = ${req.body.userid}`;
 
-      await db.queryCst(queryText);
+      await db.fetchDataCst(queryText);
       return res.status(200).send({ msg: "" });
     } catch (error) {
       return res.status(500).send({ msg: "Internal Error" });

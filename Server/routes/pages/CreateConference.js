@@ -68,7 +68,7 @@ router.post("/createConference", auth.ensureAuthenticated, async (req, res) => {
       WHERE confowner = ${user} AND confenddate >= NOW()
       ORDER BY confadddate DESC`;
 
-    const addedConfID = await db.queryCst(query);
+    const addedConfID = await db.fetchDataCst(query);
 
     await db.addData("userroles", {
       userid: user,

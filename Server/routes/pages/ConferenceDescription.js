@@ -6,7 +6,7 @@ const log = require("../../logs/logsManagement");
 
 router.post("/conferenceDescription", auth.ensureAuthenticated, async (req, res) => {
     try {
-        const confData = await db.queryCst(
+        const confData = await db.fetchDataCst(
         `SELECT
             c.confname,
             c.confcity,

@@ -18,7 +18,7 @@ router.post("/myConferences", auth.ensureAuthenticated, async (req, res) => {
       WHERE userRoles.userid = ${req.body.userid} AND confenddate >= NOW()
       GROUP BY userRoles.confid, confName, conferences.confid`;
 
-    const result = await db.queryCst(query);
+    const result = await db.fetchDataCst(query);
     return res.status(200).send(result);
   } catch (error) {
     log.addLog(error, "endpoint", "allEvents");

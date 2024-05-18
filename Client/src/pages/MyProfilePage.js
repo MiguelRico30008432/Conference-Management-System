@@ -144,10 +144,10 @@ export default function MyProfilePage() {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/saveUserData`, {
         method: "POST",
         body: JSON.stringify({
-          userID: user.trim(),
+          userID: user,
           firstName: firstName.trim(),
           lastName: lastName.trim(),
-          affiliation: affiliation.trim(),
+          affiliation: affiliation,
           email: email.trim(),
           phone: phone.trim(),
         }),

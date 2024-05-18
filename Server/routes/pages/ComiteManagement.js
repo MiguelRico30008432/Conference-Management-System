@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post("/comite", auth.ensureAuthenticated, async (req, res) => {
   try {
-    const result = await db.queryCst(`
+    const result = await db.fetchDataCst(`
     SELECT
         users.userid,
         userfirstname,
@@ -30,13 +30,13 @@ router.post("/comite", auth.ensureAuthenticated, async (req, res) => {
 
 router.post("/removePCMember", auth.ensureAuthenticated, async (req, res) => {
   try {
-    await db.queryCst(`
+    await db.fetchDataCst(`
       DELETE FROM userRoles
       WHERE
           confid = ${req.body.confid}
       AND userid = ${req.body.userid}`);
 
-    const user = await db.queryCst(
+    const user = await db.fetchDataCst(
       `SELECT CONCAT(userfirstname, ' ',userlastname) as user FROM users WHERE userid = ${req.body.userid}`
     );
 
@@ -55,14 +55,14 @@ router.post("/removePCMember", auth.ensureAuthenticated, async (req, res) => {
 
 router.post("/updateRoleMember", auth.ensureAuthenticated, async (req, res) => {
   try {
-    await db.queryCst(`
+    await db.fetchDataCst(`
       UPDATE userRoles SET
         userrole = '${req.body.role}'
       WHERE
         confid = ${req.body.confid}
       AND userid = ${req.body.userid}`);
 
-    const user = await db.queryCst(
+    const user = await db.fetchDataCst(
       `SELECT CONCAT(userfirstname, ' ',userlastname) as user FROM users WHERE userid = ${req.body.userid}`
     );
 
