@@ -124,8 +124,7 @@ export default function CreateConference() {
     "country",
     "city",
     "numberMinReviewrs",
-    "numberMaxReviewrs",
-    "confLink"
+    "numberMaxReviewrs"
   ];
 
   const fieldMappings = {
@@ -248,7 +247,7 @@ export default function CreateConference() {
       const jsonResponse = await response.json();
       if (response.status === 200) {
         setMessage(
-          <Alert severity="success">{"Yor data was saved with success"}</Alert>
+          <Alert severity="success">{"Your conference submission will undergo a careful review for acceptance or rejection. Within two days, you will be notified of our decision, via email."}</Alert>
         );
       } else {
         setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
