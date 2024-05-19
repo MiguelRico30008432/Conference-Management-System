@@ -57,13 +57,7 @@ export default function Events() {
     }
 
     if (confID > 0) {
-      if (userRole.includes("Chair") || userRole.includes("Owner")) {
-        getRows();
-      } else {
-        setError(
-          <Alert severity="error">User does not have permissions</Alert>
-        );
-      }
+      getRows();
     }
   }, [confID]);
 

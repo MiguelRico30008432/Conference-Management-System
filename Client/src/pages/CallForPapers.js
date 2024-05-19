@@ -123,7 +123,12 @@ export default function CallForPapers() {
                 Call For Papers
               </MDTypography>
               <MDTypography ml={2} mr={2} mb={2} variant="body2">
-                Text goes here
+                This page is dedicated to inviting scholars, researchers, and
+                professionals to submit their work for our upcoming conference.
+                By clicking the "Submit" button, you can access the conference
+                portal where you can find more detailed information about the
+                event, submit your papers, and view your previous submissions.
+                We look forward to your contributions and participation!
               </MDTypography>
             </Card>
           </MDBox>
