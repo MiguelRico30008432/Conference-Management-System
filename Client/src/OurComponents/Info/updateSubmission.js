@@ -1,8 +1,5 @@
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import ConfNavbar from "../../OurComponents/navBars/ConferenceNavBar";
-
 import * as React from "react";
-import { useState, useEffect, createRef } from "react";
+import { useState, useEffect, createRef, useContext } from "react";
 import Card from "@mui/material/Card";
 import Container from "@mui/material/Container";
 import MDBox from "components/MDBox";
@@ -11,18 +8,20 @@ import LoadingCircle from "OurComponents/loading/LoadingCircle";
 import Alert from "@mui/material/Alert";
 import MDButton from "components/MDButton";
 import TextField from "@mui/material/TextField";
+import { ConferenceContext } from "conference.context";
+import { AuthContext } from "auth.context";
 
 export default function UpdateSubmission({ onClose, submissionID }) {
-  console.log(submissionID);
   const [openLoading, setOpenLoading] = useState(false);
   const [message, setMessage] = useState(null);
 
-  const [confID, setConfID] = useState("");
-  const [userID, setUserID] = useState("");
+  const { confID } = useContext(ConferenceContext);
+  const { user } = useContext(AuthContext);
+
   const [title, setTitle] = useState("");
   const [abstract, setAbstract] = useState("");
   const [authors, setAuthors] = useState([
-    { firstName: "", lastName: "", email: "", affiliation: "" },
+    { firstName: "", lastName: "", email: "", affiliation: "", authorid: "" },
   ]);
 
   const fileInput = createRef();
@@ -37,7 +36,7 @@ export default function UpdateSubmission({ onClose, submissionID }) {
           {
             method: "POST",
             body: JSON.stringify({
-              /*mandar objeto com os emails dos utilizadores, confID, */
+              submissionID: submissionID,
             }),
             headers: {
               "Content-type": "application/json; charset=UTF-8",
@@ -49,7 +48,35 @@ export default function UpdateSubmission({ onClose, submissionID }) {
         const jsonResponse = await response.json();
 
         if (response.status === 200) {
-          console.log("Hi ");
+          setTitle(jsonResponse[0].submissiontitle);
+          setAbstract(jsonResponse[0].submissionabstract);
+
+          // Organize authors
+          const authorsList = jsonResponse.map((item) => ({
+            authorid: item.authorid,
+            userid: item.userid,
+            firstName: item.authorfirstname,
+            lastName: item.authorlastname,
+            email: item.authoremail,
+            affiliation: item.authoraffiliation,
+          }));
+
+          // Find Main author
+          let mainAuthor = null;
+          const otherAuthors = authorsList.filter((author) => {
+            if (author.userid === jsonResponse[0].submissionmainauthor) {
+              mainAuthor = author;
+              return false;
+            }
+            return true;
+          });
+
+          // Make main author first of the list
+          const sortedAuthors = mainAuthor
+            ? [mainAuthor, ...otherAuthors]
+            : otherAuthors;
+
+          setAuthors(sortedAuthors);
         } else {
           setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
         }
@@ -64,7 +91,7 @@ export default function UpdateSubmission({ onClose, submissionID }) {
     }
 
     getSubmissionData();
-  }, []);
+  }, [submissionID]);
 
   async function uploadFile(event) {
     event.preventDefault();
@@ -73,25 +100,37 @@ export default function UpdateSubmission({ onClose, submissionID }) {
 
     if (validateInputs()) {
       const formData = new FormData();
+
       formData.append("confID", confID);
-      formData.append("userid", userID);
-      formData.append("title", title);
-      formData.append("abstract", abstract);
-      formData.append("file", fileInput.current.files[0]);
+      formData.append("submissionid", submissionID);
+      formData.append("userid", user);
+      formData.append("title", title.trim());
+      formData.append("abstract", abstract.trim());
       authors.forEach((author, index) => {
-        formData.append(`author[${index}][firstName]`, author.firstName);
-        formData.append(`author[${index}][lastName]`, author.lastName);
-        formData.append(`author[${index}][email]`, author.email);
-        formData.append(`author[${index}][affiliation]`, author.affiliation);
+        formData.append(`author[${index}][firstName]`, author.firstName.trim());
+        formData.append(`author[${index}][lastName]`, author.lastName.trim());
+        formData.append(`author[${index}][email]`, author.email.trim());
+        formData.append(
+          `author[${index}][affiliation]`,
+          author.affiliation.trim()
+        );
+        formData.append(`author[${index}][authorid]`, author.authorid);
       });
+
+      if (fileInput.current.files[0]) {
+        formData.append("file", fileInput.current.files[0]);
+      }
 
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/createSubmission`,
+          `${process.env.REACT_APP_API_URL}/updateSubmission`,
           {
             method: "POST",
             body: formData,
             credentials: "include",
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
           }
         );
 
@@ -99,16 +138,17 @@ export default function UpdateSubmission({ onClose, submissionID }) {
 
         if (response.status === 200) {
           setMessage(
-            <Alert severity="success">Subimission created with success</Alert>
+            <Alert severity="success">Subimission updated with success</Alert>
           );
-          //Falta apagar os campos quando é criada a submissão
+          onClose();
         } else {
           setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
         }
       } catch (error) {
+        console.log(error);
         setMessage(
           <Alert severity="error">
-            Something went wrong when obtaining your informations
+            Something went wrong when updating your submission.
           </Alert>
         );
       }
@@ -152,16 +192,15 @@ export default function UpdateSubmission({ onClose, submissionID }) {
       }
     }
 
-    if (title === "" || abstract === "" || fileInput.current.files[0] === "") {
+    if (title === "" || abstract === "") {
       return false;
     }
-
     return true;
   }
 
   return (
     <>
-      {/*openLoading && <LoadingCircle />*/}
+      {openLoading && <LoadingCircle />}
       <Container maxWidth="sm">
         <MDBox mt={10} mb={2} textAlign="left">
           <MDBox mb={3} textAlign="left">
@@ -388,15 +427,23 @@ export default function UpdateSubmission({ onClose, submissionID }) {
             >
               Submit
             </MDButton>
+            <MDButton
+              variant="gradient"
+              color="info"
+              onClick={onClose}
+              sx={{
+                maxWidth: "140px",
+                maxHeight: "30px",
+                minWidth: "5px",
+                minHeight: "30px",
+                mt: 2,
+                mb: 2,
+                ml: 2,
+              }}
+            >
+              Close Update
+            </MDButton>
           </MDBox>
-          <MDButton
-            variant="gradient"
-            color="info"
-            sx={{ mt: 2, mb: 2 }}
-            onClick={onClose}
-          >
-            Close Update
-          </MDButton>
         </MDBox>
       </Container>
     </>

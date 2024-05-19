@@ -87,16 +87,19 @@ export default function MySubmissionsPage() {
     setDeleteSuccessMessage("");
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/deleteSubmission`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json; charset=UTF-8",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          submissionID: submission.id,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/deleteSubmission`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            submissionID: submission.id,
+          }),
+        }
+      );
 
       const jsonResponse = await response.json();
 
@@ -113,36 +116,39 @@ export default function MySubmissionsPage() {
 
   const handleDownload = async (submission) => {
     try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/downloadSubmissionFile`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json; charset=UTF-8",
-            },
-            credentials: "include",
-            body: JSON.stringify({
-                submissionID: submission.id,
-            }),
-        });
-
-        if (!response.ok) {
-            const jsonResponse = await response.json();
-            setError("Failed to download file: " + jsonResponse.msg);
-            console.error("Failed to download file:", jsonResponse.msg);
-            return;
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/downloadSubmissionFile`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            submissionID: submission.id,
+          }),
         }
+      );
 
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = submission.title + ".pdf"; // Set the file name
-        a.click();
-        window.URL.revokeObjectURL(url);
+      if (!response.ok) {
+        const jsonResponse = await response.json();
+        setError("Failed to download file: " + jsonResponse.msg);
+        console.error("Failed to download file:", jsonResponse.msg);
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = submission.title + ".pdf"; // Set the file name
+      a.click();
+      window.URL.revokeObjectURL(url);
     } catch (error) {
-        setError("Network error: Could not download file");
-        console.error("Network error: Could not download file", error);
+      setError("Network error: Could not download file");
+      console.error("Network error: Could not download file", error);
     }
-};
+  };
 
   const columns = [
     { field: "title", headerName: "Title", width: 200 },
@@ -156,7 +162,14 @@ export default function MySubmissionsPage() {
       disableColumnMenu: true,
       width: 400, // Increase the width to accommodate longer button labels
       renderCell: (params) => (
-        <MDBox display="flex" justifyContent="center" alignItems="center" gap={1} width="100%" height="100%">
+        <MDBox
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          gap={1}
+          width="100%"
+          height="100%"
+        >
           <MDButton
             variant="gradient"
             color="warning"
@@ -233,42 +246,45 @@ export default function MySubmissionsPage() {
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
         <ConferenceNavBar />
-        <Container maxWidth="sm">
-          <MDBox mt={10} mb={2} textAlign="left">
-            <Card>
-              <MDTypography ml={2} variant="h6">
-                My Submissions
-              </MDTypography>
-              <MDTypography ml={2} variant="body2">
-                Here you can view and manage your submissions.
-              </MDTypography>
-            </Card>
-            <MDBox mb={3} textAlign="left">
-              {error && <Alert severity="error">{error}</Alert>}
-              {deleteError && <Alert severity="error">{deleteError}</Alert>}
-              {deleteSuccessMessage && (
-                <Alert severity="success">{deleteSuccessMessage}</Alert>
-              )}
-              <Card>
-                <CompleteTable
-                  columns={columns}
-                  rows={rows}
-                  numberOfRowsPerPage={100}
-                  height={200}
-                />
-              </Card>
-            </MDBox>
-          </MDBox>
-        </Container>
-        {!detailsOpen ? null : (
-          <SubmissionsDetails
-            submission={dataForDetails}
-            onClose={() => setDetailsOpen(false)}
-          />
-        )}
-        {update && (
+        {!update ? (
+          <>
+            <Container maxWidth="sm">
+              <MDBox mt={10} mb={2} textAlign="left">
+                <Card>
+                  <MDTypography ml={2} variant="h6">
+                    My Submissions
+                  </MDTypography>
+                  <MDTypography ml={2} variant="body2">
+                    Here you can view and manage your submissions.
+                  </MDTypography>
+                </Card>
+                <MDBox mb={3} textAlign="left">
+                  {error && <Alert severity="error">{error}</Alert>}
+                  {deleteError && <Alert severity="error">{deleteError}</Alert>}
+                  {deleteSuccessMessage && (
+                    <Alert severity="success">{deleteSuccessMessage}</Alert>
+                  )}
+                  <Card>
+                    <CompleteTable
+                      columns={columns}
+                      rows={rows}
+                      numberOfRowsPerPage={100}
+                      height={200}
+                    />
+                  </Card>
+                </MDBox>
+              </MDBox>
+            </Container>
+            {!detailsOpen ? null : (
+              <SubmissionsDetails
+                submission={dataForDetails}
+                onClose={() => setDetailsOpen(false)}
+              />
+            )}
+          </>
+        ) : (
           <UpdateSubmission
-            submission={dataForUpdate}
+            submissionID={dataForUpdate}
             onClose={() => setUpdate(false)}
           />
         )}

@@ -108,9 +108,9 @@ export default function CreateSubmission() {
 
         if (response.status === 200) {
           setMessage(
-            <Alert severity="success">Subimission created with success</Alert>
+            <Alert severity="success">Submission created with success</Alert>
           );
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          window.scrollTo({ top: 0, behavior: "smooth" });
           //Falta apagar os campos quando é criada a submissão
         } else {
           setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
