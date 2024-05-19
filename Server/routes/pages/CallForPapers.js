@@ -5,16 +5,17 @@ const log = require("../../logs/logsManagement");
 
 const router = express.Router();
 
-router.get("/callForPapers", auth.ensureAuthenticated, async (req, res) => {
+router.post("/callForPapers", auth.ensureAuthenticated, async (req, res) => {
   try {
     const result = await db.fetchDataCst(`
-    SELECT
+    SELECT 
         confid AS confid,
         confname AS confname,
         confcountry AS confcountry,
         to_char(confendsubmission, 'DD-MM-YYYY') AS confsubmissionend,
         to_char(confstartdate, 'DD-MM-YYYY') AS confstartdate,
-        confareaname AS conftopics
+        confareaname AS conftopics,
+        (SELECT userrole FROM userRoles urole WHERE conf.confid = urole.confid AND userid = ${req.body.userid} ORDER BY userrole DESC LIMIT 1) AS userrole
     FROM conferences conf
     INNER JOIN confAreas area ON area.confareaid = conf.confareaid
     WHERE

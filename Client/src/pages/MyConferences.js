@@ -27,14 +27,17 @@ export default function MyConferences() {
     async function getMyConferences() {
       setOpenLoading(true);
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/myConferences`, {
-          method: "POST",
-          body: JSON.stringify({ userid: user }),
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/myConferences`,
+          {
+            method: "POST",
+            body: JSON.stringify({ userid: user }),
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+            },
+            credentials: "include",
+          }
+        );
 
         const jsonResponse = await response.json();
         console.log(jsonResponse);
@@ -75,13 +78,6 @@ export default function MyConferences() {
       width: 90,
 
       renderCell: (params) => {
-        const handleMoreDetailsButtonClick = async () => {
-          setConfID(params.row.confid);
-          setUserRole(params.row.userrole);
-          await saveConfIDOnUser(params.row.confid);
-          navigate("/MyConferences/ConferenceDescription");
-        };
-
         return (
           <div
             style={{
@@ -94,7 +90,12 @@ export default function MyConferences() {
             <MDButton
               variant="gradient"
               color="info"
-              onClick={handleMoreDetailsButtonClick}
+              onClick={async () => {
+                setConfID(params.row.confid);
+                setUserRole(params.row.userrole);
+                await saveConfIDOnUser(params.row.confid);
+                navigate("/MyConferences/ConferenceDescription");
+              }}
               sx={{
                 maxWidth: "80px",
                 maxHeight: "30px",
@@ -112,14 +113,17 @@ export default function MyConferences() {
 
   async function saveConfIDOnUser(confID) {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/updateConfContext`, {
-        method: "POST",
-        body: JSON.stringify({ userid: user, confid: confID }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-        },
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/updateConfContext`,
+        {
+          method: "POST",
+          body: JSON.stringify({ userid: user, confid: confID }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+        }
+      );
 
       if (response.status != 200) {
         const jsonResponse = await response.json();

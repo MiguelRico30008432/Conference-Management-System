@@ -31,10 +31,11 @@ export default function CallForPapers() {
         const response = await fetch(
           `${process.env.REACT_APP_API_URL}/callForPapers`,
           {
-            method: "GET",
+            method: "POST",
             headers: {
               "Content-type": "application/json; charset=UTF-8",
             },
+            body: JSON.stringify({ userid: user }),
             credentials: "include",
           }
         );
@@ -59,12 +60,14 @@ export default function CallForPapers() {
       setOpenLoading(false);
     }
 
-    getRows();
-  }, []);
+    if (user) {
+      getRows();
+    }
+  }, [user]);
 
   const columns = [
     {
-      field: "Remove",
+      field: "submit",
       filterable: false,
       headerName: "",
       description: "",
@@ -85,9 +88,10 @@ export default function CallForPapers() {
             <MDButton
               variant="gradient"
               color="info"
-              onClick={() => {
+              onClick={async () => {
                 setConfID(params.row.confid);
-                setUserRole("Author");
+                setUserRole(params.row.userrole);
+                await saveConfIDOnUser(params.row.confid);
                 navigate("/MyConferences/ConferenceDescription");
               }}
               sx={{
@@ -109,6 +113,33 @@ export default function CallForPapers() {
     { field: "confstartdate", headerName: "Start date", width: 150 },
     { field: "conftopics", headerName: "Topics", width: 300 },
   ];
+
+  async function saveConfIDOnUser(confID) {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/updateConfContext`,
+        {
+          method: "POST",
+          body: JSON.stringify({ userid: user, confid: confID }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (response.status != 200) {
+        const jsonResponse = await response.json();
+        setError(<Alert severity="error">{jsonResponse.msg}</Alert>);
+      }
+    } catch (error) {
+      setError(
+        <Alert severity="error">
+          Something went wrong when obtaining the lines
+        </Alert>
+      );
+    }
+  }
 
   return (
     <>
