@@ -103,7 +103,7 @@ router.post(
     LEFT JOIN
         authors a ON s.submissionid = a.submissionid
     WHERE
-        s.submissionid = '${req.body.submissionID}'`
+        s.submissionid = ${req.body.submissionID}`
       );
 
       return res.status(200).send(data);

@@ -155,89 +155,154 @@ export default function MySubmissionsPage() {
     { field: "status", headerName: "Status", width: 120 },
     { field: "authors", headerName: "Authors", width: 200 },
     {
-      field: "actions",
-      headerName: "", // No title for actions column
-      sortable: false,
+      field: "download",
       filterable: false,
+      headerName: "",
+      description: "",
+      sortable: false,
       disableColumnMenu: true,
-      width: 400, // Increase the width to accommodate longer button labels
-      renderCell: (params) => (
-        <MDBox
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          gap={1}
-          width="100%"
-          height="100%"
-        >
-          <MDButton
-            variant="gradient"
-            color="warning"
-            onClick={() => handleDownload(params.row)}
-            sx={{
-              maxWidth: "150px",
-              maxHeight: "30px",
-              minWidth: "30px",
-              minHeight: "30px",
-              fontSize: "0.75rem", // Smaller font size
-              padding: "5px", // Compact padding
+      resizable: false,
+      width: 130,
+      renderCell: (params) => {
+        return (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
             }}
           >
-            Download File
-          </MDButton>
-          <MDButton
-            variant="gradient"
-            color="info"
-            onClick={() => {
-              setDataForDetails(params.row);
-              setDetailsOpen(true);
-            }}
-            sx={{
-              maxWidth: "80px",
-              maxHeight: "30px",
-              minWidth: "30px",
-              minHeight: "30px",
-              fontSize: "0.75rem", // Smaller font size
-              padding: "5px", // Compact padding
-            }}
-          >
-            Details
-          </MDButton>
-          <MDButton
-            variant="gradient"
-            color="success"
-            onClick={() => {
-              setDataForUpdate(params.row.id);
-              setUpdate(true);
-            }}
-            sx={{
-              maxWidth: "80px",
-              maxHeight: "30px",
-              minWidth: "30px",
-              minHeight: "30px",
-              fontSize: "0.75rem", // Smaller font size
-              padding: "5px", // Compact padding
-            }}
-          >
-            Edit
-          </MDButton>
-          <MDButton
-            variant="gradient"
-            color="error"
-            onClick={() => handleDelete(params.row)}
-            sx={{
-              maxWidth: "150px",
-              maxHeight: "30px",
-              minWidth: "30px",
-              minHeight: "30px",
-              fontSize: "0.75rem", // Smaller font size
-              padding: "5px", // Compact padding
+            <MDButton
+              variant="gradient"
+              color="warning"
+              onClick={() => handleDownload(params.row)}
+              sx={{
+                maxWidth: "120px",
+                maxHeight: "23px",
+                minWidth: "30px",
+                minHeight: "23px",
+              }}
+            >
+              Download File
+            </MDButton>
+          </div>
+        );
+      },
+    },
+    {
+      field: "details",
+      filterable: false,
+      headerName: "",
+      description: "",
+      sortable: false,
+      disableColumnMenu: true,
+      resizable: false,
+      width: 80,
+      renderCell: (params) => {
+        return (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
             }}
           >
-            Delete Submission
-          </MDButton>
-        </MDBox>
-      ),
+            <MDButton
+              variant="gradient"
+              color="info"
+              onClick={() => {
+                setDataForDetails(params.row);
+                setDetailsOpen(true);
+              }}
+              sx={{
+                maxWidth: "60px",
+                maxHeight: "23px",
+                minWidth: "30px",
+                minHeight: "23px",
+              }}
+            >
+              Details
+            </MDButton>
+          </div>
+        );
+      },
+    },
+    {
+      field: "edit",
+      filterable: false,
+      headerName: "",
+      description: "",
+      sortable: false,
+      disableColumnMenu: true,
+      resizable: false,
+      width: 55,
+      renderCell: (params) => {
+        return (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <MDButton
+              variant="gradient"
+              color="success"
+              onClick={() => {
+                setDataForUpdate(params.row.id);
+                setUpdate(true);
+              }}
+              sx={{
+                maxWidth: "60px",
+                maxHeight: "23px",
+                minWidth: "30px",
+                minHeight: "23px",
+              }}
+            >
+              Edit
+            </MDButton>
+          </div>
+        );
+      },
+    },
+    {
+      field: "delete",
+      filterable: false,
+      headerName: "",
+      description: "",
+      sortable: false,
+      disableColumnMenu: true,
+      resizable: false,
+      width: 150,
+      renderCell: (params) => {
+        return (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <MDButton
+              variant="gradient"
+              color="error"
+              onClick={() => handleDelete(params.row)}
+              sx={{
+                maxWidth: "130px",
+                maxHeight: "23px",
+                minWidth: "30px",
+                minHeight: "23px",
+              }}
+            >
+              Delete Submission
+            </MDButton>
+          </div>
+        );
+      },
     },
   ];
 
@@ -258,12 +323,27 @@ export default function MySubmissionsPage() {
                     Here you can view and manage your submissions.
                   </MDTypography>
                 </Card>
+
+                <MDBox mt={2} textAlign="left">
+                  <Card>
+                    {error && <Alert severity="error">{error}</Alert>}
+                  </Card>
+                </MDBox>
+                <MDBox mt={2} textAlign="left">
+                  <Card>
+                    {deleteError && (
+                      <Alert severity="error">{deleteError}</Alert>
+                    )}
+                  </Card>
+                </MDBox>
+                <MDBox mt={2} textAlign="left">
+                  <Card>
+                    {deleteSuccessMessage && (
+                      <Alert severity="success">{deleteSuccessMessage}</Alert>
+                    )}
+                  </Card>
+                </MDBox>
                 <MDBox mb={3} textAlign="left">
-                  {error && <Alert severity="error">{error}</Alert>}
-                  {deleteError && <Alert severity="error">{deleteError}</Alert>}
-                  {deleteSuccessMessage && (
-                    <Alert severity="success">{deleteSuccessMessage}</Alert>
-                  )}
                   <Card>
                     <CompleteTable
                       columns={columns}
