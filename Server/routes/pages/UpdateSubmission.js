@@ -3,9 +3,6 @@ const router = express.Router();
 const db = require("../../utility/database");
 const auth = require("../../utility/verifications");
 const log = require("../../logs/logsManagement");
-const fileUpload = require("express-fileupload");
-
-router.use(fileUpload());
 
 router.post("/updateSubmission", auth.ensureAuthenticated, async (req, res) => {
   try {

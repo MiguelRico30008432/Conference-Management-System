@@ -128,9 +128,6 @@ export default function UpdateSubmission({ onClose, submissionID }) {
             method: "POST",
             body: formData,
             credentials: "include",
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
           }
         );
 

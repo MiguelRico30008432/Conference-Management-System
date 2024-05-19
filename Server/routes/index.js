@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const fileUpload = require("express-fileupload");
 
 const usersRouter = require("./users");
 const logInLogoutRouter = require("./logInLogout");
@@ -20,6 +21,8 @@ const allConflicts = require("./pages/AllConflicts");
 const events = require("./pages/Events");
 const updateSubmission = require("./pages/UpdateSubmission");
 const callForPapers = require("./pages/CallForPapers");
+
+router.use(fileUpload());
 
 router.use(logInLogoutRouter);
 router.use(emailsPage);

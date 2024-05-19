@@ -4,9 +4,6 @@ const db = require("../../utility/database");
 const auth = require("../../utility/verifications");
 const log = require("../../logs/logsManagement");
 const sb = require("../../utility/supabase");
-const fileUpload = require("express-fileupload");
-
-router.use(fileUpload());
 
 router.post("/createSubmission", auth.ensureAuthenticated, async (req, res) => {
   try {
