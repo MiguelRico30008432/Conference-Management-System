@@ -19,6 +19,7 @@ const conferenceDescription = require("./pages/ConferenceDescription");
 const allConflicts = require("./pages/AllConflicts");
 const events = require("./pages/Events");
 const updateSubmission = require("./pages/UpdateSubmission");
+const callForPapers = require("./pages/CallForPapers");
 
 router.use(logInLogoutRouter);
 router.use(emailsPage);
@@ -38,5 +39,6 @@ router.use(conferenceDescription);
 router.use(allConflicts);
 router.use(events);
 router.use(updateSubmission);
+router.use(callForPapers);
 
 module.exports = router;

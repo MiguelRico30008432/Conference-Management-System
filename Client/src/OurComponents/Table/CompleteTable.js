@@ -35,30 +35,32 @@ export default function CompleteTable({
             }
             rowHeight={rowHeight}
             sx={{
-              //colunas
+              // colunas
               "& .MuiDataGrid-columnHeader": {
                 backgroundColor: "white",
                 color: "#1F4576",
                 fontWeight: 11,
+                fontSize: "0.875rem",
               },
-              //linhas
+              // linhas
               "& .MuiDataGrid-cell": {
                 backgroundColor: "white",
                 color: "#1F4576",
                 fontWeight: 11,
+                fontSize: "0.875rem",
               },
-              //contorno aquando a seleção da célula
+              // contorno aquando a seleção da célula
               "& .MuiDataGrid-cell.MuiDataGrid-cell:focus": {
                 outline: "none",
               },
-              //cor da linha selecionada
+              // cor da linha selecionada
               "& .MuiDataGrid-row.Mui-selected": {
                 backgroundColor: "#E6E6E6",
               },
               "& .MuiDataGrid-row:hover.Mui-selected": {
                 backgroundColor: "#E6E6E6",
               },
-              //Indicador do número de linhas selecionadas
+              // Indicador do número de linhas selecionadas
               "& .MuiDataGrid-selectedRowCount": {
                 color: "#1F4576",
               },
