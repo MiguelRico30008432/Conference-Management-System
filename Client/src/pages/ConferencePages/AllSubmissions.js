@@ -11,8 +11,9 @@ import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
 import Alert from "@mui/material/Alert";
+import { v4 as uuidv4 } from "uuid";
 import CompleteTable from "OurComponents/Table/CompleteTable";
-import AllSubmissionsDetails from "OurComponents/Info/AllSubmissionsDetails";
+import SubmissionsDetails from "OurComponents/Info/SubmissionDetails";
 import Footer from "OurComponents/footer/Footer";
 
 export default function AllSubmissions() {
@@ -29,107 +30,112 @@ export default function AllSubmissions() {
       setOpenLoading(true);
 
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/allSubmissions`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            confID: confID
-          })
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/allSubmissions`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json; charset=UTF-8",
+            },
+            credentials: "include",
+            body: JSON.stringify({ confID: confID }),
+          }
+        );
 
         const jsonResponse = await response.json();
 
         if (response.status === 200) {
-          const transformedData = jsonResponse.map(submission => ({
-            id: submission.submissionid,
-            title: submission.submissiontitle,
-            authors: submission.authors,
-            addDate: formatDate(submission.submissionadddate),
-            abstract: submission.submissionabstract
-          }));
-
-          setRows(transformedData);
-
+          for (let line of jsonResponse) {
+            line.id = uuidv4();
+            setRows((allExistingRows) => [...allExistingRows, line]);
+          }
         } else {
-          setMessage(
-            <Alert severity="error">
-              Failed to fetch submissions:: {jsonResponse.message}
-            </Alert>
-          );
+          setMessage(<Alert severity="error">{jsonResponse.message}</Alert>);
         }
       } catch (error) {
         setMessage(
-          <Alert severity="error">
-            Failed to fetch conference details!
-          </Alert>
+          <Alert severity="error">Failed to fetch conference details!</Alert>
         );
       }
       setOpenLoading(false);
     }
 
-    if(isLoggedIn && confID){
-      fetchAllSubmissions()
+    if (isLoggedIn && confID) {
+      fetchAllSubmissions();
     }
   }, [confID, isLoggedIn]);
 
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-GB');
-  }
-
-const columns = [
-  { field: "title", headerName: "Title", width: 200 },
-  { field: "authors", headerName: "Authors", width: 200 },
-  {
-    field: "moreInfo",
-    headerName: "",
-    sortable: false,
-    filterable: false,
-    disableColumnMenu: true,
-    width: 150,
-    renderCell: (params) => (
-      <MDButton
-        variant="gradient"
-        color="info"
-        onClick={() => {
-          setDataForDetails(params.row);
-          setDetailsOpen(true);
-        }}
-        sx={{
-          maxWidth: "80px",
-          maxHeight: "30px",
-          minWidth: "30px",
-          minHeight: "30px",
-        }}
-      >
-        Details
-      </MDButton>
-    ),
-  },
-];
+  const columns = [
+    { field: "title", headerName: "Title", width: 200 },
+    { field: "status", headerName: "Status", width: 120 },
+    { field: "authors", headerName: "Authors", width: 200 },
+    { field: "adddate", headerName: "Submission Date", width: 120 },
+    {
+      field: "moreInfo",
+      headerName: "",
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      width: 150,
+      renderCell: (params) => {
+        return (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <MDButton
+              variant="gradient"
+              color="info"
+              onClick={() => {
+                setDataForDetails(params.row);
+                setDetailsOpen(true);
+              }}
+              sx={{
+                maxWidth: "80px",
+                maxHeight: "23px",
+                minWidth: "30px",
+                minHeight: "23px",
+              }}
+            >
+              Details
+            </MDButton>
+          </div>
+        );
+      },
+    },
+  ];
 
   return (
     <>
-    {openLoading && <LoadingCircle />}
-    <DashboardLayout>
-      <ConfNavbar />
-      {!detailsOpen ? (
+      {openLoading && <LoadingCircle />}
+      <DashboardLayout>
+        <ConfNavbar />
+
         <Container maxWidth="sm">
           <MDBox mt={8} mb={2} textAlign="left">
             <MDBox mb={3} textAlign="left">
               <Card>
                 <MDTypography ml={2} variant="h6">
-                  AllSubmissions
+                  All Submissions
                 </MDTypography>
                 <MDTypography ml={2} variant="body2">
-                  text goes here
+                  Welcome to the My Submissions Page! Here, you can manage all
+                  your conference submissions. You can view details of each
+                  submission, including title, authors, status, and date. Easily
+                  update your submissions by clicking the "Edit" button,
+                  download submitted files by clicking "Download File," and
+                  remove a submission by clicking "Delete Submission" and
+                  confirming your action.
                 </MDTypography>
               </Card>
+
+              <Card sx={{ mt: 2, mb: 2 }}>{message}</Card>
+
               <MDBox mb={3} mt={2} textAlign="left">
-                {message && <Alert severity="error">{message}</Alert>}
                 <Card>
                   <CompleteTable
                     columns={columns}
@@ -142,16 +148,16 @@ const columns = [
             </MDBox>
           </MDBox>
         </Container>
-      ) : (
-        <Container maxWidth="sm">
-          <AllSubmissionsDetails 
+
+        {detailsOpen && (
+          <SubmissionsDetails
             submission={dataForDetails}
             onClose={() => setDetailsOpen(false)}
           />
-        </Container>
-      )}
-      <Footer />
-    </DashboardLayout>
+        )}
+
+        <Footer />
+      </DashboardLayout>
     </>
   );
 }

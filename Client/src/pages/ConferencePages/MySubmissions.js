@@ -75,7 +75,9 @@ export default function MySubmissionsPage() {
       setOpenLoading(false);
     }
 
-    fetchSubmissions();
+    if (user && confID) {
+      fetchSubmissions();
+    }
   }, [confID, user]);
 
   const handleDelete = async () => {
@@ -98,7 +100,7 @@ export default function MySubmissionsPage() {
       );
 
       const jsonResponse = await response.json();
-      console.log(jsonResponse);
+
       if (response.ok) {
         setRows((rows) => rows.filter((row) => row.id !== dataForDelete));
         setError(
