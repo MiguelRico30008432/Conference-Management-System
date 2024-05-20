@@ -2,57 +2,58 @@ import React from "react";
 import MDButton from "components/MDButton";
 import MDTypography from "components/MDTypography";
 import { Box, Card, Container } from "@mui/material";
+import MDBox from "components/MDBox";
 
 export default function SubmissionDetails({ onClose, submission }) {
   return (
-    <Card>
-      <Container component="main" maxWidth="sm">
-        <Box
-          sx={{
-            mt: 2,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "left",
-          }}
-        >
+    <Container maxWidth="sm">
+      <MDBox mb={3} textAlign="left">
+        <Card>
           <MDTypography
             variant="h5"
             fontWeight="medium"
             color="grey"
             textAlign="center"
-            sx={{ mb: 3 }}
+            sx={{ mb: 3, mt: 2 }}
           >
             {submission.title}
           </MDTypography>
 
-          <MDTypography variant="h6">Authors:</MDTypography>
-          <MDTypography variant="body2">{submission.authors}</MDTypography>
-
-          <MDTypography variant="h6" sx={{ mt: 2 }}>
-            Status:
-          </MDTypography>
-          <MDTypography variant="body2">{submission.status}</MDTypography>
-
-          <MDTypography variant="h6" sx={{ mt: 2 }}>
-            Submission Date:
-          </MDTypography>
-          <MDTypography variant="body2">{submission.addDate}</MDTypography>
-
-          <MDTypography variant="h6" sx={{ mt: 2 }}>
-            Abstract:
-          </MDTypography>
-          <MDTypography variant="body2">{submission.abstract}</MDTypography>
+          <MDBox ml={2} textAlign="left">
+            <MDTypography variant="h6">Authors:</MDTypography>
+            <MDTypography variant="body2">{submission.authors}</MDTypography>
+            <MDTypography variant="h6" sx={{ mt: 2 }}>
+              Status:
+            </MDTypography>
+            <MDTypography variant="body2">{submission.status}</MDTypography>
+            <MDTypography variant="h6" sx={{ mt: 2 }}>
+              Submission Date:
+            </MDTypography>
+            <MDTypography variant="body2">{submission.addDate}</MDTypography>
+            <MDTypography variant="h6" sx={{ mt: 2 }}>
+              Abstract:
+            </MDTypography>
+            <MDTypography variant="body2">{submission.abstract}</MDTypography>
+          </MDBox>
 
           <MDButton
             variant="gradient"
             color="info"
-            sx={{ mt: 2, mb: 2 }}
             onClick={onClose}
+            sx={{
+              maxWidth: "150px",
+              maxHeight: "30px",
+              minWidth: "5px",
+              minHeight: "30px",
+              mt: 2,
+              ml: 2,
+              mb: 2,
+            }}
           >
             Close Details
           </MDButton>
-        </Box>
-      </Container>
-    </Card>
+        </Card>
+      </MDBox>
+    </Container>
   );
 }

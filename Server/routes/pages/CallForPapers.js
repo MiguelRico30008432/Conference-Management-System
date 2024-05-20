@@ -15,7 +15,7 @@ router.post("/callForPapers", auth.ensureAuthenticated, async (req, res) => {
         to_char(confendsubmission, 'DD-MM-YYYY') AS confsubmissionend,
         to_char(confstartdate, 'DD-MM-YYYY') AS confstartdate,
         confareaname AS conftopics,
-        (SELECT userrole FROM userRoles urole WHERE conf.confid = urole.confid AND userid = ${req.body.userid} ORDER BY userrole DESC LIMIT 1) AS userrole
+        COALESCE((SELECT userrole FROM userRoles urole WHERE conf.confid = urole.confid AND userid =  ${req.body.userid} ORDER BY userrole DESC LIMIT 1), 'Author') AS userrole
     FROM conferences conf
     INNER JOIN confAreas area ON area.confareaid = conf.confareaid
     WHERE

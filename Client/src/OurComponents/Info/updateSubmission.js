@@ -412,7 +412,7 @@ export default function UpdateSubmission({ onClose, submissionID }) {
 
             <MDButton
               variant="gradient"
-              color="info"
+              color="success"
               onClick={async (event) => uploadFile(event)}
               sx={{
                 maxWidth: "60px",
