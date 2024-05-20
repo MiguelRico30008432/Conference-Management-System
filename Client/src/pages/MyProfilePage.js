@@ -231,7 +231,8 @@ export default function MyProfilePage() {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/saveInvitationCode`, {
         method: "POST",
         body: JSON.stringify({
-          userID: user
+          userID: user,
+          inviteCode: inviteCode,
         }),
         headers: {
           "Content-type": "application/json; charset=UTF-8",
