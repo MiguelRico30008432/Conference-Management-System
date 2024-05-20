@@ -9,10 +9,8 @@ const supabase = createClient(SUPABASEURL, SUPABASEKEY);
 
 async function addSubmissionFiles(file, confid, submissionid, mainAuthorID) {
   // testado
-  console.log(file);
   try {
     const fileBuffer = file.data;
-    console.log(fileBuffer);
 
     const { error: uploadError } = await supabase.storage
       .from("submission_files")
@@ -139,11 +137,6 @@ async function getSubmissionFile(confid, submissionid, mainAuthorID) {
       log.addLog(error, "supabase", "getSubmissionFile (download Error");
       return null;
     }
-    //Necessário no endpoint para passar o ficheiro para o front end
-    //const fileBuffer = await data.arrayBuffer();
-    //res.setHeader('Content-Disposition', `attachment; filename=${fileToDownload}`);
-    //res.setHeader('Content-Type', data.type);
-    //res.send(Buffer.from(fileBuffer));
     return data;
   } catch (error) {
     console.error("Error downloading file:", error.message);

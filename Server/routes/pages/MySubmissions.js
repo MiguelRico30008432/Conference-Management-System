@@ -98,69 +98,39 @@ router.post(
         return res.status(400).send({ msg: "Submission ID is required" });
       }
 
-      log.addLog(
-        `Fetching submission details for submissionID: ${submissionID}`,
-        "database",
-        "DownloadSubmissionFile -> /downloadSubmissionFile"
-      );
+      console.log(submissionID);
 
-      const submissionDetails = await db.fetchDataCst(
-        `SELECT submissionmainauthor AS "submissionMainAuthor", submissionconfid AS "submissionConfID" FROM submissions WHERE submissionid = ${submissionID}`
-      );
+      const fileToDownloadInfo = await db.fetchDataCst(`
+        SELECT
+        submissionconfid,
+        submissionmainauthor
+        FROM
+        submissions
+        WHERE
+        submissionid = ${submissionID} 
+      `);
 
-      log.addLog(
-        `Query result: ${JSON.stringify(submissionDetails)}`,
-        "database",
-        "DownloadSubmissionFile -> /downloadSubmissionFile"
-      );
-
-      if (submissionDetails.length === 0) {
-        log.addLog(
-          `Submission not found for submissionID: ${submissionID}`,
-          "database",
-          "DownloadSubmissionFile -> /downloadSubmissionFile"
-        );
-        return res.status(404).send({ msg: "Submission not found" });
+      if (fileToDownloadInfo.length === 0) {
+        return res.status(404).send({ msg: "Submission file not found" });
       }
 
-      const { submissionMainAuthor, submissionConfID } = submissionDetails[0];
-
-      log.addLog(
-        `Found submission details: mainAuthor: ${submissionMainAuthor}, confID: ${submissionConfID}`,
-        "database",
-        "DownloadSubmissionFile -> /downloadSubmissionFile"
-      );
-
       const file = await sb.getSubmissionFile(
-        submissionConfID,
+        fileToDownloadInfo[0].submissionconfid,
         submissionID,
-        submissionMainAuthor
+        fileToDownloadInfo[0].submissionmainauthor
       );
 
       if (!file) {
-        log.addLog(
-          `File not found for submissionID: ${submissionID}`,
-          "database",
-          "DownloadSubmissionFile -> /downloadSubmissionFile"
-        );
         return res.status(404).send({ msg: "File not found" });
       }
 
-      log.addLog(
-        `File successfully retrieved: ${file.name}`,
-        "database",
-        "DownloadSubmissionFile -> /downloadSubmissionFile"
-      );
+      console.log("passei o !file");
 
+      const fileBuffer = await file.arrayBuffer();
       res.setHeader("Content-Disposition", `attachment; filename=${file.name}`);
       res.setHeader("Content-Type", file.type);
-      res.send(file.data);
+      res.send(Buffer.from(fileBuffer));
     } catch (error) {
-      log.addLog(
-        `Backend catch error: ${error.message}`,
-        "database",
-        "DownloadSubmissionFile -> /downloadSubmissionFile"
-      );
       return res.status(500).send({
         msg: "Error downloading submission file",
         error: error.message,
