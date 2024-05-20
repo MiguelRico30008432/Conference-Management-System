@@ -46,14 +46,17 @@ export default function MyProfilePage() {
     async function getUserData() {
       setOpenLoading(true);
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/userData`, {
-          method: "POST",
-          body: JSON.stringify({ userID: user }),
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/userData`,
+          {
+            method: "POST",
+            body: JSON.stringify({ userID: user }),
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+            },
+            credentials: "include",
+          }
+        );
 
         const jsonResponse = await response.json();
 
@@ -141,21 +144,24 @@ export default function MyProfilePage() {
   async function saveUserData() {
     setOpenLoading(true);
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/saveUserData`, {
-        method: "POST",
-        body: JSON.stringify({
-          userID: user,
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
-          affiliation: affiliation.trim(),
-          email: email.trim(),
-          phone: phone.trim(),
-        }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-        },
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/saveUserData`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            userID: user,
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            affiliation: affiliation.trim(),
+            email: email.trim(),
+            phone: phone.trim(),
+          }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+        }
+      );
 
       const jsonResponse = await response.json();
 
@@ -185,14 +191,17 @@ export default function MyProfilePage() {
   async function saveUserPassword() {
     setOpenLoading(true);
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/saveUserPassword`, {
-        method: "POST",
-        body: JSON.stringify({ userID: user, userPassword: password }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-        },
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/saveUserPassword`,
+        {
+          method: "POST",
+          body: JSON.stringify({ userID: user, userPassword: password }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+        }
+      );
 
       const jsonResponse = await response.json();
 

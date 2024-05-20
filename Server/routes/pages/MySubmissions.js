@@ -14,12 +14,11 @@ router.post("/mySubmissions", auth.ensureAuthenticated, async (req, res) => {
             submissions.submissiontitle AS title, 
             STRING_AGG(CONCAT(CONCAT(a1.authorfirstname,' ',a1.authorlastname), ', ', CONCAT(a2.authorfirstname,' ',a2.authorlastname)), ', ') AS authors,
             submissions.submissionaccepted AS status,
-            submissions.submissionadddate AS addDate, 
+            to_char(submissions.submissionadddate, 'DD-MM-YYYY') AS addDate,
             submissions.submissionabstract AS abstract
-        FROM
-            submissions
-            INNER JOIN authors a1 ON submissions.submissionid = a1.submissionid
-            LEFT JOIN authors a2 ON submissions.submissionid = a2.submissionid AND a2.userid != ${userID}
+        FROM submissions
+        INNER JOIN authors a1 ON submissions.submissionid = a1.submissionid
+        LEFT JOIN authors a2 ON submissions.submissionid = a2.submissionid AND a2.userid != ${userID}
         WHERE 
             a1.userid = ${userID} AND submissions.submissionconfID = ${confID}
         GROUP BY
@@ -48,7 +47,7 @@ router.delete(
   auth.ensureAuthenticated,
   async (req, res) => {
     try {
-      const { submissionID } = req.body;
+      const submissionID = req.body.submissionID;
 
       if (!submissionID) {
         return res.status(400).send({ msg: "Submission ID is required" });
@@ -67,6 +66,7 @@ router.delete(
       await db.fetchDataCst(
         `DELETE FROM authors WHERE submissionid = ${submissionID}`
       );
+
       await db.fetchDataCst(
         `DELETE FROM submissions WHERE submissionid = ${submissionID}`
       );
@@ -98,8 +98,6 @@ router.post(
         return res.status(400).send({ msg: "Submission ID is required" });
       }
 
-      console.log(submissionID);
-
       const fileToDownloadInfo = await db.fetchDataCst(`
         SELECT
         submissionconfid,
@@ -123,8 +121,6 @@ router.post(
       if (!file) {
         return res.status(404).send({ msg: "File not found" });
       }
-
-      console.log("passei o !file");
 
       const fileBuffer = await file.arrayBuffer();
       res.setHeader("Content-Disposition", `attachment; filename=${file.name}`);

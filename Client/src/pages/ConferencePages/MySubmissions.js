@@ -6,7 +6,7 @@ import Container from "@mui/material/Container";
 import MDTypography from "components/MDTypography";
 import MDBox from "components/MDBox";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
-
+import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "OurComponents/footer/Footer";
 import ConferenceNavBar from "OurComponents/navBars/ConferenceNavBar";
@@ -17,21 +17,17 @@ import UpdateSubmission from "OurComponents/Info/updateSubmission";
 import { AuthContext } from "auth.context";
 import { ConferenceContext } from "conference.context";
 
-function formatDate(dateString) {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-GB");
-}
-
 export default function MySubmissionsPage() {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [dataForDetails, setDataForDetails] = useState({});
   const [dataForUpdate, setDataForUpdate] = useState({});
   const [update, setUpdate] = useState(false);
   const [openLoading, setOpenLoading] = useState(false);
+  const [openPopUpMessage, setOpenPopUpMessage] = useState(false);
   const [rows, setRows] = useState([]);
   const [error, setError] = useState(null);
-  const [deleteError, setDeleteError] = useState("");
-  const [deleteSuccessMessage, setDeleteSuccessMessage] = useState("");
+  const [dataForDelete, setDataForDelete] = useState(null);
+
   const { user } = useContext(AuthContext);
   const { confID } = useContext(ConferenceContext);
 
@@ -64,16 +60,16 @@ export default function MySubmissionsPage() {
               title: submission.title,
               authors: submission.authors,
               status: submission.status ? "Accepted" : "Pending",
-              addDate: formatDate(submission.addDate),
+              addDate: submission.adddate,
               abstract: submission.abstract,
-              fileUrl: submission.fileUrl, // Assuming the file URL is included
+              fileUrl: submission.fileUrl,
             }));
             setRows(transformedData);
           } else {
-            setError("Failed to fetch submissions: " + jsonResponse.message);
+            setError(<Alert severity="error">{jsonResponse.message}</Alert>);
           }
         } catch (error) {
-          setError("Network error: Could not fetch submissions");
+          setError(<Alert severity="error">Could not fetch submissions</Alert>);
         }
       }
       setOpenLoading(false);
@@ -82,9 +78,9 @@ export default function MySubmissionsPage() {
     fetchSubmissions();
   }, [confID, user]);
 
-  const handleDelete = async (submission) => {
-    setDeleteError("");
-    setDeleteSuccessMessage("");
+  const handleDelete = async () => {
+    setError(null);
+    setOpenLoading(true);
 
     try {
       const response = await fetch(
@@ -96,25 +92,32 @@ export default function MySubmissionsPage() {
           },
           credentials: "include",
           body: JSON.stringify({
-            submissionID: submission.id,
+            submissionID: dataForDelete,
           }),
         }
       );
 
       const jsonResponse = await response.json();
-
+      console.log(jsonResponse);
       if (response.ok) {
-        setRows(rows.filter((row) => row.id !== submission.id));
-        setDeleteSuccessMessage("Submission deleted successfully");
+        setRows((rows) => rows.filter((row) => row.id !== dataForDelete));
+        setError(
+          <Alert severity="success">Submission deleted successfully</Alert>
+        );
       } else {
-        setDeleteError("Failed to delete submission: " + jsonResponse.msg);
+        setError(<Alert severity="error">{jsonResponse.msg}</Alert>);
       }
     } catch (error) {
-      setDeleteError("Network error: Could not delete submission");
+      setError(<Alert severity="error">Could not delete submission</Alert>);
     }
+
+    setOpenLoading(false);
   };
 
   const handleDownload = async (submission) => {
+    setError(null);
+    setOpenLoading(true);
+
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/downloadSubmissionFile`,
@@ -133,7 +136,6 @@ export default function MySubmissionsPage() {
       if (!response.ok) {
         const jsonResponse = await response.json();
         setError("Failed to download file: " + jsonResponse.msg);
-        console.error("Failed to download file:", jsonResponse.msg);
         return;
       }
 
@@ -146,15 +148,17 @@ export default function MySubmissionsPage() {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      setError("Network error: Could not download file");
-      console.error("Network error: Could not download file", error);
+      setError(<Alert severity="error">Could not download file</Alert>);
     }
+
+    setOpenLoading(false);
   };
 
   const columns = [
     { field: "title", headerName: "Title", width: 200 },
     { field: "status", headerName: "Status", width: 120 },
     { field: "authors", headerName: "Authors", width: 200 },
+    { field: "addDate", headerName: "Submission Date", width: 120 },
     {
       field: "download",
       filterable: false,
@@ -291,7 +295,10 @@ export default function MySubmissionsPage() {
             <MDButton
               variant="gradient"
               color="error"
-              onClick={() => handleDelete(params.row)}
+              onClick={() => {
+                setDataForDelete(params.row.id);
+                setOpenPopUpMessage(true);
+              }}
               sx={{
                 maxWidth: "130px",
                 maxHeight: "23px",
@@ -310,6 +317,17 @@ export default function MySubmissionsPage() {
   return (
     <>
       {openLoading && <LoadingCircle />}
+      <PopUpWithMessage
+        open={openPopUpMessage}
+        handleClose={() => setOpenPopUpMessage(false)}
+        handleConfirm={async () => {
+          await handleDelete();
+          setOpenPopUpMessage(false);
+        }}
+        title={"Confirm your submission removal"}
+        text={"Are you sure you want to remove this submission?"}
+      />
+
       <DashboardLayout>
         <ConferenceNavBar />
         {!update ? (
@@ -325,25 +343,8 @@ export default function MySubmissionsPage() {
                   </MDTypography>
                 </Card>
 
-                <MDBox mt={2} textAlign="left">
-                  <Card>
-                    {error && <Alert severity="error">{error}</Alert>}
-                  </Card>
-                </MDBox>
-                <MDBox mt={2} textAlign="left">
-                  <Card>
-                    {deleteError && (
-                      <Alert severity="error">{deleteError}</Alert>
-                    )}
-                  </Card>
-                </MDBox>
-                <MDBox mt={2} textAlign="left">
-                  <Card>
-                    {deleteSuccessMessage && (
-                      <Alert severity="success">{deleteSuccessMessage}</Alert>
-                    )}
-                  </Card>
-                </MDBox>
+                <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
+
                 <MDBox mb={3} textAlign="left">
                   <Card>
                     <CompleteTable
