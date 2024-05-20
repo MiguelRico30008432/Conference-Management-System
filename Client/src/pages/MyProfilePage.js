@@ -211,6 +211,43 @@ export default function MyProfilePage() {
     setOpenLoading(false);
   }
 
+  async function handleInvitationCode() {
+    if (inviteCode.trim() === "") {
+      setInviteMessage(<Alert severity="error">Please enter an invitation code.</Alert>);
+      return;
+    }
+  
+    setOpenLoading(true);
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/saveInvitationCode`, {
+        method: "POST",
+        body: JSON.stringify({
+          userID: user
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+        credentials: "include",
+      });
+  
+      const jsonResponse = await response.json();
+  
+      if (response.status === 200) {
+        setInviteMessage(<Alert severity="success">Invitation code accepted. You have joined the conference.</Alert>);
+        setInviteCode(""); // Clear the input field after successful submission
+      } else {
+        setInviteMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
+      }
+    } catch (error) {
+      setInviteMessage(
+        <Alert severity="error">Something went wrong when submitting your invitation code.</Alert>
+      );
+    }
+    setOpenLoading(false);
+  }
+  
+  
+
   return (
     <>
       {openLoading && <LoadingCircle />}
@@ -493,7 +530,7 @@ export default function MyProfilePage() {
                 mb: 2,
               }}
               onClick={() => {
-                setMessage(null);
+                handleInvitationCode();
               }}
             >
               Join Conference

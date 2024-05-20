@@ -68,4 +68,25 @@ router.post("/saveUserPassword", auth.ensureAuthenticated, async (req, res) => {
   }
 });
 
+
+
+router.post("/saveInvitationCode", auth.ensureAuthenticated, async (req, res) => {
+  try {
+    const userInfo = await db.fetchData("users", "userid", req.body.userID);
+    const userEmail = userInfo[0].useremail
+    const invitationInfo = await db.fetchData("invitations", "invitationemail", userEmail);
+    const userRole = invitationInfo[0].invitationrole;
+    const confID = invitationInfo[0].confid;
+    await db.addData("userroles", {
+        userid: req.body.userID,
+        userrole: userRole,
+        confid: confID
+      });
+    return res.status(200).send({ msg: "" });
+  } catch (error) {
+    return res.status(500).send({ msg: "Internal Error" });
+  }
+});
+
+
 module.exports = router;
