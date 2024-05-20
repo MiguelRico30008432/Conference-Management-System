@@ -3,13 +3,13 @@ const router = express.Router();
 const db = require("../../utility/database");
 const auth = require("../../utility/verifications");
 const log = require("../../logs/logsManagement");
-const { getSubmissionFile } = require("../../utility/supabase");
+const sb = require("../../utility/supabase");
 
 router.post("/mySubmissions", auth.ensureAuthenticated, async (req, res) => {
-    try {
-        const { confID, userID } = req.body;
-        const submissions = await db.fetchDataCst(
-            `SELECT 
+  try {
+    const { confID, userID } = req.body;
+    const submissions = await db.fetchDataCst(
+      `SELECT 
             submissions.submissionid AS id, 
             submissions.submissiontitle AS title, 
             STRING_AGG(CONCAT(CONCAT(a1.authorfirstname,' ',a1.authorlastname), ', ', CONCAT(a2.authorfirstname,' ',a2.authorlastname)), ', ') AS authors,
@@ -28,80 +28,115 @@ router.post("/mySubmissions", auth.ensureAuthenticated, async (req, res) => {
             submissions.submissionaccepted,
             submissions.submissionadddate,
             submissions.submissionabstract;`
-        );
+    );
 
-        // If no submissions found, return an empty array
-        if (submissions.length === 0) {
-            return res.status(200).json([]);
-        }
-
-        // Return the fetched data
-        return res.status(200).json(submissions);
-    } catch (error) {
-        log.addLog(error, "database", "MySubmissions -> /submissions");
-        res.status(500).send({ msg: "Error fetching submission data" });
+    // If no submissions found, return an empty array
+    if (submissions.length === 0) {
+      return res.status(200).json([]);
     }
+
+    // Return the fetched data
+    return res.status(200).json(submissions);
+  } catch (error) {
+    log.addLog(error, "database", "MySubmissions -> /submissions");
+    res.status(500).send({ msg: "Error fetching submission data" });
+  }
 });
 
-router.delete("/deleteSubmission", auth.ensureAuthenticated, async (req, res) => {
+router.delete(
+  "/deleteSubmission",
+  auth.ensureAuthenticated,
+  async (req, res) => {
     try {
-        const { submissionID } = req.body;
+      const { submissionID } = req.body;
 
-        if (!submissionID) {
-            return res.status(400).send({ msg: "Submission ID is required" });
-        }
+      if (!submissionID) {
+        return res.status(400).send({ msg: "Submission ID is required" });
+      }
 
-        await db.fetchDataCst(`DELETE FROM authors WHERE submissionid = ${submissionID}`);
-        await db.fetchDataCst(`DELETE FROM submissions WHERE submissionid = ${submissionID}`);
+      const submissionToDeleteInfo = await db.fetchDataCst(`
+        SELECT
+        submissionconfid,
+        submissionmainauthor
+        FROM
+        submissions
+        WHERE
+        submissionid = ${submissionID} 
+      `);
 
-        return res.status(200).send({ msg: "Submission deleted successfully." });
+      await db.fetchDataCst(
+        `DELETE FROM authors WHERE submissionid = ${submissionID}`
+      );
+      await db.fetchDataCst(
+        `DELETE FROM submissions WHERE submissionid = ${submissionID}`
+      );
+
+      await sb.deleteSubmissionFile(
+        submissionToDeleteInfo[0].submissionconfid,
+        submissionID,
+        submissionToDeleteInfo[0].submissionmainauthor
+      );
+
+      return res.status(200).send({ msg: "Submission deleted successfully." });
     } catch (error) {
-        log.addLog(error, "database", "DeleteSubmission -> /deleteSubmission");
-        return res.status(500).send({ msg: "Error deleting submission", error: error.message });
+      log.addLog(error, "database", "DeleteSubmission -> /deleteSubmission");
+      return res
+        .status(500)
+        .send({ msg: "Error deleting submission", error: error.message });
     }
-});
+  }
+);
 
-router.post("/downloadSubmissionFile", auth.ensureAuthenticated, async (req, res) => {
+router.post(
+  "/downloadSubmissionFile",
+  auth.ensureAuthenticated,
+  async (req, res) => {
     try {
-        const { submissionID } = req.body;
+      const { submissionID } = req.body;
 
-        if (!submissionID) {
-            return res.status(400).send({ msg: "Submission ID is required" });
-        }
+      if (!submissionID) {
+        return res.status(400).send({ msg: "Submission ID is required" });
+      }
 
-        log.addLog(`Fetching submission details for submissionID: ${submissionID}`, "database", "DownloadSubmissionFile -> /downloadSubmissionFile");
+      console.log(submissionID);
 
-        const submissionDetails = await db.fetchDataCst(
-            `SELECT submissionmainauthor AS "submissionMainAuthor", submissionconfid AS "submissionConfID" FROM submissions WHERE submissionid = ${submissionID}`
-        );
+      const fileToDownloadInfo = await db.fetchDataCst(`
+        SELECT
+        submissionconfid,
+        submissionmainauthor
+        FROM
+        submissions
+        WHERE
+        submissionid = ${submissionID} 
+      `);
 
-        log.addLog(`Query result: ${JSON.stringify(submissionDetails)}`, "database", "DownloadSubmissionFile -> /downloadSubmissionFile");
+      if (fileToDownloadInfo.length === 0) {
+        return res.status(404).send({ msg: "Submission file not found" });
+      }
 
-        if (submissionDetails.length === 0) {
-            log.addLog(`Submission not found for submissionID: ${submissionID}`, "database", "DownloadSubmissionFile -> /downloadSubmissionFile");
-            return res.status(404).send({ msg: "Submission not found" });
-        }
+      const file = await sb.getSubmissionFile(
+        fileToDownloadInfo[0].submissionconfid,
+        submissionID,
+        fileToDownloadInfo[0].submissionmainauthor
+      );
 
-        const { submissionMainAuthor, submissionConfID } = submissionDetails[0];
+      if (!file) {
+        return res.status(404).send({ msg: "File not found" });
+      }
 
-        log.addLog(`Found submission details: mainAuthor: ${submissionMainAuthor}, confID: ${submissionConfID}`, "database", "DownloadSubmissionFile -> /downloadSubmissionFile");
+      console.log("passei o !file");
 
-        const file = await getSubmissionFile(submissionConfID, submissionID, submissionMainAuthor);
-
-        if (!file) {
-            log.addLog(`File not found for submissionID: ${submissionID}`, "database", "DownloadSubmissionFile -> /downloadSubmissionFile");
-            return res.status(404).send({ msg: "File not found" });
-        }
-
-        log.addLog(`File successfully retrieved: ${file.name}`, "database", "DownloadSubmissionFile -> /downloadSubmissionFile");
-
-        res.setHeader('Content-Disposition', `attachment; filename=${file.name}`);
-        res.setHeader('Content-Type', file.type);
-        res.send(file.data);
+      const fileBuffer = await file.arrayBuffer();
+      res.setHeader("Content-Disposition", `attachment; filename=${file.name}`);
+      res.setHeader("Content-Type", file.type);
+      res.send(Buffer.from(fileBuffer));
     } catch (error) {
-        log.addLog(`Backend catch error: ${error.message}`, "database", "DownloadSubmissionFile -> /downloadSubmissionFile");
-        return res.status(500).send({ msg: "Error downloading submission file", error: error.message });
+      return res.status(500).send({
+        msg: "Error downloading submission file",
+        error: error.message,
+      });
     }
-});
+  }
+);
 
 module.exports = router;

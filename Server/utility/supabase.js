@@ -7,7 +7,7 @@ const { SUPABASEURL, SUPABASEKEY } = process.env;
 
 const supabase = createClient(SUPABASEURL, SUPABASEKEY);
 
-async function addSubmissionFiles(file, confid, submissionid, userid) {
+async function addSubmissionFiles(file, confid, submissionid, mainAuthorID) {
   // testado
   try {
     const fileBuffer = file.data;
@@ -15,7 +15,7 @@ async function addSubmissionFiles(file, confid, submissionid, userid) {
     const { error: uploadError } = await supabase.storage
       .from("submission_files")
       .upload(
-        confid + "/" + userid + "/" + submissionid + "/" + uuidv4(),
+        confid + "/" + mainAuthorID + "/" + submissionid + "/" + uuidv4(),
         fileBuffer,
         {
           cacheControl: "3600",
@@ -33,11 +33,11 @@ async function addSubmissionFiles(file, confid, submissionid, userid) {
   }
 }
 
-async function updateSubmissionFile(file, confid, submissionid, userid) {
+async function updateSubmissionFile(file, confid, submissionid, mainAuthorID) {
   try {
     const fileBuffer = file.data;
 
-    const directoryPath = `${confid}/${userid}/${submissionid}/`;
+    const directoryPath = `${confid}/${mainAuthorID}/${submissionid}/`;
 
     const { data: existingFiles, error: listError } = await supabase.storage
       .from("submission_files")
@@ -65,7 +65,7 @@ async function updateSubmissionFile(file, confid, submissionid, userid) {
     const { error: uploadError } = await supabase.storage
       .from("submission_files")
       .upload(
-        confid + "/" + userid + "/" + submissionid + "/" + uuidv4(),
+        confid + "/" + mainAuthorID + "/" + submissionid + "/" + uuidv4(),
         fileBuffer,
         {
           cacheControl: "3600",
@@ -87,8 +87,8 @@ async function updateSubmissionFile(file, confid, submissionid, userid) {
   }
 }
 
-async function deleteSubmissionFile(confid, submissionid, userid) {
-  const directoryPath = `${confid}/${userid}/${submissionid}/`;
+async function deleteSubmissionFile(confid, submissionid, mainAuthorID) {
+  const directoryPath = `${confid}/${mainAuthorID}/${submissionid}/`;
 
   const { data: existingFiles, error: listError } = await supabase.storage
     .from("submission_files")
@@ -110,8 +110,8 @@ async function deleteSubmissionFile(confid, submissionid, userid) {
   }
 }
 
-async function getSubmissionFile(confid, submissionid, userid) {
-  const directoryPath = `${confid}/${userid}/${submissionid}/`;
+async function getSubmissionFile(confid, submissionid, mainAuthorID) {
+  const directoryPath = `${confid}/${mainAuthorID}/${submissionid}/`;
   try {
     const { data: existingFiles, error: listError } = await supabase.storage
       .from("submission_files")
@@ -137,11 +137,6 @@ async function getSubmissionFile(confid, submissionid, userid) {
       log.addLog(error, "supabase", "getSubmissionFile (download Error");
       return null;
     }
-    //Necessário no endpoint para passar o ficheiro para o front end
-    //const fileBuffer = await data.arrayBuffer();
-    //res.setHeader('Content-Disposition', `attachment; filename=${fileToDownload}`);
-    //res.setHeader('Content-Type', data.type);
-    //res.send(Buffer.from(fileBuffer));
     return data;
   } catch (error) {
     console.error("Error downloading file:", error.message);

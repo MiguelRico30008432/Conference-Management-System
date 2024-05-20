@@ -144,6 +144,7 @@ export default function MySubmissionsPage() {
       a.download = submission.title + ".pdf"; // Set the file name
       a.click();
       window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
     } catch (error) {
       setError("Network error: Could not download file");
       console.error("Network error: Could not download file", error);

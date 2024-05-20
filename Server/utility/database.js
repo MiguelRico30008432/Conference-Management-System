@@ -33,7 +33,7 @@ async function fetchAllData(table, column) {
     const result = await pool.query(queryText, []);
     return result.rows;
   } catch (err) {
-    log.addLog(err, "database", "fetchData");
+    log.addLog(err, "database", "fetchAllData");
   }
 }
 
@@ -58,7 +58,7 @@ async function addData(table, entryParameters) {
 async function deleteData(table, collum, comparisonValue) {
   //utilizada para apagar dados em qualquer tabela onde é recebido o nome da tabela, a coluna e o parametro de comparação para saber que linha apagar
   try {
-    console.log()
+    console.log();
     const queryText = `DELETE FROM ${table} WHERE ${collum} = $1`;
     await pool.query(queryText, [comparisonValue]);
     return;
