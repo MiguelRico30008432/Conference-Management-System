@@ -128,7 +128,7 @@ export default function CallForPapers() {
         }
       );
 
-      if (response.status != 200) {
+      if (response.status !== 200) {
         const jsonResponse = await response.json();
         setError(<Alert severity="error">{jsonResponse.msg}</Alert>);
       }

@@ -142,7 +142,6 @@ export default function UpdateSubmission({ onClose, submissionID }) {
           setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
         }
       } catch (error) {
-        console.log(error);
         setMessage(
           <Alert severity="error">
             Something went wrong when updating your submission.
@@ -306,6 +305,7 @@ export default function UpdateSubmission({ onClose, submissionID }) {
                     label="Email"
                     autoComplete="email"
                     autoFocus
+                    value={author.email}
                     onChange={(e) =>
                       handleInputChange(index, "email", e.target.value)
                     }
@@ -318,6 +318,7 @@ export default function UpdateSubmission({ onClose, submissionID }) {
                     fullWidth
                     label="Affiliation"
                     autoFocus
+                    value={author.affiliation}
                     onChange={(e) =>
                       handleInputChange(index, "affiliation", e.target.value)
                     }
