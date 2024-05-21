@@ -20,7 +20,7 @@ export default function AllSubmissions() {
   const { confID, userRole } = useContext(ConferenceContext);
   const { isLoggedIn } = useContext(AuthContext);
   const [openLoading, setOpenLoading] = useState(false);
-  const [message, setMessage] = useState(null);
+  const [error, setError] = useState(null);
   const [rows, setRows] = useState([]);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [dataForDetails, setDataForDetails] = useState({});
@@ -58,10 +58,10 @@ export default function AllSubmissions() {
           }));
           setRows(transformedData);
         } else {
-          setMessage(<Alert severity="error">{jsonResponse.message}</Alert>);
+          setError(<Alert severity="error">{jsonResponse.message}</Alert>);
         }
       } catch (error) {
-        setMessage(
+        setError(
           <Alert severity="error">Failed to fetch conference details!</Alert>
         );
       }
@@ -74,7 +74,7 @@ export default function AllSubmissions() {
   }, [confID, isLoggedIn]);
 
   const handleDelete = async () => {
-    setMessage(null);
+    setError(null);
     setOpenLoading(true);
 
     try {
@@ -96,21 +96,21 @@ export default function AllSubmissions() {
 
       if (response.ok) {
         setRows((rows) => rows.filter((row) => row.id !== dataForDelete));
-        setMessage(
+        setError(
           <Alert severity="success">Submission deleted successfully</Alert>
         );
       } else {
-        setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
+        setError(<Alert severity="error">{jsonResponse.msg}</Alert>);
       }
     } catch (error) {
-      setMessage(<Alert severity="error">Could not delete submission</Alert>);
+      setError(<Alert severity="error">Could not delete submission</Alert>);
     }
 
     setOpenLoading(false);
   };
 
   const handleDownload = async (submission) => {
-    setMessage(null);
+    setError(null); // Clear previous errors
     setOpenLoading(true);
 
     try {
@@ -130,7 +130,8 @@ export default function AllSubmissions() {
 
       if (!response.ok) {
         const jsonResponse = await response.json();
-        setMessage("Failed to download file: " + jsonResponse.msg);
+        setError(<Alert severity="error">Failed to download file: {jsonResponse.msg}</Alert>);
+        setOpenLoading(false); // Stop loading indicator
         return;
       }
 
@@ -141,12 +142,11 @@ export default function AllSubmissions() {
       a.download = submission.title + ".pdf"; // Set the file name
       a.click();
       window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
     } catch (error) {
-      setMessage(<Alert severity="error">Could not download file</Alert>);
+      setError(<Alert severity="error">Could not download file</Alert>);
     }
 
-    setOpenLoading(false);
+    setOpenLoading(false); // Stop loading indicator
   };
 
   const columns = [
@@ -228,7 +228,7 @@ export default function AllSubmissions() {
         );
       },
     },
-    ...(userRole === "Chair" || userRole === "Owner"  ? [{
+    ...(userRole === "Chair" || userRole === "Owner" ? [{
       field: "delete",
       filterable: false,
       headerName: "",
@@ -304,7 +304,7 @@ export default function AllSubmissions() {
                 </MDTypography>
               </Card>
 
-              <Card sx={{ mt: 2, mb: 2 }}>{message}</Card>
+              <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
 
               <MDBox mb={3} mt={2} textAlign="left">
                 <Card>
