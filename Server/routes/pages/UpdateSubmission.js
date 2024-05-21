@@ -61,6 +61,8 @@ router.post("/updateSubmission", auth.ensureAuthenticated, async (req, res) => {
             `INSERT INTO authors (authorAffiliation, authorEmail, authorFirstName, authorLastName, submissionid, userid)
               VALUES ('${userRegistered[0].useraffiliation}', '${userRegistered[0].useremail}', '${userRegistered[0].userfirstname}', '${userRegistered[0].userlastname}', ${req.body.submissionid}, ${userRegistered[0].userid})`
           );
+
+          //Falta adicionar ao user roles
         }
       } else {
         //Autor está associado à submissão

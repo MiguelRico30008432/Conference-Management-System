@@ -150,6 +150,15 @@ CREATE TABLE events(
     eventAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
 
+___________________________________________________________________________________________________________
+Table Conflicts
 
-
+CREATE TABLE conflicts (
+    conflictid SERIAL PRIMARY KEY,
+    conflictconfid INT, FOREIGN KEY (conflictconfid) REFERENCES conferences(confid),
+    conflictsubmissionid INT, FOREIGN KEY (conflictsubmissionid) REFERENCES submissions(submissionid),
+    conflictreason VARCHAR,
+    conflictuseremail VARCHAR,
+    conflictadddata TIMESTAMP NOT NULL DEFAULT current_timestamp
+)
 

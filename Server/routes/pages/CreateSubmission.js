@@ -52,6 +52,7 @@ router.post("/createSubmission", auth.ensureAuthenticated, async (req, res) => {
           `INSERT INTO authors (authorAffiliation, authorEmail, authorFirstName, authorLastName, submissionID, userid) 
             VALUES ('${userRegistered[0].useraffiliation}', '${userRegistered[0].useremail}', '${userRegistered[0].userfirstname}', '${userRegistered[0].userlastname}', ${submissionid[0].max}, ${userRegistered[0].userid})`
         );
+        //Falta adicionar ao user roles
       }
     });
 
