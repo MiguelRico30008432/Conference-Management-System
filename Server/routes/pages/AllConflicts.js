@@ -9,7 +9,7 @@ router.post(
   auth.ensureAuthenticated,
   async (req, res) => {
     try {
-      //Obter lista com email do comite, chair, owner e respetivas afiliação
+      //Obter lista com os emails do comite, chair, owner e respetivas afiliações
       const committeeEmailsAffiliation = await db.fetchDataCst(`
         SELECT 
             ur.userrole,
@@ -22,8 +22,7 @@ router.post(
         WHERE 
             ur.confid = ${req.body.confid} 
         `);
-      console.log("committeeEmailsAffiliation:");
-      console.log(committeeEmailsAffiliation);
+
       //Obter submissões da conferência
       const submissionsids = await db.fetchDataCst(`
         SELECT
@@ -33,27 +32,53 @@ router.post(
         WHERE
             submissionconfid = ${req.body.confid}
         `);
-      console.log("submissions ids:");
-      console.log(submissionsids);
+
       //Por submissão obter os emails dos autores
-      if (submissionsids && submissionsids.length > 0) {
+      if (submissionsids.length > 0) {
         for (const submission of submissionsids) {
           const submissionid = submission.submissionid;
           const authorsEmails = await db.fetchDataCst(`
             SELECT
                 authorid,
-                authoremail
+                authoremail,
+                authoraffiliation
             FROM 
                 authors
             WHERE
                 submissionid = ${submissionid}
           `);
-          console.log("authorsEmails:");
-          console.log(authorsEmails);
-          //Por autor verificar se faz parte do comite, chair, owner ou se é da mesma afiliação de alguem dos roles mencionados
-          for (const author of authorsEmails) {
-            
-            //Se fizer parte do comite, chair, owner ou tiver a mesma afiliação de alguem dos roles mencionados, então adicionar na tabela de conflitos
+
+          //Por membro do comite verificar se faz parte dos autores ou se é da mesma afiliação que os autores
+          for (const committee of committeeEmailsAffiliation) {
+            for (const author of authorsEmails) {
+              const conflictExists = await db.fetchDataCst(`
+                SELECT
+                  conflictid
+                FROM
+                  conflicts
+                WHERE
+                  conflictconfid = ${req.body.confid} AND conflictuseremail = '${committee.useremail}' AND conflictsubmissionid = ${submission.submissionid}
+              `);
+
+              //Verificar primeiro se o conflito já existe
+              if (conflictExists.length === 0) {
+                //Se o membro do comitte for autor ou se tiver a mesma afiliação que, pelo menos, 1 dos autores, então adicionar na tabela de conflitos
+
+                if (committee.useremail === author.authoremail) {
+                  await db.fetchDataCst(`
+                  INSERT INTO conflicts(conflictconfid, conflictreason, conflictsubmissionid, conflictuseremail)
+                  VALUES(${req.body.confid}, 'Part of the committee as ${committee.userrole} and registered as author.', ${submission.submissionid}, '${committee.useremail}')
+                  `);
+                } else if (
+                  committee.useraffiliation === author.authoraffiliation
+                ) {
+                  await db.fetchDataCst(`
+                  INSERT INTO conflicts(conflictconfid, conflictreason, conflictsubmissionid, conflictuseremail)
+                  VALUES(${req.body.confid}, 'Same affiliation has 1 or more authors.', ${submission.submissionid}, '${committee.useremail}')
+                  `);
+                }
+              }
+            }
           }
         }
       } else {
@@ -61,12 +86,82 @@ router.post(
           .status(500)
           .send({ msg: "No submissions where detected for this conference" });
       }
-      return res.status(200);
+      return res.status(200).send({ msg: "Conflicts have been Updated" });
     } catch (error) {
       log.addLog(error, "database", "AllConflicts -> /determineConflicts");
       return res.status(500).send({ msg: "Error fetching submission data" });
     }
   }
 );
+
+router.post("/getConflicts", auth.ensureAuthenticated, async (req, res) => {
+  try {
+    const result = await db.fetchDataCst(`
+    SELECT 
+      CONCAT(u.userfirstname, ' ', u.userlastname) AS fullname,
+      s.submissiontitle,
+      c.conflictreason
+    FROM 
+      conflicts c
+    JOIN users u ON c.conflictuseremail = u.useremail
+    JOIN submissions s ON c.conflictsubmissionid = s.submissionid
+    WHERE
+      c.conflictconfid = ${req.body.confid}
+    `);
+    return res.status(200).send(result);
+  } catch (error) {
+    log.addLog(error, "database", "AllConflicts -> /getConflicts");
+    return res.status(500).send({ msg: "Error fetching submission data" });
+  }
+});
+
+router.post(
+  "/infoToDeclareConflicts",
+  auth.ensureAuthenticated,
+  async (req, res) => {
+    try {
+      const submissionInfo = await db.fetchDataCst(`
+    SELECT 
+      STRING_AGG(CONCAT(a.authorfirstname, ' ', a.authorlastname), ', ') AS authors,
+      s.submissiontitle,
+      s.submissionid
+    FROM 
+      conflicts c
+    JOIN submissions s ON c.conflictsubmissionid = s.submissionid
+    JOIN authors a ON s.submissionid = a.submissionid	
+    WHERE
+      c.conflictconfid = ${req.body.confid}
+    GROUP BY
+      s.submissionid
+    `);
+
+      const committee = await db.fetchDataCst(`
+    SELECT
+      STRING_AGG(CONCAT(u.userfirstname, ' ', u.userlastname, ' ', '(', u.useremail, ')'), ', ') AS committee
+    FROM
+      userroles ur
+    JOIN users u ON ur.userid = u.userid
+    WHERE
+      confid = ${req.body.confid}
+      `);
+
+      const data = { submissionInfo, committee };
+      console.log(data);
+      return res.status(200).send(data);
+    } catch (error) {
+      log.addLog(error, "database", "AllConflicts -> /getConflicts");
+      return res.status(500).send({ msg: "Error fetching submission data" });
+    }
+  }
+);
+
+router.post("/declareConflict", auth.ensureAuthenticated, async (req, res) => {
+  try {
+    return res.status(200);
+  } catch (error) {
+    log.addLog(error, "database", "AllConflicts -> /getConflicts");
+    return res.status(500).send({ msg: "Error fetching submission data" });
+  }
+});
 
 module.exports = router;

@@ -112,7 +112,6 @@ export default function ComitteeManagementPage() {
               variant="gradient"
               color="info"
               onClick={async () => {
-                console.log(params.row);
                 setMemberInfoData(params.row);
                 setMemberName(params.row.userfirstname);
                 setEditOpen(false);

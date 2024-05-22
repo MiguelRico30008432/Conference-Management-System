@@ -505,15 +505,33 @@ export default function DefinitionsPage() {
                 color="success"
                 onClick={async () => handleUpdateConflicts()}
                 sx={{
-                  maxWidth: "60px",
-                  maxHeight: "30px",
+                  maxWidth: "300px",
+                  maxHeight: "100px",
                   minWidth: "5px",
                   minHeight: "30px",
                   mt: 2,
                   mb: 2,
+                  ml: 2,
                 }}
               >
                 Check for Conflicts
+              </MDButton>
+
+              <MDButton
+                variant="gradient"
+                color="success"
+                onClick={async () => handleUpdateConflicts()}
+                sx={{
+                  maxWidth: "300px",
+                  maxHeight: "100px",
+                  minWidth: "5px",
+                  minHeight: "30px",
+                  mt: 2,
+                  mb: 2,
+                  ml: 2,
+                }}
+              >
+                Run Bidding Algorithm
               </MDButton>
 
               <Card sx={{ maxWidth: 1400 }}>
