@@ -204,6 +204,7 @@ export default function Conflicts() {
       const jsonResponse = await response.json();
 
       if (response.status === 200) {
+        getInfoForDeclareConflicts();
         setMessage(
           <Alert severity="success">Conflict Added With Success</Alert>
         );
