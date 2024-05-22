@@ -157,7 +157,7 @@ router.post(
       console.log(result);
       return res.status(200).send(result);
     } catch (error) {
-      log.addLog(error, "database", "AllConflicts -> /getConflicts");
+      log.addLog(error, "database", "AllConflicts -> /infoToDeclareConflicts");
       return res.status(500).send({ msg: "Error fetching submission data" });
     }
   }
@@ -165,9 +165,10 @@ router.post(
 
 router.post("/declareConflict", auth.ensureAuthenticated, async (req, res) => {
   try {
-    return res.status(200);
+    console.log("estou no endpoint");
+    return res.status(200).send();
   } catch (error) {
-    log.addLog(error, "database", "AllConflicts -> /getConflicts");
+    log.addLog(error, "database", "AllConflicts -> /declareConflict");
     return res.status(500).send({ msg: "Error fetching submission data" });
   }
 });

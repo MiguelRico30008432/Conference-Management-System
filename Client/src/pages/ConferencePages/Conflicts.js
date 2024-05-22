@@ -123,7 +123,6 @@ export default function Conflicts() {
     { field: "submissiontitle", headerName: "Submission Title", width: 400 },
     { field: "authors", headerName: "Submission Author(s)", width: 400 },
     {
-      //N esta correto
       field: "committee",
       headerName: "Committee Member",
       width: 400,
@@ -181,7 +180,36 @@ export default function Conflicts() {
   ];
 
   async function handleSubmitConflict(info) {
-    console.log(info);
+    setOpenLoading(true);
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/declareConflict`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            committeeMember: memberInConflict,
+            conflictInfo: info,
+          }),
+        }
+      );
+
+      const jsonResponse = await response.json();
+
+      if (response.status === 200) {
+      } else {
+        setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
+      }
+    } catch (error) {
+      setMessage(
+        <Alert severity="error">Failed to declare new conflict!</Alert>
+      );
+    }
+    setOpenLoading(false);
   }
 
   return (
