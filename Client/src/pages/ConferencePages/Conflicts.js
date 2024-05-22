@@ -25,6 +25,7 @@ export default function Conflicts() {
   const [openLoading, setOpenLoading] = useState(false);
   const [declareConflicts, setDeclareConflicts] = useState(false);
   const [memberInConflict, setMemberInConflict] = useState(null);
+  const [dataToInsertConflict, setDataToInsertConflict] = useState(null);
 
   useEffect(() => {
     async function fetchAllConflicts() {
@@ -91,23 +92,13 @@ export default function Conflicts() {
       const jsonResponse = await response.json();
 
       if (response.status === 200) {
-        const dataForTable = [
-          {
-            authors: jsonResponse.submissionInfo[0].authors,
-            submissiontitle: jsonResponse.submissionInfo[0].submissiontitle,
-            submissionid: jsonResponse.submissionInfo[0].submissionid,
-            committee: jsonResponse.committee[0].committee,
-          },
-        ];
-
-        for (let line of dataForTable) {
+        for (let line of jsonResponse) {
           line.id = uuidv4();
           setRowsToDeclareConflicts((allExistingRows) => [
             ...allExistingRows,
             line,
           ]);
         }
-        console.log(dataForTable);
       } else {
         setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
       }
@@ -160,7 +151,7 @@ export default function Conflicts() {
     {
       field: "",
       width: 100,
-      renderCell: () => {
+      renderCell: (params) => {
         return (
           <div
             style={{
@@ -173,7 +164,7 @@ export default function Conflicts() {
             <MDButton
               variant="gradient"
               color="info"
-              onClick={async () => handleSubmitConflict()}
+              onClick={async () => handleSubmitConflict(params.row)}
               sx={{
                 maxWidth: "100px",
                 maxHeight: "30px",
@@ -189,8 +180,8 @@ export default function Conflicts() {
     },
   ];
 
-  async function handleSubmitConflict() {
-    console.log(memberInConflict);
+  async function handleSubmitConflict(info) {
+    console.log(info);
   }
 
   return (

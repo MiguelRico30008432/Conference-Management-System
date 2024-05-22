@@ -120,34 +120,42 @@ router.post(
   auth.ensureAuthenticated,
   async (req, res) => {
     try {
-      const submissionInfo = await db.fetchDataCst(`
-    SELECT 
-      STRING_AGG(CONCAT(a.authorfirstname, ' ', a.authorlastname), ', ') AS authors,
-      s.submissiontitle,
-      s.submissionid
-    FROM 
-      conflicts c
-    JOIN submissions s ON c.conflictsubmissionid = s.submissionid
-    JOIN authors a ON s.submissionid = a.submissionid	
-    WHERE
-      c.conflictconfid = ${req.body.confid}
-    GROUP BY
-      s.submissionid
-    `);
-
-      const committee = await db.fetchDataCst(`
-    SELECT
-      STRING_AGG(CONCAT(u.userfirstname, ' ', u.userlastname, ' ', '(', u.useremail, ')'), ', ') AS committee
-    FROM
-      userroles ur
-    JOIN users u ON ur.userid = u.userid
-    WHERE
-      confid = ${req.body.confid}
+      const result = await db.fetchDataCst(`
+      WITH submission_authors AS (
+        SELECT 
+          s.submissionid,
+          s.submissiontitle,
+          STRING_AGG(CONCAT(a.authorfirstname, ' ', a.authorlastname), ', ') AS authors
+        FROM 
+          submissions s
+        JOIN authors a ON s.submissionid = a.submissionid
+        GROUP BY 
+          s.submissionid
+      ),
+      committee_info AS (
+        SELECT
+          ur.confid,
+          STRING_AGG(CONCAT(u.userfirstname, ' ', u.userlastname, ' ', '(', u.useremail, ')'), ', ') AS committee
+        FROM
+          userroles ur
+        JOIN users u ON ur.userid = u.userid
+        GROUP BY
+          ur.confid
+      )
+      SELECT
+        sa.authors,
+        sa.submissiontitle,
+        sa.submissionid,
+        ci.committee
+      FROM
+        conflicts c
+      JOIN submission_authors sa ON c.conflictsubmissionid = sa.submissionid
+      JOIN committee_info ci ON c.conflictconfid = ci.confid
+      WHERE
+        c.conflictconfid = ${req.body.confid}
       `);
-
-      const data = { submissionInfo, committee };
-      console.log(data);
-      return res.status(200).send(data);
+      console.log(result);
+      return res.status(200).send(result);
     } catch (error) {
       log.addLog(error, "database", "AllConflicts -> /getConflicts");
       return res.status(500).send({ msg: "Error fetching submission data" });
