@@ -40,7 +40,7 @@ export default function MyProfilePage() {
   const [password, setPasword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
 
-  const [inviteCode, setInviteCode] = useState("");
+  const [code, setInviteCode] = useState("");
 
   useEffect(() => {
     async function getUserData() {
@@ -221,7 +221,8 @@ export default function MyProfilePage() {
   }
 
   async function handleInvitationCode() {
-    if (inviteCode.trim() === "") {
+    const inviteCode = code.trim();
+    if (inviteCode === "") {
       setInviteMessage(<Alert severity="error">Please enter an invitation code.</Alert>);
       return;
     }
@@ -522,7 +523,7 @@ export default function MyProfilePage() {
               id="code"
               label="Intivation Code"
               autoFocus
-              value={inviteCode}
+              value={code}
               onChange={(e) => setInviteCode(e.target.value)}
               sx={{ ml: 2, width: 150 }}
             />

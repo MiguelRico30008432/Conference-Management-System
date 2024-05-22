@@ -72,26 +72,36 @@ router.post("/saveUserPassword", auth.ensureAuthenticated, async (req, res) => {
 
 router.post("/saveInvitationCode", auth.ensureAuthenticated, async (req, res) => {
   try {
-    const userInfo = await db.fetchData("users", "userid", req.body.userID);
+    const userId = req.body.userID;
+    const userInfo = await db.fetchData("users", "userid", userId);
     const userEmail = userInfo[0].useremail;
+    
     const invitationInfo = await db.fetchData("invitations", "invitationemail", userEmail);
     const userRole = invitationInfo[0].invitationrole;
     const confID = invitationInfo[0].confid;
 
     if (invitationInfo[0].invitationcode === req.body.inviteCode && 
-      userInfo[0].userid === req.body.userID) {
-    await db.addData("userroles", {
-        userid: req.body.userID,
-        userrole: userRole,
-        confid: confID
-      });
-    return res.status(200).send({ msg: "" }); 
-  } else {
-    return res.status(403).send({ msg: "This code isn't associated with your user." });
-  }} catch (error) {
-    return res.status(500).send({ msg: "Internal Error" });
-  }
+      userInfo[0].userid === userId) {
+      const infoExists = await db.fetchData("userroles", "userid", userId);
+      if (userId === infoExists[0].userid && 
+        confID === infoExists[0].confid &&
+        userRole === infoExists[0].userrole) {
+          return res.status(409).send({ msg: "This code is already registered." });
+      } else {
+        await db.addData("userroles", {
+          userid: req.body.userID,
+          userrole: userRole,
+          confid: confID
+        });
+        return res.status(200).send({ msg: "" }); 
+        }
+    } else {
+      return res.status(403).send({ msg: "This code isn't associated with your user." });
+    }} catch (error) {
+      return res.status(500).send({ msg: "Internal Error" });
+    }
 });
+
 
 
 module.exports = router;
