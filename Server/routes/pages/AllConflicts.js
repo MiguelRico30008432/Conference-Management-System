@@ -89,7 +89,9 @@ router.post(
       return res.status(200).send({ msg: "Conflicts have been Updated" });
     } catch (error) {
       log.addLog(error, "database", "AllConflicts -> /determineConflicts");
-      return res.status(500).send({ msg: "Error fetching submission data" });
+      return res
+        .status(500)
+        .send({ msg: "Error declaring Conflicts (Algorithm)" });
     }
   }
 );
@@ -111,7 +113,7 @@ router.post("/getConflicts", auth.ensureAuthenticated, async (req, res) => {
     return res.status(200).send(result);
   } catch (error) {
     log.addLog(error, "database", "AllConflicts -> /getConflicts");
-    return res.status(500).send({ msg: "Error fetching submission data" });
+    return res.status(500).send({ msg: "Error fetching conflicts" });
   }
 });
 
@@ -121,55 +123,52 @@ router.post(
   async (req, res) => {
     try {
       const result = await db.fetchDataCst(`
-      WITH submission_authors AS (
-        SELECT 
-          s.submissionid,
-          s.submissiontitle,
-          STRING_AGG(CONCAT(a.authorfirstname, ' ', a.authorlastname), ', ') AS authors
-        FROM 
-          submissions s
-        JOIN authors a ON s.submissionid = a.submissionid
-        GROUP BY 
-          s.submissionid
-      ),
-      committee_info AS (
-        SELECT
-          ur.confid,
-          STRING_AGG(CONCAT(u.userfirstname, ' ', u.userlastname, ' ', '(', u.useremail, ')'), ', ') AS committee
-        FROM
-          userroles ur
-        JOIN users u ON ur.userid = u.userid
-        GROUP BY
-          ur.confid
-      )
-      SELECT
-        sa.authors,
-        sa.submissiontitle,
-        sa.submissionid,
-        ci.committee
-      FROM
-        conflicts c
-      JOIN submission_authors sa ON c.conflictsubmissionid = sa.submissionid
-      JOIN committee_info ci ON c.conflictconfid = ci.confid
-      WHERE
-        c.conflictconfid = ${req.body.confid}
-      `);
-      console.log(result);
+    SELECT 
+      s.submissionid,
+      s.submissiontitle,
+      STRING_AGG(DISTINCT a.authorfirstname || ' ' || a.authorlastname, ', ') AS authorfullnames,
+      STRING_AGG(DISTINCT u.userfirstname || ' ' || u.userlastname, ', ') AS committeefullnames,
+      STRING_AGG(DISTINCT u.useremail, ', ') AS committeeemails
+    FROM 
+      submissions s
+    JOIN 
+      authors a ON s.submissionid = a.submissionid
+    JOIN 
+      userroles ur ON ur.confid = ${req.body.confid} AND ur.userrole IN ('Owner', 'Chair', 'Committee')
+    JOIN 
+      users u ON u.userid = ur.userid
+    LEFT JOIN 
+      conflicts c ON c.conflictconfid = ${req.body.confid} 
+        AND c.conflictsubmissionid = s.submissionid 
+        AND c.conflictuseremail = u.useremail
+    WHERE 
+      s.submissionconfid = ${req.body.confid}
+      AND c.conflictid IS NULL
+    GROUP BY 
+      s.submissionid, s.submissiontitle;
+    `);
+
       return res.status(200).send(result);
     } catch (error) {
       log.addLog(error, "database", "AllConflicts -> /infoToDeclareConflicts");
-      return res.status(500).send({ msg: "Error fetching submission data" });
+      return res
+        .status(500)
+        .send({ msg: "Error getting info to declare Conflicts" });
     }
   }
 );
 
 router.post("/declareConflict", auth.ensureAuthenticated, async (req, res) => {
   try {
-    console.log("estou no endpoint");
-    return res.status(200).send();
+    console.log(req.body.dataToAddConflict);
+    await db.fetchDataCst(`
+    INSERT INTO conflicts (conflictconfid, conflictsubmissionid, conflictreason, conflictuseremail)
+    VALUES (${req.body.confid}, ${req.body.dataToAddConflict.submissionid}, 'Conflict Added By The Committee' , '${req.body.dataToAddConflict.committeeemails}')
+    `);
+    return res.status(200).send({ msg: "Conflict Created With Success." });
   } catch (error) {
     log.addLog(error, "database", "AllConflicts -> /declareConflict");
-    return res.status(500).send({ msg: "Error fetching submission data" });
+    return res.status(500).send({ msg: "Error declaring new conflict" });
   }
 });
 

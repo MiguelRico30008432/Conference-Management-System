@@ -24,8 +24,6 @@ export default function Conflicts() {
   const [rowsToDeclareConflicts, setRowsToDeclareConflicts] = useState([]);
   const [openLoading, setOpenLoading] = useState(false);
   const [declareConflicts, setDeclareConflicts] = useState(false);
-  const [memberInConflict, setMemberInConflict] = useState(null);
-  const [dataToInsertConflict, setDataToInsertConflict] = useState(null);
 
   useEffect(() => {
     async function fetchAllConflicts() {
@@ -121,26 +119,31 @@ export default function Conflicts() {
 
   const columsForDeclareConflicts = [
     { field: "submissiontitle", headerName: "Submission Title", width: 400 },
-    { field: "authors", headerName: "Submission Author(s)", width: 400 },
     {
-      field: "committee",
+      field: "authorfullnames",
+      headerName: "Submission Author(s)",
+      width: 400,
+    },
+    {
+      field: "committeefullnames",
       headerName: "Committee Member",
       width: 400,
       renderCell: (params) => {
-        const committeeList = params.value.split(", ");
+        const committeeList = params.value ? params.value.split(", ") : [];
         return (
           <FormControl fullWidth>
-            <InputLabel id="demo-simple-select-label">
+            <InputLabel id={`select-label-${params.id}`}>
               Select Committee Member
             </InputLabel>
             <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
+              labelId={`select-label-${params.id}`}
+              id={`select-${params.id}`}
               label="Member in Conflict"
-              onChange={(e) => setMemberInConflict(e.target.value)}
             >
-              {committeeList.map((memberName) => (
-                <MenuItem value={memberName}>{memberName}</MenuItem>
+              {committeeList.map((memberName, index) => (
+                <MenuItem key={index} value={memberName}>
+                  {memberName}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
@@ -192,8 +195,8 @@ export default function Conflicts() {
           },
           credentials: "include",
           body: JSON.stringify({
-            committeeMember: memberInConflict,
-            conflictInfo: info,
+            dataToAddConflict: info,
+            confid: confID,
           }),
         }
       );
@@ -201,10 +204,14 @@ export default function Conflicts() {
       const jsonResponse = await response.json();
 
       if (response.status === 200) {
+        setMessage(
+          <Alert severity="success">Conflict Added With Success</Alert>
+        );
       } else {
         setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
       }
     } catch (error) {
+      console.log(error);
       setMessage(
         <Alert severity="error">Failed to declare new conflict!</Alert>
       );
