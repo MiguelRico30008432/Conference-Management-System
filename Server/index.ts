@@ -8,16 +8,19 @@ const log = require("./logs/logsManagement");
 require("./passportStrategies/localStrategy");
 const cors = require("cors");
 const db = require("./utility/database");
-const PgSession = require("connect-pg-simple")(session);
-const https = require("https");
-const fs = require("fs");
-const path = require("path");
+const PgSession = require('connect-pg-simple')(session);
+const https = require('https');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT;
 const SECRET = process.env.SECRET;
 
-const allowedOrigins = ["http://localhost:3000", "https://ualconf.vercel.app"];
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://ualconf.vercel.app"
+];
 
 const corsOptions = {
   origin: allowedOrigins,
@@ -34,7 +37,7 @@ app.use(
   session({
     store: new PgSession({
       pool: db.pool,
-      tableName: "session",
+      tableName: 'session'
     }),
     secret: SECRET,
     saveUninitialized: false,
@@ -42,7 +45,7 @@ app.use(
     cookie: {
       maxAge: 60000 * 60 * 3,
       secure: true,
-      sameSite: "none",
+      sameSite: 'none'
     },
   })
 );
@@ -52,19 +55,20 @@ app.use(passport.session());
 
 app.use(routes);
 
+
 app.get("/", (request, response) => {
   request.session.visited = true;
   return response.sendStatus(200);
 });
 
 const httpsOptions = {
-  key: fs.readFileSync(path.join(__dirname, "/certs/key.pem")),
-  cert: fs.readFileSync(path.join(__dirname, "/certs/cert.pem")),
+   key: fs.readFileSync(path.join(__dirname, '/certs/key.pem')),
+   cert: fs.readFileSync(path.join(__dirname, '/certs/cert.pem')),
 };
 
 const port = 8003;
 https.createServer(httpsOptions, app).listen(port, () => {
-  console.log(`Listening on port ${port}`);
+	console.log(`Listening on port ${port}`);
 });
 
 //app.use(express.static("public"));
