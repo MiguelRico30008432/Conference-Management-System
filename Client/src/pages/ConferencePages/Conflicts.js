@@ -111,7 +111,6 @@ export default function Conflicts() {
   }
 
   const columns = [
-    //falta mudar o nome das variaveis
     { field: "submissiontitle", headerName: "Submission Title", width: 400 },
     { field: "fullname", headerName: "Commite Member", width: 400 },
     { field: "conflictreason", headerName: "Conflict Reason", width: 500 },

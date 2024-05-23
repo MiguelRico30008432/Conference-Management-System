@@ -8,6 +8,7 @@ import AllSubmissions from "pages/ConferencePages/AllSubmissions";
 //Bidding
 import Bidding from "pages/ConferencePages/BiddingPage";
 import Conflicts from "pages/ConferencePages/Conflicts";
+import MyBiddings from "pages/ConferencePages/MyBiddings";
 
 //Reviews
 import MyReviews from "pages/ConferencePages/MyReviews";
@@ -92,6 +93,14 @@ const ConfRoutes = [
     submenu: "Bidding",
     route: "/MyConferences/Conference/Bidding",
     component: <Bidding />,
+    permissions: ["Owner", "Chair", "Committee"],
+  },
+  {
+    type: "collapse", //Done
+    name: "My Biddings",
+    submenu: "Bidding",
+    route: "/MyConferences/Conference/MyBidding",
+    component: <MyBiddings />,
     permissions: ["Owner", "Chair", "Committee"],
   },
   {

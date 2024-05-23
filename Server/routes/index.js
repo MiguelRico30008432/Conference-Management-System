@@ -21,6 +21,8 @@ const allConflicts = require("./pages/AllConflicts");
 const events = require("./pages/Events");
 const updateSubmission = require("./pages/UpdateSubmission");
 const callForPapers = require("./pages/CallForPapers");
+const bidding = require("./pages/Bidding");
+const myBiddings = require("./pages/MyBiddings");
 
 router.use(fileUpload());
 
@@ -43,5 +45,7 @@ router.use(allConflicts);
 router.use(events);
 router.use(updateSubmission);
 router.use(callForPapers);
+router.use(bidding);
+router.use(myBiddings);
 
 module.exports = router;

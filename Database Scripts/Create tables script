@@ -162,3 +162,15 @@ CREATE TABLE conflicts (
     conflictadddata TIMESTAMP NOT NULL DEFAULT current_timestamp
 )
 
+___________________________________________________________________________________________________________
+Table Biddings
+
+CREATE TABLE biddings (
+    biddingid SERIAL PRIMARY KEY,
+    biddingconfid INT, FOREIGN KEY (biddingconfid) REFERENCES conferences(confid),
+    biddingsubmissionid INT, FOREIGN KEY (biddingsubmissionid) REFERENCES submissions(submissionid),
+    biddinguserid INT, FOREIGN KEY (biddinguserid) REFERENCES users(userid),
+    biddingconfidence INT,
+    biddingadddata TIMESTAMP NOT NULL DEFAULT current_timestamp
+)
+

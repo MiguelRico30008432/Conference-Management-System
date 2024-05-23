@@ -17,59 +17,59 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Checkbox from "@mui/material/Checkbox";
 
-export default function BiddingPage() {
+export default function MyBiddingPage() {
   const { confID } = useContext(ConferenceContext);
   const { user, isLoggedIn } = useContext(AuthContext);
   const [message, setMessage] = useState(null);
   const [openLoading, setOpenLoading] = useState(false);
   const [rows, setRows] = useState([]);
 
-  //O use effect não tem a função defina dentro do mesmo para, na função handleSubmit;
-  //poder ser chamada fetchAllSubmissionsForBidding() sem dar refresh a pagina
   useEffect(() => {
+    async function fetchAllSubmissionsForBidding() {
+      setOpenLoading(true);
+      setRows([]);
+
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/getSubmissionsForBidding`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json; charset=UTF-8",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              confid: confID,
+            }),
+          }
+        );
+
+        const jsonResponse = await response.json();
+
+        if (response.status === 200) {
+          for (let line of jsonResponse) {
+            line.id = uuidv4();
+            line.confidence = 1;
+            line.userid = user;
+            setRows((allExistingRows) => [...allExistingRows, line]);
+          }
+        } else {
+          setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
+        }
+      } catch (error) {
+        setMessage(
+          <Alert severity="error">
+            Failed to fetch submissions for bidding!
+          </Alert>
+        );
+      }
+      setOpenLoading(false);
+    }
+
     if (isLoggedIn && confID) {
       fetchAllSubmissionsForBidding();
     }
   }, [confID, isLoggedIn]);
-
-  async function fetchAllSubmissionsForBidding() {
-    setOpenLoading(true);
-    setRows([]);
-
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/getSubmissionsForBidding`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            confid: confID,
-            userid: user,
-          }),
-        }
-      );
-
-      const jsonResponse = await response.json();
-
-      if (response.status === 200) {
-        for (let line of jsonResponse) {
-          line.id = uuidv4();
-          line.confidence = 1;
-          setRows((allExistingRows) => [...allExistingRows, line]);
-        }
-      } else {
-        setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
-      }
-    } catch (error) {
-      setMessage(
-        <Alert severity="error">Failed to fetch submissions for bidding!</Alert>
-      );
-    }
-    setOpenLoading(false);
-  }
 
   const columns = [
     // Nome da Submission
@@ -204,8 +204,6 @@ export default function BiddingPage() {
           credentials: "include",
           body: JSON.stringify({
             bids: selectedRows,
-            userid: user,
-            confid: confID,
           }),
         }
       );
@@ -216,7 +214,6 @@ export default function BiddingPage() {
         setMessage(
           <Alert severity="success">Bids submitted successfully!</Alert>
         );
-        fetchAllSubmissionsForBidding();
       } else {
         setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
       }
@@ -256,14 +253,10 @@ export default function BiddingPage() {
             <MDBox mb={3} textAlign="left">
               <Card>
                 <MDTypography ml={2} variant="h6">
-                  Bidding Process
+                  My Biddings
                 </MDTypography>
                 <MDTypography ml={2} variant="body2">
-                  In this page you are able to choose wich submissions you wish
-                  to review and attribute a value to how confortable you are
-                  around the subject.<br></br>
-                  After clicking submit, submissions with the checkbox clicked,
-                  will stop showing up and will be visible in My Biddings page.
+                  text goes here
                 </MDTypography>
               </Card>
             </MDBox>
