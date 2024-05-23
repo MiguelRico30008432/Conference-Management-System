@@ -9,15 +9,17 @@ require("../passportStrategies/localStrategy");
 const cors = require("cors");
 const db = require("../utility/database");
 const PgSession = require('connect-pg-simple')(session);
-
+const https = require('https');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT;
 const SECRET = process.env.SECRET;
 
 const allowedOrigins = [
-  "https://ualconf.vercel.app",
-  "http://localhost:3000"
+  "http://localhost:3000",
+  "https://ualconf.vercel.app"
 ];
 
 const corsOptions = {
@@ -27,7 +29,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.options("*", cors(corsOptions)); // Enable pre-flight for all routes
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -41,7 +43,9 @@ app.use(
     saveUninitialized: false,
     resave: false,
     cookie: {
-      maxAge: 60000 * 60 * 3
+      maxAge: 60000 * 60 * 3,
+      secure: true,
+      sameSite: 'none'
     },
   })
 );
@@ -51,8 +55,23 @@ app.use(passport.session());
 
 app.use(routes);
 
-app.get("/", (req, res) => res.send("Express on Vercel"));
 
-app.listen(PORT, () => console.log(`Server is running on ${PORT}`));
+app.get("/", (request, response) => {
+  request.session.visited = true;
+  return response.sendStatus(200);
+});
 
-module.exports = app;
+const httpsOptions = {
+   key: fs.readFileSync(path.join(__dirname, '/certs/key.pem')),
+   cert: fs.readFileSync(path.join(__dirname, '/certs/cert.pem')),
+};
+
+const port = 8003;
+https.createServer(httpsOptions, app).listen(port, () => {
+	console.log(`Listening on port ${port}`);
+});
+
+//app.use(express.static("public"));
+//app.listen(PORT, "0.0.0.0", () => {
+//  console.log(`Server is running on ${PORT}`);
+//});
