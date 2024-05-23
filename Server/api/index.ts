@@ -71,6 +71,8 @@ https.createServer(httpsOptions, app).listen(port, () => {
 	console.log(`Listening on port ${port}`);
 });
 
+module.exports = app;
+
 //app.use(express.static("public"));
 //app.listen(PORT, "0.0.0.0", () => {
 //  console.log(`Server is running on ${PORT}`);
