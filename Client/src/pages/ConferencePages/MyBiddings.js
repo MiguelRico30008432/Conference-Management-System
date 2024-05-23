@@ -24,52 +24,51 @@ export default function MyBiddingPage() {
   const [openLoading, setOpenLoading] = useState(false);
   const [rows, setRows] = useState([]);
 
+  //O use effect não tem a função defina dentro do mesmo para, na função handleSubmit;
+  //poder ser chamada fetchUserBiddings() sem dar refresh a pagina
   useEffect(() => {
-    async function fetchAllSubmissionsForBidding() {
-      setOpenLoading(true);
-      setRows([]);
-
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/getSubmissionsForBidding`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json; charset=UTF-8",
-            },
-            credentials: "include",
-            body: JSON.stringify({
-              confid: confID,
-            }),
-          }
-        );
-
-        const jsonResponse = await response.json();
-
-        if (response.status === 200) {
-          for (let line of jsonResponse) {
-            line.id = uuidv4();
-            line.confidence = 1;
-            line.userid = user;
-            setRows((allExistingRows) => [...allExistingRows, line]);
-          }
-        } else {
-          setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
-        }
-      } catch (error) {
-        setMessage(
-          <Alert severity="error">
-            Failed to fetch submissions for bidding!
-          </Alert>
-        );
-      }
-      setOpenLoading(false);
-    }
-
     if (isLoggedIn && confID) {
-      fetchAllSubmissionsForBidding();
+      fetchUserBiddings();
     }
   }, [confID, isLoggedIn]);
+
+  async function fetchUserBiddings() {
+    setOpenLoading(true);
+    setRows([]);
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/getUserBiddings`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            confid: confID,
+            userid: user,
+          }),
+        }
+      );
+
+      const jsonResponse = await response.json();
+
+      if (response.status === 200) {
+        for (let line of jsonResponse) {
+          line.id = uuidv4();
+          setRows((allExistingRows) => [...allExistingRows, line]);
+        }
+      } else {
+        setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
+      }
+    } catch (error) {
+      setMessage(
+        <Alert severity="error">Failed to fetch user biddings!</Alert>
+      );
+    }
+    setOpenLoading(false);
+  }
 
   const columns = [
     // Nome da Submission
@@ -113,7 +112,7 @@ export default function MyBiddingPage() {
     },
     // Campo para descrever de 0-5 o nivel de confiança em avaliar a submissão
     {
-      field: "confidence",
+      field: "biddingconfidence",
       headerName: "Confidence Level",
       width: 150,
       editable: true,
@@ -136,8 +135,8 @@ export default function MyBiddingPage() {
     },
     // Checkbox para assinalar caso queira fazer bidding pela submissão
     {
-      field: "",
-      headerName: "Bidding",
+      field: "Edit",
+      headerName: "Edit",
       sortable: false,
       disableColumnMenu: true,
       resizable: false,
@@ -146,6 +145,20 @@ export default function MyBiddingPage() {
         <Checkbox
           checked={params.value}
           onChange={(event) => handleCheckboxChange(event, params)}
+        />
+      ),
+    },
+    {
+      field: "",
+      headerName: "Delete",
+      sortable: false,
+      disableColumnMenu: true,
+      resizable: false,
+      width: 150,
+      renderCell: (params) => (
+        <Checkbox
+          checked={params.value}
+          onChange={(event) => handleDeleteCheckboxChange(event, params)}
         />
       ),
     },
@@ -165,7 +178,7 @@ export default function MyBiddingPage() {
           },
           credentials: "include",
           body: JSON.stringify({
-            submissionID: submissionInfo.submissionid,
+            submissionID: submissionInfo.biddingsubmissionid,
           }),
         }
       );
@@ -191,11 +204,22 @@ export default function MyBiddingPage() {
 
   async function handleSubmit() {
     const selectedRows = rows.filter((row) => row.bidding);
+    const rowsToDelete = rows.filter((row) => row.delete);
 
+    const conflictingRows = rows.filter((row) => row.bidding && row.delete);
+
+    if (conflictingRows.length > 0) {
+      setMessage(
+        <Alert severity="error">
+          You cannot edit and delete a bid at the same time.
+        </Alert>
+      );
+      return;
+    }
     setOpenLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/saveBidding`,
+        `${process.env.REACT_APP_API_URL}/updateBidding`,
         {
           method: "POST",
           headers: {
@@ -203,7 +227,10 @@ export default function MyBiddingPage() {
           },
           credentials: "include",
           body: JSON.stringify({
-            bids: selectedRows,
+            editbids: selectedRows,
+            deletebids: rowsToDelete,
+            userid: user,
+            confid: confID,
           }),
         }
       );
@@ -212,13 +239,14 @@ export default function MyBiddingPage() {
 
       if (response.status === 200) {
         setMessage(
-          <Alert severity="success">Bids submitted successfully!</Alert>
+          <Alert severity="success">Bids updated successfully!</Alert>
         );
+        fetchUserBiddings();
       } else {
         setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
       }
     } catch (error) {
-      setMessage(<Alert severity="error">Failed to submit bids!</Alert>);
+      setMessage(<Alert severity="error">Failed to update bids!</Alert>);
     }
     setOpenLoading(false);
   }
@@ -233,12 +261,20 @@ export default function MyBiddingPage() {
     );
   };
 
+  const handleDeleteCheckboxChange = (event, params) => {
+    const { id } = params.row;
+    const { checked } = event.target;
+    setRows((prevRows) =>
+      prevRows.map((row) => (row.id === id ? { ...row, delete: checked } : row))
+    );
+  };
+
   const handleConfidenceChange = (event, params) => {
     const { id } = params.row;
     const { value } = event.target;
     setRows((prevRows) =>
       prevRows.map((row) =>
-        row.id === id ? { ...row, confidence: value } : row
+        row.id === id ? { ...row, biddingconfidence: value } : row
       )
     );
   };
@@ -256,7 +292,10 @@ export default function MyBiddingPage() {
                   My Biddings
                 </MDTypography>
                 <MDTypography ml={2} variant="body2">
-                  text goes here
+                  In this page you are able to update(change your confidence
+                  level) or delete your biddings.<br></br>
+                  After submit if you choose to delete a bid, then it will no
+                  longer show in the table.<br></br>
                 </MDTypography>
               </Card>
             </MDBox>
