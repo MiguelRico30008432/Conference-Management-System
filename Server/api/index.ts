@@ -2,12 +2,12 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const passport = require("passport");
 const session = require("express-session");
-const routes = require("./routes/index");
-const ver = require("./utility/verifications");
-const log = require("./logs/logsManagement");
-require("./passportStrategies/localStrategy");
+const routes = require("../routes/index");
+const ver = require("../utility/verifications");
+const log = require("../logs/logsManagement");
+require("../passportStrategies/localStrategy");
 const cors = require("cors");
-const db = require("./utility/database");
+const db = require("../utility/database");
 const PgSession = require('connect-pg-simple')(session);
 const https = require('https');
 const fs = require('fs');
@@ -62,8 +62,8 @@ app.get("/", (request, response) => {
 });
 
 const httpsOptions = {
-   key: fs.readFileSync(path.join(__dirname, '/certs/key.pem')),
-   cert: fs.readFileSync(path.join(__dirname, '/certs/cert.pem')),
+   key: fs.readFileSync(path.join(__dirname, '../certs/key.pem')),
+   cert: fs.readFileSync(path.join(__dirname, '../certs/cert.pem')),
 };
 
 const port = 8003;
