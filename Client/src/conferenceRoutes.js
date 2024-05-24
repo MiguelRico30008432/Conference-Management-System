@@ -67,7 +67,7 @@ const ConfRoutes = [
   },
   {
     type: "collapse", //Done
-    name: "My Submission",
+    name: "My Submissions",
     submenu: "Submissions",
     route: "/MyConferences/Conference/MySubmissions",
     component: <MySubmissions />,

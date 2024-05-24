@@ -86,6 +86,9 @@ router.post(
           .status(500)
           .send({ msg: "No submissions where detected for this conference" });
       }
+
+      verifyBiddingsAfterConflictCheck();
+
       return res.status(200).send({ msg: "Conflicts have been Updated" });
     } catch (error) {
       log.addLog(error, "database", "AllConflicts -> /determineConflicts");
@@ -165,11 +168,34 @@ router.post("/declareConflict", auth.ensureAuthenticated, async (req, res) => {
     INSERT INTO conflicts (conflictconfid, conflictsubmissionid, conflictreason, conflictuseremail)
     VALUES (${req.body.confid}, ${req.body.dataToAddConflict.submissionid}, 'Conflict Added By The Committee' , '${req.body.dataToAddConflict.committeeemails}')
     `);
+    verifyBiddingsAfterConflictCheck();
     return res.status(200).send({ msg: "Conflict Created With Success." });
   } catch (error) {
     log.addLog(error, "database", "AllConflicts -> /declareConflict");
     return res.status(500).send({ msg: "Error declaring new conflict" });
   }
 });
+
+async function verifyBiddingsAfterConflictCheck() {
+  //verificar se já existem biddings que sejam conflitos se sim apagar as mesmas
+  const result = await db.fetchDataCst(`
+  SELECT b.biddingid
+  FROM biddings b
+  JOIN conflicts c ON b.biddingconfid = c.conflictconfid 
+    AND b.biddingsubmissionid = c.conflictsubmissionid
+  JOIN users u ON c.conflictuseremail = u.useremail
+  WHERE b.biddinguserid = u.userid
+  `);
+
+  console.log(result);
+  if (result.length > 0) {
+    for (const bid of result) {
+      await db.fetchDataCst(`
+      DELETE FROM biddings WHERE biddingid = ${bid.biddingid}
+      `);
+    }
+  }
+  console.log("verifyBiddingsAfterConflictCheck");
+}
 
 module.exports = router;
