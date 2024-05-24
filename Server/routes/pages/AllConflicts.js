@@ -187,7 +187,6 @@ async function verifyBiddingsAfterConflictCheck() {
   WHERE b.biddinguserid = u.userid
   `);
 
-  console.log(result);
   if (result.length > 0) {
     for (const bid of result) {
       await db.fetchDataCst(`
@@ -195,7 +194,6 @@ async function verifyBiddingsAfterConflictCheck() {
       `);
     }
   }
-  console.log("verifyBiddingsAfterConflictCheck");
 }
 
 module.exports = router;
