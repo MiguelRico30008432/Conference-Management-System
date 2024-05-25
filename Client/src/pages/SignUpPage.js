@@ -48,7 +48,7 @@ export default function SignUpPage() {
         affiliation
       )
     ) {
-      await Signup(firstName, lastName, email, phone, password, affiliation, code);
+      await Signup(firstName.trim(), lastName.trim(), email.trim(), phone.trim(), password, affiliation.trim(), code.trim());
     }
   };
 
