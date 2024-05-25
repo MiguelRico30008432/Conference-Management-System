@@ -12,7 +12,7 @@ router.post("/myConferences", auth.ensureAuthenticated, async (req, res) => {
         userRoles.confid AS "id",
         confName,
         conferences.confid,
-        STRING_AGG(userrole, ', ') AS userrole,
+        STRING_AGG(userrole, ',') AS userrole,
         (
           SELECT status
           FROM (
@@ -42,7 +42,7 @@ router.post("/myConferences", auth.ensureAuthenticated, async (req, res) => {
             UNION
             SELECT
               CASE 
-                WHEN NOW() > confendreview THEN 'Starting Conference' 
+                WHEN NOW() > confendreview THEN 'Pre-Conference' 
                 ELSE NULL 
               END AS status
           ) AS statuses

@@ -62,7 +62,18 @@ router.post("/updateSubmission", auth.ensureAuthenticated, async (req, res) => {
               VALUES ('${userRegistered[0].useraffiliation}', '${userRegistered[0].useremail}', '${userRegistered[0].userfirstname}', '${userRegistered[0].userlastname}', ${req.body.submissionid}, ${userRegistered[0].userid})`
           );
 
-          //Falta adicionar ao user roles
+          const userRole = await db.fetchDataCst(`
+          SELECT userRole AS role 
+          FROM userroles 
+          WHERE 
+            userid = ${userRegistered[0].userid} AND confid = ${req.body.confID} AND userrole = 'Author'`);
+
+          if (userRole.length === 0) {
+            await db.fetchDataCst(
+              `INSERT INTO userroles (userid, userrole, confid) 
+              VALUES (${userRegistered[0].userid}, 'Author', ${req.body.confID})`
+            );
+          }
         }
       } else {
         //Autor está associado à submissão

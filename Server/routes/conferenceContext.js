@@ -8,7 +8,7 @@ router.post("/confContext", auth.ensureAuthenticated, async (req, res) => {
     const query = `
     SELECT 
         usercurrentconfid,
-        STRING_AGG(userrole, ', ') AS userrole
+        STRING_AGG(userrole, ',') AS userrole
     FROM users
     INNER JOIN conferences ON conferences.confid = users.usercurrentconfid
     INNER JOIN userRoles ON userRoles.confid = conferences.confid AND userRoles.userid = users.userid 

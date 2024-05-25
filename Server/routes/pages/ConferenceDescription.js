@@ -70,7 +70,7 @@ router.post(
             WHEN confstartsubmission <= NOW() AND confendsubmission >= NOW() THEN 'Submission'
             WHEN confstartreview <= NOW() AND confendreview >= NOW() THEN 'Review'
             WHEN confstartbidding <= NOW() AND confendbidding >= NOW() THEN 'Bidding'
-            WHEN NOW() > confendreview THEN 'Starting Conference'
+            WHEN NOW() > confendreview THEN 'Pre-Conference'
             ELSE NULL 
         END AS status
         FROM conferences
