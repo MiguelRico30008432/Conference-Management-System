@@ -60,6 +60,7 @@ export default function ConferenceNavBar({ transparent, light, action }) {
   const navigate = useNavigate();
 
   const { userRole } = useContext(ConferenceContext);
+  const [roles, setRoles] = useState(userRole.split(","));
 
   // return focus to the button when we transitioned from !open -> open
   const prevOpen = React.useRef(open);
@@ -174,7 +175,6 @@ export default function ConferenceNavBar({ transparent, light, action }) {
         {/* Esta MDBox contem os links. É onde estão definidas as primeiras opções do menu (Submissões / Bidding / Reviews / Envio de Mails / Gestão do Comitê / Definições da Conferência) */}
         <MDBox color="inherit" display={{ xs: "none", lg: "flex" }} m={0} p={0}>
           {ConfRoutes.map((item) => {
-            const roles = userRole.split(",");
             if (
               item.type === "title" &&
               (item.permissions.includes(roles[0]) ||
@@ -206,7 +206,8 @@ export default function ConferenceNavBar({ transparent, light, action }) {
             {subMenus.map((subMenu) => {
               // Verifique se o usuário tem permissão para ver este submenu
               if (
-                subMenu.permissions.includes(userRole) ||
+                subMenu.permissions.includes(roles[0]) ||
+                subMenu.permissions.includes(roles[1]) ||
                 subMenu.permissions.includes("All")
               ) {
                 return (
