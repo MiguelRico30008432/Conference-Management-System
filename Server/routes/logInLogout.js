@@ -64,32 +64,41 @@ router.post("/signUp", async (req, res) => {
         useraffiliation: affiliation,
       };
 
-      await db.addData("users", newUser);
       if (inviteCode.length !== 0) {
         const invitationInfo = await db.fetchData("invitations", "invitationemail", email);
-        const userInfo = await db.fetchData("users", "useremail", email);
         const userRole = invitationInfo[0].invitationrole;
         const confID = invitationInfo[0].confid;
-        userId = userInfo[0].userid;
+        const invitationCode = invitationInfo[0].invitationcode;
+        const invitationEmail = invitationInfo[0].invitationemail;
+        console.log("laaaaaa", inviteCode ,invitationCode, email, invitationEmail)
         
-        const response = await db.addData("userroles", {
+
+        if (inviteCode === invitationCode && email === invitationEmail) {
+          await db.addData("users", newUser);
+          const userInfo = await db.fetchData("users", "useremail", email);
+          const userId = userInfo[0].userid;
+          await db.addData("userroles", {
               userid: userId,
               userrole: userRole,
               confid: confID
             });
+          return res.status(201).send({ msg: "User created." });
         } else {
-          return res.status(201).send({ msg: "Utilizador criado com sucesso" });
+          return res.status(403).send({ msg: "This code isn't associated with your user." });
         }
-          return res.status(201).send({ msg: "Utilizador criado com sucesso" });
-    
+
+      } else {
+        await db.addData("users", newUser);
+        return res.status(201).send({ msg: "User created." });
+      }
     } else {
-      return res.status(409).send({ msg: "Utilizador já existe" });
+      return res.status(409).send({ msg: "User already exists." });
     }
   } catch (error) {
-      console.error("Erro ao criar o utilizador: ", error);
+      console.error("Error when creating the user: ", error);
       return res
         .status(500)
-        .send({ msg: "Erro interno de servidor", error: error.message });
+        .send({ msg: "Internal server error", error: error.message });
   }
 });
 
