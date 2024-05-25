@@ -2,9 +2,9 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import ConfNavbar from "../../OurComponents/navBars/ConferenceNavBar";
 import { ConferenceContext } from "conference.context";
 import { AuthContext } from "auth.context";
-
 import * as React from "react";
 import { useState, useContext, useEffect, createRef } from "react";
+import Footer from "OurComponents/footer/Footer";
 import Card from "@mui/material/Card";
 import Container from "@mui/material/Container";
 import MDBox from "components/MDBox";
@@ -400,6 +400,7 @@ export default function CreateSubmission() {
             </MDBox>
           </MDBox>
         </Container>
+        <Footer />
       </DashboardLayout>
     </>
   );
