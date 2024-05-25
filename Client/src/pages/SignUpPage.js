@@ -34,7 +34,7 @@ export default function SignUpPage() {
 
     const data = new FormData(event.currentTarget);
     const formData = Object.fromEntries(data.entries());
-    const { firstName, lastName, email, phone, password, affiliation } =
+    const { firstName, lastName, email, phone, password, affiliation, code } =
       formData;
 
     if (
@@ -47,7 +47,7 @@ export default function SignUpPage() {
         affiliation
       )
     ) {
-      await signup(firstName, lastName, email, phone, password, affiliation);
+      await signup(firstName, lastName, email, phone, password, affiliation, code);
     }
   };
 
@@ -57,7 +57,8 @@ export default function SignUpPage() {
     email,
     phone,
     password,
-    affiliation
+    affiliation,
+    code
   ) {
     setOpenLoading(true);
     try {
@@ -70,6 +71,7 @@ export default function SignUpPage() {
           phone: phone,
           password: password,
           affiliation: affiliation,
+          inviteCode: code
         }),
         headers: {
           "Content-type": "application/json; charset=UTF-8",
