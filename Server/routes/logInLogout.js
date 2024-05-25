@@ -68,7 +68,6 @@ router.post("/signUp", async (req, res) => {
 
       return res.status(201).send({ msg: "Utilizador criado com sucesso" });
     } else {
-      console.log("Utilizador já existe");
       return res.status(409).send({ msg: "Utilizador já existe" });
     }
   } catch (error) {

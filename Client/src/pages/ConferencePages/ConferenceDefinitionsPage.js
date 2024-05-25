@@ -249,7 +249,6 @@ export default function DefinitionsPage() {
       newMaxReviewers === "" ||
       newSubmissionUpdate === ""
     ) {
-      console.log(newSubmissionsStart);
       setMessage(
         <Alert severity="error">All fields marked with * are required.</Alert>
       );

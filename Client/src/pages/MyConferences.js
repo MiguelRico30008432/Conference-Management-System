@@ -40,7 +40,6 @@ export default function MyConferences() {
         );
 
         const jsonResponse = await response.json();
-        console.log(jsonResponse);
 
         if (response.status === 200) {
           for (let line of jsonResponse) {

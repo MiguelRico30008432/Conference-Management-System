@@ -52,7 +52,19 @@ router.post("/createSubmission", auth.ensureAuthenticated, async (req, res) => {
           `INSERT INTO authors (authorAffiliation, authorEmail, authorFirstName, authorLastName, submissionID, userid) 
             VALUES ('${userRegistered[0].useraffiliation}', '${userRegistered[0].useremail}', '${userRegistered[0].userfirstname}', '${userRegistered[0].userlastname}', ${submissionid[0].max}, ${userRegistered[0].userid})`
         );
-        //Falta adicionar ao user roles
+
+        const userRole = await db.fetchDataCst(`
+          SELECT userRole AS role 
+          FROM userroles 
+          WHERE 
+            userid = ${userRegistered[0].userid} AND confid = ${req.body.confID} AND userrole = 'Author'`);
+
+        if (userRole.length === 0) {
+          await db.fetchDataCst(
+            `INSERT INTO userroles (userid, userrole, confid) 
+              VALUES (${userRegistered[0].userid}, 'Author', ${req.body.confID})`
+          );
+        }
       }
     });
 
@@ -82,32 +94,5 @@ router.post("/getAuthorData", auth.ensureAuthenticated, async (req, res) => {
     return res.status(500);
   }
 });
-
-//router.post("/downloadFile", auth.ensureAuthenticated, async (req, res) => {
-//  try {
-//    const fileId = req.body.fileid;
-//
-//    const query = `SELECT fileName, file FROM files WHERE fileid = ${fileId}`;
-//    const result = await db.fetchDataCst(query);
-//
-//    const fileData = result[0];
-//
-//    // Define o cabeçalho Content-Disposition para definir o nome do arquivo no download
-//    res.setHeader(
-//      "Content-Disposition",
-//      `attachment; filename=${fileData.fileName}`
-//    );
-//
-//    // Define o tipo de conteúdo para forçar o download
-//
-//    res.setHeader("Content-Type", "application/octet-stream");
-//
-//    // Envie os dados do arquivo como resposta
-//    res.send(Buffer.from(fileData.file, "base64"));
-//  } catch (error) {
-//    console.error(error);
-//    return res.status(500).send({ msg: "Internal Error" });
-//  }
-//});
 
 module.exports = router;

@@ -163,7 +163,6 @@ router.post(
 
 router.post("/declareConflict", auth.ensureAuthenticated, async (req, res) => {
   try {
-    console.log(req.body.dataToAddConflict);
     await db.fetchDataCst(`
     INSERT INTO conflicts (conflictconfid, conflictsubmissionid, conflictreason, conflictuseremail)
     VALUES (${req.body.confid}, ${req.body.dataToAddConflict.submissionid}, 'Conflict Added By The Committee' , '${req.body.dataToAddConflict.committeeemails}')
