@@ -60,7 +60,13 @@ export default function ConferenceNavBar({ transparent, light, action }) {
   const navigate = useNavigate();
 
   const { userRole } = useContext(ConferenceContext);
-  const [roles, setRoles] = useState(userRole.split(","));
+  const [roles, setRoles] = useState("Author");
+
+  useEffect(() => {
+    if (userRole) {
+      setRoles(userRole.split(","));
+    }
+  }, [userRole]);
 
   // return focus to the button when we transitioned from !open -> open
   const prevOpen = React.useRef(open);
