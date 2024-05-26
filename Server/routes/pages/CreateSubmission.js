@@ -78,6 +78,12 @@ router.post("/createSubmission", auth.ensureAuthenticated, async (req, res) => {
       req.body.userid
     );
 
+    db.createEvent(
+      req.body.confID,
+      req.body.userid,
+      `New Submission ${req.body.title} uploaded`
+    );
+
     return res.status(200).send({ msg: "Submission Created." });
   } catch (error) {
     log.addLog(error, "database", "CreateSubmissions -> /createSubmission");
