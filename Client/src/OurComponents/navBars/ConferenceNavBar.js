@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext} from "react";
+import { useState, useEffect, useContext } from "react";
 import { Button, Menu, MenuItem } from "@mui/material";
 
 // react-router components
@@ -9,7 +9,7 @@ import PropTypes from "prop-types";
 
 // @mui material components
 import Container from "@mui/material/Container";
-import {Icon, IconButton} from "@mui/material";
+import { Icon, IconButton } from "@mui/material";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -41,7 +41,7 @@ import {
   setOpenConfigurator,
 } from "context";
 
-import * as React from 'react';
+import * as React from "react";
 
 export default function ConferenceNavBar({ transparent, light, action }) {
   const [mobileNavbar, setMobileNavbar] = useState(false);
@@ -60,6 +60,7 @@ export default function ConferenceNavBar({ transparent, light, action }) {
   const navigate = useNavigate();
 
   const { userRole } = useContext(ConferenceContext);
+  const [roles, setRoles] = useState(userRole.split(","));
 
   // return focus to the button when we transitioned from !open -> open
   const prevOpen = React.useRef(open);
@@ -109,8 +110,14 @@ export default function ConferenceNavBar({ transparent, light, action }) {
       sx={{ mt: 2 }}
     >
       <NotificationItem icon={<Icon>email</Icon>} title="Check new messages" />
-      <NotificationItem icon={<Icon>podcasts</Icon>} title="Manage Podcast sessions" />
-      <NotificationItem icon={<Icon>shopping_cart</Icon>} title="Payment successfully completed" />
+      <NotificationItem
+        icon={<Icon>podcasts</Icon>}
+        title="Manage Podcast sessions"
+      />
+      <NotificationItem
+        icon={<Icon>shopping_cart</Icon>}
+        title="Payment successfully completed"
+      />
     </Menu>
   );
 
@@ -168,7 +175,12 @@ export default function ConferenceNavBar({ transparent, light, action }) {
         {/* Esta MDBox contem os links. É onde estão definidas as primeiras opções do menu (Submissões / Bidding / Reviews / Envio de Mails / Gestão do Comitê / Definições da Conferência) */}
         <MDBox color="inherit" display={{ xs: "none", lg: "flex" }} m={0} p={0}>
           {ConfRoutes.map((item) => {
-            if (item.type === "title" && (item.permissions.includes(userRole) || item.permissions.includes("All"))) {
+            if (
+              item.type === "title" &&
+              (item.permissions.includes(roles[0]) ||
+                item.permissions.includes(roles[1]) ||
+                item.permissions.includes("All"))
+            ) {
               return (
                 <div key={item.name}>
                   <Button
@@ -193,7 +205,11 @@ export default function ConferenceNavBar({ transparent, light, action }) {
           >
             {subMenus.map((subMenu) => {
               // Verifique se o usuário tem permissão para ver este submenu
-              if (subMenu.permissions.includes(userRole) || subMenu.permissions.includes("All")) {
+              if (
+                subMenu.permissions.includes(roles[0]) ||
+                subMenu.permissions.includes(roles[1]) ||
+                subMenu.permissions.includes("All")
+              ) {
                 return (
                   <MenuItem
                     key={subMenu.name}
@@ -202,7 +218,8 @@ export default function ConferenceNavBar({ transparent, light, action }) {
                     {subMenu.name}
                   </MenuItem>
                 );
-              }})}
+              }
+            })}
           </Menu>
         </MDBox>
 
@@ -226,19 +243,19 @@ export default function ConferenceNavBar({ transparent, light, action }) {
             sx={navbarMobileMenu}
             onClick={handleMiniSidenav}
           >
-           
-            <Icon fontSize="medium"> 
-              {miniSidenav ? "menu_open" : "menu"}
-            </Icon>
+            <Icon fontSize="medium">{miniSidenav ? "menu_open" : "menu"}</Icon>
             <MDTypography variant="body2" color="text">
               Menu
-              </MDTypography>
+            </MDTypography>
           </IconButton>
           {renderMenu()}
         </MDBox>
       </MDBox>
       {mobileView && (
-        <ConferencesNavbarMobile open={mobileNavbar} close={closeMobileNavbar} />
+        <ConferencesNavbarMobile
+          open={mobileNavbar}
+          close={closeMobileNavbar}
+        />
       )}
     </Container>
   );

@@ -14,7 +14,7 @@ import Select from "@mui/material/Select";
 import FormControl from "@mui/material/FormControl";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import MDBox from "components/MDBox";
-import Alert from '@mui/material/Alert';
+import Alert from "@mui/material/Alert";
 
 export default function Compose() {
   const { confID } = useContext(ConferenceContext);
@@ -24,24 +24,30 @@ export default function Compose() {
   const [recipientError, setRecipientError] = useState("");
   const [subjectError, setSubjectError] = useState("");
   const [descriptionError, setDescriptionError] = useState("");
-  const [sendResponse, setSendResponse] = useState({ success: false, message: "" });
+  const [sendResponse, setSendResponse] = useState({
+    success: false,
+    message: "",
+  });
   const [committeeMembersExist, setCommitteeMembersExist] = useState(false);
 
   useEffect(() => {
     async function getData() {
-      await fetch(`${process.env.REACT_APP_API_URL}/checkCommitteeMembers?confID=${confID}`, {
-        method: "GET",
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-        },
-        credentials: "include",
-      })
-        .then(response => response.json())
-        .then(data => {
+      await fetch(
+        `${process.env.REACT_APP_API_URL}/checkCommitteeMembers?confID=${confID}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+        }
+      )
+        .then((response) => response.json())
+        .then((data) => {
           // Set state based on response from backend
           setCommitteeMembersExist(data.committeeMembersExist);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error("Error checking committee members:", error);
         });
     }
@@ -49,50 +55,54 @@ export default function Compose() {
     if (confID) {
       getData();
     }
-
   }, [confID]);
 
   const handleSendEmail = async (event) => {
     event.preventDefault();
-    setRecipientError('');
-    setSubjectError('');
-    setDescriptionError('');
-  
+    setRecipientError("");
+    setSubjectError("");
+    setDescriptionError("");
+
     if (!recipient || !subject || !description) {
-      if (!recipient) setRecipientError('You must select a recipient!');
-      if (!subject) setSubjectError('You must enter a subject!');
-      if (!description) setDescriptionError('You must enter a description!');
+      if (!recipient) setRecipientError("You must select a recipient!");
+      if (!subject) setSubjectError("You must enter a subject!");
+      if (!description) setDescriptionError("You must enter a description!");
       return;
     }
-  
+
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/sendComposeEmail`, {
-        method: "POST",
-        body: JSON.stringify({ 
-          recipient, 
-          subject, 
-          description: JSON.stringify(description),
-          confID: confID 
-        }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-        },
-        credentials: "include",
-      });
-  
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/sendComposeEmail`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            recipient,
+            subject,
+            description: JSON.stringify(description),
+            confID: confID,
+          }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+        }
+      );
+
       const data = await response.json();
-      console.log("Response from backend:", data); // Log the response
-  
+
       if (!response.ok) {
         throw new Error(data.message || "Failed to send email.");
       }
-  
+
       setSendResponse({ success: true, message: "Email sent successfully." });
       setRecipient("");
       setSubject("");
       setDescription("");
     } catch (error) {
-      setSendResponse({ success: false, message: error.message || "An error occurred while sending the email." });
+      setSendResponse({
+        success: false,
+        message: error.message || "An error occurred while sending the email.",
+      });
     }
   };
 
@@ -116,7 +126,12 @@ export default function Compose() {
               </Alert>
             )}
             <Box component="form" onSubmit={handleSendEmail} noValidate>
-              <FormControl fullWidth margin="normal" variant="outlined" error={Boolean(recipientError)}>
+              <FormControl
+                fullWidth
+                margin="normal"
+                variant="outlined"
+                error={Boolean(recipientError)}
+              >
                 <MDTypography variant="body2">Send To *</MDTypography>
                 <Select
                   id="recipient"
@@ -127,7 +142,9 @@ export default function Compose() {
                   IconComponent={ArrowDropDownIcon}
                   sx={{ height: "3rem" }}
                 >
-                  <MenuItem value="" disabled>Choose a Group to Send the Email</MenuItem>
+                  <MenuItem value="" disabled>
+                    Choose a Group to Send the Email
+                  </MenuItem>
                   <MenuItem value="chair">Chair</MenuItem>
                   {committeeMembersExist && (
                     <MenuItem value="committee">Committee</MenuItem>
@@ -136,10 +153,14 @@ export default function Compose() {
                     <MenuItem value="all">Chair and Committee</MenuItem>
                   )}
                 </Select>
-                {recipientError && <Alert severity="error">{recipientError}</Alert>}
+                {recipientError && (
+                  <Alert severity="error">{recipientError}</Alert>
+                )}
               </FormControl>
               <FormControl fullWidth error={Boolean(subjectError)}>
-                <MDTypography variant="body2" sx={{ mt: 2, mb: 1 }}>Subject *</MDTypography>
+                <MDTypography variant="body2" sx={{ mt: 2, mb: 1 }}>
+                  Subject *
+                </MDTypography>
                 <Box
                   sx={{
                     "& textarea": {
@@ -149,9 +170,9 @@ export default function Compose() {
                       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
                       border: "1px solid #c4c4c4",
                       borderRadius: "4px",
-                      resize: "none", 
+                      resize: "none",
                       marginTop: "8px",
-                    }
+                    },
                   }}
                 >
                   <textarea
@@ -164,13 +185,15 @@ export default function Compose() {
                         e.preventDefault(); // Prevent default behavior of enter key
                       }
                     }}
-                    rows={1} 
+                    rows={1}
                   />
                 </Box>
                 {subjectError && <Alert severity="error">{subjectError}</Alert>}
               </FormControl>
               <FormControl fullWidth error={Boolean(descriptionError)}>
-                <MDTypography variant="body2" sx={{ mt: 2, mb: 1 }}>Description *</MDTypography>
+                <MDTypography variant="body2" sx={{ mt: 2, mb: 1 }}>
+                  Description *
+                </MDTypography>
                 <Box
                   sx={{
                     "& textarea": {
@@ -182,7 +205,7 @@ export default function Compose() {
                       borderRadius: "4px",
                       resize: "vertical",
                       marginTop: "8px",
-                    }
+                    },
                   }}
                 >
                   <textarea
@@ -193,13 +216,15 @@ export default function Compose() {
                     rows={4}
                   />
                 </Box>
-                {descriptionError && <Alert severity="error">{descriptionError}</Alert>}
+                {descriptionError && (
+                  <Alert severity="error">{descriptionError}</Alert>
+                )}
               </FormControl>
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2, color: 'white !important' }}
+                sx={{ mt: 3, mb: 2, color: "white !important" }}
               >
                 Send Email
               </Button>

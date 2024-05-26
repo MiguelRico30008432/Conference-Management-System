@@ -10,6 +10,7 @@ import Footer from "OurComponents/footer/Footer";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
 import ConfereceDetails from "OurComponents/Info/ConfereceDetails";
 import Alert from "@mui/material/Alert";
+import ConferenceProgressCard from "OurComponents/Info/ConferenceProgressCard";
 
 export default function ConferenceDetails() {
   const { confID } = useContext(ConferenceContext);
@@ -22,20 +23,23 @@ export default function ConferenceDetails() {
       setOpenLoading(true);
 
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/conferenceDescription`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            confID: confID
-          })
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/conferenceDescription`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json; charset=UTF-8",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              confID: confID,
+            }),
+          }
+        );
 
         const jsonResponse = await response.json();
 
-        if(response.status === 200){
+        if (response.status === 200) {
           setDataForDetails({
             confname: jsonResponse[0].confname,
             confcity: jsonResponse[0].confcity,
@@ -43,7 +47,9 @@ export default function ConferenceDetails() {
             confwebpage: jsonResponse[0].confwebpage,
             confowner: jsonResponse[0].confowner,
             confdescription: jsonResponse[0].confdescription,
-            confstartsubmission: formatDate(jsonResponse[0].confstartsubmission),
+            confstartsubmission: formatDate(
+              jsonResponse[0].confstartsubmission
+            ),
             confendsubmission: formatDate(jsonResponse[0].confendsubmission),
             confstartreview: formatDate(jsonResponse[0].confstartreview),
             confendreview: formatDate(jsonResponse[0].confendreview),
@@ -57,8 +63,7 @@ export default function ConferenceDetails() {
             confminreviewers: jsonResponse[0].confminreviewers,
             confadddate: formatDate(jsonResponse[0].confadddate),
             confcontact: jsonResponse[0].confcontact,
-          })
-
+          });
         } else {
           setMessage(
             <Alert severity="error">
@@ -68,42 +73,42 @@ export default function ConferenceDetails() {
         }
       } catch (error) {
         setMessage(
-          <Alert severity="error">
-            Failed to fetch conference details!
-          </Alert>
+          <Alert severity="error">Failed to fetch conference details!</Alert>
         );
       }
       setOpenLoading(false);
     }
 
-    if(confID){
-      fetchConfDetails()
+    if (confID) {
+      fetchConfDetails();
     }
   }, [confID]);
 
   function formatDate(dateString) {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-GB');
+    return date.toLocaleDateString("en-GB");
   }
 
   return (
     <>
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
-       <ConfNavbar />
-         <Container maxWidth="sm">
-           <MDBox mt={10} mb={2} textAlign="left">
-           {message}
-             <MDBox mb={3} textAlign="left">
-               <Card>
-                 <ConfereceDetails
-                   text={dataForDetails}
-                 />
-               </Card>
-             </MDBox>
-           </MDBox>
-         </Container>
-       <Footer />
+        <ConfNavbar />
+        <Container maxWidth="sm">
+          <MDBox mt={10} textAlign="left">
+            <ConferenceProgressCard confID={confID} />
+          </MDBox>
+
+          <MDBox mt={2} mb={2} textAlign="left">
+            {message}
+            <MDBox mb={3} textAlign="left">
+              <Card>
+                <ConfereceDetails text={dataForDetails} />
+              </Card>
+            </MDBox>
+          </MDBox>
+        </Container>
+        <Footer />
       </DashboardLayout>
     </>
   );

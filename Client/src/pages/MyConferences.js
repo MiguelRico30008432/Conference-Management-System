@@ -40,7 +40,6 @@ export default function MyConferences() {
         );
 
         const jsonResponse = await response.json();
-        console.log(jsonResponse);
 
         if (response.status === 200) {
           for (let line of jsonResponse) {
@@ -65,7 +64,8 @@ export default function MyConferences() {
   }, [isLoggedIn]);
 
   const columns = [
-    { field: "confname", headerName: "Conference Name", width: 600 },
+    { field: "confname", headerName: "Conference Name", width: 450 },
+    { field: "confphase", headerName: "Conference Phase", width: 200 },
     { field: "userrole", headerName: "Your Role", width: 200 },
     {
       field: "Enter",

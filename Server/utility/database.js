@@ -58,7 +58,6 @@ async function addData(table, entryParameters) {
 async function deleteData(table, collum, comparisonValue) {
   //utilizada para apagar dados em qualquer tabela onde é recebido o nome da tabela, a coluna e o parametro de comparação para saber que linha apagar
   try {
-    console.log();
     const queryText = `DELETE FROM ${table} WHERE ${collum} = $1`;
     await pool.query(queryText, [comparisonValue]);
     return;
@@ -152,7 +151,6 @@ async function fetchAllEmailData(
 async function createEvent(confid, userid, event, date) {
   try {
     if (date) {
-      console.log("date");
       await fetchDataCst(`
         INSERT INTO events (eventconfid, eventuserid, eventName, eventadddate)
         VALUES (${confid}, ${userid}, '${event}', '${date}')`);

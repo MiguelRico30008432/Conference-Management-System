@@ -11,6 +11,7 @@ import CompleteTable from "OurComponents/Table/CompleteTable";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
 import { v4 as uuidv4 } from "uuid";
 import Alert from "@mui/material/Alert";
+import Footer from "OurComponents/footer/Footer";
 
 export default function Events() {
   const { confID, userRole } = useContext(ConferenceContext);
@@ -106,6 +107,7 @@ export default function Events() {
             </MDBox>
           </MDBox>
         </Container>
+        <Footer />
       </DashboardLayout>
     </>
   );

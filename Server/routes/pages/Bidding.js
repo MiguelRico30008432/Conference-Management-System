@@ -10,12 +10,12 @@ router.post(
   async (req, res) => {
     try {
       const result = await db.fetchDataCst(`
-      SELECT
+    SELECT
       s.submissionid,
       s.submissiontitle
-  FROM
+    FROM
       submissions s
-  WHERE
+    WHERE
       s.submissionconfid = ${req.body.confid}
       AND NOT EXISTS (
           SELECT 1
@@ -23,6 +23,12 @@ router.post(
           WHERE b.biddingsubmissionid = s.submissionid
             AND b.biddinguserid = ${req.body.userid}
       )
+      AND NOT EXISTS (
+          SELECT 1
+          FROM conflicts c
+          JOIN users u ON u.useremail = c.conflictuseremail
+          WHERE c.conflictsubmissionid = s.submissionid
+            AND u.userid = ${req.body.userid})
     `);
       return res.status(200).send(result);
     } catch (error) {

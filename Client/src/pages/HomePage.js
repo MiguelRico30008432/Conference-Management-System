@@ -132,10 +132,11 @@ export default function HomePage() {
             {images[currentImageIndex].text}
           </div>
         </div>
+      </div>
         <div
           style={{
             position: "absolute",
-            bottom: "10px",
+            padding: "5px",
             left: "50%",
             transform: "translateX(-50%)",
             display: "flex",
@@ -154,10 +155,11 @@ export default function HomePage() {
                 cursor: "pointer",
                 opacity: 0.6
               }}
+              title="Click to change section"
             />
           ))}
         </div>
-      </div>
+      
 
       {/* Render Conference Management section */}
       {currentImageIndex === 0 && (

@@ -27,6 +27,7 @@ export default function SignUpPage() {
   const [affiliationAlert, setAffiliationAlert] = useState(null);
   const [errorOnLogin, setErrorOnLogin] = useState(false);
   const [errorOnRequest, setErrorOnRequest] = useState(null);
+  const [message, setMessage] = useState(null);
   const [openLoading, setOpenLoading] = useState(false);
 
   const handleSubmit = async (event) => {
@@ -34,7 +35,7 @@ export default function SignUpPage() {
 
     const data = new FormData(event.currentTarget);
     const formData = Object.fromEntries(data.entries());
-    const { firstName, lastName, email, phone, password, affiliation } =
+    const { firstName, lastName, email, phone, password, affiliation, code } =
       formData;
 
     if (
@@ -47,17 +48,18 @@ export default function SignUpPage() {
         affiliation
       )
     ) {
-      await signup(firstName, lastName, email, phone, password, affiliation);
+      await Signup(firstName.trim(), lastName.trim(), email.trim(), phone.trim(), password, affiliation.trim(), code.trim());
     }
   };
 
-  async function signup(
+  async function Signup(
     firstName,
     lastName,
     email,
     phone,
     password,
-    affiliation
+    affiliation,
+    code
   ) {
     setOpenLoading(true);
     try {
@@ -70,6 +72,7 @@ export default function SignUpPage() {
           phone: phone,
           password: password,
           affiliation: affiliation,
+          inviteCode: code
         }),
         headers: {
           "Content-type": "application/json; charset=UTF-8",
@@ -77,7 +80,14 @@ export default function SignUpPage() {
       });
 
       if (response.status === 201) {
-        navigate("/");
+        setMessage(
+          <Alert severity="success">
+            Your account has been created successfully. Redirecting to home page...
+          </Alert>
+        );
+        setTimeout(() => {
+          navigate("/");
+        }, 4000);
       } else {
         const jsonResponse = await response.json();
         setErrorOnRequest(<Alert severity="error">{jsonResponse.msg}</Alert>);
@@ -231,7 +241,7 @@ export default function SignUpPage() {
                     />
                     {affiliationAlert}
                   </Grid>
-                  <Grid item xs={8}>
+                  <Grid item xs={8} >
                     <TextField
                       fullWidth
                       id="code"
@@ -249,6 +259,7 @@ export default function SignUpPage() {
                 >
                   sign Up
                 </MDButton>
+                {message}
                 {errorOnRequest}
                 <MDBox mt={3} mb={1} textAlign="center">
                   <MDTypography variant="button" color="text">

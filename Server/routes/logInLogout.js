@@ -48,7 +48,7 @@ router.post("/signIn", (req, res, next) => {
 
 //User Registration
 router.post("/signUp", async (req, res) => {
-  const { firstName, lastName, password, email, phone, affiliation } = req.body;
+  const { firstName, lastName, password, email, phone, affiliation, inviteCode } = req.body;
 
   try {
     const findUserName = await db.fetchData("users", "useremail", email);
@@ -64,18 +64,41 @@ router.post("/signUp", async (req, res) => {
         useraffiliation: affiliation,
       };
 
-      await db.addData("users", newUser);
+      if (inviteCode.length !== 0) {
+        const invitationInfo = await db.fetchData("invitations", "invitationemail", email);
+        const userRole = invitationInfo[0].invitationrole;
+        const confID = invitationInfo[0].confid;
+        const invitationCode = invitationInfo[0].invitationcode;
+        const invitationEmail = invitationInfo[0].invitationemail;
+        console.log("laaaaaa", inviteCode ,invitationCode, email, invitationEmail)
+        
 
-      return res.status(201).send({ msg: "Utilizador criado com sucesso" });
+        if (inviteCode === invitationCode && email === invitationEmail) {
+          await db.addData("users", newUser);
+          const userInfo = await db.fetchData("users", "useremail", email);
+          const userId = userInfo[0].userid;
+          await db.addData("userroles", {
+              userid: userId,
+              userrole: userRole,
+              confid: confID
+            });
+          return res.status(201).send({ msg: "User created." });
+        } else {
+          return res.status(403).send({ msg: "This code isn't associated with your user." });
+        }
+
+      } else {
+        await db.addData("users", newUser);
+        return res.status(201).send({ msg: "User created." });
+      }
     } else {
-      console.log("Utilizador já existe");
-      return res.status(409).send({ msg: "Utilizador já existe" });
+      return res.status(409).send({ msg: "User already exists." });
     }
   } catch (error) {
-    console.error("Erro ao criar o utilizador: ", error);
-    return res
-      .status(500)
-      .send({ msg: "Erro interno de servidor", error: error.message });
+      console.error("Error when creating the user: ", error);
+      return res
+        .status(500)
+        .send({ msg: "Internal server error", error: error.message });
   }
 });
 

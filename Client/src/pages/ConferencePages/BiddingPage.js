@@ -16,6 +16,7 @@ import MDButton from "components/MDButton";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Checkbox from "@mui/material/Checkbox";
+import Footer from "OurComponents/footer/Footer";
 
 export default function BiddingPage() {
   const { confID } = useContext(ConferenceContext);
@@ -296,6 +297,7 @@ export default function BiddingPage() {
             </Card>
           </MDBox>
         </Container>
+        <Footer />
       </DashboardLayout>
     </>
   );

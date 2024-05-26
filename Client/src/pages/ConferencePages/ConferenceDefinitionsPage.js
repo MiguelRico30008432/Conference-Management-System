@@ -18,6 +18,7 @@ import MenuItem from "@mui/material/MenuItem";
 import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
+import Footer from "OurComponents/footer/Footer";
 
 export default function DefinitionsPage() {
   const { confID } = useContext(ConferenceContext);
@@ -248,7 +249,6 @@ export default function DefinitionsPage() {
       newMaxReviewers === "" ||
       newSubmissionUpdate === ""
     ) {
-      console.log(newSubmissionsStart);
       setMessage(
         <Alert severity="error">All fields marked with * are required.</Alert>
       );
@@ -829,6 +829,7 @@ export default function DefinitionsPage() {
             </MDBox>
           </MDBox>
         </Container>
+        <Footer />
       </DashboardLayout>
     </>
   );

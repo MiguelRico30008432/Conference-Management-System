@@ -211,7 +211,6 @@ export default function Conflicts() {
         setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
       }
     } catch (error) {
-      console.log(error);
       setMessage(
         <Alert severity="error">Failed to declare new conflict!</Alert>
       );
