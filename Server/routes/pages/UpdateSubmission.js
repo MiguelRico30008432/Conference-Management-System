@@ -14,8 +14,7 @@ router.post("/updateSubmission", auth.ensureAuthenticated, async (req, res) => {
     const beforeUpdateListOfAuthorsIDS = await db.fetchDataCst(
       `SELECT 
         authorid
-      FROM
-        authors
+      FROM authors
       WHERE
         submissionid = ${req.body.submissionid}
       `
@@ -149,6 +148,12 @@ router.post("/updateSubmission", auth.ensureAuthenticated, async (req, res) => {
         mainAuthorID[0].submissionmainauthor
       );
     }
+
+    db.createEvent(
+      req.body.confID,
+      req.body.userid,
+      `Submission ${req.body.title} Updated`
+    );
 
     return res.status(200).json({ message: "Submission updated successfully" });
   } catch (error) {

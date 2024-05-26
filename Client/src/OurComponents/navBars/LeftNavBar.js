@@ -180,11 +180,6 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
     ) {
       return true;
     }
-
-    //hide menu if you are admin
-    if (key === "MyProfile" && isAdmin) {
-      return true;
-    }
   }
 
   return (
