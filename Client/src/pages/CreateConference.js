@@ -18,9 +18,7 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import InputAdornment from '@mui/material/InputAdornment';
 import PhoneIcon from '@mui/icons-material/Phone';
-import EmailIcon from '@mui/icons-material/Email';
 import LanguageIcon from '@mui/icons-material/Language';
-import Typography from '@mui/material/Typography';
 import MDTypography from "components/MDTypography";
 import moment from 'moment';
 
@@ -421,15 +419,13 @@ export default function CreateConference() {
                       fullWidth
                       name="contact"
                       label="Support Contact"
-                      type="text"
+                      type="tel"
                       id="contact"
                       sx={{ marginBottom: '15px' }}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
                             <PhoneIcon />
-                            <Typography>/</Typography>
-                            <EmailIcon />
                           </InputAdornment>
                         ),
                       }}
