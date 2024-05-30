@@ -16,14 +16,14 @@ import Container from "@mui/material/Container";
 import Alert from "@mui/material/Alert";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import InputAdornment from '@mui/material/InputAdornment';
+import PhoneIcon from '@mui/icons-material/Phone';
+import EmailIcon from '@mui/icons-material/Email';
+import LanguageIcon from '@mui/icons-material/Language';
+import Typography from '@mui/material/Typography';
 import MDTypography from "components/MDTypography";
 import moment from 'moment';
 
-// Material Dashboard 2 React context
-import {
-  useMaterialUIController,
-  setMiniSidenav
-} from "context";
 
 export default function CreateConference() {
   const navigate = useNavigate();
@@ -170,6 +170,7 @@ export default function CreateConference() {
       numberMinReviewrs,
       numberMaxReviewrs,
       confLink,
+      contact
     } = formData;
 
     await createConference(
@@ -190,7 +191,8 @@ export default function CreateConference() {
       city.trim(),
       numberMinReviewrs,
       numberMaxReviewrs,
-      confLink.trim()
+      confLink.trim(),
+      contact.trim()
     );
   };
 
@@ -212,7 +214,8 @@ export default function CreateConference() {
     city,
     numberMinReviewrs,
     numberMaxReviewrs,
-    confLink
+    confLink, 
+    contact
   ) => {
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/createConference`, {
@@ -236,6 +239,7 @@ export default function CreateConference() {
           numberMinReviewrs: numberMinReviewrs,
           numberMaxReviewrs: numberMaxReviewrs,
           confLink: confLink,
+          contact: contact
         }),
         headers: {
           "Content-type": "application/json; charset=UTF-8",
@@ -395,14 +399,40 @@ export default function CreateConference() {
                       autoComplete="off"
                     />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid item xs={6}>
                     <TextField
                       fullWidth
                       name="confLink"
                       label="Conference Webpage"
                       type="url"
                       id="confLink"
-                      sx={{ marginBottom: "15px" }}
+                      sx={{ marginBottom: '15px' }}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <LanguageIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField
+                      fullWidth
+                      name="contact"
+                      label="Support Contact"
+                      type="text"
+                      id="contact"
+                      sx={{ marginBottom: '15px' }}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <PhoneIcon />
+                            <Typography>/</Typography>
+                            <EmailIcon />
+                          </InputAdornment>
+                        ),
+                      }}
                     />
                   </Grid>
                   <div>
