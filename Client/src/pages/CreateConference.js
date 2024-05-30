@@ -17,10 +17,14 @@ import Alert from "@mui/material/Alert";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import InputAdornment from '@mui/material/InputAdornment';
-import PhoneIcon from '@mui/icons-material/Phone';
+import MailIcon from '@mui/icons-material/Mail';
 import LanguageIcon from '@mui/icons-material/Language';
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import IconButton from "@mui/material/IconButton";
 import MDTypography from "components/MDTypography";
 import moment from 'moment';
+
 
 
 export default function CreateConference() {
@@ -40,6 +44,20 @@ export default function CreateConference() {
   const [conferenceTypes, setConferenceTypes] = useState([]);
   const [conferenceAreas, setConferenceAreas] = useState([]);
   const { user, isLoggedIn } = useContext(AuthContext);
+  const [rows, setRows] = useState(4); 
+  const MIN_ROWS = 3; 
+
+
+  // Handles description text box size
+  const handleIncreaseRows = () => {
+    setRows(rows + 1);
+  };
+
+  const handleDecreaseRows = () => {
+    if (rows >= MIN_ROWS) {
+      setRows(rows - 1);
+    }
+  };
 
   //Handles the Dropdown menus
   const handleTypeChange = (event) => {
@@ -270,7 +288,6 @@ export default function CreateConference() {
   const nextDayBidding = moment(biddingEndDate).add(1, 'days').format('YYYY-MM-DD');
 
   return (
-    // <DashboardLayout>
     <DashboardLayout>
       <UpperNavBar />
 
@@ -389,12 +406,28 @@ export default function CreateConference() {
                       required
                       fullWidth
                       multiline
-                      rows={3}
+                      rows={rows}
                       name="description"
                       label="Description"
                       type="text"
                       id="description"
                       autoComplete="off"
+                      sx={{ '& .MuiInputBase-root': { paddingRight: '20px' } }}
+                      InputProps={{
+                        endAdornment: (
+                          <div style={{ display: "inline-block", height: "100%", marginRight: "10px" }}>
+                            <div style={{ position: "absolute", top: 0, right: 0 }}>
+                                <IconButton onClick={handleIncreaseRows} style={{ fontSize: "15px" }} title="Increase text box size">
+                                  <AddIcon />
+                                </IconButton>
+                              <br />
+                                <IconButton onClick={handleDecreaseRows} style={{ fontSize: "15px" }} title="Decrease text box size">
+                                  <RemoveIcon />
+                                </IconButton>
+                            </div>
+                          </div>
+                        )
+                      }}
                     />
                   </Grid>
                   <Grid item xs={6}>
@@ -419,13 +452,13 @@ export default function CreateConference() {
                       fullWidth
                       name="contact"
                       label="Support Contact"
-                      type="tel"
+                      type="text"
                       id="contact"
                       sx={{ marginBottom: '15px' }}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
-                            <PhoneIcon />
+                            <MailIcon />
                           </InputAdornment>
                         ),
                       }}
