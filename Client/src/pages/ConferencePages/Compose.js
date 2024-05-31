@@ -221,9 +221,10 @@ export default function Compose() {
                   <Alert severity="error">{descriptionError}</Alert>
                 )}
               </FormControl>
+              
               <Button
                 type="submit"
-                fullWidth
+
                 variant="contained"
                 sx={{ mt: 3, mb: 2, color: "white !important" }}
               >
