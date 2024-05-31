@@ -216,7 +216,8 @@ export default function SendInvitation() {
             </MDTypography>
             <MDTypography ml={2} variant="body2">
             On this page you can send invites so new members can join your conference, you can send an email to multiple users, each one will have a different code. 
-            Make sure to choose the role you want the user's to have. After sending the invitation, in case there was an error or you sent to the incorrect user, you can always delete the invitation if it has not been already used.
+            Make sure to choose the role you want the user's to have. After sending the invitation, in case there was an error or you sent to the incorrect user, 
+            you can always delete the invitation if it has not been already used.
             </MDTypography>
           </Card>
           <Card sx={{ mt: 3, p: 3 }}>

@@ -116,7 +116,8 @@ export default function Compose() {
               Send Email
             </MDTypography>
             <MDTypography ml={2} variant="body2">
-              Text goes here
+              Here you can send an email to either the chair, committee members or both. The subject and description are to your
+              liking so the text is according to the theme in the subject you mention.
             </MDTypography>
           </Card>
           <Card sx={{ mt: 3, p: 3 }}>
