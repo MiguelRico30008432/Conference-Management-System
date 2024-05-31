@@ -5,11 +5,11 @@ CREATE TABLE users (
     userFirstName VARCHAR(50) NOT NULL,
     userLastName VARCHAR(50) NOT NULL,
     userEmail VARCHAR(100) NOT NULL,
-    userPhone VARCHAR(15),
+    userPhone VARCHAR(18),
     useraffiliation VARCHAR(20) NOT NULL,
     userAdmin BOOLEAN DEFAULT false,
     userPassword VARCHAR(200) NOT NULL,
-    userAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
+    userAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp,
     userCurrentConfID bigint NULL
 );
 
