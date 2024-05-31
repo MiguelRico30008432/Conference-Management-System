@@ -42,6 +42,7 @@ import {
 // Images
 import brandWhite from "assets/images/logo-ct.png";
 import brandDark from "assets/images/logo-ct-dark.png";
+import logo from "assets/images/logos/appLogo.jpg"
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -151,19 +152,14 @@ export default function App() {
         {layout === "dashboard" && (
           <>
             <Sidenav
-              color={sidenavColor}
-              brand={
-                (transparentSidenav && !darkMode) || whiteSidenav
-                  ? brandDark
-                  : brandWhite
-              }
-              brandName="UAL conf"
-              routes={routes}
-              onMouseEnter={handleOnMouseEnter}
-              onMouseLeave={handleOnMouseLeave}
+              color={ sidenavColor }
+              brand = { logo }
+              routes={ routes }
+              onMouseEnter={ handleOnMouseEnter }
+              onMouseLeave={ handleOnMouseLeave }
             />
             <NavBarSettings />
-            {configsButton}
+            { configsButton }
           </>
         )}
         {layout === "vr" && <NavBarSettings />}
@@ -180,19 +176,14 @@ export default function App() {
       {layout === "dashboard" && (
         <>
           <Sidenav
-            color={sidenavColor}
-            brand={
-              (transparentSidenav && !darkMode) || whiteSidenav
-                ? brandDark
-                : brandWhite
-            }
-            brandName="UAL Conf"
-            routes={routes}
-            onMouseEnter={handleOnMouseEnter}
-            onMouseLeave={handleOnMouseLeave}
+            color={ sidenavColor }
+            brand = { logo }
+            routes={ routes }
+            onMouseEnter={ handleOnMouseEnter }
+            onMouseLeave={ handleOnMouseLeave }
           />
           <NavBarSettings />
-          {configsButton}
+          { configsButton }
         </>
       )}
       {layout === "vr" && <NavBarSettings />}

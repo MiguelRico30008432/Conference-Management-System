@@ -34,7 +34,7 @@ import {
 
 import { AuthContext } from "../../auth.context";
 
-function Sidenav({ color, brand, brandName, routes, ...rest }) {
+function Sidenav({ color, brand, routes, ...rest }) {
   const { isLoggedIn, isAdmin, userRole } = useContext(AuthContext);
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -188,10 +188,10 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
       variant="permanent"
       ownerState={{ transparentSidenav, whiteSidenav, miniSidenav, darkMode }}
     >
-      <MDBox pt={3} pb={1} px={4} textAlign="center">
+      <MDBox textAlign="center">
         <MDBox
           display={{ xs: "block", xl: "none" }}
-          position="absolute"
+          position="flex"
           top={0}
           right={0}
           p={1.625}
@@ -204,19 +204,22 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
         </MDBox>
         <MDBox component={NavLink} to="/" display="flex" alignItems="center">
           {brand && (
-            <MDBox component="img" src={brand} alt="Brand" width="2rem" />
+            <MDBox 
+              component="img" 
+              src={brand} display="flex"
+              justifyContent="center"
+              alignItems="center" 
+              width="22rem" 
+              marginBottom = "-14px" 
+              title="Go to Home Page"/>
           )}
-          <MDBox
-            width={!brandName && "100%"}
-            sx={(theme) => sidenavLogoLabel(theme, { miniSidenav })}
-          >
+          <MDBox>
             <MDTypography
               component="h6"
               variant="button"
               fontWeight="medium"
               color={textColor}
             >
-              {brandName}
             </MDTypography>
           </MDBox>
         </MDBox>
@@ -249,8 +252,6 @@ Sidenav.propTypes = {
     "error",
     "dark",
   ]),
-  brand: PropTypes.string,
-  brandName: PropTypes.string.isRequired,
   routes: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 

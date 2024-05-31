@@ -18,12 +18,6 @@ router.post("/myConferences", auth.ensureAuthenticated, async (req, res) => {
           FROM (
             SELECT
               CASE 
-                WHEN NOW() < confstartsubmission THEN 'Configuration'
-                ELSE NULL 
-              END AS status
-            UNION
-            SELECT
-              CASE 
                 WHEN confstartsubmission <= NOW() AND confendsubmission >= NOW() THEN 'Submission' 
                 ELSE NULL 
               END AS status
@@ -42,7 +36,7 @@ router.post("/myConferences", auth.ensureAuthenticated, async (req, res) => {
             UNION
             SELECT
               CASE 
-                WHEN NOW() > confendreview THEN 'Pre-Conference' 
+                WHEN NOW() > confendreview THEN 'Configuration' 
                 ELSE NULL 
               END AS status
           ) AS statuses
