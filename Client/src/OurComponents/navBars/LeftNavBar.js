@@ -209,8 +209,8 @@ function Sidenav({ color, brand, routes, ...rest }) {
               src={brand} display="flex"
               justifyContent="center"
               alignItems="center" 
-              width="22rem" 
-              marginBottom = "-14px" 
+              width="100%" 
+              marginBottom = "-15px" 
               title="Go to Home Page"/>
           )}
           <MDBox>
