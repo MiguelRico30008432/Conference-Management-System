@@ -188,15 +188,16 @@ function Sidenav({ color, brand, routes, ...rest }) {
       variant="permanent"
       ownerState={{ transparentSidenav, whiteSidenav, miniSidenav, darkMode }}
     >
-      <MDBox textAlign="center">
+      <MDBox textAlign="center" position="relative">
         <MDBox
-          display={{ xs: "block", xl: "none" }}
-          position="flex"
-          top={0}
-          right={0}
-          p={1.625}
+          display={{ xs: "flex", xl: "none" }}
+          position="absolute"
+          top="10px" 
+          right="10px" 
+          zIndex={1} 
           onClick={closeSidenav}
           sx={{ cursor: "pointer" }}
+          title="Close Menu"
         >
           <MDTypography variant="h6" color="secondary">
             <Icon sx={{ fontWeight: "bold" }}>close</Icon>
@@ -206,12 +207,14 @@ function Sidenav({ color, brand, routes, ...rest }) {
           {brand && (
             <MDBox 
               component="img" 
-              src={brand} display="flex"
+              src={brand} 
+              display="flex"
               justifyContent="center"
               alignItems="center" 
               width="100%" 
-              marginBottom = "-15px" 
-              title="Go to Home Page"/>
+              marginBottom="-15px" 
+              title="Go to Home Page"
+            />
           )}
           <MDBox>
             <MDTypography
