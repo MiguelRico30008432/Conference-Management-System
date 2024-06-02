@@ -71,11 +71,27 @@ router.delete(
         `DELETE FROM submissions WHERE submissionid = ${submissionID}`
       );
 
+      
+      const remainingSubmissions = await db.fetchDataCst(
+        `SELECT COUNT(*) FROM submissions WHERE submissionmainauthor = ${submissionToDeleteInfo[0].submissionmainauthor}`
+      );
+
+      console.log(remainingSubmissions);
+
+      console.log(remainingSubmissions[0]);
+      if (parseInt(remainingSubmissions[0].count) === 0) {
+        await db.fetchDataCst(
+          `DELETE FROM userroles WHERE userid = ${submissionToDeleteInfo[0].submissionmainauthor} AND userrole = 'Author'`
+        );
+      }
+
       await sb.deleteSubmissionFile(
         submissionToDeleteInfo[0].submissionconfid,
         submissionID,
         submissionToDeleteInfo[0].submissionmainauthor
       );
+
+
 
       return res.status(200).send({ msg: "Submission deleted successfully." });
     } catch (error) {
