@@ -73,15 +73,12 @@ router.delete(
 
       
       const remainingSubmissions = await db.fetchDataCst(
-        `SELECT COUNT(*) FROM submissions WHERE submissionmainauthor = ${submissionToDeleteInfo[0].submissionmainauthor}`
+        `SELECT COUNT(*) FROM submissions WHERE submissionmainauthor = ${submissionToDeleteInfo[0].submissionmainauthor} AND submissionconfid = ${submissionToDeleteInfo[0].submissionconfid}`
       );
 
-      console.log(remainingSubmissions);
-
-      console.log(remainingSubmissions[0]);
       if (parseInt(remainingSubmissions[0].count) === 0) {
         await db.fetchDataCst(
-          `DELETE FROM userroles WHERE userid = ${submissionToDeleteInfo[0].submissionmainauthor} AND userrole = 'Author'`
+          `DELETE FROM userroles WHERE userid = ${submissionToDeleteInfo[0].submissionmainauthor} AND userrole = 'Author' AND confid = ${submissionToDeleteInfo[0].submissionconfid}`
         );
       }
 
