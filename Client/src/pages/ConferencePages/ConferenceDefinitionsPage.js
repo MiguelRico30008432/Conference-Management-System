@@ -13,12 +13,10 @@ import MDTypography from "components/MDTypography";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
 import Footer from "OurComponents/footer/Footer";
+import { FormControlLabel, Checkbox } from "@mui/material";
 
 export default function DefinitionsPage() {
   const { confID } = useContext(ConferenceContext);
@@ -610,29 +608,28 @@ export default function DefinitionsPage() {
                     </Grid>
                     <Grid item xs={12} sm={5}>
                       <FormControl fullWidth>
-                        <InputLabel
-                          id="confsubupdate"
-                          sx={{ ml: 2, mt: 3, width: "90%" }}
-                        >
-                          Submissions Update
-                        </InputLabel>
-                        <Select
-                          required
-                          fullWidth
-                          labelId="confsubupdate"
-                          label="Submissions Update"
-                          id="confsubupdate"
-                          InputLabelProps={{ shrink: true }}
-                          value={newSubmissionUpdate}
-                          disabled={!editModeActive}
-                          onChange={(e) =>
-                            setNewSubmissionUpdate(e.target.value)
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={newSubmissionUpdate}
+                              onChange={(e) =>
+                                setNewSubmissionUpdate(e.target.checked)
+                              }
+                              disabled={!editModeActive}
+                              sx={{ ml: -1 }}
+                            />
                           }
-                          sx={{ ml: 2, mt: 3.5, width: "90%" }}
-                        >
-                          <MenuItem value={true}>True</MenuItem>
-                          <MenuItem value={false}>False</MenuItem>
-                        </Select>
+                          label="Submissions Update"
+                          sx={{
+                            ml: 2,
+                            mt: 2,
+                            width: "90%",
+                            alignItems: "center",
+                            "& .MuiFormControlLabel-label": {
+                              fontWeight: "normal",
+                            },
+                          }}
+                        />
                       </FormControl>
                     </Grid>
                     <Grid item xs={12} sm={5}>
