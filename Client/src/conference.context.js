@@ -7,27 +7,31 @@ const ConferenceContext = React.createContext();
 function ConferenceProviderWrapper(props) {
   const [confID, setConfID] = useState(null);
   const [userRole, setUserRole] = useState(null);
-  const [confName, setConfName] = useState(null);
+  const [confStatus, setConfStatus] = useState(null);
 
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
     async function getConfData() {
       try {
-          const response = await fetch(`${process.env.REACT_APP_API_URL}/confContext`, {
-          method: "POST",
-          body: JSON.stringify({ userid: user }),
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-          credentials: "include",
-          withCredentials: true,
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/confContext`,
+          {
+            method: "POST",
+            body: JSON.stringify({ userid: user }),
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+            },
+            credentials: "include",
+            withCredentials: true,
+          }
+        );
 
         if (response.ok) {
           const userData = await response.json();
           setConfID(parseInt(userData[0].usercurrentconfid));
           setUserRole(userData[0].userrole);
+          setConfStatus(userData[0].status);
         }
       } catch (error) {
         console.error("Error in auth context", error);
@@ -46,6 +50,8 @@ function ConferenceProviderWrapper(props) {
         setConfID,
         userRole,
         setUserRole,
+        confStatus,
+        setConfStatus,
       }}
     >
       {props.children}

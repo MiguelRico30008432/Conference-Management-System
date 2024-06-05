@@ -15,7 +15,8 @@ import LoadingCircle from "OurComponents/loading/LoadingCircle";
 
 export default function MyConferences() {
   const { user, isLoggedIn } = useContext(AuthContext);
-  const { setConfID, setUserRole } = useContext(ConferenceContext);
+  const { setConfID, setUserRole, setConfStatus } =
+    useContext(ConferenceContext);
 
   const [rows, setRow] = useState([]);
   const [error, setError] = useState(null);
@@ -93,6 +94,7 @@ export default function MyConferences() {
               onClick={async () => {
                 setConfID(params.row.confid);
                 setUserRole(params.row.userrole);
+                setConfStatus(params.row.status);
                 await saveConfIDOnUser(params.row.confid);
                 navigate("/MyConferences/ConferenceDescription");
               }}
