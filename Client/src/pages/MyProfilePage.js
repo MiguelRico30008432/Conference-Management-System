@@ -223,41 +223,50 @@ export default function MyProfilePage() {
   async function handleInvitationCode() {
     const inviteCode = code.trim();
     if (inviteCode === "") {
-      setInviteMessage(<Alert severity="error">Please enter an invitation code.</Alert>);
+      setInviteMessage(
+        <Alert severity="error">Please enter an invitation code.</Alert>
+      );
       return;
     }
-  
+
     setOpenLoading(true);
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/saveInvitationCode`, {
-        method: "POST",
-        body: JSON.stringify({
-          userID: user,
-          inviteCode: inviteCode,
-        }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-        },
-        credentials: "include",
-      });
-  
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/saveInvitationCode`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            userID: user,
+            inviteCode: inviteCode,
+          }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+        }
+      );
+
       const jsonResponse = await response.json();
-  
+
       if (response.status === 200) {
-        setInviteMessage(<Alert severity="success">Invitation code accepted. You have joined the conference.</Alert>);
+        setInviteMessage(
+          <Alert severity="success">
+            Invitation code accepted. You have joined the conference.
+          </Alert>
+        );
         setInviteCode(""); // Clear the input field after successful submission
       } else {
         setInviteMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
       }
     } catch (error) {
       setInviteMessage(
-        <Alert severity="error">Something went wrong when submitting your invitation code.</Alert>
+        <Alert severity="error">
+          Something went wrong when submitting your invitation code.
+        </Alert>
       );
     }
     setOpenLoading(false);
   }
-  
-  
 
   return (
     <>
@@ -513,7 +522,7 @@ export default function MyProfilePage() {
         <MDBox mb={3}>
           <Card>
             <MDTypography ml={2} mb={2} mt={2} variant="body2">
-              "Do you have a conference invitation?"
+              Do you have a conference invitation?
             </MDTypography>
 
             <TextField
