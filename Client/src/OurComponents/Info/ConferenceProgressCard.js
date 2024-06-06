@@ -7,9 +7,8 @@ import { useEffect, useState, useContext } from "react";
 import { ConferenceContext } from "conference.context";
 
 export default function ConferenceProgressCard() {
-  const { confID } = useContext(ConferenceContext);
+  const { confID, confPhase } = useContext(ConferenceContext);
   const [increment, setIncrement] = useState(0);
-  const [status, setStatus] = useState("");
 
   useEffect(() => {
     async function getRows() {
@@ -30,7 +29,6 @@ export default function ConferenceProgressCard() {
 
         if (response.status === 200) {
           setIncrement(jsonResponse.percentage);
-          setStatus(jsonResponse.status);
         }
       } catch (error) {}
     }
@@ -62,7 +60,7 @@ export default function ConferenceProgressCard() {
               |
             </MDTypography>
             <MDTypography variant="body2" ml={2}>
-              Current phase: {status}
+              Current phase: {confPhase}
             </MDTypography>
           </MDBox>
         </Card>

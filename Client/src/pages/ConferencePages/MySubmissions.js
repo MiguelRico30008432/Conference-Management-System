@@ -30,7 +30,7 @@ export default function MySubmissionsPage() {
   const [subUpdate, setSubUpdate] = useState(null);
 
   const { user } = useContext(AuthContext);
-  const { confID } = useContext(ConferenceContext);
+  const { confID, confPhase } = useContext(ConferenceContext);
 
   useEffect(() => {
     async function fetchSubmissions() {
@@ -191,6 +191,8 @@ export default function MySubmissionsPage() {
       resizable: false,
       width: 55,
       renderCell: (params) => {
+        if (confPhase !== "Submission" || !subUpdate) return null;
+
         return (
           <div
             style={{
@@ -200,7 +202,7 @@ export default function MySubmissionsPage() {
               height: "100%",
             }}
           >
-            {!subUpdate ? null : (
+            {
               <MDButton
                 variant="gradient"
                 color="success"
@@ -217,7 +219,7 @@ export default function MySubmissionsPage() {
               >
                 Edit
               </MDButton>
-            )}
+            }
           </div>
         );
       },
@@ -307,6 +309,8 @@ export default function MySubmissionsPage() {
       resizable: false,
       width: 150,
       renderCell: (params) => {
+        if (confPhase !== "Submission") return null;
+
         return (
           <div
             style={{
