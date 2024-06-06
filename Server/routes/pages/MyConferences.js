@@ -19,7 +19,7 @@ router.post("/myConferences", auth.ensureAuthenticated, async (req, res) => {
           WHEN confstartreview <= NOW() AND confendreview >= NOW() THEN 'Review'
           WHEN confstartbidding <= NOW() AND confendbidding >= NOW() THEN 'Bidding'
           WHEN NOW() > confendreview THEN 'Pre-Conference'
-        END AS status
+        END AS confphase
     FROM conferences
     INNER JOIN userRoles ON userRoles.confid = conferences.confid
     WHERE userRoles.userid = ${req.body.userid} AND confenddate >= NOW()

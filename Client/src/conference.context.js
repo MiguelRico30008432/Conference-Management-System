@@ -7,7 +7,7 @@ const ConferenceContext = React.createContext();
 function ConferenceProviderWrapper(props) {
   const [confID, setConfID] = useState(null);
   const [userRole, setUserRole] = useState(null);
-  const [confStatus, setConfStatus] = useState(null);
+  const [confPhase, setConfPhase] = useState(null);
 
   const { user } = useContext(AuthContext);
 
@@ -31,7 +31,7 @@ function ConferenceProviderWrapper(props) {
           const userData = await response.json();
           setConfID(parseInt(userData[0].usercurrentconfid));
           setUserRole(userData[0].userrole);
-          setConfStatus(userData[0].status);
+          setConfPhase(userData[0].confphase);
         }
       } catch (error) {
         console.error("Error in auth context", error);
@@ -50,8 +50,8 @@ function ConferenceProviderWrapper(props) {
         setConfID,
         userRole,
         setUserRole,
-        confStatus,
-        setConfStatus,
+        confPhase,
+        setConfPhase,
       }}
     >
       {props.children}

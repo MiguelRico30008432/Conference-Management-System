@@ -7,7 +7,7 @@ import { useEffect, useState, useContext } from "react";
 import { ConferenceContext } from "conference.context";
 
 export default function ConferenceProgressCard() {
-  const { confID, confStatus } = useContext(ConferenceContext);
+  const { confID, confPhase } = useContext(ConferenceContext);
   const [increment, setIncrement] = useState(0);
 
   useEffect(() => {
@@ -60,7 +60,7 @@ export default function ConferenceProgressCard() {
               |
             </MDTypography>
             <MDTypography variant="body2" ml={2}>
-              Current phase: {confStatus}
+              Current phase: {confPhase}
             </MDTypography>
           </MDBox>
         </Card>
