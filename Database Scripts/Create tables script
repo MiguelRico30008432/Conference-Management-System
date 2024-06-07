@@ -174,3 +174,11 @@ CREATE TABLE biddings (
     biddingadddata TIMESTAMP NOT NULL DEFAULT current_timestamp
 )
 
+__________________________________________________________________________________________________________
+CREATE TABLE ReviewsAssignments (
+    assignmentid SERIAL PRIMARY KEY,
+    assignmentconfid INT, FOREIGN KEY (assignmentconfid) REFERENCES conferences(confid),
+    assignmentsubmissionid INT, FOREIGN KEY (assignmentsubmissionid) REFERENCES submissions(submissionid),
+    assignmentuserid INT, FOREIGN KEY (assignmentuserid) REFERENCES users(userid),
+    assignmentmanually BOOLEAN,
+    assignmentadddate TIMESTAMP NOT NULL DEFAULT current_timestamp)

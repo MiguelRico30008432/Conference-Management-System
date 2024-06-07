@@ -465,6 +465,42 @@ export default function DefinitionsPage() {
     setOpenLoading(false);
   }
 
+  async function handleAssignmentAlgorithm() {
+    setOpenLoading(true);
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/reviewsAssignmentsAlgorithm`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            confid: confID,
+          }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (response.status === 200) {
+        setMessage(
+          <Alert severity="success">
+            Reviews Assignments list has been updated.
+          </Alert>
+        );
+      }
+    } catch (error) {
+      setMessage(
+        <Alert severity="error">
+          Something went wrong running the algorithm
+        </Alert>
+      );
+    }
+
+    setOpenLoading(false);
+  }
+
   return (
     <>
       {openLoading && <LoadingCircle />}
@@ -518,7 +554,7 @@ export default function DefinitionsPage() {
               <MDButton
                 variant="gradient"
                 color="success"
-                onClick={async () => handleUpdateConflicts()}
+                onClick={async () => handleAssignmentAlgorithm()}
                 sx={{
                   maxWidth: "300px",
                   maxHeight: "100px",
@@ -529,7 +565,7 @@ export default function DefinitionsPage() {
                   ml: 2,
                 }}
               >
-                Run Bidding Algorithm
+                Run Review Assignment Algorithm
               </MDButton>
 
               <Card sx={{ maxWidth: 1400 }}>

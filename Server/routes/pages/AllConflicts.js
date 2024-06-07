@@ -11,17 +11,18 @@ router.post(
     try {
       //Obter lista com os emails do comite, chair, owner e respetivas afiliações
       const committeeEmailsAffiliation = await db.fetchDataCst(`
-        SELECT 
-            ur.userrole,
-            u.useremail,
-            u.useraffiliation
-        FROM 
-            userroles ur
-        JOIN 
-            users u ON ur.userid = u.userid
-        WHERE 
-            ur.confid = ${req.body.confid} 
-        `);
+      SELECT 
+        ur.userrole,
+        u.useremail,
+        u.useraffiliation
+      FROM 
+        userroles ur
+      JOIN 
+        users u ON ur.userid = u.userid
+      WHERE 
+        ur.confid = ${req.body.confid}
+      AND ur.userrole IN ('Chair', 'Owner', 'Committee')
+      `);
 
       //Obter submissões da conferência
       const submissionsids = await db.fetchDataCst(`
