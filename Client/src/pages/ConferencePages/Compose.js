@@ -62,14 +62,14 @@ export default function Compose() {
     setRecipientError("");
     setSubjectError("");
     setDescriptionError("");
-
+  
     if (!recipient || !subject || !description) {
       if (!recipient) setRecipientError("You must select a recipient!");
       if (!subject) setSubjectError("You must enter a subject!");
       if (!description) setDescriptionError("You must enter a description!");
       return;
     }
-
+  
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/sendComposeEmail`,
@@ -87,13 +87,13 @@ export default function Compose() {
           credentials: "include",
         }
       );
-
+  
       const data = await response.json();
-
+  
       if (!response.ok) {
         throw new Error(data.message || "Failed to send email.");
       }
-
+  
       setSendResponse({ success: true, message: "Email sent successfully." });
       setRecipient("");
       setSubject("");
