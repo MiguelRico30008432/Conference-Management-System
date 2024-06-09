@@ -108,7 +108,7 @@ export default function MyProfilePage() {
   async function changePassword() {
     if (password.length === 0 || repeatPassword.length === 0) {
       setPasswordMessage(
-        <Alert severity="error">Please fill in the password field.</Alert>
+        <Alert severity="error">Password not changed: Please fill in the password field.</Alert>
       );
     } else if (password !== repeatPassword) {
       setPasswordMessage(
@@ -432,7 +432,7 @@ export default function MyProfilePage() {
         <MDBox mb={3} textAlign="left">
           <Card>
             {passwordMessage}
-            {inviteMessage && <div style={{ marginTop: "1px" }}>{inviteMessage}</div>}
+            {inviteMessage}
           </Card>
         </MDBox>
 
@@ -452,9 +452,10 @@ export default function MyProfilePage() {
                   type="password"
                   id="password"
                   disabled={!passwordModeActive}
-                  autoComplete="new-password"
                   value={password}
-                  onChange={(e) => setPasword(e.target.value)}
+                  onChange={(e) => {
+                    setPasword(e.target.value);
+                  }}
                   sx={{ ml: 2, width: '90%' }}
                 />
 
@@ -466,9 +467,10 @@ export default function MyProfilePage() {
                   type="password"
                   id="password"
                   disabled={!passwordModeActive}
-                  autoComplete="new-password"
                   value={repeatPassword}
-                  onChange={(e) => setRepeatPassword(e.target.value)}
+                  onChange={(e) => {
+                    setRepeatPassword(e.target.value);
+                  }}
                   sx={{ mt: 2, ml: 2, width: '90%' }}
                 />
 
@@ -509,8 +511,8 @@ export default function MyProfilePage() {
                         mb: 2,
                       }}
                       onClick={() => {
-                        setPasswordModeActive(false);
                         changePassword();
+                        setPasswordModeActive(false);
                       }}
                     >
                       Save Changes
@@ -535,7 +537,7 @@ export default function MyProfilePage() {
                   value={code}
                   onChange={(e) => {
                     setInviteCode(e.target.value);
-                    setInviteMessage(null); 
+                    setInviteMessage(null);
                   }}
                   sx={{ ml: 2, width: '90%' }}
                 />
