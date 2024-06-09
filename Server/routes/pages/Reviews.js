@@ -74,6 +74,7 @@ async function getAssignments(confid) {
   try {
     const assignments = await db.fetchDataCst(`
     SELECT
+      r.assignmentid,
       r.assignmentsubmissionid,
       u.useremail,
       r.assignmentmanually
@@ -142,7 +143,15 @@ async function getWorkload(confid) {
   }
 }
 
-async function verifyAssignmentsReviewers(confid) {}
+async function verifyAssignmentsReviewers(confid) {} //EM FALTA
+
+async function deleteAutomaticAssignments(assignmentsToDelete) {} // EM FALTA
+
+async function pickPreferableAutomaticAssignments(
+  automaticAssignments,
+  workload,
+  assignmentsNeeded
+) {} //EM FALTA
 
 async function ReviewsAssignmentAlghoritm(confid) {
   //get committe list
@@ -191,9 +200,9 @@ async function ReviewsAssignmentAlghoritm(confid) {
       }
 
       //Separate manual assignments(cant be altered) from automatic assignments(can be altered)
+      let manualAssignments = [];
+      let automaticAssignments = [];
       if (submissionMadeAssignments.length > 0) {
-        let manualAssignments = [];
-        let automaticAssignments = [];
         for (const madeAssignment of submissionMadeAssignments) {
           if (madeAssignment.assignmentmanually === true) {
             manualAssignments.push(madeAssignment);
@@ -202,27 +211,57 @@ async function ReviewsAssignmentAlghoritm(confid) {
           }
         }
       }
-      //If with theres enougth manual assignments skip to next submission
+      //If theres enougth manual assignments, delete automatic assignments and skip to next submission
       if (manualAssignments.length >= reviewersNeededPerReview) {
+        await deleteAutomaticAssignments(automaticAssignments);
         continue;
       }
 
-      //If theres not enougth manual assignments then we need to check biddings
-      if (manualAssignments.length < reviewersNeededPerReview) {
+      // If submissionMadeAssignments = reviewersNeededReview then we skip for next submission
+      if (submissionMadeAssignments.length === reviewersNeededPerReview) {
+        continue;
+      }
+
+      //If submissionMadeAssignments > reviewerNeededPerReview, then we need to choose witch automatica assignments stay
+      if (submissionMadeAssignments.length > reviewersNeededPerReview) {
+        //From the automatic assignments we choose the preferible ones having in count confidence level and workload of the committee members
+        const automaticAssignmentsNeeded =
+          reviewersNeededPerReview - manualAssignments.length;
+        const choosenAutomaticAssignments =
+          await pickPreferableAutomaticAssignments(
+            automaticAssignments,
+            workload,
+            automaticAssignmentsNeeded
+          );
+
+        //Then we delete the assignments we do not use
+        const unnacesseryAssignments = automaticAssignments.filter(
+          (assignment) => {
+            return !choosenAutomaticAssignments.some(
+              (choosen) => choosen === assignment
+            );
+          }
+        );
+
+        await deleteAutomaticAssignments(unnacesseryAssignments);
+      }
+
+      //If theres not enougth submissionMadeAssignments then we need to check biddings
+      if (submissionMadeAssignments.length < reviewersNeededPerReview) {
         //create temporary list with the submission biddings
         const submissionBiddings = biddings.filter(
           (bid) => bid.biddingsubmissionid === submission.submissionid
         );
         //If theres enougth biddings so that manual assignments + biddings = reviewersNeededPerReview, then we register the biddings as automatic assignments
         if (
-          manualAssignments.length + submissionBiddings.length ===
+          submissionMadeAssignments.length + submissionBiddings.length ===
           reviewersNeededPerReview
         ) {
           //Criar uma função para adicionar ao reviewsassignment e depois adicionar +1 no workload de quem esta associado a bid
         }
 
         if (
-          manualAssignments.length + submissionBiddings.length >
+          submissionMadeAssignments.length + submissionBiddings.length >
           reviewersNeededPerReview
         ) {
           //Criar uma função que retorne quem, das biddings, fica com a review (Nivel De Confiança > Bidding Date  (Se calhar nesta função ja posso levar em conta o workload VER))
@@ -230,7 +269,7 @@ async function ReviewsAssignmentAlghoritm(confid) {
         }
 
         if (
-          manualAssignments.length + submissionBiddings.length <
+          submissionMadeAssignments.length + submissionBiddings.length <
           reviewersNeededPerReview
         ) {
           //Criar uma função que retorne quem tem menos workload e assim fica com a review (=Workload  escolher o que essta primeiro na lista)
