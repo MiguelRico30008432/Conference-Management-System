@@ -109,8 +109,7 @@ router.post("/saveInvitationCode", auth.ensureAuthenticated, async (req, res) =>
       return res.status(403).send({ msg: "This code isn't associated with your user." });
     }
   } catch (error) {
-    console.error("Error when saving the invitation code: ", error);
-    return res.status(500).send({ msg: "Internal Error", error: error.message });
+      return res.status(500).send({ msg: "Internal Error"});
   }
 });
 
