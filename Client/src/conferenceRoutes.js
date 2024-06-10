@@ -13,7 +13,6 @@ import MyBiddings from "pages/ConferencePages/MyBiddings";
 //Reviews
 import MyReviews from "pages/ConferencePages/MyReviews";
 import AllReviews from "pages/ConferencePages/AllReviews";
-import Assignements from "pages/ConferencePages/Assignements";
 
 //Emails
 import Compose from "pages/ConferencePages/Compose";
