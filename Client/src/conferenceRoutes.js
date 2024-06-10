@@ -126,7 +126,7 @@ const ConfRoutes = [
   },
   {
     type: "collapse", //Done
-    name: "Assigned to me",
+    name: "My Reviews",
     submenu: "Reviews",
     route: "/MyConferences/Conference/MyReviews",
     component: <MyReviews />,

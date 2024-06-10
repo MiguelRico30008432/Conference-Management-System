@@ -23,7 +23,7 @@ const updateSubmission = require("./pages/UpdateSubmission");
 const callForPapers = require("./pages/CallForPapers");
 const bidding = require("./pages/Bidding");
 const myBiddings = require("./pages/MyBiddings");
-const Reviews = require("./pages/Reviews");
+const myReviews = require("./pages/MyReviews");
 
 router.use(fileUpload());
 
@@ -48,6 +48,6 @@ router.use(updateSubmission);
 router.use(callForPapers);
 router.use(bidding);
 router.use(myBiddings);
-router.use(Reviews);
+router.use(myReviews);
 
 module.exports = router;
