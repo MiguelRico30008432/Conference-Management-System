@@ -13,6 +13,7 @@ import { v4 as uuidv4 } from "uuid";
 import ConferenceNavBar from "OurComponents/navBars/ConferenceNavBar";
 import CompleteTable from "OurComponents/Table/CompleteTable";
 import ReviewsDone from "OurComponents/Info/ReviewsDone";
+import { fetchAPI } from "OurFunctions/fetchAPI";
 
 import { AuthContext } from "auth.context";
 import { ConferenceContext } from "conference.context";
@@ -30,37 +31,20 @@ export default function MyReviews() {
 
   useEffect(() => {
     async function fetchReviews() {
-      setOpenLoading(true);
+      const response = await fetchAPI(
+        "myReviews",
+        "POST",
+        { userid: user, confid: confID },
+        setError,
+        setOpenLoading
+      );
 
-      if (confID && user) {
-        try {
-          const response = await fetch(
-            `${process.env.REACT_APP_API_URL}/myReviews`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json; charset=UTF-8",
-              },
-              credentials: "include",
-              body: JSON.stringify({
-                userid: user,
-                confid: confID,
-              }),
-            }
-          );
-
-          const jsonResponse = await response.json();
-          if (response.status === 200) {
-            for (let line of jsonResponse) {
-              line.id = uuidv4();
-              setRows((allExistingRows) => [...allExistingRows, line]);
-            }
-          }
-        } catch (error) {
-          setError(<Alert severity="error">Could not fetch Reviews</Alert>);
+      if (response) {
+        for (let line of response) {
+          line.id = uuidv4();
+          setRows((allExistingRows) => [...allExistingRows, line]);
         }
       }
-      setOpenLoading(false);
     }
 
     if (user && confID) {

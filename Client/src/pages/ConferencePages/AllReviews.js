@@ -13,6 +13,8 @@ import ConferenceNavBar from "OurComponents/navBars/ConferenceNavBar";
 import CompleteTable from "OurComponents/Table/CompleteTable";
 import SubmissionsDetails from "OurComponents/Info/SubmissionDetails";
 import UpdateSubmission from "OurComponents/Info/updateSubmission";
+import { fetchAPI } from "OurFunctions/fetchAPI";
+import { v4 as uuidv4 } from "uuid";
 
 import { AuthContext } from "auth.context";
 import { ConferenceContext } from "conference.context";
@@ -27,32 +29,20 @@ export default function AllReviews() {
 
   useEffect(() => {
     async function fetchReviews() {
-      setOpenLoading(true);
+      const response = await fetchAPI(
+        "myReviews",
+        "POST",
+        { userid: user, confid: confID },
+        setError,
+        setOpenLoading
+      );
 
-      if (confID && user) {
-        try {
-          const update = await fetch(
-            `${process.env.REACT_APP_API_URL}/myReviews`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json; charset=UTF-8",
-              },
-              credentials: "include",
-              body: JSON.stringify({
-                confid: confID,
-              }),
-            }
-          );
-
-          const response = await update.json();
-          if (response.status === 200) {
-          }
-        } catch (error) {
-          setError(<Alert severity="error">Could not fetch submissions</Alert>);
+      if (response) {
+        for (let line of response) {
+          line.id = uuidv4();
+          setRows((allExistingRows) => [...allExistingRows, line]);
         }
       }
-      setOpenLoading(false);
     }
 
     if (user && confID) {
