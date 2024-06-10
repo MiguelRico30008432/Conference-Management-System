@@ -13,7 +13,6 @@ function sendEmail(to, subject, replacements, file, callback) {
       return callback(err);
     }
 
-    // Substitutes variables in HTML File
     let htmlContent = html;
     for (let key in replacements) {
       let replacementText = replacements[key].replace(/\n/g, "<br>"); // Convert newlines to <br> tags

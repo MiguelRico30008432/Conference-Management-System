@@ -7,9 +7,6 @@ const { sendEmail } = require("../../utility/emails");
 router.post("/sendComposeEmail", auth.ensureAuthenticated, async (req, res) => {
   const { recipient, subject, description, confID } = req.body;
 
-  console.log(description.split("\n").join("<br />"));
-  
-  // Validate the required fields
   if (!subject || !description || !confID) {
     return res.status(400).json({ success: false, message: "Missing required fields." });
   }
@@ -21,32 +18,34 @@ router.post("/sendComposeEmail", auth.ensureAuthenticated, async (req, res) => {
         SELECT useremail
         FROM users
         JOIN userroles ON users.userid = userroles.userid
-        WHERE userroles.confID = '${confID}' AND userroles.userrole IN ('Owner','Chair', 'Committee');
+        WHERE userroles.confID = ${confID} AND userroles.userrole IN ('Owner', 'Chair', 'Committee');
       `;
     } else {
       queryText = `
         SELECT useremail
         FROM users
         JOIN userroles ON users.userid = userroles.userid
-        WHERE userroles.confID = '${confID}' AND userroles.userrole IN ('Owner','Chair');
+        WHERE userroles.confID = ${confID} AND userroles.userrole IN ('Owner', 'Chair');
       `;
     }
 
-    const result = await db.fetchDataCst(queryText);
-    const emails = result.map((row) => row.useremail);
+    const result = await db.fetchDataCst(queryText, [confID]);
+    console.log(result);
 
-    
-    formattedDescription = description.split("\n").join("<br />");
-    console.log(formattedDescription);
+    if (!result || !Array.isArray(result)) {
+      return res.status(404).json({ success: false, message: "No recipients found." });
+    }
+
+    const emails = result.map((row) => row.useremail);
+    const formattedDescription = description.split("\n").join("<br />");
 
     await sendEmail(emails, subject, { descriptionEmail: formattedDescription }, 'SendComposeEmail.html', (error, info) => {
       if (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: "An error occurred while sending the email." });
       }
+      res.status(200).json({ success: true, message: "Emails sent successfully." });
     });
-
-    res.status(200).json({ success: true, message: "Emails sent successfully." });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "An error occurred while sending the email." });

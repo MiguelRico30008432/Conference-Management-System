@@ -44,7 +44,6 @@ export default function Compose() {
       )
         .then((response) => response.json())
         .then((data) => {
-          // Set state based on response from backend
           setCommitteeMembersExist(data.committeeMembersExist);
         })
         .catch((error) => {
@@ -78,7 +77,7 @@ export default function Compose() {
           body: JSON.stringify({
             recipient,
             subject,
-            description: JSON.stringify(description),
+            description: description, // no need to stringify again here
             confID: confID,
           }),
           headers: {
@@ -183,7 +182,7 @@ export default function Compose() {
                     onChange={(e) => setSubject(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
-                        e.preventDefault(); // Prevent default behavior of enter key
+                        e.preventDefault();
                       }
                     }}
                     rows={1}
@@ -224,7 +223,6 @@ export default function Compose() {
               
               <Button
                 type="submit"
-
                 variant="contained"
                 sx={{ mt: 3, mb: 2, color: "white !important" }}
               >
@@ -233,7 +231,7 @@ export default function Compose() {
             </Box>
           </Card>
         </MDBox>
-        <br></br>
+        <br />
       </Container>
       <Footer />
     </DashboardLayout>
