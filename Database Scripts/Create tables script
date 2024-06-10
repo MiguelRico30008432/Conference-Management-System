@@ -177,4 +177,4 @@ CREATE TABLE ReviewsAssignments (
     assignmentsubmissionid INT, FOREIGN KEY (assignmentsubmissionid) REFERENCES submissions(submissionid),
     assignmentuserid INT, FOREIGN KEY (assignmentuserid) REFERENCES users(userid),
     assignmentmanually BOOLEAN,
-    assignmentadddate TIMESTAMP NOT NULL DEFAULT current_timestamp)
+    assignmentadddate TIMESTAMP NOT NULL DEFAULT current_timestamp);
