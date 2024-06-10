@@ -24,6 +24,7 @@ const callForPapers = require("./pages/CallForPapers");
 const bidding = require("./pages/Bidding");
 const myBiddings = require("./pages/MyBiddings");
 const myReviews = require("./pages/MyReviews");
+const submissionsDecision = require("./pages/SubmissionsDecision");
 
 router.use(fileUpload());
 
@@ -49,5 +50,6 @@ router.use(callForPapers);
 router.use(bidding);
 router.use(myBiddings);
 router.use(myReviews);
+router.use(submissionsDecision);
 
 module.exports = router;
