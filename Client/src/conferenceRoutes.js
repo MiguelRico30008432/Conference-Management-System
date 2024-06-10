@@ -127,14 +127,6 @@ const ConfRoutes = [
   },
   {
     type: "collapse", //Done
-    name: "Assignements",
-    submenu: "Reviews",
-    route: "/MyConferences/Conference/Assignements",
-    component: <Assignements />,
-    permissions: ["Owner", "Chair", "Committee"],
-  },
-  {
-    type: "collapse", //Done
     name: "Assigned to me",
     submenu: "Reviews",
     route: "/MyConferences/Conference/MyReviews",

@@ -19,7 +19,7 @@ export default function AllReviews() {
           <MDBox mb={3} textAlign="left">
             <Card>
               <MDTypography ml={2} variant="h6">
-                AllReviews
+                All Reviews
               </MDTypography>
               <MDTypography ml={2} variant="body2">
                 text goes here
