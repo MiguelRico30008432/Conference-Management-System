@@ -68,4 +68,25 @@ router.post("/submissionDecisionDetails", auth.ensureAuthenticated, async (req, 
   }
 });
 
+router.post("/acceptOrRejectDecision", auth.ensureAuthenticated, async (req, res) => {
+    const { submissionId, acceptOrReject } = req.body;
+    console.log(submissionId);
+    console.log(acceptOrReject);
+    try {
+        // Update submission status in the database
+        await db.fetchDataCst(`
+            UPDATE submissions 
+            SET submissionaccepted = ${acceptOrReject === 2}, 
+                submissiondecisionmade = true 
+            WHERE submissionid = ${submissionId};
+        `);
+
+        res.status(200).send({ msg: "Submission decision updated successfully." });
+    } catch (error) {
+        console.error("Error in /acceptOrRejectDecision:", error);
+        log.addLog(error, "backend", "acceptOrRejectDecision");
+        res.status(500).send({ msg: "Internal Error" });
+    }
+});
+
 module.exports = router;

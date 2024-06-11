@@ -42,9 +42,9 @@ export default function SubmissionsDecision() {
             row.id === submissionId ? { ...row, status: decision === "accept" ? "Accepted" : "Rejected" } : row
           )
         );
-        setError(
-          <Alert severity="success">Submission {decision === "accept" ? "accepted" : "rejected"} successfully</Alert>
-        );
+        // Display different messages based on the decision
+        const message = decision === "accept" ? "Submission Accepted" : "Submission Rejected";
+        setError(<Alert severity="success">{message}</Alert>);
       } else {
         const jsonResponse = await response.json();
         setError(<Alert severity="error">{jsonResponse.message}</Alert>);
@@ -76,7 +76,9 @@ export default function SubmissionsDecision() {
 
         const data = await response.json();
         console.log("Fetched Submissions Data:", data); // Debug log
-        setRows(data.map((item) => ({ ...item, id: uuidv4() })));
+        // Filter submissions where submissiondecisionmade is false
+        const filteredData = data.filter(item => !item.submissiondecisionmade);
+        setRows(filteredData.map((item) => ({ ...item, id: uuidv4() })));
       } catch (error) {
         setError(<Alert severity="error">{error.message}</Alert>);
       } finally {
