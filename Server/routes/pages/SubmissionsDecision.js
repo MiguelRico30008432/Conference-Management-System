@@ -11,31 +11,60 @@ router.post("/allSubmissionsDecisions", auth.ensureAuthenticated, async (req, re
   try {
     const queryText = `
       SELECT
-        s.submissionid,
-        s.submissiontitle AS title,
-        STRING_AGG(CONCAT(a1.authorfirstname, ' ', a1.authorlastname), ', ') AS authors,
-        COALESCE(ROUND(AVG(r.reviewgrade)::numeric, 1), 0) AS averagegrade
+        submissions.submissionid,
+        submissions.submissiontitle,
+        STRING_AGG(DISTINCT authors.authorfirstname || ' ' || authors.authorlastname, ', ') AS authors,
+        TRIM(TO_CHAR(AVG(reviews.reviewgrade), '999D9'))::float AS averagegrade
       FROM
-        submissions s
+        submissions
       LEFT JOIN
-        reviewsassignments ra ON s.submissionid = ra.assignmentsubmissionid
+        reviewsassignments ON submissions.submissionid = reviewsassignments.assignmentsubmissionid
       LEFT JOIN
-        reviews r ON ra.assignmentid = r.reviewassignmentid
+        reviews ON reviewsassignments.assignmentid = reviews.reviewassignmentid
       LEFT JOIN
-        authors a1 ON s.submissionid = a1.submissionid
+        authors ON submissions.submissionid = authors.submissionid
       WHERE
-        s.submissionconfid = $1
+        submissions.submissionconfid = $1 AND submissions.submissionaccepted = false
       GROUP BY
-        s.submissionid, s.submissiontitle
+        submissions.submissionid, submissions.submissiontitle
       ORDER BY
-        s.submissionid;
+        submissions.submissionid;
     `;
     const result = await db.pool.query(queryText, [confid]);
 
-    return res.status(200).json(result.rows);
-  } catch (error) {
-    log.addLog(error, "database", "SubmissionsDecision -> /allSubmissionsDecisions");
-    return res.status(500).send({ message: "Failed to fetch submissions" });
+    res.status(200).json(result.rows);
+  } catch (err) {
+    log.addLog(err, "backend", "allSubmissionsDecisions");
+    res.status(500).json({ message: "Failed to fetch submissions" });
+  }
+});
+
+// Fetch detailed review information for a specific submission
+router.post("/submissionDecisionDetails", auth.ensureAuthenticated, async (req, res) => {
+  const { submissionId } = req.body;
+
+  try {
+    const queryText = `
+      SELECT
+        users.userfirstname,
+        users.userlastname,
+        reviews.reviewgrade,
+        reviews.reviewtext
+      FROM
+        reviews
+      LEFT JOIN
+        reviewsassignments ON reviews.reviewassignmentid = reviewsassignments.assignmentid
+      LEFT JOIN
+        users ON reviews.userid = users.userid
+      WHERE
+        reviewsassignments.assignmentsubmissionid = $1;
+    `;
+    const result = await db.pool.query(queryText, [submissionId]);
+
+    res.status(200).json(result.rows);
+  } catch (err) {
+    log.addLog(err, "backend", "submissionDecisionDetails");
+    res.status(500).json({ message: "Failed to fetch submission details" });
   }
 });
 

@@ -11,6 +11,7 @@ import Footer from "OurComponents/footer/Footer";
 import { v4 as uuidv4 } from "uuid";
 import ConferenceNavBar from "OurComponents/navBars/ConferenceNavBar";
 import CompleteTable from "OurComponents/Table/CompleteTable";
+import SubmissionDecisionDetails from "OurComponents/Info/SubmissionDecisionDetails";
 
 import { AuthContext } from "auth.context";
 import { ConferenceContext } from "conference.context";
@@ -23,7 +24,7 @@ export default function SubmissionsDecision() {
   const [error, setError] = useState(null);
   const [rows, setRows] = useState([]);
   const [detailsOpen, setDetailsOpen] = useState(false);
-  const [dataForDetails, setDataForDetails] = useState({});
+  const [dataForDetails, setDataForDetails] = useState({ title: "", reviews: [] });
 
   const handleDecision = async (submissionId, decision) => {
     setOpenLoading(true);
@@ -74,6 +75,7 @@ export default function SubmissionsDecision() {
         }
 
         const data = await response.json();
+        console.log("Fetched Submissions Data:", data); // Debug log
         setRows(data.map((item) => ({ ...item, id: uuidv4() })));
       } catch (error) {
         setError(<Alert severity="error">{error.message}</Alert>);
@@ -87,8 +89,36 @@ export default function SubmissionsDecision() {
     }
   }, [confID, user]);
 
+  const fetchDetails = async (submissionId, submissionTitle) => {
+    setOpenLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/submissionDecisionDetails`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ submissionId }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      setDataForDetails({ title: submissionTitle, reviews: data });
+      setDetailsOpen(true);
+    } catch (error) {
+      setError(<Alert severity="error">{error.message}</Alert>);
+    } finally {
+      setOpenLoading(false);
+    }
+  };
+
   const columns = [
-    { field: "title", headerName: "Title", width: 200 },
+    { field: "submissiontitle", headerName: "Title", width: 200 },
     { field: "authors", headerName: "Authors", width: 200 },
     { field: "averagegrade", headerName: "Average Grade", width: 120 },
     {
@@ -105,10 +135,7 @@ export default function SubmissionsDecision() {
           <MDButton
             variant="gradient"
             color="info"
-            onClick={() => {
-              setDataForDetails(params.row);
-              setDetailsOpen(true);
-            }}
+            onClick={() => fetchDetails(params.row.submissionid, params.row.submissiontitle)}
             sx={{ maxWidth: "60px", maxHeight: "23px", minWidth: "30px", minHeight: "23px" }}
           >
             Details
@@ -178,22 +205,27 @@ export default function SubmissionsDecision() {
                   Here you can view and manage submissions decisions.
                 </MDTypography>
               </Card>
+
+              <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
+
+              <MDBox mb={3} textAlign="left">
+                <Card>
+                  <CompleteTable
+                    columns={columns}
+                    rows={rows}
+                    numberOfRowsPerPage={100}
+                    height={200}
+                  />
+                </Card>
+              </MDBox>
             </MDBox>
           </MDBox>
-
-          {error && <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>}
-
-          <MDBox mb={3} textAlign="left">
-            <Card>
-              <CompleteTable
-                columns={columns}
-                rows={rows}
-                numberOfRowsPerPage={100}
-                height={200}
-              />
-            </Card>
-          </MDBox>
         </Container>
+
+        {detailsOpen && (
+          <SubmissionDecisionDetails submission={dataForDetails} onClose={() => setDetailsOpen(false)} />
+        )}
+
         <Footer />
       </DashboardLayout>
     </>

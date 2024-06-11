@@ -30,7 +30,6 @@ router.post("/sendComposeEmail", auth.ensureAuthenticated, async (req, res) => {
     }
 
     const result = await db.fetchDataCst(queryText, [confID]);
-    console.log(result);
 
     if (!result || !Array.isArray(result)) {
       return res.status(404).json({ success: false, message: "No recipients found." });
