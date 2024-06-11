@@ -77,8 +77,6 @@ router.post("/submissionDecisionDetails", auth.ensureAuthenticated, async (req, 
 
 router.post("/acceptOrRejectDecision", auth.ensureAuthenticated, async (req, res) => {
   const { submissionId, acceptOrReject } = req.body;
-  console.log("Submission ID:", submissionId);
-  console.log("Decision Value:", acceptOrReject);
 
   try {
     let queryText = '';
