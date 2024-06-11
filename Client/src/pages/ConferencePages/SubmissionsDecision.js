@@ -26,24 +26,52 @@ export default function SubmissionsDecision() {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [dataForDetails, setDataForDetails] = useState({ title: "", reviews: [] });
 
-  const handleDecision = async (submissionId, decision) => {
+  const fetchSubmissions = async () => {
+    setOpenLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/allSubmissionsDecisions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ confid: confID }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      console.log("Fetched Submissions Data:", data); // Debug log
+
+      // Filter submissions where submissiondecisionmade is false
+      const filteredData = data.filter(item => !item.submissiondecisionmade);
+      setRows(filteredData.map((item) => ({ ...item, id: uuidv4() })));
+    } catch (error) {
+      setError(<Alert severity="error">{error.message}</Alert>);
+    } finally {
+      setOpenLoading(false);
+    }
+  };
+
+  const sendDecision = async (submissionId, decisionValue) => {
     setOpenLoading(true);
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/submissionDecision`, {
+      console.log(decisionValue);
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/acceptOrRejectDecision`, {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=UTF-8" },
         credentials: "include",
-        body: JSON.stringify({ submissionId, decision }),
+        body: JSON.stringify({ submissionId, acceptOrReject: decisionValue }),
       });
 
       if (response.ok) {
-        setRows((prevRows) =>
-          prevRows.map((row) =>
-            row.id === submissionId ? { ...row, status: decision === "accept" ? "Accepted" : "Rejected" } : row
-          )
-        );
-        // Display different messages based on the decision
-        const message = decision === "accept" ? "Submission Accepted" : "Submission Rejected";
+        await fetchSubmissions();
+        const message = decisionValue === 2 ? "Submission Accepted" : "Submission Rejected";
         setError(<Alert severity="success">{message}</Alert>);
       } else {
         const jsonResponse = await response.json();
@@ -56,36 +84,6 @@ export default function SubmissionsDecision() {
   };
 
   useEffect(() => {
-    async function fetchSubmissions() {
-      setOpenLoading(true);
-      setError(null);
-
-      try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/allSubmissionsDecisions`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({ confid: confID }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        console.log("Fetched Submissions Data:", data); // Debug log
-        // Filter submissions where submissiondecisionmade is false
-        const filteredData = data.filter(item => !item.submissiondecisionmade);
-        setRows(filteredData.map((item) => ({ ...item, id: uuidv4() })));
-      } catch (error) {
-        setError(<Alert severity="error">{error.message}</Alert>);
-      } finally {
-        setOpenLoading(false);
-      }
-    }
-
     if (user && confID) {
       fetchSubmissions();
     }
@@ -159,7 +157,7 @@ export default function SubmissionsDecision() {
           <MDButton
             variant="gradient"
             color="success"
-            onClick={() => handleDecision(params.row.id, "accept")}
+            onClick={() => sendDecision(params.row.submissionid, 2)}
             sx={{ maxWidth: "60px", maxHeight: "23px", minWidth: "30px", minHeight: "23px" }}
           >
             Accept
@@ -181,7 +179,7 @@ export default function SubmissionsDecision() {
           <MDButton
             variant="gradient"
             color="error"
-            onClick={() => handleDecision(params.row.id, "reject")}
+            onClick={() => sendDecision(params.row.submissionid, 1)}
             sx={{ maxWidth: "60px", maxHeight: "23px", minWidth: "30px", minHeight: "23px" }}
           >
             Reject
