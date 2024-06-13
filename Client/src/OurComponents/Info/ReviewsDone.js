@@ -10,10 +10,17 @@ import Alert from "@mui/material/Alert";
 import MDButton from "components/MDButton";
 import { fetchAPI } from "OurFunctions/fetchAPI";
 import { AuthContext } from "auth.context";
+import { ConferenceContext } from "conference.context";
 import ReviewsCard from "./ReviewsCard";
 
-export default function ReviewsDone({ assignmentID, title, onClose }) {
+export default function ReviewsDone({
+  singleUser = true,
+  assignmentID,
+  title,
+  onClose,
+}) {
   const { user } = useContext(AuthContext);
+  const { confPhase } = useContext(ConferenceContext);
 
   const [abstract, setAbstract] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -27,7 +34,7 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
   useEffect(() => {
     async function fetchReviews() {
       const response = await fetchAPI(
-        "specificReview",
+        singleUser ? "singleReview" : "multiReviews",
         "POST",
         { userid: user, assignmentid: assignmentID },
         setError,

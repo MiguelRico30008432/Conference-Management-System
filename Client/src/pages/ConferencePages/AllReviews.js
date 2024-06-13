@@ -11,21 +11,25 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "OurComponents/footer/Footer";
 import ConferenceNavBar from "OurComponents/navBars/ConferenceNavBar";
 import CompleteTable from "OurComponents/Table/CompleteTable";
-import SubmissionsDetails from "OurComponents/Info/SubmissionDetails";
-import UpdateSubmission from "OurComponents/Info/updateSubmission";
 import { fetchAPI } from "OurFunctions/fetchAPI";
 import { v4 as uuidv4 } from "uuid";
+import { handleDownload } from "OurFunctions/DownloadFile";
+import ReviewsDone from "OurComponents/Info/ReviewsDone";
 
 import { AuthContext } from "auth.context";
 import { ConferenceContext } from "conference.context";
 
 export default function AllReviews() {
-  const { confID, userRole } = useContext(ConferenceContext);
+  const { confID } = useContext(ConferenceContext);
   const { user } = useContext(AuthContext);
 
-  const [openLoading, setOpenLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [title, setTile] = useState(null);
+  const [assignmentID, setAssignmentID] = useState(null);
   const [rows, setRows] = useState([]);
+
+  const [openLoading, setOpenLoading] = useState(false);
+  const [openReview, setOpenReview] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     async function fetchReviews() {
@@ -51,19 +55,61 @@ export default function AllReviews() {
   }, [confID, user]);
 
   const columns = [
-    { field: "title", headerName: "Title", width: 200 },
-    { field: "status", headerName: "Status", width: 120 },
-    { field: "authors", headerName: "Authors", width: 200 },
-    { field: "addDate", headerName: "Submission Date", width: 120 },
+    { field: "submissiontitle", headerName: "Submission Title", width: 300 },
+    { field: "submissionadddate", headerName: "Submission Date", width: 150 },
+    { field: "username", headerName: "Main Author", width: 200 },
     {
-      field: "edit",
+      field: "download",
       filterable: false,
       headerName: "",
       description: "",
       sortable: false,
       disableColumnMenu: true,
       resizable: false,
-      width: 55,
+      width: 130,
+      renderCell: (params) => {
+        return (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <MDButton
+              variant="gradient"
+              color="warning"
+              onClick={() => {
+                const submission = {
+                  id: params.row.submissionid,
+                  title: params.row.submissiontitle,
+                };
+
+                handleDownload(submission, setError, setOpenLoading);
+              }}
+              sx={{
+                maxWidth: "120px",
+                maxHeight: "23px",
+                minWidth: "30px",
+                minHeight: "23px",
+              }}
+            >
+              Download File
+            </MDButton>
+          </div>
+        );
+      },
+    },
+    {
+      field: "review",
+      filterable: false,
+      headerName: "",
+      description: "",
+      sortable: false,
+      disableColumnMenu: true,
+      resizable: false,
+      width: 70,
       renderCell: (params) => {
         return (
           <div
@@ -77,16 +123,20 @@ export default function AllReviews() {
             {
               <MDButton
                 variant="gradient"
-                color="success"
-                onClick={() => {}}
+                color="info"
+                onClick={() => {
+                  setAssignmentID(params.row.assignmentid);
+                  setTile(params.row.submissiontitle);
+                  setOpenReview(true);
+                }}
                 sx={{
-                  maxWidth: "60px",
+                  maxWidth: "70px",
                   maxHeight: "23px",
                   minWidth: "30px",
                   minHeight: "23px",
                 }}
               >
-                Edit
+                Review
               </MDButton>
             }
           </div>
@@ -100,33 +150,43 @@ export default function AllReviews() {
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
         <ConferenceNavBar />
-        <Container maxWidth="sm">
-          <MDBox mt={10} mb={2} textAlign="left">
+        {openReview ? (
+          <ReviewsDone
+            singleUser={false}
+            assignmentID={assignmentID}
+            title={title}
+            onClose={() => setOpenReview(false)}
+          />
+        ) : (
+          <Container maxWidth="sm">
+            <MDBox mt={10} mb={2} textAlign="left">
+              <MDBox mb={3} textAlign="left">
+                <Card>
+                  <MDTypography ml={2} variant="h6">
+                    All Reviews
+                  </MDTypography>
+                  <MDTypography ml={2} variant="body2">
+                    text goes here
+                  </MDTypography>
+                </Card>
+              </MDBox>
+            </MDBox>
+
+            <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
+
             <MDBox mb={3} textAlign="left">
               <Card>
-                <MDTypography ml={2} variant="h6">
-                  All Reviews
-                </MDTypography>
-                <MDTypography ml={2} variant="body2">
-                  text goes here
-                </MDTypography>
+                <CompleteTable
+                  columns={columns}
+                  rows={rows}
+                  numberOfRowsPerPage={100}
+                  height={200}
+                />
               </Card>
             </MDBox>
-          </MDBox>
-
-          <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
-
-          <MDBox mb={3} textAlign="left">
-            <Card>
-              <CompleteTable
-                columns={columns}
-                rows={rows}
-                numberOfRowsPerPage={100}
-                height={200}
-              />
-            </Card>
-          </MDBox>
-        </Container>
+          </Container>
+        )}
+        <Footer />
       </DashboardLayout>
     </>
   );

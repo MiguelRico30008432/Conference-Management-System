@@ -28,7 +28,7 @@ router.post("/myReviews", auth.ensureAuthenticated, async (req, res) => {
   }
 });
 
-router.post("/specificReview", auth.ensureAuthenticated, async (req, res) => {
+router.post("/singleReview", auth.ensureAuthenticated, async (req, res) => {
   try {
     const abstract = await db.fetchDataCst(`
       SELECT
@@ -66,7 +66,7 @@ router.post("/specificReview", auth.ensureAuthenticated, async (req, res) => {
       .status(200)
       .send({ username: user, abstract: abstract, lines: lines });
   } catch (error) {
-    log.addLog(error, "endpoint", "specificReview");
+    log.addLog(error, "endpoint", "singleReview");
     return res.status(500);
   }
 });
