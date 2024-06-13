@@ -8,56 +8,111 @@ import MDTypography from "components/MDTypography";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
 import Alert from "@mui/material/Alert";
 import MDButton from "components/MDButton";
-import TextField from "@mui/material/TextField";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import Box from "@mui/material/Box";
-
-import { ConferenceContext } from "conference.context";
+import { fetchAPI } from "OurFunctions/fetchAPI";
 import { AuthContext } from "auth.context";
+import ReviewsCard from "./ReviewsCard";
 
-export default function ReviewsDone({ onClose }) {
-  const [openLoading, setOpenLoading] = useState(false);
-  const [message, setMessage] = useState(null);
-
-  const { confID } = useContext(ConferenceContext);
+export default function ReviewsDone({ assignmentID, title, onClose }) {
   const { user } = useContext(AuthContext);
 
+  const [abstract, setAbstract] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [userName, setUserName] = useState("");
+
+  const [openLoading, setOpenLoading] = useState(false);
+  const [addReviewActive, setAddReviewActive] = useState(false);
+  const [hideButton, setHideButton] = useState(false);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
-    async function fetchReview() {
-      setOpenLoading(true);
+    async function fetchReviews() {
+      const response = await fetchAPI(
+        "specificReview",
+        "POST",
+        { userid: user, assignmentid: assignmentID },
+        setError,
+        setOpenLoading
+      );
 
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/getSubmissionInfo`,
-          {
-            method: "POST",
-            body: JSON.stringify({}),
-            headers: {
-              "Content-type": "application/json; charset=UTF-8",
-            },
-            credentials: "include",
-          }
-        );
+      if (response) {
+        setAbstract(response.abstract[0].submissionabstract);
 
-        const jsonResponse = await response.json();
-
-        if (response.status === 200) {
+        if (response.lines.length > 0) {
+          setReviews(response.lines);
+          setAddReviewActive(false);
         } else {
-          setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
+          setUserName(response.username[0].username);
+          setAddReviewActive(true);
         }
-      } catch {
-        setMessage(
-          <Alert severity="error">
-            Something went wrong when obtaining the submission information.
-          </Alert>
-        );
       }
-      setOpenLoading(false);
     }
 
-    fetchReview();
-  }, []);
+    if (assignmentID) fetchReviews();
+  }, [assignmentID]);
+
+  function addNewReview() {
+    setHideButton(true);
+    const newReview = {
+      username: userName,
+      reviewadddate: new Date().toLocaleDateString(),
+      reviewtext: "",
+      reviewgrade: 1,
+      read: false,
+    };
+    setReviews([newReview, ...reviews]);
+  }
+
+  function updateReview() {
+    setHideButton(true);
+    setReviews(
+      reviews.map((review) => ({
+        ...review,
+        read: false,
+      }))
+    );
+  }
+
+  function disabledReviews() {
+    setReviews(
+      reviews.map((review) => ({
+        ...review,
+        read: true,
+      }))
+    );
+  }
+
+  function handleReviewChange(index, key, value) {
+    const updatedReviews = [...reviews];
+    updatedReviews[index][key] = value;
+    setReviews(updatedReviews);
+  }
+
+  async function submitReview() {
+    const response = await fetchAPI(
+      "saveReview",
+      "POST",
+      {
+        addNew: addReviewActive,
+        assignmentid: assignmentID,
+        reviewgrade: reviews[0].reviewgrade,
+        reviewtext: reviews[0].reviewtext,
+      },
+      setError,
+      setOpenLoading
+    );
+
+    if (response) {
+      setError(
+        <Alert severity="success">
+          Submission {addReviewActive ? "registered" : "updated"} with success
+        </Alert>
+      );
+    }
+
+    disabledReviews();
+    setAddReviewActive(false);
+    setHideButton(false);
+  }
 
   return (
     <>
@@ -76,59 +131,7 @@ export default function ReviewsDone({ onClose }) {
           </MDBox>
         </MDBox>
 
-        <Card sx={{ mt: 2, mb: 2 }}>{message}</Card>
-
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-            <Card>
-              <MDTypography ml={2} mb={2} mt={2} variant="body2">
-                Title
-              </MDTypography>
-              <MDTypography ml={2} mb={2} mt={2} variant="body2">
-                Abstract
-              </MDTypography>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <Card>
-              <MDTypography ml={2} mb={2} mt={2} variant="body2">
-                Review
-              </MDTypography>
-
-              <Box
-                sx={{
-                  "& textarea": {
-                    padding: "18.5px 14px",
-                    fontSize: "0.9rem",
-                    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-                    border: "1px solid #c4c4c4",
-                    borderRadius: "4px",
-                    resize: "vertical",
-                    width: "90%",
-                    ml: 2,
-                    mr: 2,
-                    mb: 2,
-                  },
-                }}
-              >
-                <textarea
-                  id="description"
-                  placeholder="Enter your description here"
-                  rows={4}
-                />
-              </Box>
-
-              <Select value={0} sx={{ ml: 2, mr: 2, mb: 2 }}>
-                {[1, 2, 3, 4, 5].map((value) => (
-                  <MenuItem key={value} value={value}>
-                    {value}
-                  </MenuItem>
-                ))}
-              </Select>
-            </Card>
-          </Grid>
-        </Grid>
+        <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
 
         <MDButton
           variant="gradient"
@@ -139,13 +142,103 @@ export default function ReviewsDone({ onClose }) {
             maxHeight: "30px",
             minWidth: "5px",
             minHeight: "30px",
-            mt: 2,
-            ml: 2,
             mb: 2,
           }}
         >
           Close Review
         </MDButton>
+
+        {addReviewActive && !hideButton && (
+          <MDButton
+            variant="gradient"
+            color="info"
+            onClick={addNewReview}
+            sx={{
+              maxWidth: "125px",
+              maxHeight: "30px",
+              minWidth: "5px",
+              minHeight: "30px",
+              ml: 2,
+              mb: 2,
+            }}
+          >
+            New Review
+          </MDButton>
+        )}
+
+        {!addReviewActive && !hideButton && (
+          <MDButton
+            variant="gradient"
+            color="info"
+            onClick={updateReview}
+            sx={{
+              maxWidth: "145px",
+              maxHeight: "30px",
+              minWidth: "5px",
+              minHeight: "30px",
+              ml: 2,
+              mb: 2,
+            }}
+          >
+            Update Review
+          </MDButton>
+        )}
+
+        {hideButton && (
+          <MDButton
+            variant="gradient"
+            color="success"
+            onClick={async () => await submitReview()}
+            sx={{
+              maxWidth: "150px",
+              maxHeight: "30px",
+              minWidth: "5px",
+              minHeight: "30px",
+              ml: 2,
+              mb: 2,
+            }}
+          >
+            {addReviewActive ? "Add new" : "Save"}
+          </MDButton>
+        )}
+
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={5}>
+            <Card>
+              <MDTypography ml={2} mt={2} variant="h9">
+                Title
+              </MDTypography>
+              <MDTypography ml={2} variant="body2">
+                {title}
+              </MDTypography>
+              <MDTypography ml={2} mt={2} variant="h9">
+                Abstract
+              </MDTypography>
+              <MDTypography ml={2} mb={2} variant="body2">
+                {abstract}
+              </MDTypography>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} md={7}>
+            {reviews.map((review, index) => (
+              <ReviewsCard
+                key={index}
+                reviewName={review.username}
+                reviewDate={review.reviewadddate}
+                review={review.reviewtext}
+                grade={review.reviewgrade}
+                read={review.read}
+                onReviewTextChange={(value) =>
+                  handleReviewChange(index, "reviewtext", value)
+                }
+                onReviewGradeChange={(value) =>
+                  handleReviewChange(index, "reviewgrade", value)
+                }
+              />
+            ))}
+          </Grid>
+        </Grid>
       </Container>
     </>
   );

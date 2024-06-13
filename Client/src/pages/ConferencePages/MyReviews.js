@@ -14,7 +14,6 @@ import ConferenceNavBar from "OurComponents/navBars/ConferenceNavBar";
 import CompleteTable from "OurComponents/Table/CompleteTable";
 import ReviewsDone from "OurComponents/Info/ReviewsDone";
 import { fetchAPI } from "OurFunctions/fetchAPI";
-
 import { AuthContext } from "auth.context";
 import { ConferenceContext } from "conference.context";
 import { handleDownload } from "OurFunctions/DownloadFile";
@@ -23,11 +22,13 @@ export default function MyReviews() {
   const { confID } = useContext(ConferenceContext);
   const { user } = useContext(AuthContext);
 
+  const [title, setTile] = useState(null);
+  const [assignmentID, setAssignmentID] = useState(null);
+  const [rows, setRows] = useState([]);
+
   const [openLoading, setOpenLoading] = useState(false);
   const [openReview, setOpenReview] = useState(false);
   const [error, setError] = useState(null);
-
-  const [rows, setRows] = useState([]);
 
   useEffect(() => {
     async function fetchReviews() {
@@ -100,7 +101,7 @@ export default function MyReviews() {
       },
     },
     {
-      field: "open",
+      field: "review",
       filterable: false,
       headerName: "",
       description: "",
@@ -123,6 +124,8 @@ export default function MyReviews() {
                 variant="gradient"
                 color="info"
                 onClick={() => {
+                  setAssignmentID(params.row.assignmentid);
+                  setTile(params.row.submissiontitle);
                   setOpenReview(true);
                 }}
                 sx={{
@@ -144,11 +147,15 @@ export default function MyReviews() {
   return (
     <>
       {openLoading && <LoadingCircle />}
-      {openReview ? (
-        <ReviewsDone submissionID={142} onClose={() => setOpenReview(false)} />
-      ) : (
-        <DashboardLayout>
-          <ConferenceNavBar />
+      <DashboardLayout>
+        <ConferenceNavBar />
+        {openReview ? (
+          <ReviewsDone
+            assignmentID={assignmentID}
+            title={title}
+            onClose={() => setOpenReview(false)}
+          />
+        ) : (
           <Container maxWidth="sm">
             <MDBox mt={10} mb={2} textAlign="left">
               <MDBox mb={3} textAlign="left">
@@ -176,8 +183,9 @@ export default function MyReviews() {
               </Card>
             </MDBox>
           </Container>
-        </DashboardLayout>
-      )}
+        )}
+        <Footer />
+      </DashboardLayout>
     </>
   );
 }
