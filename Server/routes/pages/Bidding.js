@@ -51,7 +51,10 @@ async function getBiddings(confid) {
       s.submissiontitle,
       u.useremail,
       b.biddingconfidence,
-      b.biddingadddata
+      b.biddingadddata,
+      b.biddingconfid,
+      b.biddingsubmissionid,
+      b.biddinguserid
     FROM
       biddings b
     JOIN
@@ -118,6 +121,7 @@ async function getWorkload(confid) {
   try {
     const workload = await db.fetchDataCst(`
     SELECT 
+      u.userid,
       u.useremail,
       ur.userrole,
       COUNT(ra.assignmentid) AS assignment_count
@@ -143,15 +147,184 @@ async function getWorkload(confid) {
   }
 }
 
-async function verifyAssignmentsReviewers(confid) {} //EM FALTA
+async function addWorkload(workload, addingInfo) {
+  for (const user in addingInfo) {
+    for (const member in workload) {
+      if (member.useremail === user) {
+        member.assignment_count = member.assignment_count + 1;
+      }
+    }
+  }
+  return workload;
+} //Por testar
 
-async function deleteAutomaticAssignments(assignmentsToDelete) {} // EM FALTA
+async function addToAssignment(biddings) {
+  try {
+    for (const bid of biddings) {
+      await db.fetchDataCst(`
+        INSERT INTO ReviewsAssignments (assignmentconfid, assignmentsubmissionid, assignmentuserid, assignmentmanually)
+        VALUE(${bid.biddingconfid}, ${bid.biddingsubmissionid}, ${bid.biddinguserid}, FALSE)
+      `);
+    }
+  } catch (error) {
+    log.addLog(error, "database", "Bidding -> addToAssignment()");
+  }
+} //Por testar
+
+async function verifyAssignmentsReviewers(confid, minimumReviewersNeeded) {
+  try {
+    const assignments = await db.fetchDataCst(`
+    SELECT
+      assignmentid,
+      COUNT(assignmentid) AS assignment_count
+    FROM 
+      reviewsassignments
+    WHERE
+      assignmentconfid = ${confid}
+    GROUP by
+      assignmentid
+    `);
+
+    for (const assignment of assignments) {
+      if (assignment.assignment_count < minimumReviewersNeeded) {
+        return false;
+      }
+    }
+    return true;
+  } catch (error) {
+    log.addLog(error, "database", "Bidding -> verifyAssignmentsReviewers()");
+  }
+} //Por Testar
+
+async function deleteAutomaticAssignments(assignmentsToDelete) {
+  try {
+    for (const assignment of assignmentsToDelete) {
+      await db.fetchDataCst(`
+      DELETE FROM reviewsassignments WHERE assignmentid = ${assignment.assignmentid};
+      `);
+    }
+  } catch (error) {
+    log.addLog(error, "database", "Bidding -> deleteAutomaticAssignments()");
+  }
+} // Por Testar
+
+async function getCommitteMembersWithLessWorkload(workload, missingReviewers) {
+  let choosenMembers = [];
+  let iteration = 0;
+
+  workload.sort((a, b) => a.assignment_count - b.assignment_count); //Orders the list by assignmentcount value from lower to higher
+
+  while (iteration < missingReviewers) {
+    choosenMembers.push(workload[iteration]);
+    iteration++;
+  }
+
+  return choosenMembers;
+} //Por Testar
 
 async function pickPreferableAutomaticAssignments(
   automaticAssignments,
   workload,
   assignmentsNeeded
-) {} //EM FALTA
+) {
+  //If we get to this function there probably was manual assignments added after the automatic ones were run at least once
+  //soo we will chose the ones with the reviewer that has least workload
+  try {
+    let preferedAssignments = [];
+
+    workload.sort((a, b) => a.assignment_count - b.assignment_count); //Orders the list by assignmentcount value from lower to higher
+    //With the least ordered we will run each member to check if he has an automatica assignment
+    //If he does we add it to the preferedAssignments list
+    //When preferedAssignments.length === assignmentsNeeded we return preferedAssignments
+    for (const member of workload) {
+      for (const assignment of automaticAssignments) {
+        if (member.useremail === assignment.useremail) {
+          preferedAssignments.push(assignment);
+
+          if (preferedAssignments.length === assignmentsNeeded) {
+            return preferedAssignments;
+          }
+        }
+      }
+    }
+  } catch (error) {
+    log.addLog(
+      error,
+      "database",
+      "Bidding -> pickPreferableAutomaticAssignments()"
+    );
+  }
+} //Por testar
+
+async function pickPreferableBiddings(
+  biddingsList,
+  workload,
+  bidsNeeded,
+  minReviewers,
+  assignments
+) {
+  let preferedBids = [];
+
+  try {
+    biddingsList.sort((a, b) => b.biddingconfidence - a.biddingconfidence); //Orders the list by biddingconfidence value from higher to lower
+
+    for (const bid of biddingsList) {
+      //We will check each bid until we have the equal ammount of bids needed
+      if (
+        !assignments.find(
+          (assignment) => assignment.useremail === bid.useremail
+        )
+      ) {
+        //If the bid doesnt exist has an assignment already then we continue
+        for (const memberWorkload of workload) {
+          //If the member workload is less than minReviewers + minReviewers/2  then we had the bid has a prefered bid
+          if (
+            bid.useremail === memberWorkload.useremail &&
+            memberWorkload.assignment_count <
+              minReviewers + Math.floor(minReviewers / 2)
+          ) {
+            preferedBids.push(bid);
+            if (preferedBids.length === bidsNeeded) {
+              return preferedBids;
+            }
+          }
+        }
+      }
+    }
+
+    if (preferedBids.length < bidsNeeded) {
+      // If there was not enougth biddings selected we will just pick the first one with high confidence level
+      if (
+        !assignments.find(
+          (assignment) => assignment.useremail === bid.useremail
+        )
+      ) {
+        preferedBids.push(bid);
+        if (preferedBids.length === bidsNeeded) {
+          return preferedBids;
+        }
+      }
+    }
+  } catch (error) {
+    log.addLog(error, "database", "Bidding -> pickPreferableBiddings()");
+  }
+} //Por testar
+
+async function prepareAssignmentForReviewers(
+  choosenReviewers,
+  confid,
+  submissionid
+) {
+  let preparedToAddToAssignments = [];
+  for (const reviewer of choosenReviewers) {
+    preparedToAddToAssignments.push({
+      biddingconfid: confid,
+      biddingsubmissionid: submissionid,
+      biddinguserid: reviewer.userid,
+    });
+  }
+  return preparedToAddToAssignments;
+}// Por testar
 
 async function ReviewsAssignmentAlghoritm(confid) {
   //get committe list
@@ -182,6 +355,7 @@ async function ReviewsAssignmentAlghoritm(confid) {
 
   while (MinReviews === false) {
     for (const submission of submissions) {
+      const membersToAddWorkload = [];
       //Create temporary list with committee members with no conflict with the current submission
       const submissionNoConflictCommittee = committeeEmails.filter((user) => {
         return !conflicts.some(
@@ -227,6 +401,7 @@ async function ReviewsAssignmentAlghoritm(confid) {
         //From the automatic assignments we choose the preferible ones having in count confidence level and workload of the committee members
         const automaticAssignmentsNeeded =
           reviewersNeededPerReview - manualAssignments.length;
+
         const choosenAutomaticAssignments =
           await pickPreferableAutomaticAssignments(
             automaticAssignments,
@@ -244,6 +419,7 @@ async function ReviewsAssignmentAlghoritm(confid) {
         );
 
         await deleteAutomaticAssignments(unnacesseryAssignments);
+        continue;
       }
 
       //If theres not enougth submissionMadeAssignments then we need to check biddings
@@ -252,48 +428,105 @@ async function ReviewsAssignmentAlghoritm(confid) {
         const submissionBiddings = biddings.filter(
           (bid) => bid.biddingsubmissionid === submission.submissionid
         );
-        //If theres enougth biddings so that manual assignments + biddings = reviewersNeededPerReview, then we register the biddings as automatic assignments
+
+        //If theres enougth biddings so that all assignments + biddings = reviewersNeededPerReview, then we register the biddings as automatic assignments
         if (
           submissionMadeAssignments.length + submissionBiddings.length ===
           reviewersNeededPerReview
         ) {
-          //Criar uma função para adicionar ao reviewsassignment e depois adicionar +1 no workload de quem esta associado a bid
+          //Create the assignments from the biddings and add workload to the major list (this way we keep it updated without needing to check the database again)
+          await addToAssignment(submissionBiddings);
+
+          //Get list of the users who have new assignments to add on the workload
+          membersToAddWorkload = [];
+          for (const bid of submissionBiddings) {
+            membersToAddWorkload.push(bid.useremail);
+          }
+
+          workload = await addWorkload(workload, membersToAddWorkload); //Apos ter esta função em todo o lado necessario ver qual a melhor maneira de processar e o que enviar para a função
+          continue;
         }
 
+        //If theres all assignments + biddings > reviewersNeededPerReview, then we need to pick our preferable biddings and then register them as automatic assignments
         if (
           submissionMadeAssignments.length + submissionBiddings.length >
           reviewersNeededPerReview
         ) {
-          //Criar uma função que retorne quem, das biddings, fica com a review (Nivel De Confiança > Bidding Date  (Se calhar nesta função ja posso levar em conta o workload VER))
-          //Chamar função para adicionar ao reviewsassignment e depois adicionar +1 no workload de quem esta associado a bid
+          //First we check how many bids we need to choose
+          const bidsNeeded =
+            reviewersNeededPerReview - submissionMadeAssignments.length;
+
+          //From the ones we have we pick the best ones, based on confidence level and workload
+          const preferedBiddings = await pickPreferableBiddings(
+            submissionBiddings,
+            workload,
+            bidsNeeded,
+            reviewersNeededPerReview,
+            assignments
+          );
+          //Then we add them to the reviewAssignments table and add the workload to keep it updated
+          await addToAssignment(preferedBiddings);
+
+          membersToAddWorkload = [];
+          for (const bid of preferedBiddings) {
+            membersToAddWorkload.push(bid.useremail);
+          }
+
+          workload = await addWorkload(workload, membersToAddWorkload);
+          continue;
         }
 
         if (
           submissionMadeAssignments.length + submissionBiddings.length <
           reviewersNeededPerReview
         ) {
-          //Criar uma função que retorne quem tem menos workload e assim fica com a review (=Workload  escolher o que essta primeiro na lista)
-          //Chamar função para adicionar ao reviewsassignment e depois adicionar +1 no workload de quem esta associado a bid
+          //If we need to assign committee members to review a certain submission then we first need to pick the ones with less workload
+          //First we need to know how many reviewers we need
+          const missingReviewers =
+            reviewersNeededPerReview -
+            (submissionMadeAssignments.length + submissionBiddings.length);
+
+          //Now we pick the ones with less workload
+          const choosenReviewers = await getCommitteMembersWithLessWorkload(
+            workload,
+            missingReviewers
+          );
+
+          //Preparing the data to send to addBiddingToAssignments
+          const forcedAssignments = await prepareAssignmentForReviewers(
+            choosenReviewers
+          );
+
+          //TESTAR PK DEVE TAR A DAR MERDA xD
+
+          //Then we add them to the reviewAssignments table and add the workload to keep it updated
+          await addToAssignment(forcedAssignments);
+
+          membersToAddWorkload = [];
+          for (const assignment of forcedAssignments) {
+            membersToAddWorkload.push(assignment.useremail);
+          }
+
+          workload = await addWorkload(workload, membersToAddWorkload);
+          continue;
         }
       }
     }
-
-    MinReviews = true; // retirar depois
+    //Function to verify if all submissions have the minimal number of reviewers
+    //If true the loop will stop and the algorithm is completed
+    //If false the loop will run again and assign reviewers to the missing submissions
+    MinReviews = await verifyAssignmentsReviewers(
+      confid,
+      minimumReviewersNeeded
+    );
   }
-
-  //Function to verify if all submissions have the minimal number of reviewers
-  //If true the loop will stop and the algorithm is completed
-  //If false the loop will run again and assign reviewers to the missing submissions
-  MinReviews = await verifyAssignmentsReviewers(confid);
-  /*
+  /*  VERIFICAR NO FINAL SE COM O QUE TEMOS ESTA RELATIVAMENTE BALANCEADO OU SE TEMOS DE CRIAR UMA FUNÇÂO PARA ISTO
 --Verificar carga de trabalho de cada membro do comite: (Ver se consigo tratar disto logo no manualAssignments.length + submissionBiddings.length > reviewersNeededPerReview)
 ---Separar nº de assignments manuais (não alteráveis) e nº assignments automáticos (alteraveis)
 ---Por membro, se a diferença de carga laboral do mesmo e o membro com menos carga, existir uma diferença de (media de assignments por reviewer + metade da media) assignments:
 ---- Se for assignments manuais não mexe,
 ---- Se for assignments automaticos retirar ate chegar a uma diferença de (media de assignments por reviewer + metade da media) assignments em relação ao membro com menos carga
 ---- No final tenho de ter uma validação para passar isto true ou false devido aos assignments manuais (Desenvolver este ponto)
-
---Na questão de manual e automatic assignments tenho de ter em atenção que n estou a ter em conta os que foram criados pelo algoritmo
  */
 }
 
