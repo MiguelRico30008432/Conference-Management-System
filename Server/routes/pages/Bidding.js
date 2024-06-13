@@ -208,15 +208,27 @@ async function deleteAutomaticAssignments(assignmentsToDelete) {
   }
 } // Por Testar
 
-async function getCommitteMembersWithLessWorkload(workload, missingReviewers) {
+async function getCommitteMembersWithLessWorkload(
+  workload,
+  missingReviewers,
+  membersWithNoConflict
+) {
   let choosenMembers = [];
-  let iteration = 0;
 
   workload.sort((a, b) => a.assignment_count - b.assignment_count); //Orders the list by assignmentcount value from lower to higher
 
-  while (iteration < missingReviewers) {
-    choosenMembers.push(workload[iteration]);
-    iteration++;
+  for (const member of workload) {
+    if (
+      //checking if the committee member we want to choose has no conflict with the current submission
+      membersWithNoConflict.some(
+        (noConflictMember) => noConflictMember.useremail === member.useremail
+      )
+    ) {
+      choosenMembers.push(member);
+      if (choosenMembers.length === missingReviewers) {
+        return choosenMembers;
+      }
+    }
   }
 
   return choosenMembers;
@@ -324,7 +336,7 @@ async function prepareAssignmentForReviewers(
     });
   }
   return preparedToAddToAssignments;
-}// Por testar
+} // Por testar
 
 async function ReviewsAssignmentAlghoritm(confid) {
   //get committe list
@@ -489,7 +501,8 @@ async function ReviewsAssignmentAlghoritm(confid) {
           //Now we pick the ones with less workload
           const choosenReviewers = await getCommitteMembersWithLessWorkload(
             workload,
-            missingReviewers
+            missingReviewers,
+            submissionNoConflictCommittee
           );
 
           //Preparing the data to send to addBiddingToAssignments
