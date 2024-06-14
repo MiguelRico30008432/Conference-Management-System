@@ -151,26 +151,26 @@ export default function SendInvitation() {
     setInvitationError("");
     setDeleteError("");
     setInvitationEmailSuccess("");
-
+  
     if (!role) {
       setRoleError("You must select a role!");
       return;
     }
-
+  
     if (!emails) {
       setEmailError("You must enter recipients!");
       return;
     }
-
+  
     const emailList = emails.split(",").map((email) => email.trim());
-
+  
     const invalidEmails = emailList.filter((email) => !emailRegex.test(email));
-
+  
     if (invalidEmails.length > 0) {
       setEmailError("Invalid email format: " + invalidEmails.join(", "));
       return;
     }
-
+  
     // Send the list of emails to the backend
     try {
       const response = await fetch(
@@ -189,9 +189,10 @@ export default function SendInvitation() {
           }),
         }
       );
-
+  
       if (response.ok) {
-        setInvitationEmailSuccess("Invitations sent successfully");
+        const data = await response.json();
+        setInvitationEmailSuccess(data.message);
         // Update table data after sending invitations
         getData(); // Assuming getData function fetches updated data
       } else {
