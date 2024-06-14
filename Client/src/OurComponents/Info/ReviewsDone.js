@@ -210,9 +210,7 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
       />
 
       <Container maxWidth="sm">
-        <MDBox mt={10} mb={2} textAlign="left">
-          <MDBox mb={3} textAlign="left"></MDBox>
-        </MDBox>
+        <MDBox mt={7}></MDBox>
 
         <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
 
@@ -315,7 +313,7 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
               <MDTypography ml={2} mt={2} variant="h9">
                 Abstract
               </MDTypography>
-              <MDTypography ml={2} mb={2} variant="body2">
+              <MDTypography ml={2} mb={2} mr={1} variant="body2">
                 {abstract}
               </MDTypography>
             </Card>

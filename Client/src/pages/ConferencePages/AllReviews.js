@@ -162,7 +162,10 @@ export default function AllReviews() {
                     All Reviews
                   </MDTypography>
                   <MDTypography ml={2} variant="body2">
-                    text goes here
+                    Here you can browse and consult all reviews for each
+                    submission. Gain insights from detailed feedback provided by
+                    our reviewers. This resource ensures transparency and helps
+                    maintain the high standards of our conference.
                   </MDTypography>
                 </Card>
               </MDBox>
