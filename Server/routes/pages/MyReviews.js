@@ -47,7 +47,7 @@ router.post("/singleReview", auth.ensureAuthenticated, async (req, res) => {
         userid = ${req.body.userid}
       `);
 
-    const lines = await db.fetchDataCst(`
+    const review = await db.fetchDataCst(`
       SELECT
         reviewtext,
         reviewgrade,
@@ -64,7 +64,7 @@ router.post("/singleReview", auth.ensureAuthenticated, async (req, res) => {
 
     return res
       .status(200)
-      .send({ username: user, abstract: abstract, lines: lines });
+      .send({ username: user, abstract: abstract, review: review });
   } catch (error) {
     log.addLog(error, "endpoint", "singleReview");
     return res.status(500);
@@ -87,6 +87,19 @@ router.post("/saveReview", auth.ensureAuthenticated, async (req, res) => {
           reviewassignmentid = ${req.body.assignmentid}
         `);
     }
+
+    return res.status(200).send({ msg: "" });
+  } catch (error) {
+    log.addLog(error, "endpoint", "addReview");
+    return res.status(500);
+  }
+});
+
+router.post("/deleteReview", auth.ensureAuthenticated, async (req, res) => {
+  try {
+    await db.fetchDataCst(`
+        DELETE FROM reviews WHERE reviewassignmentid = ${req.body.assignmentid}
+      `);
 
     return res.status(200).send({ msg: "" });
   } catch (error) {

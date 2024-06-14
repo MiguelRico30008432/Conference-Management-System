@@ -15,22 +15,24 @@ export default function ReviewsCard({
   onReviewTextChange,
   onReviewGradeChange,
 }) {
-  const [reviewText, setReviewText] = useState(review);
-  const [reviewGrade, setReviewGrade] = useState(grade);
+  const [reviewText, setReviewText] = useState(review || "");
+  const [reviewGrade, setReviewGrade] = useState(grade || 0);
 
   useEffect(() => {
-    setReviewText(review);
-    setReviewGrade(grade);
+    setReviewText(review || "");
+    setReviewGrade(grade || 0);
   }, [review, grade]);
 
   function handleTextChange(event) {
-    setReviewText(event.target.value);
-    onReviewTextChange(event.target.value);
+    const value = event.target.value;
+    setReviewText(value);
+    onReviewTextChange(value);
   }
 
   function handleGradeChange(event) {
-    setReviewGrade(event.target.value);
-    onReviewGradeChange(event.target.value);
+    const value = event.target.value;
+    setReviewGrade(value);
+    onReviewGradeChange(value);
   }
 
   return (

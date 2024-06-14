@@ -12,29 +12,29 @@ import { fetchAPI } from "OurFunctions/fetchAPI";
 import { AuthContext } from "auth.context";
 import { ConferenceContext } from "conference.context";
 import ReviewsCard from "./ReviewsCard";
+import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
 
-export default function ReviewsDone({
-  singleUser = true,
-  assignmentID,
-  title,
-  onClose,
-}) {
+export default function ReviewsDone({ assignmentID, title, onClose }) {
   const { user } = useContext(AuthContext);
   const { confPhase } = useContext(ConferenceContext);
 
   const [abstract, setAbstract] = useState(null);
-  const [reviews, setReviews] = useState([]);
+  const [review, setReview] = useState("");
   const [userName, setUserName] = useState("");
+  const [originReview, setOriginReview] = useState(null);
+  const [originGrade, setOriginGrade] = useState(null);
 
   const [openLoading, setOpenLoading] = useState(false);
   const [addReviewActive, setAddReviewActive] = useState(false);
   const [hideButton, setHideButton] = useState(false);
   const [error, setError] = useState(null);
+  const [popMessage, setPopMessage] = useState(false);
+  const [deletePopMessage, setDeletePopMessage] = useState(false);
 
   useEffect(() => {
-    async function fetchReviews() {
+    async function fetchSingleReviews() {
       const response = await fetchAPI(
-        singleUser ? "singleReview" : "multiReviews",
+        "singleReview",
         "POST",
         { userid: user, assignmentid: assignmentID },
         setError,
@@ -44,8 +44,11 @@ export default function ReviewsDone({
       if (response) {
         setAbstract(response.abstract[0].submissionabstract);
 
-        if (response.lines.length > 0) {
-          setReviews(response.lines);
+        if (response.review.length > 0) {
+          response.review[0].read = true;
+          setOriginReview(response.review[0].reviewtext);
+          setOriginGrade(response.review[0].reviewgrade);
+          setReview(response.review[0]);
           setAddReviewActive(false);
         } else {
           setUserName(response.username[0].username);
@@ -54,11 +57,61 @@ export default function ReviewsDone({
       }
     }
 
-    if (assignmentID) fetchReviews();
+    if (assignmentID) fetchSingleReviews();
   }, [assignmentID]);
+
+  async function submitReview() {
+    if (verifyRequiredFields()) {
+      if (changeDetected()) {
+        const response = await fetchAPI(
+          "saveReview",
+          "POST",
+          {
+            addNew: addReviewActive,
+            assignmentid: assignmentID,
+            reviewgrade: review.reviewgrade,
+            reviewtext: review.reviewtext,
+          },
+          setError,
+          setOpenLoading
+        );
+
+        if (response) {
+          setError(
+            <Alert severity="success">
+              Submission {addReviewActive ? "registered" : "updated"} with
+              success
+            </Alert>
+          );
+        }
+      }
+
+      disabledReviews();
+      setAddReviewActive(false);
+      setHideButton(false);
+      setOriginReview(review.reviewtext);
+      setOriginGrade(review.reviewgrade);
+    }
+  }
+
+  async function deleteReview() {
+    await fetchAPI(
+      "deleteReview",
+      "POST",
+      {
+        assignmentid: assignmentID,
+      },
+      setError,
+      setOpenLoading
+    );
+
+    setDeletePopMessage(false);
+    closeComponent();
+  }
 
   function addNewReview() {
     setHideButton(true);
+
     const newReview = {
       username: userName,
       reviewadddate: new Date().toLocaleDateString(),
@@ -66,76 +119,99 @@ export default function ReviewsDone({
       reviewgrade: 1,
       read: false,
     };
-    setReviews([newReview, ...reviews]);
+
+    setReview(newReview);
   }
 
   function updateReview() {
     setHideButton(true);
-    setReviews(
-      reviews.map((review) => ({
-        ...review,
-        read: false,
-      }))
-    );
+    setReview({
+      ...review,
+      read: false,
+    });
   }
 
   function disabledReviews() {
-    setReviews(
-      reviews.map((review) => ({
-        ...review,
-        read: true,
-      }))
-    );
+    setReview({
+      ...review,
+      read: true,
+    });
   }
 
-  function handleReviewChange(index, key, value) {
-    const updatedReviews = [...reviews];
-    updatedReviews[index][key] = value;
-    setReviews(updatedReviews);
+  function handleReviewChange(key, value) {
+    setReview((review) => ({
+      ...review,
+      [key]: value,
+    }));
   }
 
-  async function submitReview() {
-    const response = await fetchAPI(
-      "saveReview",
-      "POST",
-      {
-        addNew: addReviewActive,
-        assignmentid: assignmentID,
-        reviewgrade: reviews[0].reviewgrade,
-        reviewtext: reviews[0].reviewtext,
-      },
-      setError,
-      setOpenLoading
-    );
+  function verifyCloseReview() {
+    if (changeDetected()) {
+      setPopMessage(true);
+    } else {
+      closeComponent();
+    }
+  }
 
-    if (response) {
-      setError(
-        <Alert severity="success">
-          Submission {addReviewActive ? "registered" : "updated"} with success
-        </Alert>
-      );
+  function changeDetected() {
+    const text = review.reviewtext ?? null;
+    const grade = review.reviewgrade ?? null;
+
+    if (text !== originReview || grade !== originGrade) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  function verifyRequiredFields() {
+    const text = review.reviewtext ?? null;
+    const grade = review.reviewgrade ?? null;
+
+    if (text === "" || text === null) {
+      setError(<Alert severity="error">Your review cannot be empty</Alert>);
+      return false;
+    }
+    if (grade === "" || grade === null) {
+      setError(<Alert severity="error">Your grade cannot be empty</Alert>);
+      return false;
     }
 
-    disabledReviews();
-    setAddReviewActive(false);
-    setHideButton(false);
+    return true;
+  }
+
+  function closeComponent() {
+    onClose();
   }
 
   return (
     <>
       {openLoading && <LoadingCircle />}
+      <PopUpWithMessage
+        open={popMessage}
+        title={"Changes not saved!"}
+        text={
+          "Wait! You are about to lose your unsaved review, are you sure do you want to go back?"
+        }
+        negativeButtonName={"Cancel"}
+        handleClose={() => setPopMessage(false)}
+        affirmativeButtonName={"Yes, I'm Sure"}
+        handleConfirm={closeComponent}
+      />
+
+      <PopUpWithMessage
+        open={deletePopMessage}
+        title={"Delete Review?"}
+        text={"Wait! You are about to delete your review, are you sure?"}
+        negativeButtonName={"Cancel"}
+        handleClose={() => setDeletePopMessage(false)}
+        affirmativeButtonName={"Yes, I'm Sure"}
+        handleConfirm={async () => await deleteReview()}
+      />
+
       <Container maxWidth="sm">
         <MDBox mt={10} mb={2} textAlign="left">
-          <MDBox mb={3} textAlign="left">
-            <Card>
-              <MDTypography ml={2} variant="h6">
-                My Reviews
-              </MDTypography>
-              <MDTypography ml={2} variant="body2">
-                text goes here
-              </MDTypography>
-            </Card>
-          </MDBox>
+          <MDBox mb={3} textAlign="left"></MDBox>
         </MDBox>
 
         <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
@@ -143,7 +219,7 @@ export default function ReviewsDone({
         <MDButton
           variant="gradient"
           color="info"
-          onClick={onClose}
+          onClick={verifyCloseReview}
           sx={{
             maxWidth: "140px",
             maxHeight: "30px",
@@ -174,21 +250,39 @@ export default function ReviewsDone({
         )}
 
         {!addReviewActive && !hideButton && (
-          <MDButton
-            variant="gradient"
-            color="info"
-            onClick={updateReview}
-            sx={{
-              maxWidth: "145px",
-              maxHeight: "30px",
-              minWidth: "5px",
-              minHeight: "30px",
-              ml: 2,
-              mb: 2,
-            }}
-          >
-            Update Review
-          </MDButton>
+          <>
+            <MDButton
+              variant="gradient"
+              color="info"
+              onClick={updateReview}
+              sx={{
+                maxWidth: "145px",
+                maxHeight: "30px",
+                minWidth: "5px",
+                minHeight: "30px",
+                ml: 2,
+                mb: 2,
+              }}
+            >
+              Update Review
+            </MDButton>
+
+            <MDButton
+              variant="gradient"
+              color="error"
+              onClick={() => setDeletePopMessage(true)}
+              sx={{
+                maxWidth: "145px",
+                maxHeight: "30px",
+                minWidth: "5px",
+                minHeight: "30px",
+                ml: 2,
+                mb: 2,
+              }}
+            >
+              Delete Review
+            </MDButton>
+          </>
         )}
 
         {hideButton && (
@@ -205,11 +299,11 @@ export default function ReviewsDone({
               mb: 2,
             }}
           >
-            {addReviewActive ? "Add new" : "Save"}
+            {addReviewActive ? "Add Review" : "Save Review"}
           </MDButton>
         )}
 
-        <Grid container spacing={2}>
+        <Grid container spacing={2} mb={2}>
           <Grid item xs={12} md={5}>
             <Card>
               <MDTypography ml={2} mt={2} variant="h9">
@@ -228,22 +322,19 @@ export default function ReviewsDone({
           </Grid>
 
           <Grid item xs={12} md={7}>
-            {reviews.map((review, index) => (
-              <ReviewsCard
-                key={index}
-                reviewName={review.username}
-                reviewDate={review.reviewadddate}
-                review={review.reviewtext}
-                grade={review.reviewgrade}
-                read={review.read}
-                onReviewTextChange={(value) =>
-                  handleReviewChange(index, "reviewtext", value)
-                }
-                onReviewGradeChange={(value) =>
-                  handleReviewChange(index, "reviewgrade", value)
-                }
-              />
-            ))}
+            <ReviewsCard
+              reviewName={review.username}
+              reviewDate={review.reviewadddate}
+              review={review.reviewtext}
+              grade={review.reviewgrade}
+              read={review.read}
+              onReviewTextChange={(value) =>
+                handleReviewChange("reviewtext", value)
+              }
+              onReviewGradeChange={(value) =>
+                handleReviewChange("reviewgrade", value)
+              }
+            />
           </Grid>
         </Grid>
       </Container>

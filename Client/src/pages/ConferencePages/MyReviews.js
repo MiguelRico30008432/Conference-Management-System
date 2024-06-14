@@ -1,12 +1,10 @@
 import React, { useEffect, useState, useContext } from "react";
 import MDButton from "components/MDButton";
-import Alert from "@mui/material/Alert";
 import Card from "@mui/material/Card";
 import Container from "@mui/material/Container";
 import MDTypography from "components/MDTypography";
 import MDBox from "components/MDBox";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
-import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "OurComponents/footer/Footer";
 import { v4 as uuidv4 } from "uuid";
@@ -164,7 +162,10 @@ export default function MyReviews() {
                     My Reviews
                   </MDTypography>
                   <MDTypography ml={2} variant="body2">
-                    text goes here
+                    Here, you as reviewer can add, edit, and delete reviews for
+                    submissions. Your feedback ensures the high quality of our
+                    conference. Please provide thorough and objective reviews.
+                    Thank you for your valuable contributions.
                   </MDTypography>
                 </Card>
               </MDBox>
