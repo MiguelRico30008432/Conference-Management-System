@@ -35,7 +35,7 @@ export default function MySubmissionsPage() {
   useEffect(() => {
     async function fetchSubmissions() {
       setOpenLoading(true);
-
+  
       if (confID && user) {
         try {
           const update = await fetch(
@@ -51,13 +51,13 @@ export default function MySubmissionsPage() {
               }),
             }
           );
-
+  
           const updateResponse = await update.json();
-
+  
           if (update.status === 200) {
             setSubUpdate(updateResponse[0].update);
           }
-
+  
           const response = await fetch(
             `${process.env.REACT_APP_API_URL}/mySubmissions`,
             {
@@ -72,15 +72,15 @@ export default function MySubmissionsPage() {
               }),
             }
           );
-
+  
           const jsonResponse = await response.json();
-
+  
           if (response.ok) {
             const transformedData = jsonResponse.map((submission) => ({
               id: submission.id,
               title: submission.title,
               authors: submission.authors,
-              status: submission.status ? "Accepted" : "Pending",
+              status: submission.status, // This will now be 'Accepted', 'Rejected', or 'Pending'
               addDate: submission.adddate,
               abstract: submission.abstract,
               fileUrl: submission.fileUrl,
@@ -95,7 +95,7 @@ export default function MySubmissionsPage() {
       }
       setOpenLoading(false);
     }
-
+  
     if (user && confID) {
       fetchSubmissions();
     }

@@ -1,9 +1,8 @@
+import React, { useEffect, useState, useContext } from "react";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import ConfNavbar from "../../OurComponents/navBars/ConferenceNavBar";
 import { ConferenceContext } from "conference.context";
 import { AuthContext } from "auth.context";
-import * as React from "react";
-import { useEffect, useState, useContext } from "react";
 import Card from "@mui/material/Card";
 import Container from "@mui/material/Container";
 import MDBox from "components/MDBox";
@@ -14,7 +13,7 @@ import Alert from "@mui/material/Alert";
 import CompleteTable from "OurComponents/Table/CompleteTable";
 import SubmissionDetails from "OurComponents/Info/SubmissionDetails";
 import Footer from "OurComponents/footer/Footer";
-import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage"; // Ensure this import is correct
+import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
 
 export default function AllSubmissions() {
   const { confID, userRole } = useContext(ConferenceContext);
@@ -47,16 +46,7 @@ export default function AllSubmissions() {
         const jsonResponse = await response.json();
 
         if (response.status === 200) {
-          const transformedData = jsonResponse.map((submission) => ({
-            id: submission.id,
-            title: submission.title,
-            authors: submission.authors,
-            status: submission.status ? "Accepted" : "Pending",
-            addDate: submission.adddate,
-            abstract: submission.abstract,
-            fileUrl: submission.fileUrl,
-          }));
-          setRows(transformedData);
+          setRows(jsonResponse);
         } else {
           setError(<Alert severity="error">{jsonResponse.message}</Alert>);
         }

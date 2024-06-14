@@ -33,7 +33,11 @@ router.post("/mySubmissions", auth.ensureAuthenticated, async (req, res) => {
             submissions.submissionid AS id, 
             submissions.submissiontitle AS title, 
             STRING_AGG(CONCAT(CONCAT(a1.authorfirstname,' ',a1.authorlastname), ', ', CONCAT(a2.authorfirstname,' ',a2.authorlastname)), ', ') AS authors,
-            submissions.submissionaccepted AS status,
+            CASE 
+                WHEN submissions.submissionaccepted = false AND submissions.submissiondecisionmade = true THEN 'Rejected'
+                WHEN submissions.submissionaccepted = true THEN 'Accepted'
+                ELSE 'Pending'
+            END AS status,
             to_char(submissions.submissionadddate, 'DD-MM-YYYY') AS addDate,
             submissions.submissionabstract AS abstract
         FROM submissions
@@ -45,6 +49,7 @@ router.post("/mySubmissions", auth.ensureAuthenticated, async (req, res) => {
             submissions.submissionid,
             submissions.submissiontitle,
             submissions.submissionaccepted,
+            submissions.submissiondecisionmade,
             submissions.submissionadddate,
             submissions.submissionabstract;`
     );
@@ -53,7 +58,7 @@ router.post("/mySubmissions", auth.ensureAuthenticated, async (req, res) => {
     if (submissions.length === 0) {
       return res.status(200).json([]);
     }
-
+    
     // Return the fetched data
     return res.status(200).json(submissions);
   } catch (error) {

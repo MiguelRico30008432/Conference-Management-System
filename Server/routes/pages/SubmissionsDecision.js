@@ -62,7 +62,7 @@ router.post("/submissionDecisionDetails", auth.ensureAuthenticated, async (req, 
       LEFT JOIN
         reviewsassignments ON reviews.reviewassignmentid = reviewsassignments.assignmentid
       LEFT JOIN
-        users ON reviews.userid = users.userid
+        users ON reviewsassignments.assignmentuserid = users.userid
       WHERE
         reviewsassignments.assignmentsubmissionid = $1;
     `;

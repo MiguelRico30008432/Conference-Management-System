@@ -11,7 +11,11 @@ router.post("/allSubmissions", auth.ensureAuthenticated, async (req, res) => {
             submissions.submissionid AS id, 
             submissions.submissiontitle AS title, 
             STRING_AGG(CONCAT(authorfirstname, ' ', authorlastname), ', ') AS authors,
-            submissions.submissionaccepted AS status,
+            CASE 
+                WHEN submissions.submissionaccepted = false AND submissions.submissiondecisionmade = true THEN 'Rejected'
+                WHEN submissions.submissionaccepted = true THEN 'Accepted'
+                ELSE 'Pending'
+            END AS status,
             to_char(submissions.submissionadddate, 'DD-MM-YYYY') AS addDate,
             submissions.submissionabstract AS abstract
         FROM submissions    
@@ -22,6 +26,7 @@ router.post("/allSubmissions", auth.ensureAuthenticated, async (req, res) => {
             submissions.submissionid,
             submissions.submissiontitle,
             submissions.submissionaccepted,
+            submissions.submissiondecisionmade,
             submissions.submissionadddate,
             submissions.submissionabstract`
     );
