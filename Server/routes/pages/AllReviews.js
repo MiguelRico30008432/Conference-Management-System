@@ -4,6 +4,30 @@ const db = require("../../utility/database");
 const auth = require("../../utility/verifications");
 const log = require("../../logs/logsManagement");
 
+router.post("/AllReviews", auth.ensureAuthenticated, async (req, res) => {
+  try {
+    const result = await db.fetchDataCst(`
+        SELECT
+            submissionid,
+            submissiontitle,
+            to_char(submissionadddate, 'DD-MM-YYYY') AS submissionadddate,
+            Concat(userfirstname, ' ', userlastname) AS username
+        FROM ReviewsAssignments
+        INNER JOIN submissions ON submissionid = assignmentsubmissionid
+        INNER JOIN users users ON submissionmainauthor = userid
+        WHERE 
+           assignmentconfid = ${req.body.confid}
+        GROUP BY
+          submissionid, submissiontitle, submissionadddate, userfirstname, userlastname          
+        `);
+
+    return res.status(200).send(result);
+  } catch (error) {
+    log.addLog(error, "myReviews", "AllReviews");
+    return res.status(500);
+  }
+});
+
 router.post("/multiReviews", auth.ensureAuthenticated, async (req, res) => {
   try {
     const abstract = await db.fetchDataCst(`
@@ -12,7 +36,7 @@ router.post("/multiReviews", auth.ensureAuthenticated, async (req, res) => {
       FROM ReviewsAssignments
       INNER JOIN submissions on submissionid = assignmentsubmissionid
       WHERE 
-        assignmentid = ${req.body.assignmentid}
+        assignmentsubmissionid = ${req.body.submissionid}
       `);
 
     const lines = await db.fetchDataCst(`
@@ -26,8 +50,7 @@ router.post("/multiReviews", auth.ensureAuthenticated, async (req, res) => {
       INNER JOIN submissions ON submissionid = assignmentsubmissionid
       INNER JOIN users ON assignmentuserid = users.userid
       WHERE 
-          reviewassignmentid = ${req.body.assignmentid}
-      AND assignmentuserid = ${req.body.userid}
+          assignmentsubmissionid = ${req.body.submissionid}
       `);
 
     return res.status(200).send({ abstract: abstract, lines: lines });

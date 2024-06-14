@@ -14,8 +14,7 @@ import CompleteTable from "OurComponents/Table/CompleteTable";
 import { fetchAPI } from "OurFunctions/fetchAPI";
 import { v4 as uuidv4 } from "uuid";
 import { handleDownload } from "OurFunctions/DownloadFile";
-import ReviewsDone from "OurComponents/Info/ReviewsDone";
-
+import MultiReviewsDone from "OurComponents/Info/MultiReviewsDone";
 import { AuthContext } from "auth.context";
 import { ConferenceContext } from "conference.context";
 
@@ -24,7 +23,7 @@ export default function AllReviews() {
   const { user } = useContext(AuthContext);
 
   const [title, setTile] = useState(null);
-  const [assignmentID, setAssignmentID] = useState(null);
+  const [submissionID, setSubmissionID] = useState(null);
   const [rows, setRows] = useState([]);
 
   const [openLoading, setOpenLoading] = useState(false);
@@ -34,7 +33,7 @@ export default function AllReviews() {
   useEffect(() => {
     async function fetchReviews() {
       const response = await fetchAPI(
-        "myReviews",
+        "AllReviews",
         "POST",
         { userid: user, confid: confID },
         setError,
@@ -49,9 +48,7 @@ export default function AllReviews() {
       }
     }
 
-    if (user && confID) {
-      fetchReviews();
-    }
+    if (user && confID) fetchReviews();
   }, [confID, user]);
 
   const columns = [
@@ -125,7 +122,7 @@ export default function AllReviews() {
                 variant="gradient"
                 color="info"
                 onClick={() => {
-                  setAssignmentID(params.row.assignmentid);
+                  setSubmissionID(params.row.submissionid);
                   setTile(params.row.submissiontitle);
                   setOpenReview(true);
                 }}
@@ -151,9 +148,8 @@ export default function AllReviews() {
       <DashboardLayout>
         <ConferenceNavBar />
         {openReview ? (
-          <ReviewsDone
-            singleUser={false}
-            assignmentID={assignmentID}
+          <MultiReviewsDone
+            submissionID={submissionID}
             title={title}
             onClose={() => setOpenReview(false)}
           />
