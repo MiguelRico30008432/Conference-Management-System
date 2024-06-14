@@ -4,65 +4,54 @@ const auth = require("../../utility/verifications");
 const router = express.Router();
 const { sendEmail } = require("../../utility/emails");
 
-
-
 router.post("/sendComposeEmail", auth.ensureAuthenticated, async (req, res) => {
   const { recipient, subject, description, confID } = req.body;
-  
-  // Validate the required fields
+
   if (!subject || !description || !confID) {
     return res.status(400).json({ success: false, message: "Missing required fields." });
   }
 
   try {
-    let result;
-    let emailReplacements = { descriptionEmail: description };
-
+    let queryText;
     if (recipient === "all") {
-      // Fetch all users who are Chairs or Committee members
-      result = await db.fetchAllEmailData(
-        'users', // Main table
-        'userroles', // Join table
-        'userid', // Join condition
-        'confID', // Second Join Condition
-        'useremail', // Filter column
-        'userrole', // Second Filter Column
-        confID, // Filter First Value
-        ['Chair', 'Committee'] // Filter Second Value: Chairs and Committees
-      );
+      queryText = `
+        SELECT useremail
+        FROM users
+        JOIN userroles ON users.userid = userroles.userid
+        WHERE userroles.confID = ${confID} AND userroles.userrole IN ('Owner', 'Chair', 'Committee');
+      `;
     } else {
-      //DB Query with Join
-      const recipientCapitalized = recipient.charAt(0).toUpperCase() + recipient.slice(1);
-      result = await db.fetchDataWithJoin(
-        'users', // Main table
-        'userroles', // Join table
-        'userid', // Join condition
-        'confID', // Second Join Condition
-        'useremail', // Filter column
-        'userrole', // Second Filter Column
-        confID, // Filter First Value
-        recipientCapitalized // Filter Second Value (capitalized)
-      );
+      queryText = `
+        SELECT useremail
+        FROM users
+        JOIN userroles ON users.userid = userroles.userid
+        WHERE userroles.confID = ${confID} AND userroles.userrole IN ('Owner', 'Chair');
+      `;
     }
 
-    // Convert description to a string with preserved line breaks
-    const formattedDescription = typeof description === 'string' ? description : description.join('\n');
+    const result = await db.fetchDataCst(queryText, [confID]);
 
-    await sendEmail(result, subject, { descriptionEmail: formattedDescription }, 'SendComposeEmail.html', (error, info) => {
+    if (!result || !Array.isArray(result)) {
+      return res.status(404).json({ success: false, message: "No recipients found." });
+    }
+
+    const emails = result.map((row) => row.useremail);
+    const formattedDescription = description.split("\n").join("<br />");
+
+    await sendEmail(emails, subject, { descriptionEmail: formattedDescription }, 'SendComposeEmail.html', (error, info) => {
       if (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: "An error occurred while sending the email." });
       }
+      res.status(200).json({ success: true, message: "Emails sent successfully." });
     });
-
-    res.status(200).json({ success: true, message: "Emails sent successfully." });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "An error occurred while sending the email." });
   }
 });
 
-//Checks if there are any committee members
+// Checks if there are any committee members
 router.get("/checkCommitteeMembers", async (req, res) => {
   const { confID } = req.query;
   try {
@@ -78,7 +67,5 @@ router.get("/checkCommitteeMembers", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-
 
 module.exports = router;

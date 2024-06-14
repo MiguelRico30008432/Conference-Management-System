@@ -9,13 +9,20 @@ router.post("/callForPapers", auth.ensureAuthenticated, async (req, res) => {
   try {
     const result = await db.fetchDataCst(`
       SELECT 
-          conf.confid AS confid,
-          confname AS confname,
-          confcountry AS confcountry,
-          to_char(confendsubmission, 'DD-MM-YYYY') AS confsubmissionend,
-          to_char(confstartdate, 'DD-MM-YYYY') AS confstartdate,
-          confareaname AS conftopics,
-          COALESCE(STRING_AGG(userrole, ','), 'Author') AS userrole
+        conf.confid AS confid,
+        confname AS confname,
+        confcountry AS confcountry,
+        to_char(confendsubmission, 'DD-MM-YYYY') AS confsubmissionend,
+        to_char(confstartdate, 'DD-MM-YYYY') AS confstartdate,
+        confareaname AS conftopics,
+        COALESCE(STRING_AGG(userrole, ','), 'Author') AS userrole,
+        CASE 
+          WHEN NOW() < confstartsubmission THEN 'Configuration'
+          WHEN confstartsubmission <= NOW() AND confendsubmission >= NOW() THEN 'Submission'
+          WHEN confstartreview <= NOW() AND confendreview >= NOW() THEN 'Review'
+          WHEN confstartbidding <= NOW() AND confendbidding >= NOW() THEN 'Bidding'
+          WHEN NOW() > confendreview THEN 'Pre-Conference'
+        END AS confphase
       FROM conferences conf
       INNER JOIN confAreas area ON area.confareaid = conf.confareaid
       LEFT  JOIN userRoles ON userRoles.confid = conf.confid AND userRoles.userid = ${req.body.userid}

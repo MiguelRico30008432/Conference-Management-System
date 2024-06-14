@@ -17,10 +17,12 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Checkbox from "@mui/material/Checkbox";
 import Footer from "OurComponents/footer/Footer";
+import { handleDownload } from "OurFunctions/DownloadFile";
 
 export default function BiddingPage() {
   const { confID } = useContext(ConferenceContext);
   const { user, isLoggedIn } = useContext(AuthContext);
+
   const [message, setMessage] = useState(null);
   const [openLoading, setOpenLoading] = useState(false);
   const [rows, setRows] = useState([]);
@@ -98,7 +100,14 @@ export default function BiddingPage() {
             <MDButton
               variant="gradient"
               color="warning"
-              onClick={() => handleDownload(params.row)}
+              onClick={() => {
+                const submission = {
+                  id: params.row.submissionid,
+                  title: params.row.submissiontitle,
+                };
+
+                handleDownload(submission, setMessage, setOpenLoading);
+              }}
               sx={{
                 maxWidth: "120px",
                 maxHeight: "23px",
@@ -151,44 +160,6 @@ export default function BiddingPage() {
       ),
     },
   ];
-
-  async function handleDownload(submissionInfo) {
-    setMessage(null);
-    setOpenLoading(true);
-
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/downloadSubmissionFile`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            submissionID: submissionInfo.submissionid,
-          }),
-        }
-      );
-
-      if (!response.status === 200) {
-        const jsonResponse = await response.json();
-        setMessage("Failed to download file: " + jsonResponse.msg);
-        return;
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = submissionInfo.submissiontitle + ".pdf";
-      a.click();
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      setMessage(<Alert severity="error">Could not download file</Alert>);
-    }
-    setOpenLoading(false);
-  }
 
   async function handleSubmit() {
     const selectedRows = rows.filter((row) => row.bidding);

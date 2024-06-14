@@ -27,9 +27,10 @@ export default function MySubmissionsPage() {
   const [rows, setRows] = useState([]);
   const [error, setError] = useState(null);
   const [dataForDelete, setDataForDelete] = useState(null);
+  const [subUpdate, setSubUpdate] = useState(null);
 
   const { user } = useContext(AuthContext);
-  const { confID } = useContext(ConferenceContext);
+  const { confID, confPhase } = useContext(ConferenceContext);
 
   useEffect(() => {
     async function fetchSubmissions() {
@@ -37,6 +38,26 @@ export default function MySubmissionsPage() {
 
       if (confID && user) {
         try {
+          const update = await fetch(
+            `${process.env.REACT_APP_API_URL}/getUpdateInfo`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json; charset=UTF-8",
+              },
+              credentials: "include",
+              body: JSON.stringify({
+                confid: confID,
+              }),
+            }
+          );
+
+          const updateResponse = await update.json();
+
+          if (update.status === 200) {
+            setSubUpdate(updateResponse[0].update);
+          }
+
           const response = await fetch(
             `${process.env.REACT_APP_API_URL}/mySubmissions`,
             {
@@ -161,6 +182,49 @@ export default function MySubmissionsPage() {
     { field: "authors", headerName: "Authors", width: 200 },
     { field: "addDate", headerName: "Submission Date", width: 120 },
     {
+      field: "edit",
+      filterable: false,
+      headerName: "",
+      description: "",
+      sortable: false,
+      disableColumnMenu: true,
+      resizable: false,
+      width: 55,
+      renderCell: (params) => {
+        if (confPhase !== "Submission" || !subUpdate) return null;
+
+        return (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            {
+              <MDButton
+                variant="gradient"
+                color="success"
+                onClick={() => {
+                  setDataForUpdate(params.row.id);
+                  setUpdate(true);
+                }}
+                sx={{
+                  maxWidth: "60px",
+                  maxHeight: "23px",
+                  minWidth: "30px",
+                  minHeight: "23px",
+                }}
+              >
+                Edit
+              </MDButton>
+            }
+          </div>
+        );
+      },
+    },
+    {
       field: "download",
       filterable: false,
       headerName: "",
@@ -236,45 +300,6 @@ export default function MySubmissionsPage() {
       },
     },
     {
-      field: "edit",
-      filterable: false,
-      headerName: "",
-      description: "",
-      sortable: false,
-      disableColumnMenu: true,
-      resizable: false,
-      width: 55,
-      renderCell: (params) => {
-        return (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-            }}
-          >
-            <MDButton
-              variant="gradient"
-              color="success"
-              onClick={() => {
-                setDataForUpdate(params.row.id);
-                setUpdate(true);
-              }}
-              sx={{
-                maxWidth: "60px",
-                maxHeight: "23px",
-                minWidth: "30px",
-                minHeight: "23px",
-              }}
-            >
-              Edit
-            </MDButton>
-          </div>
-        );
-      },
-    },
-    {
       field: "delete",
       filterable: false,
       headerName: "",
@@ -284,6 +309,8 @@ export default function MySubmissionsPage() {
       resizable: false,
       width: 150,
       renderCell: (params) => {
+        if (confPhase !== "Submission") return null;
+
         return (
           <div
             style={{

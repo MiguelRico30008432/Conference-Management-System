@@ -16,7 +16,8 @@ import MDButton from "components/MDButton";
 
 export default function CallForPapers() {
   const { user } = useContext(AuthContext);
-  const { setConfID, setUserRole } = useContext(ConferenceContext);
+  const { setConfID, setUserRole, setConfPhase } =
+    useContext(ConferenceContext);
 
   const [openLoading, setOpenLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -74,7 +75,7 @@ export default function CallForPapers() {
       sortable: false,
       disableColumnMenu: true,
       resizable: false,
-      width: 55,
+      width: 80,
       renderCell: (params) => {
         return (
           <div
@@ -91,6 +92,7 @@ export default function CallForPapers() {
               onClick={async () => {
                 setConfID(params.row.confid);
                 setUserRole(params.row.userrole);
+                setConfPhase(params.row.confphase);
                 await saveConfIDOnUser(params.row.confid);
                 navigate("/MyConferences/ConferenceDescription");
               }}
@@ -107,8 +109,8 @@ export default function CallForPapers() {
         );
       },
     },
-    { field: "confname", headerName: "Name", width: 250 },
-    { field: "confcountry", headerName: "Country", width: 180 },
+    { field: "confname", headerName: "Name", width: 300 },
+    { field: "confcountry", headerName: "Country", width: 150 },
     { field: "confsubmissionend", headerName: "Submission End", width: 150 },
     { field: "confstartdate", headerName: "Start date", width: 150 },
     { field: "conftopics", headerName: "Topics", width: 300 },

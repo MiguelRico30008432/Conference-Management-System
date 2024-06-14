@@ -13,7 +13,6 @@ import MyBiddings from "pages/ConferencePages/MyBiddings";
 //Reviews
 import MyReviews from "pages/ConferencePages/MyReviews";
 import AllReviews from "pages/ConferencePages/AllReviews";
-import Assignements from "pages/ConferencePages/Assignements";
 
 //Emails
 import Compose from "pages/ConferencePages/Compose";
@@ -127,15 +126,7 @@ const ConfRoutes = [
   },
   {
     type: "collapse", //Done
-    name: "Assignements",
-    submenu: "Reviews",
-    route: "/MyConferences/Conference/Assignements",
-    component: <Assignements />,
-    permissions: ["Owner", "Chair", "Committee"],
-  },
-  {
-    type: "collapse", //Done
-    name: "Assigned to me",
+    name: "My Reviews",
     submenu: "Reviews",
     route: "/MyConferences/Conference/MyReviews",
     component: <MyReviews />,

@@ -63,22 +63,8 @@ router.post(
         WHERE
             confid = ${req.body.confid}`);
 
-      const confPhase = await db.fetchDataCst(`  
-        SELECT
-        CASE 
-            WHEN NOW() < confstartsubmission THEN 'Configuration'
-            WHEN confstartsubmission <= NOW() AND confendsubmission >= NOW() THEN 'Submission'
-            WHEN confstartreview <= NOW() AND confendreview >= NOW() THEN 'Review'
-            WHEN confstartbidding <= NOW() AND confendbidding >= NOW() THEN 'Bidding'
-            WHEN NOW() > confendreview THEN 'Pre-Conference'
-            ELSE NULL 
-        END AS status
-        FROM conferences
-        WHERE conferences.confid = ${req.body.confid} AND confenddate >= NOW()`);
-
       const progress = {
         percentage: confProgress[0]?.percentage || 0,
-        status: confPhase[0]?.status || "",
       };
 
       return res.status(200).json(progress);

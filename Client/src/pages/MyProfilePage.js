@@ -108,7 +108,7 @@ export default function MyProfilePage() {
   async function changePassword() {
     if (password.length === 0 || repeatPassword.length === 0) {
       setPasswordMessage(
-        <Alert severity="error">Please fill in the password field.</Alert>
+        <Alert severity="error">Password not changed: Please fill in the password field.</Alert>
       );
     } else if (password !== repeatPassword) {
       setPasswordMessage(
@@ -222,42 +222,51 @@ export default function MyProfilePage() {
 
   async function handleInvitationCode() {
     const inviteCode = code.trim();
-    if (inviteCode === "") {
-      setInviteMessage(<Alert severity="error">Please enter an invitation code.</Alert>);
+    if (inviteCode === "") { 
+      setInviteMessage(
+        <Alert severity="error">Please enter an invitation code.</Alert>
+      );
       return;
     }
-  
+
     setOpenLoading(true);
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/saveInvitationCode`, {
-        method: "POST",
-        body: JSON.stringify({
-          userID: user,
-          inviteCode: inviteCode,
-        }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-        },
-        credentials: "include",
-      });
-  
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/saveInvitationCode`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            userID: user,
+            inviteCode: inviteCode,
+          }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+        }
+      );
+
       const jsonResponse = await response.json();
-  
+
       if (response.status === 200) {
-        setInviteMessage(<Alert severity="success">Invitation code accepted. You have joined the conference.</Alert>);
+        setInviteMessage(
+          <Alert severity="success">
+            Invitation code accepted. You have joined the conference.
+          </Alert>
+        );
         setInviteCode(""); // Clear the input field after successful submission
       } else {
         setInviteMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
       }
     } catch (error) {
       setInviteMessage(
-        <Alert severity="error">Something went wrong when submitting your invitation code.</Alert>
+        <Alert severity="error">
+          Something went wrong when submitting your invitation code.
+        </Alert>
       );
     }
     setOpenLoading(false);
   }
-  
-  
 
   return (
     <>
@@ -421,134 +430,140 @@ export default function MyProfilePage() {
         </MDBox>
 
         <MDBox mb={3} textAlign="left">
-          <Card>{passwordMessage}</Card>{" "}
+          <Card>
+            {passwordMessage}
+            {inviteMessage}
+          </Card>
         </MDBox>
 
         <MDBox mb={3}>
-          <Card>
-            <MDTypography ml={2} mb={2} mt={2} variant="body2">
-              Change Your Password
-            </MDTypography>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <Card>
+                <MDTypography ml={2} mb={2} mt={2} variant="body2">
+                  Change Your Password
+                </MDTypography>
 
-            <TextField
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              disabled={!passwordModeActive}
-              autoComplete="new-password"
-              value={password}
-              onChange={(e) => setPasword(e.target.value)}
-              sx={{ ml: 2, width: 300 }}
-            />
+                <TextField
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  disabled={!passwordModeActive}
+                  value={password}
+                  onChange={(e) => {
+                    setPasword(e.target.value);
+                  }}
+                  sx={{ ml: 2, width: '90%' }}
+                />
 
-            <TextField
-              required
-              fullWidth
-              name="password"
-              label="Repeat Password"
-              type="password"
-              id="password"
-              disabled={!passwordModeActive}
-              autoComplete="new-password"
-              value={repeatPassword}
-              onChange={(e) => setRepeatPassword(e.target.value)}
-              sx={{ mt: 2, ml: 2, width: 300 }}
-            />
+                <TextField
+                  required
+                  fullWidth
+                  name="password"
+                  label="Repeat Password"
+                  type="password"
+                  id="password"
+                  disabled={!passwordModeActive}
+                  value={repeatPassword}
+                  onChange={(e) => {
+                    setRepeatPassword(e.target.value);
+                  }}
+                  sx={{ mt: 2, ml: 2, width: '90%' }}
+                />
 
-            <MDBox style={{ display: "flex", gap: 1 }}>
-              {!passwordModeActive && (
+                <MDBox style={{ display: 'flex', gap: 1 }}>
+                  {!passwordModeActive && (
+                    <MDButton
+                      variant="gradient"
+                      color="info"
+                      sx={{
+                        maxWidth: '170px',
+                        maxHeight: '30px',
+                        minWidth: '5px',
+                        minHeight: '30px',
+                        mt: 2,
+                        ml: 2,
+                        mb: 2,
+                      }}
+                      onClick={() => {
+                        setPasswordMessage(null);
+                        setPasswordModeActive(true);
+                      }}
+                    >
+                      Change Password
+                    </MDButton>
+                  )}
+
+                  {passwordModeActive && (
+                    <MDButton
+                      variant="gradient"
+                      color="success"
+                      sx={{
+                        maxWidth: '150px',
+                        maxHeight: '30px',
+                        minWidth: '5px',
+                        minHeight: '30px',
+                        ml: 2,
+                        mt: 2,
+                        mb: 2,
+                      }}
+                      onClick={() => {
+                        changePassword();
+                        setPasswordModeActive(false);
+                      }}
+                    >
+                      Save Changes
+                    </MDButton>
+                  )}
+                </MDBox>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <Card>
+                <MDTypography ml={2} mb={2} mt={2} variant="body2">
+                  Do you have a conference invitation?
+                </MDTypography>
+
+                <TextField
+                  autoComplete="given-name"
+                  name="code"
+                  fullWidth
+                  id="code"
+                  label="Invitation Code"
+                  value={code}
+                  onChange={(e) => {
+                    setInviteCode(e.target.value);
+                    setInviteMessage(null);
+                  }}
+                  sx={{ ml: 2, width: '90%' }}
+                />
+
                 <MDButton
                   variant="gradient"
                   color="info"
                   sx={{
-                    maxWidth: "170px",
-                    maxHeight: "30px",
-                    minWidth: "5px",
-                    minHeight: "30px",
+                    maxWidth: '170px',
+                    maxHeight: '30px',
+                    minWidth: '5px',
+                    minHeight: '30px',
                     mt: 2,
                     ml: 2,
                     mb: 2,
                   }}
                   onClick={() => {
-                    setPasswordMessage(null);
-                    setPasswordModeActive(true);
+                    handleInvitationCode();
                   }}
                 >
-                  Change Password
+                  Join Conference
                 </MDButton>
-              )}
-
-              {passwordModeActive && (
-                <MDButton
-                  variant="gradient"
-                  color="success"
-                  sx={{
-                    maxWidth: "150px",
-                    maxHeight: "30px",
-                    minWidth: "5px",
-                    minHeight: "30px",
-                    ml: 2,
-                    mt: 2,
-                    mb: 2,
-                  }}
-                  onClick={() => {
-                    setPasswordModeActive(false);
-                    changePassword();
-                  }}
-                >
-                  Save Changes
-                </MDButton>
-              )}
-            </MDBox>
-          </Card>
+              </Card>
+            </Grid>
+          </Grid>
         </MDBox>
-
-        <MDBox mb={3} textAlign="left">
-          <Card>{inviteMessage}</Card>
-        </MDBox>
-
-        <MDBox mb={3}>
-          <Card>
-            <MDTypography ml={2} mb={2} mt={2} variant="body2">
-              "Do you have a conference invitation?"
-            </MDTypography>
-
-            <TextField
-              autoComplete="given-name"
-              name="code"
-              fullWidth
-              id="code"
-              label="Intivation Code"
-              autoFocus
-              value={code}
-              onChange={(e) => setInviteCode(e.target.value)}
-              sx={{ ml: 2, width: 150 }}
-            />
-
-            <MDButton
-              variant="gradient"
-              color="info"
-              sx={{
-                maxWidth: "170px",
-                maxHeight: "30px",
-                minWidth: "5px",
-                minHeight: "30px",
-                mt: 2,
-                ml: 2,
-                mb: 2,
-              }}
-              onClick={() => {
-                handleInvitationCode();
-              }}
-            >
-              Join Conference
-            </MDButton>
-          </Card>
-        </MDBox>
-
         <Footer />
       </DashboardLayout>
     </>

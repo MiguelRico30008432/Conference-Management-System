@@ -5,11 +5,11 @@ CREATE TABLE users (
     userFirstName VARCHAR(50) NOT NULL,
     userLastName VARCHAR(50) NOT NULL,
     userEmail VARCHAR(100) NOT NULL,
-    userPhone VARCHAR(15),
+    userPhone VARCHAR(18),
     useraffiliation VARCHAR(20) NOT NULL,
     userAdmin BOOLEAN DEFAULT false,
     userPassword VARCHAR(200) NOT NULL,
-    userAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
+    userAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp,
     userCurrentConfID bigint NULL
 );
 
@@ -97,13 +97,9 @@ Table Reviews
 
 CREATE TABLE reviews(
     reviewID SERIAL primary KEY,
-    submissionID INT,
-    FOREIGN KEY (submissionID) REFERENCES submissions(submissionID),
+    reviewassignmentid INT, FOREIGN KEY (reviewassignmentid) REFERENCES ReviewsAssignments(assignmentid),
     reviewGrade INT,
-    userID INT,
-    FOREIGN KEY (userID) REFERENCES users(userID),
-    reviewConfidant INT,
-    reviewText VARCHAR(200),
+    reviewText TEXT,
     reviewAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
 ___________________________________________________________________________________________________________
@@ -174,3 +170,11 @@ CREATE TABLE biddings (
     biddingadddata TIMESTAMP NOT NULL DEFAULT current_timestamp
 )
 
+__________________________________________________________________________________________________________
+CREATE TABLE ReviewsAssignments (
+    assignmentid SERIAL PRIMARY KEY,
+    assignmentconfid INT, FOREIGN KEY (assignmentconfid) REFERENCES conferences(confid),
+    assignmentsubmissionid INT, FOREIGN KEY (assignmentsubmissionid) REFERENCES submissions(submissionid),
+    assignmentuserid INT, FOREIGN KEY (assignmentuserid) REFERENCES users(userid),
+    assignmentmanually BOOLEAN,
+    assignmentadddate TIMESTAMP NOT NULL DEFAULT current_timestamp);

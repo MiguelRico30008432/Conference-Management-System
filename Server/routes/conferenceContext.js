@@ -6,14 +6,22 @@ const auth = require("../utility/verifications");
 router.post("/confContext", auth.ensureAuthenticated, async (req, res) => {
   try {
     const query = `
-    SELECT 
-        usercurrentconfid,
-        STRING_AGG(userrole, ',') AS userrole
-    FROM users
-    INNER JOIN conferences ON conferences.confid = users.usercurrentconfid
-    INNER JOIN userRoles ON userRoles.confid = conferences.confid AND userRoles.userid = users.userid 
-    WHERE users.userid = ${req.body.userid}
-    GROUP BY usercurrentconfid`;
+      SELECT 
+        userRoles.confid AS usercurrentconfid,
+        STRING_AGG(userrole, ',') AS userrole,
+         CASE 
+            WHEN NOW() < confstartsubmission THEN 'Configuration'
+            WHEN confstartsubmission <= NOW() AND confendsubmission >= NOW() THEN 'Submission'
+            WHEN confstartreview <= NOW() AND confendreview >= NOW() THEN 'Review'
+            WHEN confstartbidding <= NOW() AND confendbidding >= NOW() THEN 'Bidding'
+            WHEN NOW() > confendreview THEN 'Pre-Conference'
+          END AS confphase
+      FROM users
+      INNER JOIN conferences ON conferences.confid = users.usercurrentconfid
+      INNER JOIN userRoles ON userRoles.confid = conferences.confid AND userRoles.userid = users.userid 
+      WHERE users.userid = ${req.body.userid}
+      GROUP BY 
+        userRoles.confid, confName, conferences.confid;`;
 
     const result = await db.fetchDataCst(query);
 

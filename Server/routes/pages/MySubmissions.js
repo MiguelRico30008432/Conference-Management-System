@@ -5,6 +5,26 @@ const auth = require("../../utility/verifications");
 const log = require("../../logs/logsManagement");
 const sb = require("../../utility/supabase");
 
+router.post("/getUpdateInfo", auth.ensureAuthenticated, async (req, res) => {
+  try {
+    const update = await db.fetchDataCst(
+      `SELECT 
+        confsubupdate AS update
+      FROM
+        conferences 
+      WHERE
+        confid = ${req.body.confid}`
+    );
+
+    return res.status(200).json(update);
+  } catch (error) {
+    log.addLog(error, "database", "MySubmissions -> /getUpdateInfo");
+    res
+      .status(500)
+      .send({ msg: "Error fetching submission update definition" });
+  }
+});
+
 router.post("/mySubmissions", auth.ensureAuthenticated, async (req, res) => {
   try {
     const { confID, userID } = req.body;
@@ -70,6 +90,16 @@ router.delete(
       await db.fetchDataCst(
         `DELETE FROM submissions WHERE submissionid = ${submissionID}`
       );
+
+      const remainingSubmissions = await db.fetchDataCst(
+        `SELECT COUNT(*) FROM submissions WHERE submissionmainauthor = ${submissionToDeleteInfo[0].submissionmainauthor} AND submissionconfid = ${submissionToDeleteInfo[0].submissionconfid}`
+      );
+
+      if (parseInt(remainingSubmissions[0].count) === 0) {
+        await db.fetchDataCst(
+          `DELETE FROM userroles WHERE userid = ${submissionToDeleteInfo[0].submissionmainauthor} AND userrole = 'Author' AND confid = ${submissionToDeleteInfo[0].submissionconfid}`
+        );
+      }
 
       await sb.deleteSubmissionFile(
         submissionToDeleteInfo[0].submissionconfid,

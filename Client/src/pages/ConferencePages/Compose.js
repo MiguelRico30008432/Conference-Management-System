@@ -44,7 +44,6 @@ export default function Compose() {
       )
         .then((response) => response.json())
         .then((data) => {
-          // Set state based on response from backend
           setCommitteeMembersExist(data.committeeMembersExist);
         })
         .catch((error) => {
@@ -62,14 +61,14 @@ export default function Compose() {
     setRecipientError("");
     setSubjectError("");
     setDescriptionError("");
-
+  
     if (!recipient || !subject || !description) {
       if (!recipient) setRecipientError("You must select a recipient!");
       if (!subject) setSubjectError("You must enter a subject!");
       if (!description) setDescriptionError("You must enter a description!");
       return;
     }
-
+  
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/sendComposeEmail`,
@@ -78,7 +77,7 @@ export default function Compose() {
           body: JSON.stringify({
             recipient,
             subject,
-            description: JSON.stringify(description),
+            description: description, // no need to stringify again here
             confID: confID,
           }),
           headers: {
@@ -87,13 +86,13 @@ export default function Compose() {
           credentials: "include",
         }
       );
-
+  
       const data = await response.json();
-
+  
       if (!response.ok) {
         throw new Error(data.message || "Failed to send email.");
       }
-
+  
       setSendResponse({ success: true, message: "Email sent successfully." });
       setRecipient("");
       setSubject("");
@@ -116,7 +115,8 @@ export default function Compose() {
               Send Email
             </MDTypography>
             <MDTypography ml={2} variant="body2">
-              Text goes here
+              Here you can send an email to either the chair, committee members or both. The subject and description are to your
+              liking so the text is according to the theme in the subject you mention.
             </MDTypography>
           </Card>
           <Card sx={{ mt: 3, p: 3 }}>
@@ -182,7 +182,7 @@ export default function Compose() {
                     onChange={(e) => setSubject(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
-                        e.preventDefault(); // Prevent default behavior of enter key
+                        e.preventDefault();
                       }
                     }}
                     rows={1}
@@ -220,9 +220,9 @@ export default function Compose() {
                   <Alert severity="error">{descriptionError}</Alert>
                 )}
               </FormControl>
+              
               <Button
                 type="submit"
-                fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2, color: "white !important" }}
               >
@@ -231,7 +231,7 @@ export default function Compose() {
             </Box>
           </Card>
         </MDBox>
-        <br></br>
+        <br />
       </Container>
       <Footer />
     </DashboardLayout>
