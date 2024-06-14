@@ -12,6 +12,8 @@ import MDButton from "components/MDButton";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
+import { fetchAPI } from "OurFunctions/fetchAPI";
+import { v4 as uuidv4 } from "uuid";
 
 export default function MyConferences() {
   const { user, isLoggedIn } = useContext(AuthContext);
@@ -26,37 +28,20 @@ export default function MyConferences() {
 
   useEffect(() => {
     async function getMyConferences() {
-      setOpenLoading(true);
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/myConferences`,
-          {
-            method: "POST",
-            body: JSON.stringify({ userid: user }),
-            headers: {
-              "Content-type": "application/json; charset=UTF-8",
-            },
-            credentials: "include",
-          }
-        );
+      const response = await fetchAPI(
+        "myConferences",
+        "POST",
+        { userid: user },
+        setError,
+        setOpenLoading
+      );
 
-        const jsonResponse = await response.json();
-
-        if (response.status === 200) {
-          for (let line of jsonResponse) {
-            setRow((allExistingRows) => [...allExistingRows, line]);
-          }
-        } else {
-          setError(<Alert severity="error">{jsonResponse.msg}</Alert>);
+      if (response) {
+        for (let line of response) {
+          line.id = uuidv4();
+          setRow((allExistingRows) => [...allExistingRows, line]);
         }
-      } catch (error) {
-        setError(
-          <Alert severity="error">
-            Something went wrong when obtaining the lines
-          </Alert>
-        );
       }
-      setOpenLoading(false);
     }
 
     if (isLoggedIn) {

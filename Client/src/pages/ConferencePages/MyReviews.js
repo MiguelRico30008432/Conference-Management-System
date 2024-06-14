@@ -1,12 +1,10 @@
 import React, { useEffect, useState, useContext } from "react";
 import MDButton from "components/MDButton";
-import Alert from "@mui/material/Alert";
 import Card from "@mui/material/Card";
 import Container from "@mui/material/Container";
 import MDTypography from "components/MDTypography";
 import MDBox from "components/MDBox";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
-import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "OurComponents/footer/Footer";
 import { v4 as uuidv4 } from "uuid";
@@ -14,7 +12,6 @@ import ConferenceNavBar from "OurComponents/navBars/ConferenceNavBar";
 import CompleteTable from "OurComponents/Table/CompleteTable";
 import ReviewsDone from "OurComponents/Info/ReviewsDone";
 import { fetchAPI } from "OurFunctions/fetchAPI";
-
 import { AuthContext } from "auth.context";
 import { ConferenceContext } from "conference.context";
 import { handleDownload } from "OurFunctions/DownloadFile";
@@ -23,11 +20,13 @@ export default function MyReviews() {
   const { confID } = useContext(ConferenceContext);
   const { user } = useContext(AuthContext);
 
+  const [title, setTile] = useState(null);
+  const [assignmentID, setAssignmentID] = useState(null);
+  const [rows, setRows] = useState([]);
+
   const [openLoading, setOpenLoading] = useState(false);
   const [openReview, setOpenReview] = useState(false);
   const [error, setError] = useState(null);
-
-  const [rows, setRows] = useState([]);
 
   useEffect(() => {
     async function fetchReviews() {
@@ -100,7 +99,7 @@ export default function MyReviews() {
       },
     },
     {
-      field: "open",
+      field: "review",
       filterable: false,
       headerName: "",
       description: "",
@@ -123,6 +122,8 @@ export default function MyReviews() {
                 variant="gradient"
                 color="info"
                 onClick={() => {
+                  setAssignmentID(params.row.assignmentid);
+                  setTile(params.row.submissiontitle);
                   setOpenReview(true);
                 }}
                 sx={{
@@ -144,11 +145,15 @@ export default function MyReviews() {
   return (
     <>
       {openLoading && <LoadingCircle />}
-      {openReview ? (
-        <ReviewsDone submissionID={142} onClose={() => setOpenReview(false)} />
-      ) : (
-        <DashboardLayout>
-          <ConferenceNavBar />
+      <DashboardLayout>
+        <ConferenceNavBar />
+        {openReview ? (
+          <ReviewsDone
+            assignmentID={assignmentID}
+            title={title}
+            onClose={() => setOpenReview(false)}
+          />
+        ) : (
           <Container maxWidth="sm">
             <MDBox mt={10} mb={2} textAlign="left">
               <MDBox mb={3} textAlign="left">
@@ -157,7 +162,10 @@ export default function MyReviews() {
                     My Reviews
                   </MDTypography>
                   <MDTypography ml={2} variant="body2">
-                    text goes here
+                    Here, you as reviewer can add, edit, and delete reviews for
+                    submissions. Your feedback ensures the high quality of our
+                    conference. Please provide thorough and objective reviews.
+                    Thank you for your valuable contributions.
                   </MDTypography>
                 </Card>
               </MDBox>
@@ -176,8 +184,9 @@ export default function MyReviews() {
               </Card>
             </MDBox>
           </Container>
-        </DashboardLayout>
-      )}
+        )}
+        <Footer />
+      </DashboardLayout>
     </>
   );
 }

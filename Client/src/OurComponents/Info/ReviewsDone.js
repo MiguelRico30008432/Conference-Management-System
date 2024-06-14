@@ -8,144 +8,322 @@ import MDTypography from "components/MDTypography";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
 import Alert from "@mui/material/Alert";
 import MDButton from "components/MDButton";
-import TextField from "@mui/material/TextField";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import Box from "@mui/material/Box";
-
-import { ConferenceContext } from "conference.context";
+import { fetchAPI } from "OurFunctions/fetchAPI";
 import { AuthContext } from "auth.context";
+import { ConferenceContext } from "conference.context";
+import ReviewsCard from "./ReviewsCard";
+import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
 
-export default function ReviewsDone({ onClose }) {
-  const [openLoading, setOpenLoading] = useState(false);
-  const [message, setMessage] = useState(null);
-
-  const { confID } = useContext(ConferenceContext);
+export default function ReviewsDone({ assignmentID, title, onClose }) {
   const { user } = useContext(AuthContext);
+  const { confPhase } = useContext(ConferenceContext);
+
+  const [abstract, setAbstract] = useState(null);
+  const [review, setReview] = useState("");
+  const [originReview, setOriginReview] = useState(null);
+  const [originGrade, setOriginGrade] = useState(null);
+
+  const [openLoading, setOpenLoading] = useState(false);
+  const [addReviewActive, setAddReviewActive] = useState(false);
+  const [hideButton, setHideButton] = useState(false);
+  const [error, setError] = useState(null);
+  const [popMessage, setPopMessage] = useState(false);
+  const [deletePopMessage, setDeletePopMessage] = useState(false);
 
   useEffect(() => {
-    async function fetchReview() {
-      setOpenLoading(true);
+    async function fetchSingleReviews() {
+      const response = await fetchAPI(
+        "singleReview",
+        "POST",
+        { userid: user, assignmentid: assignmentID },
+        setError,
+        setOpenLoading
+      );
 
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/getSubmissionInfo`,
-          {
-            method: "POST",
-            body: JSON.stringify({}),
-            headers: {
-              "Content-type": "application/json; charset=UTF-8",
-            },
-            credentials: "include",
-          }
-        );
+      if (response) {
+        setAbstract(response.abstract[0].submissionabstract);
 
-        const jsonResponse = await response.json();
-
-        if (response.status === 200) {
+        if (response.review.length > 0) {
+          response.review[0].read = true;
+          setOriginReview(response.review[0].reviewtext);
+          setOriginGrade(response.review[0].reviewgrade);
+          setReview(response.review[0]);
+          setAddReviewActive(false);
         } else {
-          setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
+          setAddReviewActive(true);
+          addNewReview(response.username[0].username);
         }
-      } catch {
-        setMessage(
-          <Alert severity="error">
-            Something went wrong when obtaining the submission information.
-          </Alert>
-        );
       }
-      setOpenLoading(false);
     }
 
-    fetchReview();
-  }, []);
+    if (assignmentID) fetchSingleReviews();
+  }, [assignmentID]);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
+  async function submitReview() {
+    if (verifyRequiredFields()) {
+      if (changeDetected()) {
+        const response = await fetchAPI(
+          "saveReview",
+          "POST",
+          {
+            addNew: addReviewActive,
+            assignmentid: assignmentID,
+            reviewgrade: review.reviewgrade,
+            reviewtext: review.reviewtext,
+          },
+          setError,
+          setOpenLoading
+        );
+
+        if (response) {
+          setError(
+            <Alert severity="success">
+              Submission {addReviewActive ? "registered" : "updated"} with
+              success
+            </Alert>
+          );
+        }
+      }
+
+      disabledReviews();
+      setAddReviewActive(false);
+      setHideButton(false);
+      setOriginReview(review.reviewtext);
+      setOriginGrade(review.reviewgrade);
+    }
+  }
+
+  async function deleteReview() {
+    await fetchAPI(
+      "deleteReview",
+      "POST",
+      {
+        assignmentid: assignmentID,
+      },
+      setError,
+      setOpenLoading
+    );
+
+    setDeletePopMessage(false);
+    closeComponent();
+  }
+
+  function addNewReview(userName) {
+    setHideButton(true);
+
+    setReview({
+      username: userName,
+      reviewadddate: new Date().toLocaleDateString(),
+      reviewtext: "",
+      reviewgrade: 1,
+      read: false,
+    });
+  }
+
+  function updateReview() {
+    setHideButton(true);
+    setReview({
+      ...review,
+      read: false,
+    });
+  }
+
+  function disabledReviews() {
+    setReview({
+      ...review,
+      read: true,
+    });
+  }
+
+  function handleReviewChange(key, value) {
+    setReview((review) => ({
+      ...review,
+      [key]: value,
+    }));
+  }
+
+  function verifyCloseReview() {
+    if (changeDetected()) {
+      setPopMessage(true);
+    } else {
+      closeComponent();
+    }
+  }
+
+  function changeDetected() {
+    const text = review.reviewtext ?? null;
+    const grade = review.reviewgrade ?? null;
+
+    if (text !== originReview || grade !== originGrade) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  function verifyRequiredFields() {
+    const text = review.reviewtext ?? null;
+    const grade = review.reviewgrade ?? null;
+
+    if (text === "" || text === null) {
+      setError(<Alert severity="error">Your review cannot be empty</Alert>);
+      return false;
+    }
+    if (grade === "" || grade === null) {
+      setError(<Alert severity="error">Your grade cannot be empty</Alert>);
+      return false;
+    }
+
+    return true;
+  }
+
+  function closeComponent() {
+    onClose();
+  }
 
   return (
     <>
       {openLoading && <LoadingCircle />}
+      <PopUpWithMessage
+        open={popMessage}
+        title={"Changes not saved!"}
+        text={
+          "Wait! You are about to lose your unsaved review, are you sure do you want to go back?"
+        }
+        negativeButtonName={"Cancel"}
+        handleClose={() => setPopMessage(false)}
+        affirmativeButtonName={"Yes, I'm Sure"}
+        handleConfirm={closeComponent}
+      />
+
+      <PopUpWithMessage
+        open={deletePopMessage}
+        title={"Delete Review?"}
+        text={"Wait! You are about to delete your review, are you sure?"}
+        negativeButtonName={"Cancel"}
+        handleClose={() => setDeletePopMessage(false)}
+        affirmativeButtonName={"Yes, I'm Sure"}
+        handleConfirm={async () => await deleteReview()}
+      />
+
       <Container maxWidth="sm">
-        <MDBox mt={10} mb={2} textAlign="left">
-          <MDBox mb={3} textAlign="left">
-            <Card>
-              <MDTypography ml={2} variant="h6">
-                My Reviews
-              </MDTypography>
-              <MDTypography ml={2} variant="body2">
-                text goes here
-              </MDTypography>
-            </Card>
-          </MDBox>
-        </MDBox>
+        <MDBox mt={7}></MDBox>
 
-        <Card sx={{ mt: 2, mb: 2 }}>{message}</Card>
-
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-            <Card>
-              <MDTypography ml={2} mb={2} mt={2} variant="body2">
-                Title
-              </MDTypography>
-              <MDTypography ml={2} mb={2} mt={2} variant="body2">
-                Abstract
-              </MDTypography>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <Card>
-              <MDTypography ml={2} mb={2} mt={2} variant="body2">
-                Review
-              </MDTypography>
-
-              <Box
-                sx={{
-                  "& textarea": {
-                    padding: "18.5px 14px",
-                    fontSize: "0.9rem",
-                    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-                    border: "1px solid #c4c4c4",
-                    borderRadius: "4px",
-                    resize: "vertical",
-                    width: "90%",
-                    ml: 2,
-                    mr: 2,
-                    mb: 2,
-                  },
-                }}
-              >
-                <textarea
-                  id="description"
-                  placeholder="Enter your description here"
-                  rows={4}
-                />
-              </Box>
-
-              <Select value={0} sx={{ ml: 2, mr: 2, mb: 2 }}>
-                {[1, 2, 3, 4, 5].map((value) => (
-                  <MenuItem key={value} value={value}>
-                    {value}
-                  </MenuItem>
-                ))}
-              </Select>
-            </Card>
-          </Grid>
-        </Grid>
+        <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
 
         <MDButton
           variant="gradient"
           color="info"
-          onClick={onClose}
+          onClick={verifyCloseReview}
           sx={{
             maxWidth: "140px",
             maxHeight: "30px",
             minWidth: "5px",
             minHeight: "30px",
-            mt: 2,
-            ml: 2,
             mb: 2,
           }}
         >
           Close Review
         </MDButton>
+
+        {!addReviewActive && !hideButton && (
+          <>
+            <MDButton
+              variant="gradient"
+              color="info"
+              onClick={updateReview}
+              sx={{
+                maxWidth: "145px",
+                maxHeight: "30px",
+                minWidth: "5px",
+                minHeight: "30px",
+                ml: 2,
+                mb: 2,
+              }}
+            >
+              Update Review
+            </MDButton>
+
+            <MDButton
+              variant="gradient"
+              color="error"
+              onClick={() => setDeletePopMessage(true)}
+              sx={{
+                maxWidth: "145px",
+                maxHeight: "30px",
+                minWidth: "5px",
+                minHeight: "30px",
+                ml: 2,
+                mb: 2,
+              }}
+            >
+              Delete Review
+            </MDButton>
+          </>
+        )}
+
+        {hideButton && (
+          <MDButton
+            variant="gradient"
+            color="success"
+            onClick={async () => await submitReview()}
+            sx={{
+              maxWidth: "150px",
+              maxHeight: "30px",
+              minWidth: "5px",
+              minHeight: "30px",
+              ml: 2,
+              mb: 2,
+            }}
+          >
+            {addReviewActive ? "Add Review" : "Save Review"}
+          </MDButton>
+        )}
+
+        <Grid container spacing={2} mb={2}>
+          <Grid item xs={12} md={5}>
+            <Card>
+              <MDTypography ml={2} mt={2} variant="h9">
+                Title
+              </MDTypography>
+              <MDTypography ml={2} variant="body2">
+                {title}
+              </MDTypography>
+              <MDTypography ml={2} mt={2} variant="h9">
+                Abstract
+              </MDTypography>
+              <MDTypography ml={2} mb={2} mr={1} variant="body2">
+                {abstract}
+              </MDTypography>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} md={7}>
+            <ReviewsCard
+              reviewName={review.username}
+              reviewDate={review.reviewadddate}
+              review={review.reviewtext}
+              grade={review.reviewgrade}
+              read={review.read}
+              onReviewTextChange={(value) =>
+                handleReviewChange("reviewtext", value)
+              }
+              onReviewGradeChange={(value) =>
+                handleReviewChange("reviewgrade", value)
+              }
+            />
+          </Grid>
+        </Grid>
       </Container>
     </>
   );
