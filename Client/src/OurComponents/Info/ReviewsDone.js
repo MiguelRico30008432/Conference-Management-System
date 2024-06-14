@@ -20,7 +20,6 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
 
   const [abstract, setAbstract] = useState(null);
   const [review, setReview] = useState("");
-  const [userName, setUserName] = useState("");
   const [originReview, setOriginReview] = useState(null);
   const [originGrade, setOriginGrade] = useState(null);
 
@@ -51,14 +50,24 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
           setReview(response.review[0]);
           setAddReviewActive(false);
         } else {
-          setUserName(response.username[0].username);
           setAddReviewActive(true);
+          addNewReview(response.username[0].username);
         }
       }
     }
 
     if (assignmentID) fetchSingleReviews();
   }, [assignmentID]);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   async function submitReview() {
     if (verifyRequiredFields()) {
@@ -109,18 +118,16 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
     closeComponent();
   }
 
-  function addNewReview() {
+  function addNewReview(userName) {
     setHideButton(true);
 
-    const newReview = {
+    setReview({
       username: userName,
       reviewadddate: new Date().toLocaleDateString(),
       reviewtext: "",
       reviewgrade: 1,
       read: false,
-    };
-
-    setReview(newReview);
+    });
   }
 
   function updateReview() {
@@ -228,24 +235,6 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
         >
           Close Review
         </MDButton>
-
-        {addReviewActive && !hideButton && (
-          <MDButton
-            variant="gradient"
-            color="info"
-            onClick={addNewReview}
-            sx={{
-              maxWidth: "125px",
-              maxHeight: "30px",
-              minWidth: "5px",
-              minHeight: "30px",
-              ml: 2,
-              mb: 2,
-            }}
-          >
-            New Review
-          </MDButton>
-        )}
 
         {!addReviewActive && !hideButton && (
           <>

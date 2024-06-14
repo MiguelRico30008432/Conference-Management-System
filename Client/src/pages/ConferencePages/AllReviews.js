@@ -106,7 +106,7 @@ export default function AllReviews() {
       sortable: false,
       disableColumnMenu: true,
       resizable: false,
-      width: 70,
+      width: 120,
       renderCell: (params) => {
         return (
           <div
@@ -127,13 +127,13 @@ export default function AllReviews() {
                   setOpenReview(true);
                 }}
                 sx={{
-                  maxWidth: "70px",
+                  maxWidth: "100px",
                   maxHeight: "23px",
                   minWidth: "30px",
                   minHeight: "23px",
                 }}
               >
-                Review
+                Check Reviews
               </MDButton>
             }
           </div>
