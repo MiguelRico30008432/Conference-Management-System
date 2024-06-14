@@ -247,8 +247,8 @@ export default function SendInvitation() {
                   <MenuItem value="" disabled>
                     Choose a Role
                   </MenuItem>
-                  <MenuItem value="chair">Chair</MenuItem>
-                  <MenuItem value="committee">Committee</MenuItem>
+                  <MenuItem value="Chair">Chair</MenuItem>
+                  <MenuItem value="Committee">Committee</MenuItem>
                 </Select>
                 {roleError && <Alert severity="error">{roleError}</Alert>}
               </FormControl>

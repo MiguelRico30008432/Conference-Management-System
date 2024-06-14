@@ -99,6 +99,7 @@ router.post("/saveInvitationCode", auth.ensureAuthenticated, async (req, res) =>
             confid: confID
           });
           inviteFound = true;
+          await db.updateData("invitations", { invitationcodeused: 't' }, { invitationid: invite.invitationid });
         }
       }
     }

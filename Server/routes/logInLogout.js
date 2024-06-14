@@ -84,6 +84,7 @@ router.post("/signUp", async (req, res) => {
               userrole: userRole,
               confid: confID
             });
+            await db.updateData("invitations", { invitationcodeused: 't' }, { invitationid: invite.invitationid });
           }
         }
 
