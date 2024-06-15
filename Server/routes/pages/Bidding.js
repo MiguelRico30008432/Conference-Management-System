@@ -172,8 +172,6 @@ async function addWorkload(workload, addingInfo) {
 }
 
 async function addToAssignment(biddings) {
-  console.log("addToAssignment BEGINING");
-  console.log(biddings);
   try {
     for (const bid of biddings) {
       const verifyAssignmentExistence = await db.fetchDataCst(`
@@ -196,7 +194,7 @@ async function addToAssignment(biddings) {
   } catch (error) {
     log.addLog(error, "database", "Bidding -> addToAssignment()");
   }
-} //Por testar
+}
 
 async function verifyAssignmentsReviewers(confid, minimumReviewersNeeded) {
   try {
@@ -235,7 +233,7 @@ async function deleteAutomaticAssignments(assignmentsToDelete) {
   } catch (error) {
     log.addLog(error, "database", "Bidding -> deleteAutomaticAssignments()");
   }
-} // Por Testar
+}
 
 async function getCommitteMembersWithLessWorkload(
   workload,
@@ -264,7 +262,7 @@ async function getCommitteMembersWithLessWorkload(
   }
   console.log("getCommitteMembersWithLessWorkload apos o for");
   return choosenMembers;
-} //Por Testar
+}
 
 async function pickPreferableAutomaticAssignments(
   automaticAssignments,
@@ -302,7 +300,7 @@ async function pickPreferableAutomaticAssignments(
       "Bidding -> pickPreferableAutomaticAssignments()"
     );
   }
-} //Por testar
+}
 
 async function pickPreferableBiddings(
   biddingsList,
@@ -363,7 +361,7 @@ async function pickPreferableBiddings(
   } catch (error) {
     log.addLog(error, "database", "Bidding -> pickPreferableBiddings()");
   }
-} //Por testar
+}
 
 async function prepareAssignmentForReviewers(
   choosenReviewers,
@@ -383,7 +381,7 @@ async function prepareAssignmentForReviewers(
   console.log("prepareAssignmentForReviewers end");
   console.log(preparedToAddToAssignments);
   return preparedToAddToAssignments;
-} // Por testar
+}
 
 async function ReviewsAssignmentAlghoritm(confid) {
   //get committe list
@@ -408,7 +406,6 @@ async function ReviewsAssignmentAlghoritm(confid) {
   const reviewersNeededPerReview = Math.floor(
     submissions.length / committeeEmails.length
   );
-  console.log(reviewersNeededPerReview);
 
   //Variable used in the while loop (will be true when all submission have the minimun number of reviewers assigned)
   let MinReviews = false;
@@ -500,12 +497,9 @@ async function ReviewsAssignmentAlghoritm(confid) {
           //Get list of the users who have new assignments to add on the workload
           membersToAddWorkload = [];
           for (const bid of submissionBiddings) {
-            console.log("membersToAddWorkload bid 1");
-            console.log(bid);
             membersToAddWorkload.push(bid.useremail);
           }
-          console.log("membersToAddWorkload");
-          console.log(membersToAddWorkload);
+
           workload = await addWorkload(workload, membersToAddWorkload); //Apos ter esta função em todo o lado necessario ver qual a melhor maneira de processar e o que enviar para a função
           continue;
         }
@@ -546,11 +540,17 @@ async function ReviewsAssignmentAlghoritm(confid) {
           submissionMadeAssignments.length + submissionBiddings.length <
           reviewersNeededPerReview
         ) {
-          //If we need to assign committee members to review a certain submission then we first need to pick the ones with less workload
-          //First we need to know how many reviewers we need
+          //If we need to assign committee members to review a certain submission then we first need assign the biddings
+          await addToAssignment(submissionBiddings);
+
+          //Then we the pick the committee members with less workload
+          //We need to know how many reviewers we need
           const missingReviewers =
             reviewersNeededPerReview -
             (submissionMadeAssignments.length + submissionBiddings.length);
+
+          console.log("Missing Reviewers");
+          console.log(missingReviewers);
 
           //Now we pick the ones with less workload
           const choosenReviewers = await getCommitteMembersWithLessWorkload(
@@ -566,8 +566,6 @@ async function ReviewsAssignmentAlghoritm(confid) {
             submission.submissionid
           );
 
-          //TESTAR PK DEVE TAR A DAR MERDA xD
-
           //Then we add them to the reviewAssignments table and add the workload to keep it updated
           await addToAssignment(forcedAssignments);
 
@@ -581,6 +579,7 @@ async function ReviewsAssignmentAlghoritm(confid) {
         }
       }
     }
+
     //Function to verify if all submissions have the minimal number of reviewers
     //If true the loop will stop and the algorithm is completed
     //If false the loop will run again and assign reviewers to the missing submissions
