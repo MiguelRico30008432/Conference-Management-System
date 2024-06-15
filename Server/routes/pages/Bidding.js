@@ -8,6 +8,7 @@ async function getCommitteeEmails(confid) {
   try {
     const committeeEmails = await db.fetchDataCst(`
     SELECT 
+        u.userid,
         ur.userrole,
         u.useremail,
         u.useraffiliation
@@ -117,7 +118,7 @@ async function getConflicts(confid) {
   }
 }
 
-async function getWorkload(confid) {
+async function getWorkload(confid, committe) {
   try {
     const workload = await db.fetchDataCst(`
     SELECT 
@@ -138,9 +139,21 @@ async function getWorkload(confid) {
       AND ur.userrole IN ('Chair', 'Owner', 'Committee')
     GROUP BY 
       u.useremail,
-      ur.userrole;
+      ur.userrole,
+      u.userid
     `);
 
+    if (workload.length < committe.length) {
+      //If theres no assignments we create workload where all users will have 0 as assignment_count
+      for (const member of committe) {
+        if (!workload.find((user) => user.userid === member.userid)) {
+          member["assignment_count"] = 0;
+          workload.push(member);
+        }
+      }
+    }
+    console.log("WORKLOAD");
+    console.log(workload);
     return workload;
   } catch (error) {
     log.addLog(error, "database", "Bidding -> getWorkload()");
@@ -148,24 +161,38 @@ async function getWorkload(confid) {
 }
 
 async function addWorkload(workload, addingInfo) {
-  for (const user in addingInfo) {
-    for (const member in workload) {
-      if (member.useremail === user) {
+  for (const user of addingInfo) {
+    for (const member of workload) {
+      if (member.useremail === user || member.userid === user) {
         member.assignment_count = member.assignment_count + 1;
       }
     }
   }
   return workload;
-} //Por testar
+}
 
 async function addToAssignment(biddings) {
+  console.log("addToAssignment BEGINING");
+  console.log(biddings);
   try {
     for (const bid of biddings) {
-      await db.fetchDataCst(`
-        INSERT INTO ReviewsAssignments (assignmentconfid, assignmentsubmissionid, assignmentuserid, assignmentmanually)
-        VALUE(${bid.biddingconfid}, ${bid.biddingsubmissionid}, ${bid.biddinguserid}, FALSE)
-      `);
+      const verifyAssignmentExistence = await db.fetchDataCst(`
+        SELECT 
+          assignmentid
+        FROM
+          reviewsassignments
+        WHERE
+          assignmentconfid = ${bid.biddingconfid} AND assignmentsubmissionid = ${bid.biddingsubmissionid} AND	assignmentuserid = ${bid.biddinguserid}
+        `);
+
+      if (verifyAssignmentExistence.length === 0) {
+        await db.fetchDataCst(`
+          INSERT INTO ReviewsAssignments (assignmentconfid, assignmentsubmissionid, assignmentuserid, assignmentmanually)
+          VALUES(${bid.biddingconfid}, ${bid.biddingsubmissionid}, ${bid.biddinguserid}, FALSE)
+        `);
+      }
     }
+    console.log("addToAssignment END");
   } catch (error) {
     log.addLog(error, "database", "Bidding -> addToAssignment()");
   }
@@ -175,16 +202,15 @@ async function verifyAssignmentsReviewers(confid, minimumReviewersNeeded) {
   try {
     const assignments = await db.fetchDataCst(`
     SELECT
-      assignmentid,
-      COUNT(assignmentid) AS assignment_count
+      assignmentsubmissionid,
+      COUNT(assignmentsubmissionid) AS assignment_count
     FROM 
       reviewsassignments
     WHERE
       assignmentconfid = ${confid}
     GROUP by
-      assignmentid
+      assignmentsubmissionid	
     `);
-
     for (const assignment of assignments) {
       if (assignment.assignment_count < minimumReviewersNeeded) {
         return false;
@@ -194,15 +220,18 @@ async function verifyAssignmentsReviewers(confid, minimumReviewersNeeded) {
   } catch (error) {
     log.addLog(error, "database", "Bidding -> verifyAssignmentsReviewers()");
   }
-} //Por Testar
+}
 
 async function deleteAutomaticAssignments(assignmentsToDelete) {
+  console.log("deleteAutomaticAssignments START");
+  console.log(assignmentsToDelete);
   try {
     for (const assignment of assignmentsToDelete) {
       await db.fetchDataCst(`
       DELETE FROM reviewsassignments WHERE assignmentid = ${assignment.assignmentid};
       `);
     }
+    console.log("deleteAutomaticAssignments END");
   } catch (error) {
     log.addLog(error, "database", "Bidding -> deleteAutomaticAssignments()");
   }
@@ -216,7 +245,8 @@ async function getCommitteMembersWithLessWorkload(
   let choosenMembers = [];
 
   workload.sort((a, b) => a.assignment_count - b.assignment_count); //Orders the list by assignmentcount value from lower to higher
-
+  console.log("after sort");
+  console.log(workload);
   for (const member of workload) {
     if (
       //checking if the committee member we want to choose has no conflict with the current submission
@@ -226,11 +256,13 @@ async function getCommitteMembersWithLessWorkload(
     ) {
       choosenMembers.push(member);
       if (choosenMembers.length === missingReviewers) {
+        console.log("getCommitteMembersWithLessWorkload choosenMembers");
+        console.log(choosenMembers);
         return choosenMembers;
       }
     }
   }
-
+  console.log("getCommitteMembersWithLessWorkload apos o for");
   return choosenMembers;
 } //Por Testar
 
@@ -242,6 +274,8 @@ async function pickPreferableAutomaticAssignments(
   //If we get to this function there probably was manual assignments added after the automatic ones were run at least once
   //soo we will chose the ones with the reviewer that has least workload
   try {
+    console.log("pickPreferableAutomaticAssignments start");
+    console.log(automaticAssignments);
     let preferedAssignments = [];
 
     workload.sort((a, b) => a.assignment_count - b.assignment_count); //Orders the list by assignmentcount value from lower to higher
@@ -254,6 +288,8 @@ async function pickPreferableAutomaticAssignments(
           preferedAssignments.push(assignment);
 
           if (preferedAssignments.length === assignmentsNeeded) {
+            console.log("pickPreferableAutomaticAssignments end");
+            console.log(preferedAssignments);
             return preferedAssignments;
           }
         }
@@ -276,7 +312,10 @@ async function pickPreferableBiddings(
   assignments
 ) {
   let preferedBids = [];
-
+  console.log("pickPreferableBiddings start bids");
+  console.log(biddingsList);
+  console.log("pickPreferableBiddings start assignments");
+  console.log(assignments);
   try {
     biddingsList.sort((a, b) => b.biddingconfidence - a.biddingconfidence); //Orders the list by biddingconfidence value from higher to lower
 
@@ -297,6 +336,8 @@ async function pickPreferableBiddings(
           ) {
             preferedBids.push(bid);
             if (preferedBids.length === bidsNeeded) {
+              console.log("pickPreferableBiddings end");
+              console.log(preferedBids);
               return preferedBids;
             }
           }
@@ -313,6 +354,8 @@ async function pickPreferableBiddings(
       ) {
         preferedBids.push(bid);
         if (preferedBids.length === bidsNeeded) {
+          console.log("pickPreferableBiddings end 2");
+          console.log(preferedBids);
           return preferedBids;
         }
       }
@@ -327,6 +370,8 @@ async function prepareAssignmentForReviewers(
   confid,
   submissionid
 ) {
+  console.log("prepareAssignmentForReviewers start");
+  console.log(choosenReviewers);
   let preparedToAddToAssignments = [];
   for (const reviewer of choosenReviewers) {
     preparedToAddToAssignments.push({
@@ -335,6 +380,8 @@ async function prepareAssignmentForReviewers(
       biddinguserid: reviewer.userid,
     });
   }
+  console.log("prepareAssignmentForReviewers end");
+  console.log(preparedToAddToAssignments);
   return preparedToAddToAssignments;
 } // Por testar
 
@@ -355,19 +402,20 @@ async function ReviewsAssignmentAlghoritm(confid) {
   const conflicts = await getConflicts(confid);
 
   //get workload of each member in the committe
-  const workload = await getWorkload(confid);
+  let workload = await getWorkload(confid, committeeEmails);
 
   //Average reviewers needed per submission (if its a decimal number, round down)
   const reviewersNeededPerReview = Math.floor(
     submissions.length / committeeEmails.length
   );
+  console.log(reviewersNeededPerReview);
 
   //Variable used in the while loop (will be true when all submission have the minimun number of reviewers assigned)
   let MinReviews = false;
 
   while (MinReviews === false) {
     for (const submission of submissions) {
-      const membersToAddWorkload = [];
+      let membersToAddWorkload = [];
       //Create temporary list with committee members with no conflict with the current submission
       const submissionNoConflictCommittee = committeeEmails.filter((user) => {
         return !conflicts.some(
@@ -452,9 +500,12 @@ async function ReviewsAssignmentAlghoritm(confid) {
           //Get list of the users who have new assignments to add on the workload
           membersToAddWorkload = [];
           for (const bid of submissionBiddings) {
+            console.log("membersToAddWorkload bid 1");
+            console.log(bid);
             membersToAddWorkload.push(bid.useremail);
           }
-
+          console.log("membersToAddWorkload");
+          console.log(membersToAddWorkload);
           workload = await addWorkload(workload, membersToAddWorkload); //Apos ter esta função em todo o lado necessario ver qual a melhor maneira de processar e o que enviar para a função
           continue;
         }
@@ -481,9 +532,12 @@ async function ReviewsAssignmentAlghoritm(confid) {
 
           membersToAddWorkload = [];
           for (const bid of preferedBiddings) {
+            console.log("membersToAddWorkload bid 2");
+            console.log(bid);
             membersToAddWorkload.push(bid.useremail);
           }
-
+          console.log("membersToAddWorkload");
+          console.log(membersToAddWorkload);
           workload = await addWorkload(workload, membersToAddWorkload);
           continue;
         }
@@ -507,7 +561,9 @@ async function ReviewsAssignmentAlghoritm(confid) {
 
           //Preparing the data to send to addBiddingToAssignments
           const forcedAssignments = await prepareAssignmentForReviewers(
-            choosenReviewers
+            choosenReviewers,
+            confid,
+            submission.submissionid
           );
 
           //TESTAR PK DEVE TAR A DAR MERDA xD
@@ -517,7 +573,7 @@ async function ReviewsAssignmentAlghoritm(confid) {
 
           membersToAddWorkload = [];
           for (const assignment of forcedAssignments) {
-            membersToAddWorkload.push(assignment.useremail);
+            membersToAddWorkload.push(assignment.biddinguserid);
           }
 
           workload = await addWorkload(workload, membersToAddWorkload);
@@ -530,7 +586,7 @@ async function ReviewsAssignmentAlghoritm(confid) {
     //If false the loop will run again and assign reviewers to the missing submissions
     MinReviews = await verifyAssignmentsReviewers(
       confid,
-      minimumReviewersNeeded
+      reviewersNeededPerReview
     );
   }
   /*  VERIFICAR NO FINAL SE COM O QUE TEMOS ESTA RELATIVAMENTE BALANCEADO OU SE TEMOS DE CRIAR UMA FUNÇÂO PARA ISTO
@@ -553,7 +609,6 @@ router.post(
         .status(200)
         .send({ msg: "Reviews Assignments have been Updated" });
     } catch (error) {
-      console.log(error);
       log.addLog(error, "database", "Bidding -> /reviewsAssignmentsAlgorithm");
       return res
         .status(500)
