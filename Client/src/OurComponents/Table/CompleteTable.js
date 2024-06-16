@@ -2,6 +2,7 @@ import * as React from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { useState } from "react";
 import Card from "@mui/material/Card";
+import MDButton from "@mui/material/Button"; // Certifique-se de que o MDButton é importado corretamente
 
 export default function CompleteTable({
   columns,
@@ -47,6 +48,10 @@ export default function CompleteTable({
                 color: "#1F4576",
                 fontWeight: 11,
                 fontSize: "0.875rem",
+              },
+              // cabeçalho da coluna ao focar
+              "& .MuiDataGrid-columnHeader:focus": {
+                outline: "none",
               },
               // linhas
               "& .MuiDataGrid-cell": {
