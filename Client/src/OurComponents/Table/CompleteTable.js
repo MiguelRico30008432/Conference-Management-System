@@ -8,21 +8,27 @@ export default function CompleteTable({
   rows,
   withCheckBoxSelection = false,
   height,
-  width = "100%",
   rowHeight = 41,
   numerOfRowsPerPage = 5,
 }) {
   const [selectedRows, setSelectedRows] = useState([]);
 
+  // Ajusta a largurada das colunas consoante a resolução do ecrão, mas nunca fica menos que o seu minWidth
+  const columnsWithFlexAndMinWidth = columns.map((column) => ({
+    ...column,
+    flex: 1,
+    minWidth: column.width,
+  }));
+
   return (
     <>
       <Card>
         <div
-          style={{ height: rows.length > 0 ? "100%" : height, width: width }}
+          style={{ height: rows.length > 0 ? "100%" : height, width: "100%" }}
         >
           <DataGrid
             rows={rows}
-            columns={columns}
+            columns={columnsWithFlexAndMinWidth}
             initialState={{
               pagination: {
                 paginationModel: { page: 0, pageSize: numerOfRowsPerPage },
@@ -48,6 +54,9 @@ export default function CompleteTable({
                 color: "#1F4576",
                 fontWeight: 11,
                 fontSize: "0.875rem",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
               },
               // contorno aquando a seleção da célula
               "& .MuiDataGrid-cell.MuiDataGrid-cell:focus": {
