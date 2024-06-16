@@ -33,6 +33,7 @@ export default function SendInvitation() {
   const [invitationError, setInvitationError] = useState("");
   const [deleteSuccessMessage, setDeleteSuccessMessage] = useState("");
   const [invitationEmailSuccess, setInvitationEmailSuccess] = useState("");
+  const [alreadyInvitedEmails, setAlreadyInvitedEmails] = useState([]);
 
   const columns = [
     { field: "recipient", headerName: "Recipient", width: 200 },
@@ -82,7 +83,7 @@ export default function SendInvitation() {
           headers: {
             "Content-type": "application/json; charset=UTF-8",
           },
-          credentials: "include", // Ensure cookies are sent with the request if needed
+          credentials: "include",
         }
       );
       if (!response.ok) {
@@ -151,26 +152,27 @@ export default function SendInvitation() {
     setInvitationError("");
     setDeleteError("");
     setInvitationEmailSuccess("");
-  
+    setAlreadyInvitedEmails([]); // Reset the state for already invited emails
+
     if (!role) {
       setRoleError("You must select a role!");
       return;
     }
-  
+
     if (!emails) {
       setEmailError("You must enter recipients!");
       return;
     }
-  
+
     const emailList = emails.split(",").map((email) => email.trim());
-  
+
     const invalidEmails = emailList.filter((email) => !emailRegex.test(email));
-  
+
     if (invalidEmails.length > 0) {
       setEmailError("Invalid email format: " + invalidEmails.join(", "));
       return;
     }
-  
+
     // Send the list of emails to the backend
     try {
       const response = await fetch(
@@ -189,10 +191,15 @@ export default function SendInvitation() {
           }),
         }
       );
-  
+
       if (response.ok) {
         const data = await response.json();
         setInvitationEmailSuccess(data.message);
+
+        if (data.alreadyInvited && data.alreadyInvited.length > 0) {
+          setAlreadyInvitedEmails(data.alreadyInvited);
+        }
+
         // Update table data after sending invitations
         getData(); // Assuming getData function fetches updated data
       } else {
@@ -216,9 +223,12 @@ export default function SendInvitation() {
               Send Invitation
             </MDTypography>
             <MDTypography ml={2} variant="body2">
-            On this page you can send invites so new members can join your conference, you can send an email to multiple users, each one will have a different code. 
-            Make sure to choose the role you want the user's to have. After sending the invitation, in case there was an error or you sent to the incorrect user, 
-            you can always delete the invitation if it has not been already used.
+              On this page you can send invites so new members can join your
+              conference, you can send an email to multiple users, each one will
+              have a different code. Make sure to choose the role you want the
+              user's to have. After sending the invitation, in case there was an
+              error or you sent to the incorrect user, you can always delete the
+              invitation if it has not been already used.
             </MDTypography>
           </Card>
           <Card sx={{ mt: 3, p: 3 }}>
@@ -227,6 +237,12 @@ export default function SendInvitation() {
             )}
             {invitationError && (
               <Alert severity="error">{invitationError}</Alert>
+            )}
+            {alreadyInvitedEmails.length > 0 && (
+              <Alert severity="info">
+                The following emails have already received an invitation:{" "}
+                {alreadyInvitedEmails.join(", ")}
+              </Alert>
             )}
             <Box component="form" onSubmit={handleSendInvitation} noValidate>
               <FormControl

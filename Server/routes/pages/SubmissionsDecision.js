@@ -126,7 +126,7 @@ router.post("/acceptOrRejectDecision", auth.ensureAuthenticated, async (req, res
     const emailSubject = `Submission Status Update`;
     const submissiontitle = submissionDetailsResult.rows[0].submissiontitle;
     
-    // Collect all email addresses
+    
     const emailAddresses = submissionDetailsResult.rows.map(row => row.authoremail);
     const toEmails = emailAddresses.join(", ");
 
