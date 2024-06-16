@@ -203,7 +203,13 @@ export default function SendInvitation() {
         // Update table data after sending invitations
         getData(); // Assuming getData function fetches updated data
       } else {
-        throw new Error("Failed to send invitations");
+        const data = await response.json();
+        if (data.alreadyInvited && data.alreadyInvited.length > 0) {
+          setAlreadyInvitedEmails(data.alreadyInvited);
+          setInvitationError(data.message);
+        } else {
+          throw new Error("Failed to send invitations");
+        }
       }
     } catch (error) {
       console.error("Error sending invitations:", error);

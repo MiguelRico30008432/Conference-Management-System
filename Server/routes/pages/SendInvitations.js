@@ -21,7 +21,7 @@ router.post(
     const confInfo = await db.fetchData("conferences", "confID", confID);
     const confName = confInfo[0].confname;
 
-    
+    // Check for existing invitations
     const { alreadyInvited, newRecipients } = await checkExistingInvitations(confID, recipients);
 
     if (newRecipients.length === 0) {
