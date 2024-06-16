@@ -20,17 +20,19 @@ import Footer from "OurComponents/footer/Footer";
 import { handleDownload } from "OurFunctions/DownloadFile";
 
 export default function MyBiddingPage() {
-  const { confID } = useContext(ConferenceContext);
+  const { confID, confPhase } = useContext(ConferenceContext);
   const { user, isLoggedIn } = useContext(AuthContext);
   const [message, setMessage] = useState(null);
   const [openLoading, setOpenLoading] = useState(false);
   const [rows, setRows] = useState([]);
+  const [columns, setColumns] = useState([]);
 
   //O use effect não tem a função defina dentro do mesmo para, na função handleSubmit;
   //poder ser chamada fetchUserBiddings() sem dar refresh a pagina
   useEffect(() => {
     if (isLoggedIn && confID) {
       fetchUserBiddings();
+      constructColumns();
     }
   }, [confID, isLoggedIn]);
 
@@ -71,106 +73,197 @@ export default function MyBiddingPage() {
     setOpenLoading(false);
   }
 
-  const columns = [
-    // Nome da Submission
-    { field: "submissiontitle", headerName: "Submission Title", width: 400 },
-    // Botão para fazer download da submissão
-    {
-      field: "download",
-      filterable: false,
-      headerName: "",
-      description: "",
-      sortable: false,
-      disableColumnMenu: true,
-      resizable: false,
-      width: 250,
-      renderCell: (params) => {
-        return (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-            }}
-          >
-            <MDButton
-              variant="gradient"
-              color="warning"
-              onClick={() => {
-                const submission = {
-                  id: params.row.biddingsubmissionid,
-                  title: params.row.submissiontitle,
-                };
+  function constructColumns() {
+    if (confPhase === "Bidding") {
+      setColumns([
+        // Nome da Submission
+        {
+          field: "submissiontitle",
+          headerName: "Submission Title",
+          width: 400,
+        },
+        // Botão para fazer download da submissão
+        {
+          field: "download",
+          filterable: false,
+          headerName: "",
+          description: "",
+          sortable: false,
+          disableColumnMenu: true,
+          resizable: false,
+          width: 250,
+          renderCell: (params) => {
+            return (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              >
+                <MDButton
+                  variant="gradient"
+                  color="warning"
+                  onClick={() => {
+                    const submission = {
+                      id: params.row.biddingsubmissionid,
+                      title: params.row.submissiontitle,
+                    };
 
-                handleDownload(submission, setMessage, setOpenLoading);
-              }}
-              sx={{
-                maxWidth: "120px",
-                maxHeight: "23px",
-                minWidth: "30px",
-                minHeight: "23px",
-              }}
+                    handleDownload(submission, setMessage, setOpenLoading);
+                  }}
+                  sx={{
+                    maxWidth: "120px",
+                    maxHeight: "23px",
+                    minWidth: "30px",
+                    minHeight: "23px",
+                  }}
+                >
+                  Download File
+                </MDButton>
+              </div>
+            );
+          },
+        },
+        // Campo para descrever de 0-5 o nivel de confiança em avaliar a submissão
+        {
+          field: "biddingconfidence",
+          headerName: "Confidence Level",
+          width: 150,
+          editable: true,
+          sortable: false,
+          disableColumnMenu: true,
+          resizable: false,
+          renderCell: (params) => (
+            <Select
+              value={params.value}
+              onChange={(event) => handleConfidenceChange(event, params)}
+              style={{ width: "100%" }}
             >
-              Download File
-            </MDButton>
-          </div>
-        );
-      },
-    },
-    // Campo para descrever de 0-5 o nivel de confiança em avaliar a submissão
-    {
-      field: "biddingconfidence",
-      headerName: "Confidence Level",
-      width: 150,
-      editable: true,
-      sortable: false,
-      disableColumnMenu: true,
-      resizable: false,
-      renderCell: (params) => (
-        <Select
-          value={params.value}
-          onChange={(event) => handleConfidenceChange(event, params)}
-          style={{ width: "100%" }}
-        >
-          {[1, 2, 3, 4, 5].map((value) => (
-            <MenuItem key={value} value={value}>
-              {value}
-            </MenuItem>
-          ))}
-        </Select>
-      ),
-    },
-    // Checkbox para assinalar caso queira fazer bidding pela submissão
-    {
-      field: "Edit",
-      headerName: "Edit",
-      sortable: false,
-      disableColumnMenu: true,
-      resizable: false,
-      width: 150,
-      renderCell: (params) => (
-        <Checkbox
-          checked={params.value}
-          onChange={(event) => handleCheckboxChange(event, params)}
-        />
-      ),
-    },
-    {
-      field: "",
-      headerName: "Delete",
-      sortable: false,
-      disableColumnMenu: true,
-      resizable: false,
-      width: 150,
-      renderCell: (params) => (
-        <Checkbox
-          checked={params.value}
-          onChange={(event) => handleDeleteCheckboxChange(event, params)}
-        />
-      ),
-    },
-  ];
+              {[1, 2, 3, 4, 5].map((value) => (
+                <MenuItem key={value} value={value}>
+                  {value}
+                </MenuItem>
+              ))}
+            </Select>
+          ),
+        },
+        // Checkbox para assinalar caso queira fazer bidding pela submissão
+        {
+          field: "Edit",
+          headerName: "Edit",
+          sortable: false,
+          disableColumnMenu: true,
+          resizable: false,
+          width: 150,
+          renderCell: (params) => {
+            return (
+              <Checkbox
+                checked={params.value}
+                onChange={(event) => handleCheckboxChange(event, params)}
+              />
+            );
+          },
+        },
+        {
+          field: "",
+          headerName: "Delete",
+          sortable: false,
+          disableColumnMenu: true,
+          resizable: false,
+          width: 150,
+          renderCell: (params) => {
+            if (confPhase !== "Bidding") return null;
+
+            return (
+              <Checkbox
+                checked={params.value}
+                onChange={(event) => handleDeleteCheckboxChange(event, params)}
+              />
+            );
+          },
+        },
+      ]);
+    } else {
+      setColumns([
+        // Nome da Submission
+        {
+          field: "submissiontitle",
+          headerName: "Submission Title",
+          width: 400,
+        },
+        // Botão para fazer download da submissão
+        {
+          field: "download",
+          filterable: false,
+          headerName: "",
+          description: "",
+          sortable: false,
+          disableColumnMenu: true,
+          resizable: false,
+          width: 250,
+          renderCell: (params) => {
+            return (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              >
+                <MDButton
+                  variant="gradient"
+                  color="warning"
+                  onClick={() => {
+                    const submission = {
+                      id: params.row.biddingsubmissionid,
+                      title: params.row.submissiontitle,
+                    };
+
+                    handleDownload(submission, setMessage, setOpenLoading);
+                  }}
+                  sx={{
+                    maxWidth: "120px",
+                    maxHeight: "23px",
+                    minWidth: "30px",
+                    minHeight: "23px",
+                  }}
+                >
+                  Download File
+                </MDButton>
+              </div>
+            );
+          },
+        },
+        // Campo para descrever de 0-5 o nivel de confiança em avaliar a submissão
+        {
+          field: "biddingconfidence",
+          headerName: "Confidence Level",
+          width: 150,
+          editable: true,
+          sortable: false,
+          disableColumnMenu: true,
+          resizable: false,
+          renderCell: (params) => (
+            <Select
+              value={params.value}
+              disabled={true}
+              onChange={(event) => handleConfidenceChange(event, params)}
+              style={{ width: "100%" }}
+            >
+              {[1, 2, 3, 4, 5].map((value) => (
+                <MenuItem key={value} value={value}>
+                  {value}
+                </MenuItem>
+              ))}
+            </Select>
+          ),
+        },
+      ]);
+    }
+  }
 
   async function handleSubmit() {
     const selectedRows = rows.filter((row) => row.bidding);

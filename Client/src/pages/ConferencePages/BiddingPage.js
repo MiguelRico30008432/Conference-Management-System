@@ -18,21 +18,25 @@ import MenuItem from "@mui/material/MenuItem";
 import Checkbox from "@mui/material/Checkbox";
 import Footer from "OurComponents/footer/Footer";
 import { handleDownload } from "OurFunctions/DownloadFile";
+import BlockPageForConfStatus from "OurComponents/errorHandling/BlockPageForConfStatus";
 
 export default function BiddingPage() {
-  const { confID } = useContext(ConferenceContext);
+  const { confID, confPhase } = useContext(ConferenceContext);
   const { user, isLoggedIn } = useContext(AuthContext);
 
   const [message, setMessage] = useState(null);
   const [openLoading, setOpenLoading] = useState(false);
   const [rows, setRows] = useState([]);
+  const [blockCrud, setBlockCrud] = useState(false);
 
   //O use effect não tem a função defina dentro do mesmo para, na função handleSubmit;
   //poder ser chamada fetchAllSubmissionsForBidding() sem dar refresh a pagina
   useEffect(() => {
-    if (isLoggedIn && confID) {
+    if (isLoggedIn && confID && confPhase === "Bidding") {
       fetchAllSubmissionsForBidding();
     }
+
+    if (confPhase !== "Submission") setBlockCrud(true);
   }, [confID, isLoggedIn]);
 
   async function fetchAllSubmissionsForBidding() {
@@ -224,49 +228,63 @@ export default function BiddingPage() {
       <DashboardLayout>
         <ConfNavbar />
         <Container maxWidth="sm">
-          <MDBox mt={10} mb={2} textAlign="left">
-            <MDBox mb={3} textAlign="left">
-              <Card>
-                <MDTypography ml={2} variant="h6">
-                  Bidding Process
-                </MDTypography>
-                <MDTypography ml={2} variant="body2">
-                  In this page you are able to choose wich submissions you wish
-                  to review and attribute a value to how confortable you are
-                  around the subject.<br></br>
-                  After clicking submit, submissions with the checkbox clicked,
-                  will stop showing up and will be visible in My Biddings page.
-                </MDTypography>
-              </Card>
-            </MDBox>
-          </MDBox>
-          {message}
-          <MDBox mt={2} mb={2} textAlign="left">
-            <MDBox mb={3} textAlign="left"></MDBox>
-            <MDButton
-              variant="gradient"
-              color="success"
-              onClick={handleSubmit}
-              sx={{
-                maxWidth: "90px",
-                maxHeight: "40px",
-                minWidth: "30px",
-                minHeight: "30px",
-                marginBottom: "10px",
-                marginLeft: "10px",
-              }}
-            >
-              Submit
-            </MDButton>
-            <Card>
-              <CompleteTable
-                columns={columns}
-                rows={rows}
-                numberOfRowsPerPage={100}
-                height={200}
+          {!blockCrud && (
+            <>
+              <MDBox mt={10} mb={2} textAlign="left">
+                <MDBox mb={3} textAlign="left">
+                  <Card>
+                    <MDTypography ml={2} variant="h6">
+                      Bidding Process
+                    </MDTypography>
+                    <MDTypography ml={2} variant="body2">
+                      In this page you are able to choose wich submissions you
+                      wish to review and attribute a value to how confortable
+                      you are around the subject.<br></br>
+                      After clicking submit, submissions with the checkbox
+                      clicked, will stop showing up and will be visible in My
+                      Biddings page.
+                    </MDTypography>
+                  </Card>
+                </MDBox>
+              </MDBox>
+              {message}
+              <MDBox mt={2} mb={2} textAlign="left">
+                <MDBox mb={3} textAlign="left"></MDBox>
+                <MDButton
+                  variant="gradient"
+                  color="success"
+                  onClick={handleSubmit}
+                  sx={{
+                    maxWidth: "90px",
+                    maxHeight: "40px",
+                    minWidth: "30px",
+                    minHeight: "30px",
+                    marginBottom: "10px",
+                    marginLeft: "10px",
+                  }}
+                >
+                  Submit
+                </MDButton>
+                <Card>
+                  <CompleteTable
+                    columns={columns}
+                    rows={rows}
+                    numberOfRowsPerPage={100}
+                    height={200}
+                  />
+                </Card>
+              </MDBox>
+            </>
+          )}
+          {blockCrud && (
+            <>
+              <BlockPageForConfStatus
+                text={
+                  "It seems that this conference is no longer in the bidding phase"
+                }
               />
-            </Card>
-          </MDBox>
+            </>
+          )}
         </Container>
         <Footer />
       </DashboardLayout>

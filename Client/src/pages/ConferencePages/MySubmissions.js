@@ -35,7 +35,7 @@ export default function MySubmissionsPage() {
   useEffect(() => {
     async function fetchSubmissions() {
       setOpenLoading(true);
-  
+
       if (confID && user) {
         try {
           const update = await fetch(
@@ -51,13 +51,13 @@ export default function MySubmissionsPage() {
               }),
             }
           );
-  
+
           const updateResponse = await update.json();
-  
+
           if (update.status === 200) {
             setSubUpdate(updateResponse[0].update);
           }
-  
+
           const response = await fetch(
             `${process.env.REACT_APP_API_URL}/mySubmissions`,
             {
@@ -72,9 +72,9 @@ export default function MySubmissionsPage() {
               }),
             }
           );
-  
+
           const jsonResponse = await response.json();
-  
+
           if (response.ok) {
             const transformedData = jsonResponse.map((submission) => ({
               id: submission.id,
@@ -95,7 +95,7 @@ export default function MySubmissionsPage() {
       }
       setOpenLoading(false);
     }
-  
+
     if (user && confID) {
       fetchSubmissions();
     }

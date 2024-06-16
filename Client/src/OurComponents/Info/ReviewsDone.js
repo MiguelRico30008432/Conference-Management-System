@@ -29,6 +29,7 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
   const [error, setError] = useState(null);
   const [popMessage, setPopMessage] = useState(false);
   const [deletePopMessage, setDeletePopMessage] = useState(false);
+  const [blockCrud, setBlockCrud] = useState(false);
 
   useEffect(() => {
     async function fetchSingleReviews() {
@@ -57,6 +58,7 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
     }
 
     if (assignmentID) fetchSingleReviews();
+    if (confPhase !== "Review") setBlockCrud(true);
   }, [assignmentID]);
 
   useEffect(() => {
@@ -236,58 +238,62 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
           Close Review
         </MDButton>
 
-        {!addReviewActive && !hideButton && (
+        {!blockCrud && (
           <>
-            <MDButton
-              variant="gradient"
-              color="info"
-              onClick={updateReview}
-              sx={{
-                maxWidth: "145px",
-                maxHeight: "30px",
-                minWidth: "5px",
-                minHeight: "30px",
-                ml: 2,
-                mb: 2,
-              }}
-            >
-              Update Review
-            </MDButton>
+            {!addReviewActive && !hideButton && (
+              <>
+                <MDButton
+                  variant="gradient"
+                  color="info"
+                  onClick={updateReview}
+                  sx={{
+                    maxWidth: "145px",
+                    maxHeight: "30px",
+                    minWidth: "5px",
+                    minHeight: "30px",
+                    ml: 2,
+                    mb: 2,
+                  }}
+                >
+                  Update Review
+                </MDButton>
 
-            <MDButton
-              variant="gradient"
-              color="error"
-              onClick={() => setDeletePopMessage(true)}
-              sx={{
-                maxWidth: "145px",
-                maxHeight: "30px",
-                minWidth: "5px",
-                minHeight: "30px",
-                ml: 2,
-                mb: 2,
-              }}
-            >
-              Delete Review
-            </MDButton>
+                <MDButton
+                  variant="gradient"
+                  color="error"
+                  onClick={() => setDeletePopMessage(true)}
+                  sx={{
+                    maxWidth: "145px",
+                    maxHeight: "30px",
+                    minWidth: "5px",
+                    minHeight: "30px",
+                    ml: 2,
+                    mb: 2,
+                  }}
+                >
+                  Delete Review
+                </MDButton>
+              </>
+            )}
+
+            {hideButton && (
+              <MDButton
+                variant="gradient"
+                color="success"
+                onClick={async () => await submitReview()}
+                sx={{
+                  maxWidth: "150px",
+                  maxHeight: "30px",
+                  minWidth: "5px",
+                  minHeight: "30px",
+                  ml: 2,
+                  mb: 2,
+                }}
+              >
+                {addReviewActive ? "Add Review" : "Save Review"}
+              </MDButton>
+            )}
           </>
-        )}
-
-        {hideButton && (
-          <MDButton
-            variant="gradient"
-            color="success"
-            onClick={async () => await submitReview()}
-            sx={{
-              maxWidth: "150px",
-              maxHeight: "30px",
-              minWidth: "5px",
-              minHeight: "30px",
-              ml: 2,
-              mb: 2,
-            }}
-          >
-            {addReviewActive ? "Add Review" : "Save Review"}
-          </MDButton>
         )}
 
         <Grid container spacing={2} mb={2}>

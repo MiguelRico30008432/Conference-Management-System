@@ -15,15 +15,18 @@ import LoadingCircle from "OurComponents/loading/LoadingCircle";
 import Footer from "OurComponents/footer/Footer";
 import { v4 as uuidv4 } from "uuid";
 import { Select, FormControl, InputLabel, MenuItem } from "@mui/material";
+import BlockPageForConfStatus from "OurComponents/errorHandling/BlockPageForConfStatus";
 
 export default function Conflicts() {
-  const { confID } = useContext(ConferenceContext);
+  const { confID, confPhase } = useContext(ConferenceContext);
   const { isLoggedIn } = useContext(AuthContext);
+
   const [message, setMessage] = useState(null);
   const [rows, setRows] = useState([]);
   const [rowsToDeclareConflicts, setRowsToDeclareConflicts] = useState([]);
   const [openLoading, setOpenLoading] = useState(false);
   const [declareConflicts, setDeclareConflicts] = useState(false);
+  const [blockCrud, setBlockCrud] = useState(false);
 
   useEffect(() => {
     async function fetchAllConflicts() {
@@ -63,9 +66,11 @@ export default function Conflicts() {
       setOpenLoading(false);
     }
 
-    if (isLoggedIn && confID) {
+    if (isLoggedIn && confID && confPhase === "Bidding") {
       fetchAllConflicts();
     }
+
+    if (confPhase !== "Submission") setBlockCrud(true);
   }, [confID, isLoggedIn]);
 
   async function getInfoForDeclareConflicts() {
@@ -223,110 +228,123 @@ export default function Conflicts() {
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
         <ConfNavbar />
-        {!declareConflicts ? (
-          <Container maxWidth="sm">
-            <MDBox mt={10} mb={2} textAlign="left">
-              <MDBox mb={3} textAlign="left">
-                <Card>
-                  <MDTypography ml={2} variant="h6">
-                    Conflicts of Interest
-                  </MDTypography>
-                  <MDTypography ml={2} variant="body2">
-                    In this page, you will be able to observe the conflicts of
-                    interest present in the conference.
-                    <br />
-                    You will be able to declare conflicts of interest manually,
-                    by clicking the "Declare Conflicts" button.
-                    <br />
-                    There are two ways to run the algorithm that determines the
-                    conflicts:
-                    <br />
-                    - Pressing the "Check for Conflicts" in Administration -&gt;
-                    Conference Settings;
-                    <br />- Automatically when the bidding process begins.
-                  </MDTypography>
-                </Card>
+        {!blockCrud && (
+          <>
+            {!declareConflicts ? (
+              <Container maxWidth="sm">
+                <MDBox mt={10} mb={2} textAlign="left">
+                  <MDBox mb={3} textAlign="left">
+                    <Card>
+                      <MDTypography ml={2} variant="h6">
+                        Conflicts of Interest
+                      </MDTypography>
+                      <MDTypography ml={2} variant="body2">
+                        In this page, you will be able to observe the conflicts
+                        of interest present in the conference.
+                        <br />
+                        You will be able to declare conflicts of interest
+                        manually, by clicking the "Declare Conflicts" button.
+                        <br />
+                        There are two ways to run the algorithm that determines
+                        the conflicts:
+                        <br />
+                        - Pressing the "Check for Conflicts" in Administration
+                        -&gt; Conference Settings;
+                        <br />- Automatically when the bidding process begins.
+                      </MDTypography>
+                    </Card>
 
-                {message && <Alert severity="error">{message}</Alert>}
+                    {message && <Alert severity="error">{message}</Alert>}
 
-                <MDBox mb={3} mt={4} textAlign="left">
-                  <MDButton
-                    variant="gradient"
-                    color="info"
-                    onClick={() => {
-                      getInfoForDeclareConflicts();
-                      setDeclareConflicts(true);
-                    }}
-                    sx={{
-                      maxWidth: "190px",
-                      maxHeight: "40px",
-                      minWidth: "30px",
-                      minHeight: "30px",
-                      marginBottom: "10px",
-                      marginLeft: "10px",
-                    }}
-                  >
-                    Declare Conflicts
-                  </MDButton>
-                  <Card>
-                    <CompleteTable
-                      columns={columns}
-                      rows={rows}
-                      numberOfRowsPerPage={100}
-                      height={200}
-                    />
-                  </Card>
+                    <MDBox mb={3} mt={4} textAlign="left">
+                      <MDButton
+                        variant="gradient"
+                        color="info"
+                        onClick={() => {
+                          getInfoForDeclareConflicts();
+                          setDeclareConflicts(true);
+                        }}
+                        sx={{
+                          maxWidth: "190px",
+                          maxHeight: "40px",
+                          minWidth: "30px",
+                          minHeight: "30px",
+                          marginBottom: "10px",
+                          marginLeft: "10px",
+                        }}
+                      >
+                        Declare Conflicts
+                      </MDButton>
+                      <Card>
+                        <CompleteTable
+                          columns={columns}
+                          rows={rows}
+                          numberOfRowsPerPage={100}
+                          height={200}
+                        />
+                      </Card>
+                    </MDBox>
+                  </MDBox>
                 </MDBox>
-              </MDBox>
-            </MDBox>
-          </Container>
-        ) : (
-          <Container maxWidth="sm">
-            <MDBox mt={10} mb={2} textAlign="left">
-              <MDBox mb={2} textAlign="left">
-                <Card>
-                  <MDTypography ml={2} variant="h6">
-                    Declare Conflicts of Interest
-                  </MDTypography>
-                  <MDTypography ml={2} variant="body2">
-                    Here you are able to declare conflicts of interests present
-                    in the conference.
-                  </MDTypography>
-                </Card>
+              </Container>
+            ) : (
+              <Container maxWidth="sm">
+                <MDBox mt={10} mb={2} textAlign="left">
+                  <MDBox mb={2} textAlign="left">
+                    <Card>
+                      <MDTypography ml={2} variant="h6">
+                        Declare Conflicts of Interest
+                      </MDTypography>
+                      <MDTypography ml={2} variant="body2">
+                        Here you are able to declare conflicts of interests
+                        present in the conference.
+                      </MDTypography>
+                    </Card>
 
-                {message && <Alert severity="error">{message}</Alert>}
+                    {message && <Alert severity="error">{message}</Alert>}
 
-                <MDBox mb={3} mt={4} textAlign="left">
-                  <MDButton
-                    variant="gradient"
-                    color="info"
-                    onClick={() => {
-                      setMessage(null);
-                      setDeclareConflicts(false);
-                    }}
-                    sx={{
-                      maxWidth: "90px",
-                      maxHeight: "40px",
-                      minWidth: "30px",
-                      minHeight: "30px",
-                      marginBottom: "10px",
-                      marginLeft: "10px",
-                    }}
-                  >
-                    Back
-                  </MDButton>
-                  <Card>
-                    <CompleteTable
-                      columns={columsForDeclareConflicts}
-                      rows={rowsToDeclareConflicts}
-                      numberOfRowsPerPage={100}
-                      height={200}
-                    />
-                  </Card>
+                    <MDBox mb={3} mt={4} textAlign="left">
+                      <MDButton
+                        variant="gradient"
+                        color="info"
+                        onClick={() => {
+                          setMessage(null);
+                          setDeclareConflicts(false);
+                        }}
+                        sx={{
+                          maxWidth: "90px",
+                          maxHeight: "40px",
+                          minWidth: "30px",
+                          minHeight: "30px",
+                          marginBottom: "10px",
+                          marginLeft: "10px",
+                        }}
+                      >
+                        Back
+                      </MDButton>
+                      <Card>
+                        <CompleteTable
+                          columns={columsForDeclareConflicts}
+                          rows={rowsToDeclareConflicts}
+                          numberOfRowsPerPage={100}
+                          height={200}
+                        />
+                      </Card>
+                    </MDBox>
+                  </MDBox>
                 </MDBox>
-              </MDBox>
-            </MDBox>
-          </Container>
+              </Container>
+            )}
+          </>
+        )}
+        {blockCrud && (
+          <>
+            <BlockPageForConfStatus
+              text={
+                "It seems that this conference is no longer in the bidding phase"
+              }
+            />
+          </>
         )}
         <Footer />
       </DashboardLayout>

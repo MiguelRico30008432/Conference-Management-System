@@ -13,13 +13,15 @@ import LoadingCircle from "OurComponents/loading/LoadingCircle";
 import Alert from "@mui/material/Alert";
 import MDButton from "components/MDButton";
 import TextField from "@mui/material/TextField";
+import BlockPageForConfStatus from "OurComponents/errorHandling/BlockPageForConfStatus";
 
 export default function CreateSubmission() {
-  const { confID } = useContext(ConferenceContext);
+  const { confID, confPhase } = useContext(ConferenceContext);
   const { user, isLoggedIn } = useContext(AuthContext);
 
   const [openLoading, setOpenLoading] = useState(false);
   const [message, setMessage] = useState(null);
+  const [blockCrud, setBlockCrud] = useState(false);
 
   const [authors, setAuthors] = useState([
     { firstName: "", lastName: "", email: "", affiliation: "" },
@@ -70,9 +72,11 @@ export default function CreateSubmission() {
       setOpenLoading(false);
     }
 
-    if (isLoggedIn && confID) {
+    if (isLoggedIn && confID && confPhase === "Submission") {
       getAuthorData();
     }
+
+    if (confPhase !== "Submission") setBlockCrud(true);
   }, [isLoggedIn, confID]);
 
   async function uploadFile(event) {
@@ -177,226 +181,249 @@ export default function CreateSubmission() {
         <Container maxWidth="sm">
           <MDBox mt={10} mb={2} textAlign="left">
             <MDBox mb={3} textAlign="left">
-              <Card>
-                <MDTypography ml={2} variant="h6">
-                  Create Submission
-                </MDTypography>
-                <MDTypography ml={2} variant="body2">
-                  For each author please fill out the form below.
-                </MDTypography>
-              </Card>
-
-              <Card sx={{ mt: 2 }}>{message}</Card>
-
-              {/*Author Information*/}
-              {authors.map((author, index) =>
-                index === 0 ? (
-                  <Card key={index} sx={{ mt: 2 }}>
-                    <MDTypography ml={2} mt={1} mb={2} variant="body2">
-                      Author {index + 1} Information
+              {!blockCrud && (
+                <>
+                  <Card>
+                    <MDTypography ml={2} variant="h6">
+                      Create Submission
                     </MDTypography>
-
-                    <TextField
-                      name={`firstName${index}`}
-                      required
-                      fullWidth
-                      label="First Name"
-                      autoFocus
-                      value={author.firstName}
-                      disabled={true}
-                      sx={{ ml: 2, mb: 2, width: "30%" }}
-                    />
-
-                    <TextField
-                      name={`lastName${index}`}
-                      required
-                      fullWidth
-                      label="Last Name"
-                      autoFocus
-                      value={author.lastName}
-                      disabled={true}
-                      sx={{ ml: 2, mb: 2, width: "30%" }}
-                    />
-
-                    <TextField
-                      name={`email${index}`}
-                      required
-                      fullWidth
-                      label="Email"
-                      autoComplete="email"
-                      autoFocus
-                      value={author.email}
-                      disabled={true}
-                      sx={{ ml: 2, mb: 2, width: "30%" }}
-                    />
-
-                    <TextField
-                      name={`affiliation${index}`}
-                      required
-                      fullWidth
-                      label="Affiliation"
-                      autoFocus
-                      value={author.affiliation}
-                      disabled={true}
-                      sx={{ ml: 2, mb: 2, width: "30%" }}
-                    />
+                    <MDTypography ml={2} variant="body2">
+                      For each author please fill out the form below.
+                    </MDTypography>
                   </Card>
-                ) : (
-                  <Card key={index} sx={{ mt: 2 }}>
+
+                  <Card sx={{ mt: 2 }}>{message}</Card>
+
+                  {/*Author Information*/}
+                  {authors.map((author, index) =>
+                    index === 0 ? (
+                      <Card key={index} sx={{ mt: 2 }}>
+                        <MDTypography ml={2} mt={1} mb={2} variant="body2">
+                          Author {index + 1} Information
+                        </MDTypography>
+
+                        <TextField
+                          name={`firstName${index}`}
+                          required
+                          fullWidth
+                          label="First Name"
+                          autoFocus
+                          value={author.firstName}
+                          disabled={true}
+                          sx={{ ml: 2, mb: 2, width: "30%" }}
+                        />
+
+                        <TextField
+                          name={`lastName${index}`}
+                          required
+                          fullWidth
+                          label="Last Name"
+                          autoFocus
+                          value={author.lastName}
+                          disabled={true}
+                          sx={{ ml: 2, mb: 2, width: "30%" }}
+                        />
+
+                        <TextField
+                          name={`email${index}`}
+                          required
+                          fullWidth
+                          label="Email"
+                          autoComplete="email"
+                          autoFocus
+                          value={author.email}
+                          disabled={true}
+                          sx={{ ml: 2, mb: 2, width: "30%" }}
+                        />
+
+                        <TextField
+                          name={`affiliation${index}`}
+                          required
+                          fullWidth
+                          label="Affiliation"
+                          autoFocus
+                          value={author.affiliation}
+                          disabled={true}
+                          sx={{ ml: 2, mb: 2, width: "30%" }}
+                        />
+                      </Card>
+                    ) : (
+                      <Card key={index} sx={{ mt: 2 }}>
+                        <MDTypography ml={2} mt={1} mb={2} variant="body2">
+                          Author {index + 1} Information
+                        </MDTypography>
+
+                        <TextField
+                          name={`firstName${index}`}
+                          required
+                          fullWidth
+                          label="First Name"
+                          autoFocus
+                          value={author.firstName}
+                          onChange={(e) =>
+                            handleInputChange(
+                              index,
+                              "firstName",
+                              e.target.value
+                            )
+                          }
+                          sx={{ ml: 2, mb: 2, width: "30%" }}
+                        />
+
+                        <TextField
+                          name={`lastName${index}`}
+                          required
+                          fullWidth
+                          label="Last Name"
+                          autoFocus
+                          value={author.lastName}
+                          onChange={(e) =>
+                            handleInputChange(index, "lastName", e.target.value)
+                          }
+                          sx={{ ml: 2, mb: 2, width: "30%" }}
+                        />
+
+                        <TextField
+                          name={`email${index}`}
+                          required
+                          fullWidth
+                          label="Email"
+                          autoComplete="email"
+                          autoFocus
+                          onChange={(e) =>
+                            handleInputChange(index, "email", e.target.value)
+                          }
+                          sx={{ ml: 2, mb: 2, width: "30%" }}
+                        />
+
+                        <TextField
+                          name={`affiliation${index}`}
+                          required
+                          fullWidth
+                          label="Affiliation"
+                          autoFocus
+                          onChange={(e) =>
+                            handleInputChange(
+                              index,
+                              "affiliation",
+                              e.target.value
+                            )
+                          }
+                          sx={{ ml: 2, mb: 2, width: "30%" }}
+                        />
+
+                        <MDButton
+                          variant="outlined"
+                          color="error"
+                          onClick={() => removeAuthor(index)}
+                          sx={{ mt: 2, ml: 2, mb: 2, width: "30%" }}
+                        >
+                          Remove Author
+                        </MDButton>
+                      </Card>
+                    )
+                  )}
+
+                  <MDButton
+                    variant="gradient"
+                    color="info"
+                    onClick={addAuthor}
+                    sx={{
+                      maxWidth: "130px",
+                      maxHeight: "35px",
+                      minWidth: "1px",
+                      minHeight: "30px",
+                      mt: 2,
+                      mb: 2,
+                    }}
+                  >
+                    Add Author
+                  </MDButton>
+
+                  {/*Title and abstract*/}
+                  <Card sx={{ mt: 2 }}>
                     <MDTypography ml={2} mt={1} mb={2} variant="body2">
-                      Author {index + 1} Information
+                      Title and Abstract
                     </MDTypography>
-
                     <TextField
-                      name={`firstName${index}`}
+                      name="title"
                       required
                       fullWidth
-                      label="First Name"
+                      id="title"
+                      label="Title"
                       autoFocus
-                      value={author.firstName}
-                      onChange={(e) =>
-                        handleInputChange(index, "firstName", e.target.value)
-                      }
-                      sx={{ ml: 2, mb: 2, width: "30%" }}
+                      onChange={(e) => setTitle(e.target.value)}
+                      sx={{ ml: 2, width: "80%" }}
                     />
-
-                    <TextField
-                      name={`lastName${index}`}
-                      required
-                      fullWidth
-                      label="Last Name"
-                      autoFocus
-                      value={author.lastName}
-                      onChange={(e) =>
-                        handleInputChange(index, "lastName", e.target.value)
-                      }
-                      sx={{ ml: 2, mb: 2, width: "30%" }}
-                    />
-
-                    <TextField
-                      name={`email${index}`}
-                      required
-                      fullWidth
-                      label="Email"
-                      autoComplete="email"
-                      autoFocus
-                      onChange={(e) =>
-                        handleInputChange(index, "email", e.target.value)
-                      }
-                      sx={{ ml: 2, mb: 2, width: "30%" }}
-                    />
-
-                    <TextField
-                      name={`affiliation${index}`}
-                      required
-                      fullWidth
-                      label="Affiliation"
-                      autoFocus
-                      onChange={(e) =>
-                        handleInputChange(index, "affiliation", e.target.value)
-                      }
-                      sx={{ ml: 2, mb: 2, width: "30%" }}
-                    />
-
-                    <MDButton
-                      variant="outlined"
-                      color="error"
-                      onClick={() => removeAuthor(index)}
-                      sx={{ mt: 2, ml: 2, mb: 2, width: "30%" }}
+                    <MDBox
+                      sx={{
+                        "& textarea": {
+                          width: "80%",
+                          padding: "18.5px 14px",
+                          fontSize: "0.9rem",
+                          fontFamily:
+                            '"Roboto", "Helvetica", "Arial", sans-serif',
+                          border: "1px solid #c4c4c4",
+                          borderRadius: "4px",
+                          resize: "vertical",
+                          marginTop: "8px",
+                          ml: 2,
+                          mb: 2,
+                        },
+                      }}
                     >
-                      Remove Author
-                    </MDButton>
+                      <MDBox ml={2} mb={2} textAlign="left"></MDBox>
+                      <textarea
+                        id="subject"
+                        placeholder="Enter your abstract here*"
+                        onChange={(e) => setAbstract(e.target.value)}
+                      />
+                    </MDBox>
                   </Card>
-                )
+
+                  {/*Upload File*/}
+                  <Card sx={{ mt: 2 }}>
+                    <MDTypography ml={2} mt={1} mb={2} variant="body2">
+                      Upload File
+                    </MDTypography>
+
+                    <MDBox ml={2} mb={2} textAlign="left">
+                      <input
+                        type="file"
+                        className="form-control"
+                        placeholder="file"
+                        ref={fileInput}
+                      />
+                    </MDBox>
+                  </Card>
+
+                  <MDButton
+                    variant="gradient"
+                    color="success"
+                    onClick={async (event) => uploadFile(event)}
+                    sx={{
+                      maxWidth: "60px",
+                      maxHeight: "30px",
+                      minWidth: "5px",
+                      minHeight: "30px",
+                      mt: 2,
+                      mb: 2,
+                    }}
+                  >
+                    Submit
+                  </MDButton>
+                </>
               )}
 
-              <MDButton
-                variant="gradient"
-                color="info"
-                onClick={addAuthor}
-                sx={{
-                  maxWidth: "130px",
-                  maxHeight: "35px",
-                  minWidth: "1px",
-                  minHeight: "30px",
-                  mt: 2,
-                  mb: 2,
-                }}
-              >
-                Add Author
-              </MDButton>
-
-              {/*Title and abstract*/}
-              <Card sx={{ mt: 2 }}>
-                <MDTypography ml={2} mt={1} mb={2} variant="body2">
-                  Title and Abstract
-                </MDTypography>
-                <TextField
-                  name="title"
-                  required
-                  fullWidth
-                  id="title"
-                  label="Title"
-                  autoFocus
-                  onChange={(e) => setTitle(e.target.value)}
-                  sx={{ ml: 2, width: "80%" }}
-                />
-                <MDBox
-                  sx={{
-                    "& textarea": {
-                      width: "80%",
-                      padding: "18.5px 14px",
-                      fontSize: "0.9rem",
-                      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-                      border: "1px solid #c4c4c4",
-                      borderRadius: "4px",
-                      resize: "vertical",
-                      marginTop: "8px",
-                      ml: 2,
-                      mb: 2,
-                    },
-                  }}
-                >
-                  <MDBox ml={2} mb={2} textAlign="left"></MDBox>
-                  <textarea
-                    id="subject"
-                    placeholder="Enter your abstract here*"
-                    onChange={(e) => setAbstract(e.target.value)}
+              {blockCrud && (
+                <>
+                  <BlockPageForConfStatus
+                    text={
+                      "It seems that this conference is no longer in the submission phase"
+                    }
                   />
-                </MDBox>
-              </Card>
-
-              {/*Upload File*/}
-              <Card sx={{ mt: 2 }}>
-                <MDTypography ml={2} mt={1} mb={2} variant="body2">
-                  Upload File
-                </MDTypography>
-
-                <MDBox ml={2} mb={2} textAlign="left">
-                  <input
-                    type="file"
-                    className="form-control"
-                    placeholder="file"
-                    ref={fileInput}
-                  />
-                </MDBox>
-              </Card>
-
-              <MDButton
-                variant="gradient"
-                color="success"
-                onClick={async (event) => uploadFile(event)}
-                sx={{
-                  maxWidth: "60px",
-                  maxHeight: "30px",
-                  minWidth: "5px",
-                  minHeight: "30px",
-                  mt: 2,
-                  mb: 2,
-                }}
-              >
-                Submit
-              </MDButton>
+                </>
+              )}
             </MDBox>
           </MDBox>
         </Container>
