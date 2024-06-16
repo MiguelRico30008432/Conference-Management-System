@@ -104,39 +104,39 @@ router.post("/acceptOrRejectDecision", auth.ensureAuthenticated, async (req, res
     // Execute the update query
     await db.pool.query(queryText, [submissionId]);
 
-    // Fetch submission and main author details
+    // Fetch submission and all author details
     const submissionDetailsQuery = `
       SELECT 
         submissions.submissiontitle,
-        users.userfirstname,
-        users.userlastname,
-        users.useremail
+        authors.authoremail 
       FROM 
         submissions
       LEFT JOIN 
-        users ON submissions.submissionmainauthor = users.userid
+        authors ON submissions.submissionid = authors.submissionid
       WHERE 
         submissions.submissionid = $1;
     `;
 
     const submissionDetailsResult = await db.pool.query(submissionDetailsQuery, [submissionId]);
-    const submissionDetails = submissionDetailsResult.rows[0];
 
-    if (!submissionDetails) {
+    if (submissionDetailsResult.rows.length === 0) {
       return res.status(404).send({ msg: "Submission or author not found." });
     }
 
-    const { submissiontitle, userfirstname, userlastname, useremail } = submissionDetails;
-    const userName = `${userfirstname} ${userlastname}`;
     const emailSubject = `Submission Status Update`;
+    const submissiontitle = submissionDetailsResult.rows[0].submissiontitle;
+    
+    // Collect all email addresses
+    const emailAddresses = submissionDetailsResult.rows.map(row => row.authoremail);
+    const toEmails = emailAddresses.join(", ");
+
     const replacements = {
-      userName: userName,
       submissionTitle: submissiontitle,
       actionTaken: actionTaken
     };
 
-    // Send email notification
-    email.sendEmail(useremail, emailSubject, replacements, "emailSubmission.html", (error, info) => {
+    // Send email notification to all authors at once
+    email.sendEmail(toEmails, emailSubject, replacements, "emailSubmission.html", (error, info) => {
       if (error) {
         console.error("Error sending email:", error);
       } else {
