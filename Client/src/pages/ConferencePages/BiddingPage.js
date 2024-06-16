@@ -36,7 +36,7 @@ export default function BiddingPage() {
       fetchAllSubmissionsForBidding();
     }
 
-    if (confPhase !== "Submission") setBlockCrud(true);
+    if (confPhase !== "Bidding") setBlockCrud(true);
   }, [confID, isLoggedIn]);
 
   async function fetchAllSubmissionsForBidding() {
