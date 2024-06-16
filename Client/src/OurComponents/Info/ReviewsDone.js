@@ -16,7 +16,7 @@ import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
 
 export default function ReviewsDone({ assignmentID, title, onClose }) {
   const { user } = useContext(AuthContext);
-  const { confPhase } = useContext(ConferenceContext);
+  const { confID, confPhase } = useContext(ConferenceContext);
 
   const [abstract, setAbstract] = useState(null);
   const [review, setReview] = useState("");
@@ -79,6 +79,8 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
           "POST",
           {
             addNew: addReviewActive,
+            confid: confID,
+            responsibleUser: user,
             assignmentid: assignmentID,
             reviewgrade: review.reviewgrade,
             reviewtext: review.reviewtext,
@@ -111,6 +113,8 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
       "POST",
       {
         assignmentid: assignmentID,
+        confid: confID,
+        responsibleUser: user,
       },
       setError,
       setOpenLoading
