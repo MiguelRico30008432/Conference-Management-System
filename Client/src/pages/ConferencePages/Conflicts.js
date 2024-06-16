@@ -70,7 +70,7 @@ export default function Conflicts() {
       fetchAllConflicts();
     }
 
-    if (confPhase !== "Submission") setBlockCrud(true);
+    if (confPhase !== "Bidding") setBlockCrud(true);
   }, [confID, isLoggedIn]);
 
   async function getInfoForDeclareConflicts() {
