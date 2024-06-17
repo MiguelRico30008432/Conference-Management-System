@@ -17,6 +17,7 @@ import { FormControl, MenuItem, Select } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
+import ModalInfo from "OurComponents/Modal/ModalInfo";
 
 export default function ComitteeManagementPage() {
   const { confID, userRole } = useContext(ConferenceContext);
@@ -118,10 +119,10 @@ export default function ComitteeManagementPage() {
                 setInfoOpen(true);
               }}
               sx={{
-                maxWidth: "20px",
-                maxHeight: "30px",
+                maxWidth: "10px",
+                maxHeight: "20px",
                 minWidth: "5px",
-                minHeight: "30px",
+                minHeight: "5px",
               }}
             >
               Info
@@ -164,10 +165,10 @@ export default function ComitteeManagementPage() {
                 setEditOpen(true);
               }}
               sx={{
-                maxWidth: "20px",
-                maxHeight: "30px",
+                maxWidth: "10px",
+                maxHeight: "20px",
                 minWidth: "5px",
-                minHeight: "30px",
+                minHeight: "5px",
               }}
             >
               Edit
@@ -207,9 +208,9 @@ export default function ComitteeManagementPage() {
               }}
               sx={{
                 maxWidth: "100px",
-                maxHeight: "30px",
-                minWidth: "30px",
-                minHeight: "30px",
+                maxHeight: "20px",
+                minWidth: "5px",
+                minHeight: "5px",
               }}
             >
               Remove User
@@ -327,7 +328,7 @@ export default function ComitteeManagementPage() {
                   <CompleteTable
                     columns={columns}
                     rows={rows}
-                    numerOfRowsPerPage={5}
+                    numerOfRowsPerPage={10}
                     height={350}
                   />
                 </Card>
@@ -335,158 +336,155 @@ export default function ComitteeManagementPage() {
 
               {/* Quanto info for clicado */}
               {infoOpen && (
-                <MDBox mb={3}>
-                  <Card>
-                    <MDTypography ml={2} mb={2} mt={2} variant="h6">
-                      Information about {memberName}
-                    </MDTypography>
-
-                    <MDBox ml={2} mb={1}>
-                      <MDTypography variant="body2">
-                        <b>First name: </b>
-                        {memberInfoData.userfirstname}
-                      </MDTypography>
-
-                      <MDTypography variant="body2">
-                        <b>Last name: </b> {memberInfoData.userlastname}
-                      </MDTypography>
-
-                      <MDTypography variant="body2">
-                        <b>Email: </b> {memberInfoData.useremail}
-                      </MDTypography>
-
-                      <MDTypography variant="body2">
-                        <b>Phone: </b> {memberInfoData.userphone}
-                      </MDTypography>
-
-                      <MDTypography variant="body2">
-                        <b>Affiliation: </b> {memberInfoData.useraffiliation}
-                      </MDTypography>
-
-                      <MDTypography variant="body2">
-                        <b>Created Date: </b> {memberInfoData.useradddate}
-                      </MDTypography>
-
-                      <MDTypography mt={2} variant="body2">
-                        <b>Submitted papers:</b>
-                      </MDTypography>
-                      <MDTypography variant="body2">Missing Info</MDTypography>
-
-                      <MDTypography variant="body2">
-                        <b>Assigned submissions:</b>
-                      </MDTypography>
-                      <MDTypography variant="body2">Missing Info</MDTypography>
-
-                      <MDTypography variant="body2">
-                        <b>Bidding:</b>
-                      </MDTypography>
-
-                      <MDTypography variant="body2">Missing Info</MDTypography>
-
-                      <MDTypography variant="body2">
-                        <b>Reviewed submissions:</b>
-                      </MDTypography>
-
-                      <MDTypography variant="body2">Missing Info</MDTypography>
-
-                      <MDTypography variant="body2">
-                        <b>Conflict list:</b>
-                      </MDTypography>
-
-                      <MDTypography variant="body2">Missing Info</MDTypography>
-                    </MDBox>
-
-                    <MDButton
-                      variant="gradient"
-                      color="info"
-                      onClick={() => setInfoOpen(false)}
-                      sx={{
-                        maxWidth: "20px",
-                        maxHeight: "30px",
-                        minWidth: "5px",
-                        minHeight: "30px",
-                        mt: 1,
-                        ml: 2,
-                        mb: 2,
-                      }}
-                    >
-                      Close
-                    </MDButton>
-                  </Card>
-                </MDBox>
-              )}
-
-              {/* Quanto edit for clicado */}
-              {editOpen && (
-                <Card>
-                  <MDTypography ml={2} mt={2} variant="h6">
-                    Edit {memberName} roles
-                  </MDTypography>
-
+                <ModalInfo onClose={() => setInfoOpen(false)}>
                   <MDBox mb={3}>
-                    <MDTypography mt={1} ml={2} variant="body2">
-                      Change the role using the dropdown menu below
-                    </MDTypography>
+                    <Card>
+                      <MDTypography ml={2} mb={2} mt={2} variant="h6">
+                        Information about {memberName}
+                      </MDTypography>
 
-                    <FormControl
-                      variant="outlined"
-                      sx={{ mt: 1, ml: 2, width: 200 }}
-                    >
-                      <Select
-                        id="recipient"
-                        displayEmpty
-                        IconComponent={() => <ArrowDropDownIcon />}
-                        sx={{ height: 30 }}
-                        value={selectValueRole}
-                        onChange={(event) => {
-                          if (event.target.value === "Choose a role") {
-                            setSelectValueRole("Choose a role");
-                            setShowSaveButton(false);
-                          } else {
-                            setSelectValueRole(event.target.value);
-                            setShowSaveButton(true);
-                          }
-                        }}
-                      >
-                        <MenuItem value="Choose a role">Choose a role</MenuItem>
-                        {!memberRoles.includes("Chair") && (
-                          <MenuItem value="Chair">Chair</MenuItem>
-                        )}
-                        {!memberRoles.includes("Committee") && (
-                          <MenuItem value="Committee">Committee</MenuItem>
-                        )}
-                      </Select>
-                    </FormControl>
+                      <MDBox ml={2} mb={1}>
+                        <MDTypography variant="body2">
+                          <b>First name: </b>
+                          {memberInfoData.userfirstname}
+                        </MDTypography>
 
-                    <div style={{ display: "flex", gap: 1 }}>
+                        <MDTypography variant="body2">
+                          <b>Last name: </b> {memberInfoData.userlastname}
+                        </MDTypography>
+
+                        <MDTypography variant="body2">
+                          <b>Email: </b> {memberInfoData.useremail}
+                        </MDTypography>
+
+                        <MDTypography variant="body2">
+                          <b>Phone: </b> {memberInfoData.userphone}
+                        </MDTypography>
+
+                        <MDTypography variant="body2">
+                          <b>Affiliation: </b> {memberInfoData.useraffiliation}
+                        </MDTypography>
+
+                        <MDTypography variant="body2">
+                          <b>Created Date: </b> {memberInfoData.useradddate}
+                        </MDTypography>
+
+                        <MDTypography mt={2} variant="body2">
+                          <b>Submitted papers:</b>
+                        </MDTypography>
+                        <MDTypography variant="body2">
+                          Missing Info
+                        </MDTypography>
+
+                        <MDTypography variant="body2">
+                          <b>Assigned submissions:</b>
+                        </MDTypography>
+                        <MDTypography variant="body2">
+                          Missing Info
+                        </MDTypography>
+
+                        <MDTypography variant="body2">
+                          <b>Bidding:</b>
+                        </MDTypography>
+
+                        <MDTypography variant="body2">
+                          Missing Info
+                        </MDTypography>
+
+                        <MDTypography variant="body2">
+                          <b>Reviewed submissions:</b>
+                        </MDTypography>
+
+                        <MDTypography variant="body2">
+                          Missing Info
+                        </MDTypography>
+
+                        <MDTypography variant="body2">
+                          <b>Conflict list:</b>
+                        </MDTypography>
+
+                        <MDTypography variant="body2">
+                          Missing Info
+                        </MDTypography>
+                      </MDBox>
+
                       <MDButton
                         variant="gradient"
                         color="info"
-                        onClick={() => {
-                          setEditOpen(false);
-                          setShowSaveButton(false);
-                        }}
+                        onClick={() => setInfoOpen(false)}
                         sx={{
                           maxWidth: "20px",
                           maxHeight: "30px",
                           minWidth: "5px",
                           minHeight: "30px",
-                          mt: 2,
+                          mt: 1,
                           ml: 2,
-                          mb: 1,
+                          mb: 2,
                         }}
                       >
                         Close
                       </MDButton>
+                    </Card>
+                  </MDBox>
+                </ModalInfo>
+              )}
 
-                      {showSaveButton && (
+              {/* Quanto edit for clicado */}
+              {editOpen && (
+                <ModalInfo
+                  onClose={() => setEditOpen(false)}
+                  height={{ xs: 300, sm: "90%", md: 260 }}
+                  width={{ xs: "95%", sm: "90%", md: 700 }}
+                >
+                  <Card>
+                    <MDTypography ml={2} mt={2} variant="h6">
+                      Edit {memberName} roles
+                    </MDTypography>
+
+                    <MDBox mb={3}>
+                      <MDTypography mt={1} ml={2} variant="body2">
+                        Change the role using the dropdown menu below
+                      </MDTypography>
+
+                      <FormControl
+                        variant="outlined"
+                        sx={{ mt: 1, ml: 2, width: 200 }}
+                      >
+                        <Select
+                          id="recipient"
+                          displayEmpty
+                          IconComponent={() => <ArrowDropDownIcon />}
+                          sx={{ height: 30 }}
+                          value={selectValueRole}
+                          onChange={(event) => {
+                            if (event.target.value === "Choose a role") {
+                              setSelectValueRole("Choose a role");
+                              setShowSaveButton(false);
+                            } else {
+                              setSelectValueRole(event.target.value);
+                              setShowSaveButton(true);
+                            }
+                          }}
+                        >
+                          <MenuItem value="Choose a role">
+                            Choose a role
+                          </MenuItem>
+                          {!memberRoles.includes("Chair") && (
+                            <MenuItem value="Chair">Chair</MenuItem>
+                          )}
+                          {!memberRoles.includes("Committee") && (
+                            <MenuItem value="Committee">Committee</MenuItem>
+                          )}
+                        </Select>
+                      </FormControl>
+
+                      <div style={{ display: "flex", gap: 1 }}>
                         <MDButton
                           variant="gradient"
-                          color="success"
-                          onClick={async () => {
+                          color="info"
+                          onClick={() => {
                             setEditOpen(false);
                             setShowSaveButton(false);
-                            await changeMemberRole();
                           }}
                           sx={{
                             maxWidth: "20px",
@@ -498,12 +496,35 @@ export default function ComitteeManagementPage() {
                             mb: 1,
                           }}
                         >
-                          Save
+                          Close
                         </MDButton>
-                      )}
-                    </div>
-                  </MDBox>
-                </Card>
+
+                        {showSaveButton && (
+                          <MDButton
+                            variant="gradient"
+                            color="success"
+                            onClick={async () => {
+                              setEditOpen(false);
+                              setShowSaveButton(false);
+                              await changeMemberRole();
+                            }}
+                            sx={{
+                              maxWidth: "20px",
+                              maxHeight: "30px",
+                              minWidth: "5px",
+                              minHeight: "30px",
+                              mt: 2,
+                              ml: 2,
+                              mb: 1,
+                            }}
+                          >
+                            Save
+                          </MDButton>
+                        )}
+                      </div>
+                    </MDBox>
+                  </Card>
+                </ModalInfo>
               )}
             </MDBox>
           </Container>

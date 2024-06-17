@@ -151,7 +151,7 @@ export default function MyConferences() {
             <CompleteTable
               columns={columns}
               rows={rows}
-              numerOfRowsPerPage={5}
+              numerOfRowsPerPage={10}
               height={200}
             />
           </Card>

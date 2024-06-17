@@ -1,57 +1,40 @@
+import React, { useState } from "react";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 import { useNavigate } from "react-router-dom";
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
-import * as React from "react";
-import Card from "@mui/material/Card";
-import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
 
-export default function BlockPageForConfStatus({ title, text }) {
+export default function BlockPageForConfStatus({
+  affirmativeButtonName = "Go back",
+  text,
+  title = "Oh My...",
+}) {
   const navigate = useNavigate();
 
   return (
-    <Card sx={{ ml: 30, mr: 30, mt: 15 }}>
-      <MDBox
-        variant="gradient"
-        bgColor="error"
-        borderRadius="lg"
-        coloredShadow="success"
-        mx={17}
-        mt={-3}
-        p={1}
-        mb={1}
-        textAlign="center"
-      >
-        <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
-          Oh My...
-        </MDTypography>
-      </MDBox>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <MDTypography
-          variant="h10"
-          fontWeight="medium"
-          color="grey"
-          textAlign="center"
-          mt={1}
-        >
-          {text}
-        </MDTypography>
+    <Dialog open={true}>
+      <DialogTitle>{title}</DialogTitle>
+      <DialogContent>
+        <DialogContentText>{text}</DialogContentText>
+      </DialogContent>
+      <DialogActions>
         <MDButton
-          variant="gradient"
-          color="info"
-          sx={{ mt: 2, mb: 2 }}
+          color="warning"
+          sx={{
+            maxWidth: "110px",
+            maxHeight: "30px",
+            minWidth: "1px",
+            minHeight: "30px",
+          }}
           onClick={() => navigate("/MyConferences/ConferenceDescription")}
         >
-          Return to Conference
+          {affirmativeButtonName}
         </MDButton>
-      </Box>
-    </Card>
+      </DialogActions>
+    </Dialog>
   );
 }

@@ -304,26 +304,6 @@ export default function CreateConference() {
     <DashboardLayout>
       <UpperNavBar />
       <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-        <MDBox
-          mb={3}
-          mt={2}
-          textAlign="left"
-          sx={{
-            maxWidth: 700,
-            margin: "auto",
-            marginBottom: 2,
-          }}
-        >
-          <Card>
-            <MDTypography ml={2} variant="h6">
-              Create Conference
-            </MDTypography>
-            <MDTypography ml={2} variant="body2">
-              Fill the form to create a conference
-            </MDTypography>
-          </Card>
-        </MDBox>
-
         <MDBox mb={3}>
           <Card
             sx={{
