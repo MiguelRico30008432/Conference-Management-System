@@ -280,7 +280,7 @@ export default function BiddingPage() {
             <>
               <BlockPageForConfStatus
                 text={
-                  "It seems that this conference is no longer in the bidding phase"
+                  "It seems that this conference is not in the bidding phase"
                 }
               />
             </>

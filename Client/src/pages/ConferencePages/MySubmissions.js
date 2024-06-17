@@ -13,7 +13,7 @@ import ConferenceNavBar from "OurComponents/navBars/ConferenceNavBar";
 import CompleteTable from "OurComponents/Table/CompleteTable";
 import SubmissionsDetails from "OurComponents/Info/SubmissionDetails";
 import UpdateSubmission from "OurComponents/Info/updateSubmission";
-
+import ModalInfo from "OurComponents/Modal/ModalInfo";
 import { AuthContext } from "auth.context";
 import { ConferenceContext } from "conference.context";
 
@@ -386,17 +386,21 @@ export default function MySubmissionsPage() {
               </MDBox>
             </Container>
             {!detailsOpen ? null : (
-              <SubmissionsDetails
-                submission={dataForDetails}
-                onClose={() => setDetailsOpen(false)}
-              />
+              <ModalInfo onClose={() => setDetailsOpen(false)} height={450}>
+                <SubmissionsDetails
+                  submission={dataForDetails}
+                  onClose={() => setDetailsOpen(false)}
+                />
+              </ModalInfo>
             )}
           </>
         ) : (
-          <UpdateSubmission
-            submissionID={dataForUpdate}
-            onClose={() => setUpdate(false)}
-          />
+          <ModalInfo onClose={() => setDetailsOpen(false)}>
+            <UpdateSubmission
+              submissionID={dataForUpdate}
+              onClose={() => setUpdate(false)}
+            />
+          </ModalInfo>
         )}
         <Footer />
       </DashboardLayout>

@@ -6,16 +6,14 @@ import Grid from "@mui/material/Grid";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
-import Alert from "@mui/material/Alert";
 import MDButton from "components/MDButton";
 import { fetchAPI } from "OurFunctions/fetchAPI";
 import { AuthContext } from "auth.context";
-import { ConferenceContext } from "conference.context";
 import ReviewsCard from "./ReviewsCard";
+import ModalInfo from "OurComponents/Modal/ModalInfo";
 
 export default function MultiReviewsDone({ submissionID, title, onClose }) {
   const { user } = useContext(AuthContext);
-  const { confPhase } = useContext(ConferenceContext);
 
   const [abstract, setAbstract] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -45,10 +43,8 @@ export default function MultiReviewsDone({ submissionID, title, onClose }) {
   return (
     <>
       {openLoading && <LoadingCircle />}
-      <Container maxWidth="sm">
-        <MDBox mt={7}></MDBox>
-
-        <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
+      <ModalInfo onClose={onClose}>
+        {error && <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>}
 
         <MDButton
           variant="gradient"
@@ -96,7 +92,7 @@ export default function MultiReviewsDone({ submissionID, title, onClose }) {
             ))}
           </Grid>
         </Grid>
-      </Container>
+      </ModalInfo>
     </>
   );
 }
