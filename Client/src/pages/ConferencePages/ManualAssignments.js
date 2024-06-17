@@ -65,7 +65,7 @@ export default function ManualAssignments() {
       await fetchAPI(
         "createManualAssignment",
         "POST",
-        { info: info },
+        { info: info, confid: confID },
         setError,
         setOpenLoading
       );
