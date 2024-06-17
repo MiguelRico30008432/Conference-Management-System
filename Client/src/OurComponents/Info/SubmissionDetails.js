@@ -26,7 +26,7 @@ export default function SubmissionDetails({ onClose, submission }) {
         <MDTypography variant="h6" sx={{ mt: 2 }}>
           Submission Date:
         </MDTypography>
-        <MDTypography variant="body2">{submission.addDate}</MDTypography>
+        <MDTypography variant="body2">{submission.adddate}</MDTypography>
         <MDTypography variant="h6" sx={{ mt: 2 }}>
           Abstract:
         </MDTypography>

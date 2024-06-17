@@ -148,7 +148,7 @@ export default function AllSubmissions() {
     { field: "title", headerName: "Title", width: 200 },
     { field: "status", headerName: "Status", width: 120 },
     { field: "authors", headerName: "Authors", width: 200 },
-    { field: "addDate", headerName: "Submission Date", width: 120 },
+    { field: "adddate", headerName: "Submission Date", width: 120 },
     {
       field: "download",
       filterable: false,

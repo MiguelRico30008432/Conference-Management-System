@@ -38,7 +38,7 @@ router.post("/mySubmissions", auth.ensureAuthenticated, async (req, res) => {
                 WHEN submissions.submissionaccepted = true THEN 'Accepted'
                 ELSE 'Pending'
             END AS status,
-            to_char(submissions.submissionadddate, 'DD-MM-YYYY') AS addDate,
+            to_char(submissions.submissionadddate, 'DD-MM-YYYY') AS adddate,
             submissions.submissionabstract AS abstract
         FROM submissions
         INNER JOIN authors a1 ON submissions.submissionid = a1.submissionid

@@ -81,7 +81,7 @@ export default function MySubmissionsPage() {
               title: submission.title,
               authors: submission.authors,
               status: submission.status, // This will now be 'Accepted', 'Rejected', or 'Pending'
-              addDate: submission.adddate,
+              adddate: submission.adddate,
               abstract: submission.abstract,
               fileUrl: submission.fileUrl,
             }));
@@ -180,7 +180,7 @@ export default function MySubmissionsPage() {
     { field: "title", headerName: "Title", width: 200 },
     { field: "status", headerName: "Status", width: 120 },
     { field: "authors", headerName: "Authors", width: 200 },
-    { field: "addDate", headerName: "Submission Date", width: 120 },
+    { field: "adddate", headerName: "Submission Date", width: 120 },
     {
       field: "edit",
       filterable: false,
