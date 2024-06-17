@@ -21,10 +21,8 @@ router.post("/createConference", auth.ensureAuthenticated, async (req, res) => {
       description,
       country,
       city,
-      numberMinReviewrs,
-      numberMaxReviewrs,
       confLink,
-      contact
+      contact,
     } = req.body;
 
     const findTypeId = await db.fetchData(
@@ -57,10 +55,8 @@ router.post("/createConference", auth.ensureAuthenticated, async (req, res) => {
       confdescription: description,
       confcountry: country,
       confcity: city,
-      confmaxreviewers: numberMaxReviewrs,
-      confminreviewers: numberMinReviewrs,
       confwebpage: confLink,
-      confcontact: contact
+      confcontact: contact,
     });
 
     const query = `
