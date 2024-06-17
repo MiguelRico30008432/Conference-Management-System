@@ -7,7 +7,7 @@ const router = express.Router();
 router.post("/comite", auth.ensureAuthenticated, async (req, res) => {
   try {
     const result = await db.fetchDataCst(`
-    SELECT
+   SELECT
         users.userid,
         userfirstname,
         userlastname,
@@ -18,7 +18,7 @@ router.post("/comite", auth.ensureAuthenticated, async (req, res) => {
         STRING_AGG(userrole, ', ') AS userrole
     FROM userRoles 
     INNER JOIN users on users.userid = userRoles.userid
-    WHERE userRoles.confid = ${req.body.confid}
+    WHERE userRoles.confid = ${req.body.confid} and  userRoles.userrole IN ('Owner', 'Chair', 'Committee')
     GROUP BY users.userid, userfirstname, userlastname, useremail, userphone, useraffiliation`);
 
     return res.status(200).send(result);

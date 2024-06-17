@@ -13,6 +13,7 @@ import { AuthContext } from "auth.context";
 import { ConferenceContext } from "conference.context";
 import ReviewsCard from "./ReviewsCard";
 import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
+import ModalInfo from "OurComponents/Modal/ModalInfo";
 
 export default function ReviewsDone({ assignmentID, title, onClose }) {
   const { user } = useContext(AuthContext);
@@ -200,33 +201,28 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
   return (
     <>
       {openLoading && <LoadingCircle />}
-      <PopUpWithMessage
-        open={popMessage}
-        title={"Changes not saved!"}
-        text={
-          "Wait! You are about to lose your unsaved review, are you sure do you want to go back?"
-        }
-        negativeButtonName={"Cancel"}
-        handleClose={() => setPopMessage(false)}
-        affirmativeButtonName={"Yes, I'm Sure"}
-        handleConfirm={closeComponent}
-      />
-
-      <PopUpWithMessage
-        open={deletePopMessage}
-        title={"Delete Review?"}
-        text={"Wait! You are about to delete your review, are you sure?"}
-        negativeButtonName={"Cancel"}
-        handleClose={() => setDeletePopMessage(false)}
-        affirmativeButtonName={"Yes, I'm Sure"}
-        handleConfirm={async () => await deleteReview()}
-      />
-
-      <Container maxWidth="sm">
-        <MDBox mt={7}></MDBox>
-
-        <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
-
+      <ModalInfo open={true} onClose={onClose}>
+        <PopUpWithMessage
+          open={popMessage}
+          title={"Changes not saved!"}
+          text={
+            "Wait! You are about to lose your unsaved review, are you sure do you want to go back?"
+          }
+          negativeButtonName={"Cancel"}
+          handleClose={() => setPopMessage(false)}
+          affirmativeButtonName={"Yes, I'm Sure"}
+          handleConfirm={closeComponent}
+        />
+        <PopUpWithMessage
+          open={deletePopMessage}
+          title={"Delete Review?"}
+          text={"Wait! You are about to delete your review, are you sure?"}
+          negativeButtonName={"Cancel"}
+          handleClose={() => setDeletePopMessage(false)}
+          affirmativeButtonName={"Yes, I'm Sure"}
+          handleConfirm={async () => await deleteReview()}
+        />
+        <Card sx={{ mb: 2 }}>{error}</Card>
         <MDButton
           variant="gradient"
           color="info"
@@ -241,7 +237,6 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
         >
           Close Review
         </MDButton>
-
         {!blockCrud && (
           <>
             {!addReviewActive && !hideButton && (
@@ -299,7 +294,6 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
             )}
           </>
         )}
-
         <Grid container spacing={2} mb={2}>
           <Grid item xs={12} md={5}>
             <Card>
@@ -334,7 +328,7 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
             />
           </Grid>
         </Grid>
-      </Container>
+      </ModalInfo>
     </>
   );
 }

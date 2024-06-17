@@ -419,7 +419,7 @@ export default function CreateSubmission() {
                 <>
                   <BlockPageForConfStatus
                     text={
-                      "It seems that this conference is no longer in the submission phase"
+                      "It seems that this conference is not in the submission phase"
                     }
                   />
                 </>

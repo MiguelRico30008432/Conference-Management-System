@@ -14,6 +14,7 @@ import CompleteTable from "OurComponents/Table/CompleteTable";
 import SubmissionDetails from "OurComponents/Info/SubmissionDetails";
 import Footer from "OurComponents/footer/Footer";
 import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
+import ModalInfo from "OurComponents/Modal/ModalInfo";
 
 export default function AllSubmissions() {
   const { confID, userRole } = useContext(ConferenceContext);
@@ -120,7 +121,11 @@ export default function AllSubmissions() {
 
       if (!response.ok) {
         const jsonResponse = await response.json();
-        setError(<Alert severity="error">Failed to download file: {jsonResponse.msg}</Alert>);
+        setError(
+          <Alert severity="error">
+            Failed to download file: {jsonResponse.msg}
+          </Alert>
+        );
         setOpenLoading(false); // Stop loading indicator
         return;
       }
@@ -218,45 +223,49 @@ export default function AllSubmissions() {
         );
       },
     },
-    ...(userRole === "Chair" || userRole === "Owner" ? [{
-      field: "delete",
-      filterable: false,
-      headerName: "",
-      description: "",
-      sortable: false,
-      disableColumnMenu: true,
-      resizable: false,
-      width: 150,
-      renderCell: (params) => {
-        return (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-            }}
-          >
-            <MDButton
-              variant="gradient"
-              color="error"
-              onClick={() => {
-                setDataForDelete(params.row.id);
-                setOpenPopUpMessage(true);
-              }}
-              sx={{
-                maxWidth: "130px",
-                maxHeight: "23px",
-                minWidth: "30px",
-                minHeight: "23px",
-              }}
-            >
-              Delete Submission
-            </MDButton>
-          </div>
-        );
-      },
-    }] : [])
+    ...(userRole === "Chair" || userRole === "Owner"
+      ? [
+          {
+            field: "delete",
+            filterable: false,
+            headerName: "",
+            description: "",
+            sortable: false,
+            disableColumnMenu: true,
+            resizable: false,
+            width: 150,
+            renderCell: (params) => {
+              return (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                >
+                  <MDButton
+                    variant="gradient"
+                    color="error"
+                    onClick={() => {
+                      setDataForDelete(params.row.id);
+                      setOpenPopUpMessage(true);
+                    }}
+                    sx={{
+                      maxWidth: "130px",
+                      maxHeight: "23px",
+                      minWidth: "30px",
+                      minHeight: "23px",
+                    }}
+                  >
+                    Delete Submission
+                  </MDButton>
+                </div>
+              );
+            },
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -311,10 +320,12 @@ export default function AllSubmissions() {
         </Container>
 
         {detailsOpen && (
-          <SubmissionDetails
-            submission={dataForDetails}
-            onClose={() => setDetailsOpen(false)}
-          />
+          <ModalInfo onClose={() => setDetailsOpen(false)} height={450}>
+            <SubmissionDetails
+              submission={dataForDetails}
+              onClose={() => setDetailsOpen(false)}
+            />
+          </ModalInfo>
         )}
 
         <Footer />

@@ -33,10 +33,9 @@ router.post("/multiReviews", auth.ensureAuthenticated, async (req, res) => {
     const abstract = await db.fetchDataCst(`
       SELECT
         submissionabstract
-      FROM ReviewsAssignments
-      INNER JOIN submissions on submissionid = assignmentsubmissionid
+      FROM submissions
       WHERE 
-        assignmentsubmissionid = ${req.body.submissionid}
+        submissionid = ${req.body.submissionid}
       `);
 
     const lines = await db.fetchDataCst(`

@@ -340,9 +340,7 @@ export default function Conflicts() {
         {blockCrud && (
           <>
             <BlockPageForConfStatus
-              text={
-                "It seems that this conference is no longer in the bidding phase"
-              }
+              text={"It seems that this conference is not in the bidding phase"}
             />
           </>
         )}
