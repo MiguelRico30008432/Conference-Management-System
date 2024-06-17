@@ -24,8 +24,6 @@ router.post(
             c.confendbidding,
             c.confstartdate,
             c.confenddate,
-            c.confmaxreviewers,
-            c.confminreviewers,
             c.confadddate,
             c.confcontact,
             ct.conftypename AS conftype,

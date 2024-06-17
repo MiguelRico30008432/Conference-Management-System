@@ -42,8 +42,6 @@ export default function DefinitionsPage() {
   const [reviewEnd, setReviewEnd] = useState("");
   const [confStart, setConfStart] = useState("");
   const [confEnd, setConfEnd] = useState("");
-  const [minReviewers, setMinReviewers] = useState("");
-  const [maxReviewers, setMaxReviewers] = useState("");
   const [submissionUpdate, setSubmissionUpdate] = useState("");
 
   //new values
@@ -60,8 +58,6 @@ export default function DefinitionsPage() {
   const [newReviewEnd, setNewReviewEnd] = useState("");
   const [newConfStart, setNewConfStart] = useState("");
   const [newConfEnd, setNewConfEnd] = useState("");
-  const [newMinReviewers, setNewMinReviewers] = useState("");
-  const [newMaxReviewers, setNewMaxReviewers] = useState("");
   const [newSubmissionUpdate, setNewSubmissionUpdate] = useState("");
 
   useEffect(() => {
@@ -124,12 +120,6 @@ export default function DefinitionsPage() {
           setConfEnd(formatDate(jsonResponse[0].confenddate));
           setNewConfEnd(formatDate(jsonResponse[0].confenddate));
 
-          setMinReviewers(jsonResponse[0].confminreviewers);
-          setNewMinReviewers(jsonResponse[0].confminreviewers);
-
-          setMaxReviewers(jsonResponse[0].confmaxreviewers);
-          setNewMaxReviewers(jsonResponse[0].confmaxreviewers);
-
           setSubmissionUpdate(jsonResponse[0].confsubupdate);
           setNewSubmissionUpdate(jsonResponse[0].confsubupdate);
         } else {
@@ -160,43 +150,9 @@ export default function DefinitionsPage() {
     }
   };
 
-  function reviewersVerification() {
-    if (newMinReviewers < 1) {
-      setMessage(
-        <Alert severity="error">
-          You must set, at least, 1 reviewer (minimum)
-        </Alert>
-      );
-      return false;
-    }
-    if (newMaxReviewers > 10) {
-      setMessage(
-        <Alert severity="error">
-          You must not set more than 10 reviewers (maximum)
-        </Alert>
-      );
-      return false;
-    }
-    if (newMaxReviewers < newMinReviewers) {
-      setMessage(
-        <Alert severity="error">
-          Maximum number of reviewers cannot be lower than the minimum number of
-          reviewers
-        </Alert>
-      );
-      return false;
-    }
-    return true;
-  }
-
   async function handleSubmit(event) {
     event.preventDefault();
-    if (
-      makeRequest() &&
-      valideInputs() &&
-      datesBetweenStarEndVerifications() &&
-      reviewersVerification()
-    ) {
+    if (makeRequest() && valideInputs() && datesBetweenStarEndVerifications()) {
       setEditModeActive(false);
       await saveUserData();
     }
@@ -217,8 +173,6 @@ export default function DefinitionsPage() {
       reviewEnd !== newReviewEnd ||
       confStart !== newConfStart ||
       confEnd !== newConfEnd ||
-      minReviewers !== newMinReviewers ||
-      maxReviewers !== newMaxReviewers ||
       submissionUpdate !== newSubmissionUpdate
     ) {
       return true;
@@ -243,8 +197,6 @@ export default function DefinitionsPage() {
       newConfStart === "" ||
       newConfEnd === "" ||
       newReviewEnd === "" ||
-      newMinReviewers === "" ||
-      newMaxReviewers === "" ||
       newSubmissionUpdate === ""
     ) {
       setMessage(
@@ -278,8 +230,6 @@ export default function DefinitionsPage() {
             confendreview: newReviewEnd,
             confstartdate: newConfStart,
             confenddate: newConfEnd,
-            confminreviewers: newMinReviewers,
-            confmaxreviewers: newMaxReviewers,
             confsubupdate: newSubmissionUpdate,
           }),
           headers: {
@@ -311,8 +261,6 @@ export default function DefinitionsPage() {
         setReviewEnd(newReviewEnd);
         setConfStart(newConfStart);
         setConfEnd(newConfEnd);
-        setMinReviewers(newMinReviewers);
-        setMaxReviewers(newMaxReviewers);
         setSubmissionUpdate(newSubmissionUpdate);
       } else {
         setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
@@ -811,34 +759,6 @@ export default function DefinitionsPage() {
                         onChange={(e) =>
                           setNewConfEnd(formatDate(e.target.value))
                         }
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confminreviewers"
-                        label="Minimun Number of Reviews"
-                        name="confminreviewers"
-                        InputLabelProps={{ shrink: true }}
-                        value={newMinReviewers}
-                        disabled={!editModeActive}
-                        onChange={(e) => setNewMinReviewers(e.target.value)}
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confmaxreviewers"
-                        label="Maximum Number of Reviews"
-                        name="confmaxreviewers"
-                        InputLabelProps={{ shrink: true }}
-                        value={newMaxReviewers}
-                        disabled={!editModeActive}
-                        onChange={(e) => setNewMaxReviewers(e.target.value)}
                         sx={{ ml: 2, mt: 2, width: "90%" }}
                       />
                     </Grid>
