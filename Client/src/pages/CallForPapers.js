@@ -148,8 +148,7 @@ export default function CallForPapers() {
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
         <UpperNavBar />
-
-        <MDBox mt={2} mb={2} textAlign="left">
+        <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
           <MDBox mb={3} textAlign="left">
             <Card>
               <MDTypography ml={2} mt={1} variant="h6">
@@ -181,7 +180,6 @@ export default function CallForPapers() {
             </Card>
           </MDBox>
         </MDBox>
-
         <Footer />
       </DashboardLayout>
     </>

@@ -16,6 +16,7 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Alert from "@mui/material/Alert";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
+import FieldInfo from "OurComponents/ToolTip/FieldInfo";
 
 export default function SignUpPage() {
   const navigate = useNavigate();
@@ -26,7 +27,6 @@ export default function SignUpPage() {
   const [passwordAlert, setPasswordAlert] = useState(null);
   const [affiliationAlert, setAffiliationAlert] = useState(null);
   const [errorOnLogin, setErrorOnLogin] = useState(false);
-  const [errorOnRequest, setErrorOnRequest] = useState(null);
   const [message, setMessage] = useState(null);
   const [openLoading, setOpenLoading] = useState(false);
 
@@ -48,7 +48,15 @@ export default function SignUpPage() {
         affiliation
       )
     ) {
-      await Signup(firstName.trim(), lastName.trim(), email.trim(), phone.trim(), password, affiliation.trim(), code.trim());
+      await Signup(
+        firstName.trim(),
+        lastName.trim(),
+        email.trim(),
+        phone.trim(),
+        password,
+        affiliation.trim(),
+        code.trim()
+      );
     }
   };
 
@@ -72,7 +80,7 @@ export default function SignUpPage() {
           phone: phone,
           password: password,
           affiliation: affiliation,
-          inviteCode: code
+          inviteCode: code,
         }),
         headers: {
           "Content-type": "application/json; charset=UTF-8",
@@ -82,7 +90,8 @@ export default function SignUpPage() {
       if (response.status === 201) {
         setMessage(
           <Alert severity="success">
-            Your account has been created successfully. Redirecting to home page...
+            Your account has been created successfully. Redirecting to home
+            page...
           </Alert>
         );
         setTimeout(() => {
@@ -90,7 +99,7 @@ export default function SignUpPage() {
         }, 4000);
       } else {
         const jsonResponse = await response.json();
-        setErrorOnRequest(<Alert severity="error">{jsonResponse.msg}</Alert>);
+        setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
       }
     } catch (error) {
       setErrorOnLogin(true);
@@ -241,13 +250,19 @@ export default function SignUpPage() {
                     />
                     {affiliationAlert}
                   </Grid>
-                  <Grid item xs={8} >
-                    <TextField
-                      fullWidth
-                      id="code"
-                      label="Intivation Code"
-                      name="code"
-                    />
+                  <Grid item xs={8}>
+                    <FieldInfo
+                      text={
+                        "Please enter your invite code if you received it via email."
+                      }
+                    >
+                      <TextField
+                        fullWidth
+                        id="code"
+                        label="Intivation Code"
+                        name="code"
+                      />
+                    </FieldInfo>
                   </Grid>
                 </Grid>
                 <MDButton
@@ -259,8 +274,10 @@ export default function SignUpPage() {
                 >
                   sign Up
                 </MDButton>
-                {message}
-                {errorOnRequest}
+                <MDBox mt={1} mb={1} textAlign="center">
+                  {message}
+                </MDBox>
+
                 <MDBox mt={3} mb={1} textAlign="center">
                   <MDTypography variant="button" color="text">
                     Already have an account?{" "}

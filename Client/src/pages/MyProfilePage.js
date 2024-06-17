@@ -11,15 +11,13 @@ import * as React from "react";
 import Card from "@mui/material/Card";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
+import { fetchAPI } from "OurFunctions/fetchAPI";
 import Alert from "@mui/material/Alert";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
 
 export default function MyProfilePage() {
   const { user, isLoggedIn } = useContext(AuthContext);
 
-  const [editModeActive, setEditModeActive] = useState(false);
-  const [passwordModeActive, setPasswordModeActive] = useState(false);
   const [openEmailChangeDialog, setOpenEmailChangeDialog] = useState(false);
   const [openLoading, setOpenLoading] = useState(false);
   const [message, setMessage] = useState(null);
@@ -36,52 +34,36 @@ export default function MyProfilePage() {
   const [originalEmail, setOriginalEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [originalPhone, setOriginalPhone] = useState("");
+  const [disableSaveUser, setDisableSaveUser] = useState(true);
 
   const [password, setPasword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
+  const [disableSavePassword, setDisableSavePassword] = useState(true);
 
   const [code, setInviteCode] = useState("");
 
   useEffect(() => {
     async function getUserData() {
-      setOpenLoading(true);
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/userData`,
-          {
-            method: "POST",
-            body: JSON.stringify({ userID: user }),
-            headers: {
-              "Content-type": "application/json; charset=UTF-8",
-            },
-            credentials: "include",
-          }
-        );
+      const response = await fetchAPI(
+        "userData",
+        "POST",
+        { userID: user },
+        setMessage,
+        setOpenLoading
+      );
 
-        const jsonResponse = await response.json();
-
-        if (response.status === 200) {
-          setFirstName(jsonResponse[0].userfirstname);
-          setOriginalFirstName(jsonResponse[0].userfirstname);
-          setLastName(jsonResponse[0].userlastname);
-          setOriginalLastName(jsonResponse[0].userlastname);
-          setAffiliation(jsonResponse[0].useraffiliation);
-          setOriginalAffiliation(jsonResponse[0].useraffiliation);
-          setEmail(jsonResponse[0].useremail);
-          setOriginalEmail(jsonResponse[0].useremail);
-          setPhone(jsonResponse[0].userphone);
-          setOriginalPhone(jsonResponse[0].userphone);
-        } else {
-          setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
-        }
-      } catch (error) {
-        setMessage(
-          <Alert severity="error">
-            Something went wrong when obtaining your informations
-          </Alert>
-        );
+      if (response) {
+        setFirstName(response[0].userfirstname);
+        setOriginalFirstName(response[0].userfirstname);
+        setLastName(response[0].userlastname);
+        setOriginalLastName(response[0].userlastname);
+        setAffiliation(response[0].useraffiliation);
+        setOriginalAffiliation(response[0].useraffiliation);
+        setEmail(response[0].useremail);
+        setOriginalEmail(response[0].useremail);
+        setPhone(response[0].userphone);
+        setOriginalPhone(response[0].userphone);
       }
-      setOpenLoading(false);
     }
 
     if (isLoggedIn) {
@@ -89,28 +71,52 @@ export default function MyProfilePage() {
     }
   }, [isLoggedIn]);
 
+  useEffect(() => {
+    if (changesDetected()) setDisableSaveUser(false);
+    else setDisableSaveUser(true);
+  }, [firstName, lastName, affiliation, email, phone]);
+
+  useEffect(() => {
+    if (password === "" || repeatPassword === "") setDisableSavePassword(true);
+    else setDisableSavePassword(false);
+  }, [password, repeatPassword]);
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage(null);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    if (passwordMessage) {
+      const timer = setTimeout(() => {
+        setPasswordMessage(null);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [passwordMessage]);
+
   async function changeUserData() {
-    if (makeRequest()) {
-      if (valideInputs()) {
-        if (originalEmail !== email) {
-          setOpenEmailChangeDialog(true);
-        } else {
-          await saveUserData();
-        }
+    if (valideInputs()) {
+      if (originalEmail !== email) {
+        setOpenEmailChangeDialog(true);
       } else {
-        setMessage(
-          <Alert severity="error">All fields marked with * are required.</Alert>
-        );
+        await saveUserData();
       }
+    } else {
+      setMessage(
+        <Alert severity="error">All fields marked with * are required.</Alert>
+      );
     }
   }
 
   async function changePassword() {
-    if (password.length === 0 || repeatPassword.length === 0) {
-      setPasswordMessage(
-        <Alert severity="error">Password not changed: Please fill in the password field.</Alert>
-      );
-    } else if (password !== repeatPassword) {
+    if (password !== repeatPassword) {
       setPasswordMessage(
         <Alert severity="error">
           The first password does not match with the second one.
@@ -121,7 +127,7 @@ export default function MyProfilePage() {
     }
   }
 
-  function makeRequest() {
+  function changesDetected() {
     if (
       originalFirstName !== firstName ||
       originalLastName !== lastName ||
@@ -142,130 +148,76 @@ export default function MyProfilePage() {
   }
 
   async function saveUserData() {
-    setOpenLoading(true);
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/saveUserData`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            userID: user,
-            firstName: firstName.trim(),
-            lastName: lastName.trim(),
-            affiliation: affiliation.trim(),
-            email: email.trim(),
-            phone: phone.trim(),
-          }),
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-          credentials: "include",
-        }
-      );
+    const response = await fetchAPI(
+      "saveUserData",
+      "POST",
+      {
+        userID: user,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        affiliation: affiliation.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+      },
+      setMessage,
+      setOpenLoading
+    );
 
-      const jsonResponse = await response.json();
-
-      if (response.status === 200) {
-        setMessage(
-          <Alert severity="success">{"Your data was saved with success"}</Alert>
-        );
-
-        setOriginalFirstName(firstName);
-        setOriginalLastName(lastName);
-        setOriginalAffiliation(affiliation);
-        setOriginalPhone(phone);
-        setOriginalEmail(email);
-      } else {
-        setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
-      }
-    } catch (error) {
+    if (response) {
       setMessage(
-        <Alert severity="error">
-          Something went wrong when obtaining your informations
-        </Alert>
+        <Alert severity="success">{"Your data was saved with success"}</Alert>
       );
+
+      setOriginalFirstName(firstName);
+      setOriginalLastName(lastName);
+      setOriginalAffiliation(affiliation);
+      setOriginalPhone(phone);
+      setOriginalEmail(email);
     }
-    setOpenLoading(false);
   }
 
   async function saveUserPassword() {
-    setOpenLoading(true);
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/saveUserPassword`,
-        {
-          method: "POST",
-          body: JSON.stringify({ userID: user, userPassword: password }),
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-          credentials: "include",
-        }
-      );
+    const response = await fetchAPI(
+      "saveUserPassword",
+      "POST",
+      { userID: user, userPassword: password },
+      setPasswordMessage,
+      setOpenLoading
+    );
 
-      const jsonResponse = await response.json();
-
-      if (response.status === 200) {
-        setPasswordMessage(<Alert severity="success">Password changed</Alert>);
-      } else {
-        setPasswordMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
-      }
-    } catch (error) {
-      setPasswordMessage(
-        <Alert severity="error">
-          Something went wrong when obtaining your informations
-        </Alert>
-      );
+    if (response) {
+      setPasswordMessage(<Alert severity="success">Password changed</Alert>);
     }
-    setOpenLoading(false);
   }
 
   async function handleInvitationCode() {
     const inviteCode = code.trim();
-    if (inviteCode === "") { 
+    if (inviteCode === "") {
       setInviteMessage(
         <Alert severity="error">Please enter an invitation code.</Alert>
       );
       return;
     }
 
-    setOpenLoading(true);
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/saveInvitationCode`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            userID: user,
-            inviteCode: inviteCode,
-          }),
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-          credentials: "include",
-        }
-      );
+    const response = await fetchAPI(
+      "saveInvitationCode",
+      "POST",
+      {
+        userID: user,
+        inviteCode: inviteCode,
+      },
+      setInviteMessage,
+      setOpenLoading
+    );
 
-      const jsonResponse = await response.json();
-
-      if (response.status === 200) {
-        setInviteMessage(
-          <Alert severity="success">
-            Invitation code accepted. You have joined the conference.
-          </Alert>
-        );
-        setInviteCode(""); // Clear the input field after successful submission
-      } else {
-        setInviteMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
-      }
-    } catch (error) {
+    if (response) {
       setInviteMessage(
-        <Alert severity="error">
-          Something went wrong when submitting your invitation code.
+        <Alert severity="success">
+          Invitation code accepted. You have joined the conference.
         </Alert>
       );
+      setInviteCode(""); // Clear the input field after successful submission
     }
-    setOpenLoading(false);
   }
 
   return (
@@ -286,125 +238,103 @@ export default function MyProfilePage() {
 
       <DashboardLayout>
         <UpperNavBar />
-        <MDBox mb={3} textAlign="left">
-          <Card>
-            <MDTypography ml={2} variant="h6">
-              My Profile
-            </MDTypography>
-            <MDTypography ml={2} variant="body2">
-              Feel free to change your data by clicking on edit profile or
-              change your password
-            </MDTypography>
-          </Card>
-        </MDBox>
+        <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <MDBox mb={3} textAlign="left">
+            <Card>
+              <MDTypography ml={2} variant="h6">
+                My Profile
+              </MDTypography>
+              <MDTypography ml={2} variant="body2">
+                Feel free to change your data by clicking on edit profile or
+                change your password
+              </MDTypography>
+            </Card>
+          </MDBox>
 
-        <MDBox mb={3} textAlign="left">
-          <Card>{message}</Card>
-        </MDBox>
+          <MDBox mb={3} textAlign="left">
+            <Card>{message}</Card>
+          </MDBox>
 
-        <MDBox mb={3}>
-          <Card>
-            <MDTypography ml={2} mb={2} mt={2} variant="body2">
-              Change your informations
-            </MDTypography>
+          <MDBox mb={3}>
+            <Card>
+              {/*User change*/}
+              <MDTypography ml={2} mb={2} mt={2} variant="body2">
+                Change your informations
+              </MDTypography>
 
-            <Grid container spacing={1}>
-              <Grid item xs={12} sm={5}>
-                <TextField
-                  autoComplete="given-name"
-                  name="firstName"
-                  required
-                  fullWidth
-                  id="firstName"
-                  label="First Name"
-                  autoFocus
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  disabled={!editModeActive}
-                  sx={{ ml: 2, mt: 2, width: "90%" }}
-                />
+              <Grid container spacing={1}>
+                <Grid item xs={12} sm={5}>
+                  <TextField
+                    autoComplete="given-name"
+                    name="firstName"
+                    required
+                    fullWidth
+                    id="firstName"
+                    label="First Name"
+                    autoFocus
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    sx={{ ml: 2, mt: 2, width: "90%" }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={5}>
+                  <TextField
+                    required
+                    fullWidth
+                    id="lastName"
+                    label="Last Name"
+                    name="lastName"
+                    autoComplete="family-name"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    sx={{ ml: 2, mt: 2, width: "90%" }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={5}>
+                  <TextField
+                    required
+                    fullWidth
+                    id="affiliation"
+                    label="affiliation"
+                    name="affiliation"
+                    value={affiliation}
+                    onChange={(e) => setAffiliation(e.target.value)}
+                    sx={{ ml: 2, mt: 2, width: "90%" }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={5}>
+                  <TextField
+                    required
+                    fullWidth
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                    }}
+                    sx={{ ml: 2, mt: 2, width: "90%" }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    id="phone"
+                    label="Phone Number"
+                    name="phone"
+                    autoComplete="phone"
+                    value={phone}
+                    onChange={(e) => {
+                      setPhone(e.target.value);
+                    }}
+                    sx={{ ml: 2, mt: 2, width: 150 }}
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={12} sm={5}>
-                <TextField
-                  required
-                  fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  autoComplete="family-name"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  disabled={!editModeActive}
-                  sx={{ ml: 2, mt: 2, width: "90%" }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={5}>
-                <TextField
-                  required
-                  fullWidth
-                  id="affiliation"
-                  label="affiliation"
-                  name="affiliation"
-                  value={affiliation}
-                  onChange={(e) => setAffiliation(e.target.value)}
-                  disabled={!editModeActive}
-                  sx={{ ml: 2, mt: 2, width: "90%" }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={5}>
-                <TextField
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={!editModeActive}
-                  sx={{ ml: 2, mt: 2, width: "90%" }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  id="phone"
-                  label="Phone Number"
-                  name="phone"
-                  autoComplete="phone"
-                  value={phone}
-                  disabled={!editModeActive}
-                  onChange={(e) => setPhone(e.target.value)}
-                  sx={{ ml: 2, mt: 2, width: 150 }}
-                />
-              </Grid>
-            </Grid>
 
-            <MDBox style={{ display: "flex", gap: 1 }}>
-              {!editModeActive && (
-                <MDButton
-                  variant="gradient"
-                  color="info"
-                  sx={{
-                    maxWidth: "200px",
-                    maxHeight: "30px",
-                    minWidth: "5px",
-                    minHeight: "30px",
-                    mt: 2,
-                    ml: 2,
-                    mb: 2,
-                  }}
-                  onClick={() => {
-                    setEditModeActive(true);
-                    setMessage(null);
-                  }}
-                >
-                  Edit Profile
-                </MDButton>
-              )}
-
-              {editModeActive && (
+              <MDBox style={{ display: "flex", gap: 1 }}>
                 <MDButton
                   variant="gradient"
                   color="success"
@@ -418,151 +348,126 @@ export default function MyProfilePage() {
                     mb: 2,
                   }}
                   onClick={() => {
-                    setEditModeActive(false);
                     changeUserData();
                   }}
+                  disabled={disableSaveUser}
                 >
                   Save Changes
                 </MDButton>
-              )}
-            </MDBox>
-          </Card>
-        </MDBox>
+              </MDBox>
+            </Card>
+          </MDBox>
 
-        <MDBox mb={3} textAlign="left">
-          <Card>
-            {passwordMessage}
-            {inviteMessage}
-          </Card>
-        </MDBox>
+          <MDBox mb={3} textAlign="left">
+            <Card>
+              {passwordMessage}
+              {inviteMessage}
+            </Card>
+          </MDBox>
 
-        <MDBox mb={3}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <Card>
-                <MDTypography ml={2} mb={2} mt={2} variant="body2">
-                  Change Your Password
-                </MDTypography>
+          <MDBox mb={3}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <Card>
+                  {/*Password change*/}
+                  <MDTypography ml={2} mb={2} mt={2} variant="body2">
+                    Change Your Password
+                  </MDTypography>
 
-                <TextField
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  disabled={!passwordModeActive}
-                  value={password}
-                  onChange={(e) => {
-                    setPasword(e.target.value);
-                  }}
-                  sx={{ ml: 2, width: '90%' }}
-                />
+                  <TextField
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => {
+                      setPasword(e.target.value);
+                    }}
+                    sx={{ ml: 2, width: "90%" }}
+                  />
 
-                <TextField
-                  required
-                  fullWidth
-                  name="password"
-                  label="Repeat Password"
-                  type="password"
-                  id="password"
-                  disabled={!passwordModeActive}
-                  value={repeatPassword}
-                  onChange={(e) => {
-                    setRepeatPassword(e.target.value);
-                  }}
-                  sx={{ mt: 2, ml: 2, width: '90%' }}
-                />
+                  <TextField
+                    required
+                    fullWidth
+                    name="password"
+                    label="Repeat Password"
+                    type="password"
+                    value={repeatPassword}
+                    onChange={(e) => {
+                      setRepeatPassword(e.target.value);
+                    }}
+                    sx={{ mt: 2, ml: 2, width: "90%" }}
+                  />
 
-                <MDBox style={{ display: 'flex', gap: 1 }}>
-                  {!passwordModeActive && (
-                    <MDButton
-                      variant="gradient"
-                      color="info"
-                      sx={{
-                        maxWidth: '170px',
-                        maxHeight: '30px',
-                        minWidth: '5px',
-                        minHeight: '30px',
-                        mt: 2,
-                        ml: 2,
-                        mb: 2,
-                      }}
-                      onClick={() => {
-                        setPasswordMessage(null);
-                        setPasswordModeActive(true);
-                      }}
-                    >
-                      Change Password
-                    </MDButton>
-                  )}
-
-                  {passwordModeActive && (
+                  <MDBox style={{ display: "flex", gap: 1 }}>
                     <MDButton
                       variant="gradient"
                       color="success"
                       sx={{
-                        maxWidth: '150px',
-                        maxHeight: '30px',
-                        minWidth: '5px',
-                        minHeight: '30px',
+                        maxWidth: "150px",
+                        maxHeight: "30px",
+                        minWidth: "5px",
+                        minHeight: "30px",
                         ml: 2,
                         mt: 2,
                         mb: 2,
                       }}
+                      disabled={disableSavePassword}
                       onClick={() => {
+                        setPasswordMessage(null);
                         changePassword();
-                        setPasswordModeActive(false);
                       }}
                     >
-                      Save Changes
+                      Save Password
                     </MDButton>
-                  )}
-                </MDBox>
-              </Card>
+                  </MDBox>
+                </Card>
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                {/*Invitation Code*/}
+                <Card>
+                  <MDTypography ml={2} mb={2} mt={2} variant="body2">
+                    Do you have a conference invitation?
+                  </MDTypography>
+
+                  <TextField
+                    autoComplete="given-name"
+                    name="code"
+                    fullWidth
+                    id="code"
+                    label="Invitation Code"
+                    value={code}
+                    onChange={(e) => {
+                      setInviteCode(e.target.value);
+                      setInviteMessage(null);
+                    }}
+                    sx={{ ml: 2, width: "90%" }}
+                  />
+
+                  <MDButton
+                    variant="gradient"
+                    color="info"
+                    sx={{
+                      maxWidth: "170px",
+                      maxHeight: "30px",
+                      minWidth: "5px",
+                      minHeight: "30px",
+                      mt: 2,
+                      ml: 2,
+                      mb: 2,
+                    }}
+                    onClick={() => {
+                      handleInvitationCode();
+                    }}
+                  >
+                    Join Conference
+                  </MDButton>
+                </Card>
+              </Grid>
             </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Card>
-                <MDTypography ml={2} mb={2} mt={2} variant="body2">
-                  Do you have a conference invitation?
-                </MDTypography>
-
-                <TextField
-                  autoComplete="given-name"
-                  name="code"
-                  fullWidth
-                  id="code"
-                  label="Invitation Code"
-                  value={code}
-                  onChange={(e) => {
-                    setInviteCode(e.target.value);
-                    setInviteMessage(null);
-                  }}
-                  sx={{ ml: 2, width: '90%' }}
-                />
-
-                <MDButton
-                  variant="gradient"
-                  color="info"
-                  sx={{
-                    maxWidth: '170px',
-                    maxHeight: '30px',
-                    minWidth: '5px',
-                    minHeight: '30px',
-                    mt: 2,
-                    ml: 2,
-                    mb: 2,
-                  }}
-                  onClick={() => {
-                    handleInvitationCode();
-                  }}
-                >
-                  Join Conference
-                </MDButton>
-              </Card>
-            </Grid>
-          </Grid>
+          </MDBox>
         </MDBox>
         <Footer />
       </DashboardLayout>

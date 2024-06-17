@@ -4,24 +4,20 @@ import Footer from "OurComponents/footer/Footer";
 import imageroom from "../assets/images/imageroom.jpg";
 import imageroom1 from "../assets/images/imageroom1.jpg";
 import imageroom2 from "../assets/images/imageroom2.jpg";
+import MDBox from "components/MDBox";
 
 // @material-ui core components
 import IconButton from "@mui/material/IconButton";
 import Icon from "@mui/material/Icon";
 
 // Custom styles for DashboardNavbar
-import {
-  navbarMobileMenu,
-} from "examples/Navbars/DashboardNavbar/styles";
+import { navbarMobileMenu } from "examples/Navbars/DashboardNavbar/styles";
 
 // Material Dashboard 2 React example components
 import MDTypography from "components/MDTypography";
 
 // Material Dashboard 2 React context
-import {
-  useMaterialUIController,
-  setMiniSidenav
-} from "context";
+import { useMaterialUIController, setMiniSidenav } from "context";
 
 export default function HomePage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -78,61 +74,63 @@ export default function HomePage() {
 
   return (
     <DashboardLayout>
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
-    <IconButton
-      size="small"
-      disableRipple
-      color="inherit"
-      sx={navbarMobileMenu}
-      onClick={() => handleMiniSidenav()}
-    >
-      <Icon fontSize="medium">
-        {miniSidenav ? "menu_open" : "menu"}
-      </Icon>
-      <MDTypography variant="body2" color="text"> Menu </MDTypography>
-    </IconButton>
-  </div>
-      <div style={{ position: "relative", textAlign: "center" }}>
-        <div
-          style={{ 
-            display: "flex",
-            justifyContent: "flex-end", 
-            height: "400px",
-            overflow: "hidden",
-            position: "relative" 
-          }}
-        >
-          <img
-            src={images[currentImageIndex].src}
-            alt={`Image ${currentImageIndex + 1}`}
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              cursor: "pointer",
-            }}
-            onClick={() =>
-              handleImageClick(images[currentImageIndex].sectionId)
-            }
-            title="Click to discover more"
-          />
+      <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <IconButton
+            size="small"
+            disableRipple
+            color="inherit"
+            sx={navbarMobileMenu}
+            onClick={() => handleMiniSidenav()}
+          >
+            <Icon fontSize="medium">{miniSidenav ? "menu_open" : "menu"}</Icon>
+            <MDTypography variant="body2" color="text">
+              {" "}
+              Menu{" "}
+            </MDTypography>
+          </IconButton>
+        </div>
+        <div style={{ position: "relative", textAlign: "center" }}>
           <div
-            ref={targetRef}
             style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              padding: "20px",
-              fontSize: "70px",
-              color: "white",
-              width: "100%",
-              opacity: 1,
+              display: "flex",
+              justifyContent: "flex-end",
+              height: "400px",
+              overflow: "hidden",
+              position: "relative",
             }}
           >
-            {images[currentImageIndex].text}
+            <img
+              src={images[currentImageIndex].src}
+              alt={`Image ${currentImageIndex + 1}`}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                cursor: "pointer",
+              }}
+              onClick={() =>
+                handleImageClick(images[currentImageIndex].sectionId)
+              }
+              title="Click to discover more"
+            />
+            <div
+              ref={targetRef}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                padding: "20px",
+                fontSize: "70px",
+                color: "white",
+                width: "100%",
+                opacity: 1,
+              }}
+            >
+              {images[currentImageIndex].text}
+            </div>
           </div>
         </div>
-      </div>
         <div
           style={{
             position: "absolute",
@@ -153,80 +151,94 @@ export default function HomePage() {
                 backgroundColor: currentImageIndex === index ? "#000" : "#ccc",
                 margin: "0 5px",
                 cursor: "pointer",
-                opacity: 0.6
+                opacity: 0.6,
               }}
               title="Click to change section"
             />
           ))}
         </div>
-      
 
-      {/* Render Conference Management section */}
-      {currentImageIndex === 0 && (
-        <div
-          ref={conferenceManagementRef}
-          id="conference-management"
-          style={{ textAlign: "center", padding: "20px 20px" }}
-        >
-          <div style={{ padding: "20px" }}>
-            <h2
-              style={{ padding: "10px", borderRadius: "5px", color: "#6495ED" }}
-            >
-              Conference Management
-            </h2>
-            <p>
-              Organize, manage, and coordinate with authors and reviewers.
-              <br></br>
-              <strong>UAL Conf</strong> simplifies the creation, organization and management of
-              your conference.
-            </p>
+        {/* Render Conference Management section */}
+        {currentImageIndex === 0 && (
+          <div
+            ref={conferenceManagementRef}
+            id="conference-management"
+            style={{ textAlign: "center", padding: "20px 20px" }}
+          >
+            <div style={{ padding: "20px" }}>
+              <h2
+                style={{
+                  padding: "10px",
+                  borderRadius: "5px",
+                  color: "#6495ED",
+                }}
+              >
+                Conference Management
+              </h2>
+              <p>
+                Organize, manage, and coordinate with authors and reviewers.
+                <br></br>
+                <strong>UAL Conf</strong> simplifies the creation, organization
+                and management of your conference.
+              </p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Render Submit Papers section */}
-      {currentImageIndex === 1 && (
-        <div
-          ref={submitPapersRef}
-          id="submit-papers"
-          style={{ textAlign: "center", padding: "20px 20px" }}
-        >
-          <div style={{ padding: "20px" }}>
-            <h2
-              style={{ padding: "10px", borderRadius: "5px", color: "#6495ED" }}
-            >
-              Submit Papers
-            </h2>
-            <p>
-              Submit your papers effortlessly. <br></br>
-              <strong>UAL Conf</strong> simplifies the submition of all the necessary documents
-              for your conference.
-            </p>
+        {/* Render Submit Papers section */}
+        {currentImageIndex === 1 && (
+          <div
+            ref={submitPapersRef}
+            id="submit-papers"
+            style={{ textAlign: "center", padding: "20px 20px" }}
+          >
+            <div style={{ padding: "20px" }}>
+              <h2
+                style={{
+                  padding: "10px",
+                  borderRadius: "5px",
+                  color: "#6495ED",
+                }}
+              >
+                Submit Papers
+              </h2>
+              <p>
+                Submit your papers effortlessly. <br></br>
+                <strong>UAL Conf</strong> simplifies the submition of all the
+                necessary documents for your conference.
+              </p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Render Review Process section */}
-      {currentImageIndex === 2 && (
-        <div
-          ref={reviewProcessRef}
-          id="review-process"
-          style={{ textAlign: "center", padding: "20px 20px" }}
-        >
-          <div style={{ padding: "20px" }}>
-            <h2
-              style={{ padding: "10px", borderRadius: "5px", color: "#6495ED" }}
-            >
-              Review Process
-            </h2>
-            <p>
-              Efficiently review papers and manage the entire review process.
-              <br></br>
-              <strong>UAL Conf</strong> simplifies the review process, from day one until the final version of your conference.
-            </p>
+        {/* Render Review Process section */}
+        {currentImageIndex === 2 && (
+          <div
+            ref={reviewProcessRef}
+            id="review-process"
+            style={{ textAlign: "center", padding: "20px 20px" }}
+          >
+            <div style={{ padding: "20px" }}>
+              <h2
+                style={{
+                  padding: "10px",
+                  borderRadius: "5px",
+                  color: "#6495ED",
+                }}
+              >
+                Review Process
+              </h2>
+              <p>
+                Efficiently review papers and manage the entire review process.
+                <br></br>
+                <strong>UAL Conf</strong> simplifies the review process, from
+                day one until the final version of your conference.
+              </p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </MDBox>
+
       <Footer />
     </DashboardLayout>
   );

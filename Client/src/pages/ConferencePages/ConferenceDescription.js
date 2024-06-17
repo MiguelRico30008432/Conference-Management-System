@@ -94,20 +94,22 @@ export default function ConferenceDetails() {
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
         <ConfNavbar />
-        <Container maxWidth="sm">
-          <MDBox mt={10} textAlign="left">
-            <ConferenceProgressCard confID={confID} />
-          </MDBox>
-
-          <MDBox mt={2} mb={2} textAlign="left">
-            {message}
-            <MDBox mb={3} textAlign="left">
-              <Card>
-                <ConfereceDetails text={dataForDetails} />
-              </Card>
+        <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <Container maxWidth="sm">
+            <MDBox mt={10} textAlign="left">
+              <ConferenceProgressCard confID={confID} />
             </MDBox>
-          </MDBox>
-        </Container>
+
+            <MDBox mt={2} mb={2} textAlign="left">
+              {message}
+              <MDBox mb={3} textAlign="left">
+                <Card>
+                  <ConfereceDetails text={dataForDetails} />
+                </Card>
+              </MDBox>
+            </MDBox>
+          </Container>
+        </MDBox>
         <Footer />
       </DashboardLayout>
     </>

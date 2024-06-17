@@ -284,50 +284,50 @@ export default function AllSubmissions() {
 
       <DashboardLayout>
         <ConfNavbar />
-
-        <Container maxWidth="sm">
-          <MDBox mt={8} mb={2} textAlign="left">
-            <MDBox mb={3} textAlign="left">
-              <Card>
-                <MDTypography ml={2} variant="h6">
-                  All Submissions
-                </MDTypography>
-                <MDTypography ml={2} variant="body2">
-                  Welcome to the My Submissions Page! Here, you can manage all
-                  your conference submissions. You can view details of each
-                  submission, including title, authors, status, and date. Easily
-                  update your submissions by clicking the "Edit" button,
-                  download submitted files by clicking "Download File," and
-                  remove a submission by clicking "Delete Submission" and
-                  confirming your action.
-                </MDTypography>
-              </Card>
-
-              <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
-
-              <MDBox mb={3} mt={2} textAlign="left">
+        <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <Container maxWidth="sm">
+            <MDBox mt={8} mb={2} textAlign="left">
+              <MDBox mb={3} textAlign="left">
                 <Card>
-                  <CompleteTable
-                    columns={columns}
-                    rows={rows}
-                    numberOfRowsPerPage={100}
-                    height={200}
-                  />
+                  <MDTypography ml={2} variant="h6">
+                    All Submissions
+                  </MDTypography>
+                  <MDTypography ml={2} variant="body2">
+                    Welcome to the My Submissions Page! Here, you can manage all
+                    your conference submissions. You can view details of each
+                    submission, including title, authors, status, and date.
+                    Easily update your submissions by clicking the "Edit"
+                    button, download submitted files by clicking "Download
+                    File," and remove a submission by clicking "Delete
+                    Submission" and confirming your action.
+                  </MDTypography>
                 </Card>
+
+                <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
+
+                <MDBox mb={3} mt={2} textAlign="left">
+                  <Card>
+                    <CompleteTable
+                      columns={columns}
+                      rows={rows}
+                      numberOfRowsPerPage={100}
+                      height={200}
+                    />
+                  </Card>
+                </MDBox>
               </MDBox>
             </MDBox>
-          </MDBox>
-        </Container>
+          </Container>
 
-        {detailsOpen && (
-          <ModalInfo onClose={() => setDetailsOpen(false)} height={450}>
-            <SubmissionDetails
-              submission={dataForDetails}
-              onClose={() => setDetailsOpen(false)}
-            />
-          </ModalInfo>
-        )}
-
+          {detailsOpen && (
+            <ModalInfo onClose={() => setDetailsOpen(false)} height={450}>
+              <SubmissionDetails
+                submission={dataForDetails}
+                onClose={() => setDetailsOpen(false)}
+              />
+            </ModalInfo>
+          )}
+        </MDBox>
         <Footer />
       </DashboardLayout>
     </>

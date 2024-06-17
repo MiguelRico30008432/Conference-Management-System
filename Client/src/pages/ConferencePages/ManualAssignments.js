@@ -154,33 +154,35 @@ export default function ManualAssignments() {
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
         <ConferenceNavBar />
-        <Container maxWidth="sm">
-          <MDBox mt={10} mb={2} textAlign="left">
+        <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <Container maxWidth="sm">
+            <MDBox mt={10} mb={2} textAlign="left">
+              <MDBox mb={3} textAlign="left">
+                <Card>
+                  <MDTypography ml={2} variant="h6">
+                    Manual Assignments
+                  </MDTypography>
+                  <MDTypography ml={2} variant="body2">
+                    TEXT
+                  </MDTypography>
+                </Card>
+              </MDBox>
+            </MDBox>
+
+            <Card sx={{ mt: 2, mb: 2 }}>{message}</Card>
+
             <MDBox mb={3} textAlign="left">
               <Card>
-                <MDTypography ml={2} variant="h6">
-                  Manual Assignments
-                </MDTypography>
-                <MDTypography ml={2} variant="body2">
-                  TEXT
-                </MDTypography>
+                <CompleteTable
+                  columns={columns}
+                  rows={rows}
+                  numberOfRowsPerPage={100}
+                  height={200}
+                />
               </Card>
             </MDBox>
-          </MDBox>
-
-          <Card sx={{ mt: 2, mb: 2 }}>{message}</Card>
-
-          <MDBox mb={3} textAlign="left">
-            <Card>
-              <CompleteTable
-                columns={columns}
-                rows={rows}
-                numberOfRowsPerPage={100}
-                height={200}
-              />
-            </Card>
-          </MDBox>
-        </Container>
+          </Container>
+        </MDBox>
         <Footer />
       </DashboardLayout>
     </>

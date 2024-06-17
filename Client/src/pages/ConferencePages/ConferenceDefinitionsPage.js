@@ -454,334 +454,338 @@ export default function DefinitionsPage() {
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
         <ConfNavbar />
-        <Container maxWidth="sm">
-          <MDBox mt={10} mb={2} textAlign="left">
-            <MDBox mb={3} textAlign="left">
-              <Card>
-                <MDTypography ml={2} variant="h6">
-                  Definitions
-                </MDTypography>
-                <MDTypography ml={2} variant="body2">
-                  To edit details from your conference simply click on 'edit'
-                </MDTypography>
-              </Card>
-            </MDBox>
+        <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <Container maxWidth="sm">
+            <MDBox mt={10} mb={2} textAlign="left">
+              <MDBox mb={3} textAlign="left">
+                <Card>
+                  <MDTypography ml={2} variant="h6">
+                    Definitions
+                  </MDTypography>
+                  <MDTypography ml={2} variant="body2">
+                    To edit details from your conference simply click on 'edit'
+                  </MDTypography>
+                </Card>
+              </MDBox>
 
-            {message}
+              {message}
 
-            <MDBox mb={3} textAlign="left">
-              <MDButton
-                variant="gradient"
-                color="info"
-                sx={{ mt: 2, mb: 2 }}
-                onClick={() => {
-                  setEditModeActive(true);
-                  setMessage(null);
-                }}
-              >
-                Edit Conference Definitions
-              </MDButton>
+              <MDBox mb={3} textAlign="left">
+                <MDButton
+                  variant="gradient"
+                  color="info"
+                  sx={{ mt: 2, mb: 2 }}
+                  onClick={() => {
+                    setEditModeActive(true);
+                    setMessage(null);
+                  }}
+                >
+                  Edit Conference Definitions
+                </MDButton>
 
-              <MDButton
-                variant="gradient"
-                color="success"
-                onClick={async () => handleUpdateConflicts()}
-                sx={{
-                  maxWidth: "300px",
-                  maxHeight: "100px",
-                  minWidth: "5px",
-                  minHeight: "30px",
-                  mt: 2,
-                  mb: 2,
-                  ml: 2,
-                }}
-              >
-                Check for Conflicts
-              </MDButton>
+                <MDButton
+                  variant="gradient"
+                  color="success"
+                  onClick={async () => handleUpdateConflicts()}
+                  sx={{
+                    maxWidth: "300px",
+                    maxHeight: "100px",
+                    minWidth: "5px",
+                    minHeight: "30px",
+                    mt: 2,
+                    mb: 2,
+                    ml: 2,
+                  }}
+                >
+                  Check for Conflicts
+                </MDButton>
 
-              <MDButton
-                variant="gradient"
-                color="success"
-                onClick={async () => handleAssignmentAlgorithm()}
-                sx={{
-                  maxWidth: "300px",
-                  maxHeight: "100px",
-                  minWidth: "5px",
-                  minHeight: "30px",
-                  mt: 2,
-                  mb: 2,
-                  ml: 2,
-                }}
-              >
-                Run Review Assignment Algorithm
-              </MDButton>
+                <MDButton
+                  variant="gradient"
+                  color="success"
+                  onClick={async () => handleAssignmentAlgorithm()}
+                  sx={{
+                    maxWidth: "300px",
+                    maxHeight: "100px",
+                    minWidth: "5px",
+                    minHeight: "30px",
+                    mt: 2,
+                    mb: 2,
+                    ml: 2,
+                  }}
+                >
+                  Run Review Assignment Algorithm
+                </MDButton>
 
-              <Card sx={{ maxWidth: 1400 }}>
-                <MDBox mt={1} mb={1} textAlign="center"></MDBox>
-                <Box component="form" noValidate onSubmit={handleSubmit}>
-                  <Grid container spacing={1}>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        name="confname"
-                        required
-                        fullWidth
-                        id="confname"
-                        label="Conference Name"
-                        autoFocus
-                        InputLabelProps={{ shrink: true }}
-                        value={newName}
-                        onChange={(e) => setNewName(e.target.value)}
-                        disabled={!editModeActive}
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        fullWidth
-                        id="confwebpage"
-                        label="Conference Web Page"
-                        name="confwebpage"
-                        InputLabelProps={{ shrink: true }}
-                        value={newWebpage}
-                        onChange={(e) => setNewWebpage(e.target.value)}
-                        disabled={!editModeActive}
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confcity"
-                        label="City"
-                        name="confcity"
-                        InputLabelProps={{ shrink: true }}
-                        value={newCity}
-                        onChange={(e) => setNewCity(e.target.value)}
-                        disabled={!editModeActive}
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confcountry"
-                        label="Country"
-                        name="confcountry"
-                        InputLabelProps={{ shrink: true }}
-                        value={newCountry}
-                        onChange={(e) => setNewCountry(e.target.value)}
-                        disabled={!editModeActive}
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confcontact"
-                        label="Support Contact"
-                        name="confcontact"
-                        InputLabelProps={{ shrink: true }}
-                        value={newContact}
-                        disabled={!editModeActive}
-                        onChange={(e) => setNewContact(e.target.value)}
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <FormControl fullWidth>
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              checked={newSubmissionUpdate}
-                              onChange={(e) =>
-                                setNewSubmissionUpdate(e.target.checked)
-                              }
-                              disabled={!editModeActive}
-                              sx={{ ml: -1 }}
-                            />
-                          }
-                          label="Submissions Update"
-                          sx={{
-                            ml: 2,
-                            mt: 2,
-                            width: "90%",
-                            alignItems: "center",
-                            "& .MuiFormControlLabel-label": {
-                              fontWeight: "normal",
-                            },
-                          }}
+                <Card sx={{ maxWidth: 1400 }}>
+                  <MDBox mt={1} mb={1} textAlign="center"></MDBox>
+                  <Box component="form" noValidate onSubmit={handleSubmit}>
+                    <Grid container spacing={1}>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          name="confname"
+                          required
+                          fullWidth
+                          id="confname"
+                          label="Conference Name"
+                          autoFocus
+                          InputLabelProps={{ shrink: true }}
+                          value={newName}
+                          onChange={(e) => setNewName(e.target.value)}
+                          disabled={!editModeActive}
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
                         />
-                      </FormControl>
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          fullWidth
+                          id="confwebpage"
+                          label="Conference Web Page"
+                          name="confwebpage"
+                          InputLabelProps={{ shrink: true }}
+                          value={newWebpage}
+                          onChange={(e) => setNewWebpage(e.target.value)}
+                          disabled={!editModeActive}
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confcity"
+                          label="City"
+                          name="confcity"
+                          InputLabelProps={{ shrink: true }}
+                          value={newCity}
+                          onChange={(e) => setNewCity(e.target.value)}
+                          disabled={!editModeActive}
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confcountry"
+                          label="Country"
+                          name="confcountry"
+                          InputLabelProps={{ shrink: true }}
+                          value={newCountry}
+                          onChange={(e) => setNewCountry(e.target.value)}
+                          disabled={!editModeActive}
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confcontact"
+                          label="Support Contact"
+                          name="confcontact"
+                          InputLabelProps={{ shrink: true }}
+                          value={newContact}
+                          disabled={!editModeActive}
+                          onChange={(e) => setNewContact(e.target.value)}
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <FormControl fullWidth>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={newSubmissionUpdate}
+                                onChange={(e) =>
+                                  setNewSubmissionUpdate(e.target.checked)
+                                }
+                                disabled={!editModeActive}
+                                sx={{ ml: -1 }}
+                              />
+                            }
+                            label="Submissions Update"
+                            sx={{
+                              ml: 2,
+                              mt: 2,
+                              width: "90%",
+                              alignItems: "center",
+                              "& .MuiFormControlLabel-label": {
+                                fontWeight: "normal",
+                              },
+                            }}
+                          />
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confstartsubmission"
+                          label="Submissions Start Date"
+                          name="confstartsubmission"
+                          type="date"
+                          InputLabelProps={{ shrink: true }}
+                          inputProps={{ min: currentDate }}
+                          value={newSubmissionsStart}
+                          disabled={
+                            !editModeActive || isDatePast(submissionsStart)
+                          }
+                          onChange={(e) =>
+                            setNewSubmissionStart(formatDate(e.target.value))
+                          }
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confendsubmission"
+                          label="Submissions End Date"
+                          name="confendsubmission"
+                          type="date"
+                          InputLabelProps={{ shrink: true }}
+                          inputProps={{ min: addOneDay(newSubmissionsStart) }}
+                          value={newSubmissionsEnd}
+                          disabled={
+                            !editModeActive || isDatePast(submissionsEnd)
+                          }
+                          onChange={(e) =>
+                            setNewSubmissionEnd(formatDate(e.target.value))
+                          }
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confstartbidding"
+                          label="Bidding Start Date"
+                          name="confstartbidding"
+                          type="date"
+                          InputLabelProps={{ shrink: true }}
+                          inputProps={{ min: addOneDay(newSubmissionsEnd) }}
+                          value={newBiddingStart}
+                          disabled={!editModeActive || isDatePast(biddingStart)}
+                          onChange={(e) =>
+                            setNewBiddingStart(formatDate(e.target.value))
+                          }
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confendbidding"
+                          label="Bidding End Date"
+                          name="confendbidding"
+                          type="date"
+                          InputLabelProps={{ shrink: true }}
+                          inputProps={{ min: addOneDay(newBiddingStart) }}
+                          value={newBiddingEnd}
+                          disabled={!editModeActive || isDatePast(biddingEnd)}
+                          onChange={(e) =>
+                            setNewBiddingEnd(formatDate(e.target.value))
+                          }
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confstartreview"
+                          label="Reviews Start Date"
+                          name="confstartreview"
+                          type="date"
+                          InputLabelProps={{ shrink: true }}
+                          inputProps={{ min: addOneDay(newBiddingEnd) }}
+                          value={newReviewStart}
+                          disabled={!editModeActive || isDatePast(reviewStart)}
+                          onChange={(e) =>
+                            setNewReviewStart(formatDate(e.target.value))
+                          }
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confendreview"
+                          label="Reviews End Date"
+                          name="confendreview"
+                          type="date"
+                          InputLabelProps={{ shrink: true }}
+                          inputProps={{ min: addOneDay(newReviewStart) }}
+                          value={newReviewEnd}
+                          disabled={!editModeActive || isDatePast(reviewEnd)}
+                          onChange={(e) =>
+                            setNewReviewEnd(formatDate(e.target.value))
+                          }
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confstartdate"
+                          label="Conferance Start Date"
+                          name="confstartdate"
+                          type="date"
+                          InputLabelProps={{ shrink: true }}
+                          inputProps={{ min: addOneDay(newReviewEnd) }}
+                          value={newConfStart}
+                          disabled={!editModeActive || isDatePast(confStart)}
+                          onChange={(e) =>
+                            setNewConfStart(formatDate(e.target.value))
+                          }
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confenddate"
+                          label="Conference End Date"
+                          name="confenddate"
+                          type="date"
+                          InputLabelProps={{ shrink: true }}
+                          inputProps={{ min: addOneDay(newConfStart) }}
+                          value={newConfEnd}
+                          disabled={!editModeActive || isDatePast(confEnd)}
+                          onChange={(e) =>
+                            setNewConfEnd(formatDate(e.target.value))
+                          }
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confstartsubmission"
-                        label="Submissions Start Date"
-                        name="confstartsubmission"
-                        type="date"
-                        InputLabelProps={{ shrink: true }}
-                        inputProps={{ min: currentDate }}
-                        value={newSubmissionsStart}
-                        disabled={
-                          !editModeActive || isDatePast(submissionsStart)
-                        }
-                        onChange={(e) =>
-                          setNewSubmissionStart(formatDate(e.target.value))
-                        }
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confendsubmission"
-                        label="Submissions End Date"
-                        name="confendsubmission"
-                        type="date"
-                        InputLabelProps={{ shrink: true }}
-                        inputProps={{ min: addOneDay(newSubmissionsStart) }}
-                        value={newSubmissionsEnd}
-                        disabled={!editModeActive || isDatePast(submissionsEnd)}
-                        onChange={(e) =>
-                          setNewSubmissionEnd(formatDate(e.target.value))
-                        }
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confstartbidding"
-                        label="Bidding Start Date"
-                        name="confstartbidding"
-                        type="date"
-                        InputLabelProps={{ shrink: true }}
-                        inputProps={{ min: addOneDay(newSubmissionsEnd) }}
-                        value={newBiddingStart}
-                        disabled={!editModeActive || isDatePast(biddingStart)}
-                        onChange={(e) =>
-                          setNewBiddingStart(formatDate(e.target.value))
-                        }
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confendbidding"
-                        label="Bidding End Date"
-                        name="confendbidding"
-                        type="date"
-                        InputLabelProps={{ shrink: true }}
-                        inputProps={{ min: addOneDay(newBiddingStart) }}
-                        value={newBiddingEnd}
-                        disabled={!editModeActive || isDatePast(biddingEnd)}
-                        onChange={(e) =>
-                          setNewBiddingEnd(formatDate(e.target.value))
-                        }
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confstartreview"
-                        label="Reviews Start Date"
-                        name="confstartreview"
-                        type="date"
-                        InputLabelProps={{ shrink: true }}
-                        inputProps={{ min: addOneDay(newBiddingEnd) }}
-                        value={newReviewStart}
-                        disabled={!editModeActive || isDatePast(reviewStart)}
-                        onChange={(e) =>
-                          setNewReviewStart(formatDate(e.target.value))
-                        }
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confendreview"
-                        label="Reviews End Date"
-                        name="confendreview"
-                        type="date"
-                        InputLabelProps={{ shrink: true }}
-                        inputProps={{ min: addOneDay(newReviewStart) }}
-                        value={newReviewEnd}
-                        disabled={!editModeActive || isDatePast(reviewEnd)}
-                        onChange={(e) =>
-                          setNewReviewEnd(formatDate(e.target.value))
-                        }
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confstartdate"
-                        label="Conferance Start Date"
-                        name="confstartdate"
-                        type="date"
-                        InputLabelProps={{ shrink: true }}
-                        inputProps={{ min: addOneDay(newReviewEnd) }}
-                        value={newConfStart}
-                        disabled={!editModeActive || isDatePast(confStart)}
-                        onChange={(e) =>
-                          setNewConfStart(formatDate(e.target.value))
-                        }
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confenddate"
-                        label="Conference End Date"
-                        name="confenddate"
-                        type="date"
-                        InputLabelProps={{ shrink: true }}
-                        inputProps={{ min: addOneDay(newConfStart) }}
-                        value={newConfEnd}
-                        disabled={!editModeActive || isDatePast(confEnd)}
-                        onChange={(e) =>
-                          setNewConfEnd(formatDate(e.target.value))
-                        }
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                  </Grid>
-                  <MDButton
-                    type="submit"
-                    variant="gradient"
-                    color="info"
-                    sx={{
-                      ml: 2,
-                      mt: 2,
-                      mb: 2,
-                      display: editModeActive ? "block" : "none",
-                    }}
-                  >
-                    Save Changes
-                  </MDButton>
-                  <MDBox mt={3} mb={1} textAlign="center"></MDBox>
-                </Box>
-              </Card>
+                    <MDButton
+                      type="submit"
+                      variant="gradient"
+                      color="info"
+                      sx={{
+                        ml: 2,
+                        mt: 2,
+                        mb: 2,
+                        display: editModeActive ? "block" : "none",
+                      }}
+                    >
+                      Save Changes
+                    </MDButton>
+                    <MDBox mt={3} mb={1} textAlign="center"></MDBox>
+                  </Box>
+                </Card>
+              </MDBox>
             </MDBox>
-          </MDBox>
-        </Container>
+          </Container>
+        </MDBox>
         <Footer />
       </DashboardLayout>
     </>

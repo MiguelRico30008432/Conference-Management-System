@@ -147,44 +147,46 @@ export default function MyReviews() {
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
         <ConferenceNavBar />
-        {openReview ? (
-          <ReviewsDone
-            assignmentID={assignmentID}
-            title={title}
-            onClose={() => setOpenReview(false)}
-          />
-        ) : (
-          <Container maxWidth="sm">
-            <MDBox mt={10} mb={2} textAlign="left">
+        <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          {openReview ? (
+            <ReviewsDone
+              assignmentID={assignmentID}
+              title={title}
+              onClose={() => setOpenReview(false)}
+            />
+          ) : (
+            <Container maxWidth="sm">
+              <MDBox mt={10} mb={2} textAlign="left">
+                <MDBox mb={3} textAlign="left">
+                  <Card>
+                    <MDTypography ml={2} variant="h6">
+                      My Reviews
+                    </MDTypography>
+                    <MDTypography ml={2} variant="body2">
+                      Here, you as reviewer can add, edit, and delete reviews
+                      for submissions. Your feedback ensures the high quality of
+                      our conference. Please provide thorough and objective
+                      reviews. Thank you for your valuable contributions.
+                    </MDTypography>
+                  </Card>
+                </MDBox>
+              </MDBox>
+
+              <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
+
               <MDBox mb={3} textAlign="left">
                 <Card>
-                  <MDTypography ml={2} variant="h6">
-                    My Reviews
-                  </MDTypography>
-                  <MDTypography ml={2} variant="body2">
-                    Here, you as reviewer can add, edit, and delete reviews for
-                    submissions. Your feedback ensures the high quality of our
-                    conference. Please provide thorough and objective reviews.
-                    Thank you for your valuable contributions.
-                  </MDTypography>
+                  <CompleteTable
+                    columns={columns}
+                    rows={rows}
+                    numberOfRowsPerPage={100}
+                    height={200}
+                  />
                 </Card>
               </MDBox>
-            </MDBox>
-
-            <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
-
-            <MDBox mb={3} textAlign="left">
-              <Card>
-                <CompleteTable
-                  columns={columns}
-                  rows={rows}
-                  numberOfRowsPerPage={100}
-                  height={200}
-                />
-              </Card>
-            </MDBox>
-          </Container>
-        )}
+            </Container>
+          )}
+        </MDBox>
         <Footer />
       </DashboardLayout>
     </>

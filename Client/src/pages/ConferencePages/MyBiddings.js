@@ -347,50 +347,52 @@ export default function MyBiddingPage() {
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
         <ConfNavbar />
-        <Container maxWidth="sm">
-          <MDBox mt={10} mb={2} textAlign="left">
-            <MDBox mb={3} textAlign="left">
+        <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <Container maxWidth="sm">
+            <MDBox mt={10} mb={2} textAlign="left">
+              <MDBox mb={3} textAlign="left">
+                <Card>
+                  <MDTypography ml={2} variant="h6">
+                    My Biddings
+                  </MDTypography>
+                  <MDTypography ml={2} variant="body2">
+                    In this page you are able to update(change your confidence
+                    level) or delete your biddings.<br></br>
+                    After submit if you choose to delete a bid, then it will no
+                    longer show in the table.<br></br>
+                  </MDTypography>
+                </Card>
+              </MDBox>
+            </MDBox>
+            {message}
+            <MDBox mt={2} mb={2} textAlign="left">
+              <MDBox mb={3} textAlign="left"></MDBox>
+              <MDButton
+                variant="gradient"
+                color="success"
+                onClick={handleSubmit}
+                sx={{
+                  maxWidth: "90px",
+                  maxHeight: "40px",
+                  minWidth: "30px",
+                  minHeight: "30px",
+                  marginBottom: "10px",
+                  marginLeft: "10px",
+                }}
+              >
+                Submit
+              </MDButton>
               <Card>
-                <MDTypography ml={2} variant="h6">
-                  My Biddings
-                </MDTypography>
-                <MDTypography ml={2} variant="body2">
-                  In this page you are able to update(change your confidence
-                  level) or delete your biddings.<br></br>
-                  After submit if you choose to delete a bid, then it will no
-                  longer show in the table.<br></br>
-                </MDTypography>
+                <CompleteTable
+                  columns={columns}
+                  rows={rows}
+                  numberOfRowsPerPage={100}
+                  height={200}
+                />
               </Card>
             </MDBox>
-          </MDBox>
-          {message}
-          <MDBox mt={2} mb={2} textAlign="left">
-            <MDBox mb={3} textAlign="left"></MDBox>
-            <MDButton
-              variant="gradient"
-              color="success"
-              onClick={handleSubmit}
-              sx={{
-                maxWidth: "90px",
-                maxHeight: "40px",
-                minWidth: "30px",
-                minHeight: "30px",
-                marginBottom: "10px",
-                marginLeft: "10px",
-              }}
-            >
-              Submit
-            </MDButton>
-            <Card>
-              <CompleteTable
-                columns={columns}
-                rows={rows}
-                numberOfRowsPerPage={100}
-                height={200}
-              />
-            </Card>
-          </MDBox>
-        </Container>
+          </Container>
+        </MDBox>
         <Footer />
       </DashboardLayout>
     </>

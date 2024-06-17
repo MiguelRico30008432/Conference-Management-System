@@ -147,44 +147,46 @@ export default function AllReviews() {
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
         <ConferenceNavBar />
-        {openReview ? (
-          <MultiReviewsDone
-            submissionID={submissionID}
-            title={title}
-            onClose={() => setOpenReview(false)}
-          />
-        ) : (
-          <Container maxWidth="sm">
-            <MDBox mt={10} mb={2} textAlign="left">
+        <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          {openReview ? (
+            <MultiReviewsDone
+              submissionID={submissionID}
+              title={title}
+              onClose={() => setOpenReview(false)}
+            />
+          ) : (
+            <Container maxWidth="sm">
+              <MDBox mt={10} mb={2} textAlign="left">
+                <MDBox mb={3} textAlign="left">
+                  <Card>
+                    <MDTypography ml={2} variant="h6">
+                      All Reviews
+                    </MDTypography>
+                    <MDTypography ml={2} variant="body2">
+                      Here you can browse and consult all reviews for each
+                      submission. Gain insights from detailed feedback provided
+                      by our reviewers. This resource ensures transparency and
+                      helps maintain the high standards of our conference.
+                    </MDTypography>
+                  </Card>
+                </MDBox>
+              </MDBox>
+
+              <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
+
               <MDBox mb={3} textAlign="left">
                 <Card>
-                  <MDTypography ml={2} variant="h6">
-                    All Reviews
-                  </MDTypography>
-                  <MDTypography ml={2} variant="body2">
-                    Here you can browse and consult all reviews for each
-                    submission. Gain insights from detailed feedback provided by
-                    our reviewers. This resource ensures transparency and helps
-                    maintain the high standards of our conference.
-                  </MDTypography>
+                  <CompleteTable
+                    columns={columns}
+                    rows={rows}
+                    numberOfRowsPerPage={100}
+                    height={200}
+                  />
                 </Card>
               </MDBox>
-            </MDBox>
-
-            <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
-
-            <MDBox mb={3} textAlign="left">
-              <Card>
-                <CompleteTable
-                  columns={columns}
-                  rows={rows}
-                  numberOfRowsPerPage={100}
-                  height={200}
-                />
-              </Card>
-            </MDBox>
-          </Container>
-        )}
+            </Container>
+          )}
+        </MDBox>
         <Footer />
       </DashboardLayout>
     </>

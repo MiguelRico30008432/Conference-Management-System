@@ -74,39 +74,41 @@ export default function Events() {
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
         <ConfNavbar />
-        <Container maxWidth="sm">
-          <MDBox mt={10} mb={2} textAlign="left">
-            <MDBox mb={3} textAlign="left">
-              <Card>
-                <MDTypography ml={2} variant="h6">
-                  Events
-                </MDTypography>
-                <MDTypography ml={2} mr={2} mb={2} variant="body2">
-                  Here you can stay updated with all the events happening during
-                  the conference. This page provides a comprehensive overview of
-                  the schedule, ensuring you don't miss any important thing.
-                  Check back regularly to stay informed about the latest updates
-                  and changes. Enjoy the conference!
-                </MDTypography>
-              </Card>
-            </MDBox>
+        <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <Container maxWidth="sm">
+            <MDBox mt={10} mb={2} textAlign="left">
+              <MDBox mb={3} textAlign="left">
+                <Card>
+                  <MDTypography ml={2} variant="h6">
+                    Events
+                  </MDTypography>
+                  <MDTypography ml={2} mr={2} mb={2} variant="body2">
+                    Here you can stay updated with all the events happening
+                    during the conference. This page provides a comprehensive
+                    overview of the schedule, ensuring you don't miss any
+                    important thing. Check back regularly to stay informed about
+                    the latest updates and changes. Enjoy the conference!
+                  </MDTypography>
+                </Card>
+              </MDBox>
 
-            <MDBox mb={3} textAlign="left">
-              <Card>{error}</Card>
-            </MDBox>
+              <MDBox mb={3} textAlign="left">
+                <Card>{error}</Card>
+              </MDBox>
 
-            <MDBox mb={3}>
-              <Card>
-                <CompleteTable
-                  columns={columns}
-                  rows={rows}
-                  numerOfRowsPerPage={100}
-                  height={350}
-                />
-              </Card>
+              <MDBox mb={3}>
+                <Card>
+                  <CompleteTable
+                    columns={columns}
+                    rows={rows}
+                    numerOfRowsPerPage={10}
+                    height={350}
+                  />
+                </Card>
+              </MDBox>
             </MDBox>
-          </MDBox>
-        </Container>
+          </Container>
+        </MDBox>
         <Footer />
       </DashboardLayout>
     </>

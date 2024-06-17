@@ -358,50 +358,52 @@ export default function MySubmissionsPage() {
 
       <DashboardLayout>
         <ConferenceNavBar />
-        {!update ? (
-          <>
-            <Container maxWidth="sm">
-              <MDBox mt={10} mb={2} textAlign="left">
-                <Card>
-                  <MDTypography ml={2} variant="h6">
-                    My Submissions
-                  </MDTypography>
-                  <MDTypography ml={2} variant="body2">
-                    Here you can view and manage your submissions.
-                  </MDTypography>
-                </Card>
-
-                <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
-
-                <MDBox mb={3} textAlign="left">
+        <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          {!update ? (
+            <>
+              <Container maxWidth="sm">
+                <MDBox mt={10} mb={2} textAlign="left">
                   <Card>
-                    <CompleteTable
-                      columns={columns}
-                      rows={rows}
-                      numberOfRowsPerPage={100}
-                      height={200}
-                    />
+                    <MDTypography ml={2} variant="h6">
+                      My Submissions
+                    </MDTypography>
+                    <MDTypography ml={2} variant="body2">
+                      Here you can view and manage your submissions.
+                    </MDTypography>
                   </Card>
+
+                  <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
+
+                  <MDBox mb={3} textAlign="left">
+                    <Card>
+                      <CompleteTable
+                        columns={columns}
+                        rows={rows}
+                        numberOfRowsPerPage={100}
+                        height={200}
+                      />
+                    </Card>
+                  </MDBox>
                 </MDBox>
-              </MDBox>
-            </Container>
-            {!detailsOpen ? null : (
-              <ModalInfo onClose={() => setDetailsOpen(false)} height={450}>
-                <SubmissionsDetails
-                  submission={dataForDetails}
-                  onClose={() => setDetailsOpen(false)}
-                />
-              </ModalInfo>
-            )}
-          </>
-        ) : (
-          <ModalInfo onClose={() => setDetailsOpen(false)}>
-            <UpdateSubmission
-              submissionID={dataForUpdate}
-              onClose={() => setUpdate(false)}
-            />
-          </ModalInfo>
-        )}
+              </Container>
+              {!detailsOpen ? null : (
+                <ModalInfo onClose={() => setDetailsOpen(false)} height={450}>
+                  <SubmissionsDetails
+                    submission={dataForDetails}
+                    onClose={() => setDetailsOpen(false)}
+                  />
+                </ModalInfo>
+              )}
+            </>
+          ) : (
+            <ModalInfo onClose={() => setDetailsOpen(false)}>
+              <UpdateSubmission
+                submissionID={dataForUpdate}
+                onClose={() => setUpdate(false)}
+              />
+            </ModalInfo>
+          )}
+        </MDBox>
         <Footer />
       </DashboardLayout>
     </>

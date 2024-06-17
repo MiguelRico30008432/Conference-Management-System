@@ -5,6 +5,7 @@ const mail = require("../utility/emails");
 const auth = require("../utility/verifications");
 const bcrypt = require("bcrypt");
 const passport = require("passport");
+const ver = require("../utility/verifications");
 
 //Login
 router.post("/signIn", (req, res, next) => {
@@ -24,7 +25,7 @@ router.post("/signIn", (req, res, next) => {
       } else {
         return res.status(401).send({
           success: false,
-          message: "Unauthorized. Invalid credentials.",
+          message: "Invalid credentials.",
         });
       }
     }
@@ -48,10 +49,23 @@ router.post("/signIn", (req, res, next) => {
 
 // User Registration
 router.post("/signUp", async (req, res) => {
-  const { firstName, lastName, password, email, phone, affiliation, inviteCode } = req.body;
+  const {
+    firstName,
+    lastName,
+    password,
+    email,
+    phone,
+    affiliation,
+    inviteCode,
+  } = req.body;
 
   try {
     const findUserName = await db.fetchData("users", "useremail", email);
+
+    if (!ver.containsOnlyDigits(phone))
+      return res
+        .status(404)
+        .send({ msg: "The phone number must be only digits" });
 
     if (!findUserName.length) {
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -65,7 +79,11 @@ router.post("/signUp", async (req, res) => {
       };
 
       if (inviteCode.length !== 0) {
-        const invitationInfo = await db.fetchData("invitations", "invitationemail", email);
+        const invitationInfo = await db.fetchData(
+          "invitations",
+          "invitationemail",
+          email
+        );
 
         let inviteFound = false;
         for (const invite of invitationInfo) {
@@ -82,16 +100,22 @@ router.post("/signUp", async (req, res) => {
             await db.addData("userroles", {
               userid: userId,
               userrole: userRole,
-              confid: confID
+              confid: confID,
             });
-            await db.updateData("invitations", { invitationcodeused: 't' }, { invitationid: invite.invitationid });
+            await db.updateData(
+              "invitations",
+              { invitationcodeused: "t" },
+              { invitationid: invite.invitationid }
+            );
           }
         }
 
         if (inviteFound) {
           return res.status(201).send({ msg: "User created." });
         } else {
-          return res.status(403).send({ msg: "This code isn't associated with your user." });
+          return res
+            .status(403)
+            .send({ msg: "This code isn't associated with your user." });
         }
       } else {
         await db.addData("users", newUser);
@@ -102,7 +126,9 @@ router.post("/signUp", async (req, res) => {
     }
   } catch (error) {
     console.error("Error when creating the user: ", error);
-    return res.status(500).send({ msg: "Internal server error", error: error.message });
+    return res
+      .status(500)
+      .send({ msg: "Internal server error", error: error.message });
   }
 });
 

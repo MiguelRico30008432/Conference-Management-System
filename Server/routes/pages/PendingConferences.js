@@ -23,8 +23,6 @@ router.get(
         to_char(conferences.confstartbidding, 'DD-MM-YYYY HH24:MI:SS') AS confstartbidding,
         to_char(conferences.confendbidding, 'DD-MM-YYYY HH24:MI:SS') AS confendbidding,
         confAreas.confareaname,
-        conferences.confmaxreviewers,
-        conferences.confminreviewers,
         conferences.confadddate,
         conferences.confapproved,
         conferences.confOwner

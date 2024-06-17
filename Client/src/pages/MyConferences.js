@@ -50,9 +50,6 @@ export default function MyConferences() {
   }, [isLoggedIn]);
 
   const columns = [
-    { field: "confname", headerName: "Conference Name", width: 450 },
-    { field: "confphase", headerName: "Conference Phase", width: 200 },
-    { field: "userrole", headerName: "Your Role", width: 200 },
     {
       field: "Enter",
       filterable: false,
@@ -84,10 +81,10 @@ export default function MyConferences() {
                 navigate("/MyConferences/ConferenceDescription");
               }}
               sx={{
-                maxWidth: "80px",
-                maxHeight: "30px",
+                maxWidth: "50px",
+                maxHeight: "23px",
                 minWidth: "30px",
-                minHeight: "30px",
+                minHeight: "23px",
               }}
             >
               Enter
@@ -96,6 +93,9 @@ export default function MyConferences() {
         );
       },
     },
+    { field: "confname", headerName: "Conference Name", width: 450 },
+    { field: "confphase", headerName: "Conference Phase", width: 200 },
+    { field: "userrole", headerName: "Your Role", width: 200 },
   ];
 
   async function saveConfIDOnUser(confID) {
@@ -130,31 +130,33 @@ export default function MyConferences() {
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
         <UpperNavBar />
-        <MDBox mb={5} textAlign="left">
-          <Card>
-            <MDTypography ml={2} variant="body2">
-              On this page, you'll find a comprehensive list of all the
-              conferences you are participating in. Once inside, you'll have
-              access to a wealth of resources, sessions, and interactive
-              features tailored to enhance your conference experience.
-            </MDTypography>
+        <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <MDBox mb={5} textAlign="left">
+            <Card>
+              <MDTypography ml={2} variant="body2">
+                On this page, you'll find a comprehensive list of all the
+                conferences you are participating in. Once inside, you'll have
+                access to a wealth of resources, sessions, and interactive
+                features tailored to enhance your conference experience.
+              </MDTypography>
 
-            <MDTypography ml={2} variant="body2">
-              To explore any conference further, simply click on the "Enter"
-              button next to its details.
-            </MDTypography>
+              <MDTypography ml={2} variant="body2">
+                To explore any conference further, simply click on the "Enter"
+                button next to its details.
+              </MDTypography>
+            </Card>
+          </MDBox>
+          {error}
+          <Card>
+            <CompleteTable
+              columns={columns}
+              rows={rows}
+              numerOfRowsPerPage={5}
+              height={200}
+            />
           </Card>
         </MDBox>
-        {error}
-        <Card>
-          <CompleteTable
-            columns={columns}
-            rows={rows}
-            numerOfRowsPerPage={5}
-            height={200}
-          />
-        </Card>
-        <br></br>
+
         <Footer />
       </DashboardLayout>
     </>

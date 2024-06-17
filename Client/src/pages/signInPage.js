@@ -30,6 +30,7 @@ export default function SignInPage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setErrorOnRequest(null);
 
     const data = new FormData(event.currentTarget);
     const formData = Object.fromEntries(data.entries());
@@ -43,7 +44,7 @@ export default function SignInPage() {
   const login = async (email, password) => {
     setOpenLoading(true);
     try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/signIn`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/signIn`, {
         method: "POST",
         body: JSON.stringify({ email: email, password: password }),
         headers: {
@@ -169,7 +170,9 @@ export default function SignInPage() {
                     </MDTypography>
                   </MDTypography>
                 </MDBox>
-                {errorOnRequest}
+                <MDBox mt={1} mb={1} textAlign="center">
+                  {errorOnRequest}
+                </MDBox>
               </Box>
             </Box>
           </Container>

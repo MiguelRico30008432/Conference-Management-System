@@ -3,6 +3,7 @@ const db = require("../../utility/database");
 const auth = require("../../utility/verifications");
 const bcrypt = require("bcrypt");
 const router = express.Router();
+const ver = require("../../utility/verifications");
 
 router.post("/userData", auth.ensureAuthenticated, async (req, res) => {
   try {
@@ -34,6 +35,11 @@ router.post("/saveUserData", auth.ensureAuthenticated, async (req, res) => {
     if (userRecords.length != 0 && userRecords[0].userid != req.body.userID) {
       return res.status(404).send({ msg: "Email already in use" });
     }
+
+    if (!ver.containsOnlyDigits(req.body.phone))
+      return res
+        .status(404)
+        .send({ msg: "The phone number must be only digits" });
 
     await db.updateData(
       "users",
@@ -68,52 +74,71 @@ router.post("/saveUserPassword", auth.ensureAuthenticated, async (req, res) => {
   }
 });
 
+router.post(
+  "/saveInvitationCode",
+  auth.ensureAuthenticated,
+  async (req, res) => {
+    try {
+      const userId = req.body.userID;
+      const userInfo = await db.fetchData("users", "userid", userId);
+      const userEmail = userInfo[0].useremail;
 
+      const invitationInfo = await db.fetchData(
+        "invitations",
+        "invitationemail",
+        userEmail
+      );
 
-router.post("/saveInvitationCode", auth.ensureAuthenticated, async (req, res) => {
-  try {
-    const userId = req.body.userID;
-    const userInfo = await db.fetchData("users", "userid", userId);
-    const userEmail = userInfo[0].useremail;
+      let inviteFound = false;
+      for (const invite of invitationInfo) {
+        const userRole = invite.invitationrole;
+        const confID = invite.confid;
+        const invitationCode = invite.invitationcode;
 
-    const invitationInfo = await db.fetchData("invitations", "invitationemail", userEmail);
+        if (
+          invitationCode === req.body.inviteCode &&
+          userInfo[0].userid === userId
+        ) {
+          const infoExists = await db.fetchData("userroles", "userid", userId);
 
-    let inviteFound = false;
-    for (const invite of invitationInfo) {
-      const userRole = invite.invitationrole;
-      const confID = invite.confid;
-      const invitationCode = invite.invitationcode;
+          // Check if the role for this conference ID already exists for the user
+          const existingRole = infoExists.find(
+            (info) => info.confid === confID && info.userrole === userRole
+          );
 
-      if (invitationCode === req.body.inviteCode && userInfo[0].userid === userId) {
-        const infoExists = await db.fetchData("userroles", "userid", userId);
-
-        // Check if the role for this conference ID already exists for the user
-        const existingRole = infoExists.find(info => info.confid === confID && info.userrole === userRole);
-
-        if (existingRole) {
-          return res.status(409).send({ msg: "This code is already registered." });
-        } else {
-          await db.addData("userroles", {
-            userid: req.body.userID,
-            userrole: userRole,
-            confid: confID
-          });
-          inviteFound = true;
-          await db.updateData("invitations", { invitationcodeused: 't' }, { invitationid: invite.invitationid });
+          if (existingRole) {
+            return res
+              .status(409)
+              .send({ msg: "This code is already registered." });
+          } else {
+            await db.addData("userroles", {
+              userid: req.body.userID,
+              userrole: userRole,
+              confid: confID,
+            });
+            inviteFound = true;
+            await db.updateData(
+              "invitations",
+              { invitationcodeused: "t" },
+              { invitationid: invite.invitationid }
+            );
+          }
         }
       }
-    }
 
-    if (inviteFound) {
-      return res.status(200).send({ msg: "Invitation code registered successfully." });
-    } else {
-      return res.status(403).send({ msg: "This code isn't associated with your user." });
+      if (inviteFound) {
+        return res
+          .status(200)
+          .send({ msg: "Invitation code registered successfully." });
+      } else {
+        return res
+          .status(403)
+          .send({ msg: "This code isn't associated with your user." });
+      }
+    } catch (error) {
+      return res.status(500).send({ msg: "Internal Error" });
     }
-  } catch (error) {
-      return res.status(500).send({ msg: "Internal Error"});
   }
-});
-
-
+);
 
 module.exports = router;

@@ -222,111 +222,114 @@ export default function SendInvitation() {
   return (
     <DashboardLayout>
       <ConfNavbar />
-      <Container maxWidth="sm">
-        <MDBox mt={10} textAlign="left">
-          <Card>
-            <MDTypography ml={2} variant="h6">
-              Send Invitation
-            </MDTypography>
-            <MDTypography ml={2} variant="body2">
-              On this page you can send invites so new members can join your
-              conference, you can send an email to multiple users, each one will
-              have a different code. Make sure to choose the role you want the
-              user's to have. After sending the invitation, in case there was an
-              error or you sent to the incorrect user, you can always delete the
-              invitation if it has not been already used.
-            </MDTypography>
-          </Card>
-          <Card sx={{ mt: 3, p: 3 }}>
-            {invitationEmailSuccess && (
-              <Alert severity="success">{invitationEmailSuccess}</Alert>
-            )}
-            {invitationError && (
-              <Alert severity="error">{invitationError}</Alert>
-            )}
-            {alreadyInvitedEmails.length > 0 && (
-              <Alert severity="info">
-                The following emails have already received an invitation:{" "}
-                {alreadyInvitedEmails.join(", ")}
-              </Alert>
-            )}
-            <Box component="form" onSubmit={handleSendInvitation} noValidate>
-              <FormControl
-                fullWidth
-                margin="normal"
-                variant="outlined"
-                error={Boolean(roleError)}
-              >
-                <MDTypography variant="body2">Role *</MDTypography>
-                <Select
-                  id="role"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  displayEmpty
-                  inputProps={{ "aria-label": "Without label" }}
-                  IconComponent={ArrowDropDownIcon}
-                  sx={{ height: "3rem" }}
-                >
-                  <MenuItem value="" disabled>
-                    Choose a Role
-                  </MenuItem>
-                  <MenuItem value="Chair">Chair</MenuItem>
-                  <MenuItem value="Committee">Committee</MenuItem>
-                </Select>
-                {roleError && <Alert severity="error">{roleError}</Alert>}
-              </FormControl>
-              <FormControl fullWidth error={Boolean(emailError)}>
-                <MDTypography variant="body2" sx={{ mt: 2, mb: 1 }}>
-                  Recipients *
-                </MDTypography>
-                <Box
-                  sx={{
-                    "& textarea": {
-                      width: "100%",
-                      padding: "18.5px 14px",
-                      fontSize: "0.9rem",
-                      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-                      border: "1px solid #c4c4c4",
-                      borderRadius: "4px",
-                      resize: "vertical",
-                      marginTop: "8px",
-                    },
-                  }}
-                >
-                  <textarea
-                    id="emails"
-                    placeholder="Enter recipients separated by commas"
-                    value={emails}
-                    onChange={(e) => setEmails(e.target.value)}
-                    rows={4}
-                  />
-                </Box>
-                {emailError && <Alert severity="error">{emailError}</Alert>}
-              </FormControl>
-              <Button
-                type="submit"
-                variant="contained"
-                sx={{ mt: 3, mb: 2, color: "white !important" }}
-              >
+      <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        <Container maxWidth="sm">
+          <MDBox mt={10} textAlign="left">
+            <Card>
+              <MDTypography ml={2} variant="h6">
                 Send Invitation
-              </Button>
-            </Box>
-          </Card>
-          <Card sx={{ mt: 3 }}>
-            {deleteError && <Alert severity="error">{deleteError}</Alert>}
-            {deleteSuccessMessage && (
-              <Alert severity="success">{deleteSuccessMessage}</Alert>
-            )}
-            <CompleteTable
-              columns={columns}
-              rows={rows}
-              numerOfRowsPerPage={5}
-              height={200}
-            />
-          </Card>
-        </MDBox>
-        <br></br>
-      </Container>
+              </MDTypography>
+              <MDTypography ml={2} variant="body2">
+                On this page you can send invites so new members can join your
+                conference, you can send an email to multiple users, each one
+                will have a different code. Make sure to choose the role you
+                want the user's to have. After sending the invitation, in case
+                there was an error or you sent to the incorrect user, you can
+                always delete the invitation if it has not been already used.
+              </MDTypography>
+            </Card>
+            <Card sx={{ mt: 3, p: 3 }}>
+              {invitationEmailSuccess && (
+                <Alert severity="success">{invitationEmailSuccess}</Alert>
+              )}
+              {invitationError && (
+                <Alert severity="error">{invitationError}</Alert>
+              )}
+              {alreadyInvitedEmails.length > 0 && (
+                <Alert severity="info">
+                  The following emails have already received an invitation:{" "}
+                  {alreadyInvitedEmails.join(", ")}
+                </Alert>
+              )}
+              <Box component="form" onSubmit={handleSendInvitation} noValidate>
+                <FormControl
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  error={Boolean(roleError)}
+                >
+                  <MDTypography variant="body2">Role *</MDTypography>
+                  <Select
+                    id="role"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    displayEmpty
+                    inputProps={{ "aria-label": "Without label" }}
+                    IconComponent={ArrowDropDownIcon}
+                    sx={{ height: "3rem" }}
+                  >
+                    <MenuItem value="" disabled>
+                      Choose a Role
+                    </MenuItem>
+                    <MenuItem value="Chair">Chair</MenuItem>
+                    <MenuItem value="Committee">Committee</MenuItem>
+                  </Select>
+                  {roleError && <Alert severity="error">{roleError}</Alert>}
+                </FormControl>
+                <FormControl fullWidth error={Boolean(emailError)}>
+                  <MDTypography variant="body2" sx={{ mt: 2, mb: 1 }}>
+                    Recipients *
+                  </MDTypography>
+                  <Box
+                    sx={{
+                      "& textarea": {
+                        width: "100%",
+                        padding: "18.5px 14px",
+                        fontSize: "0.9rem",
+                        fontFamily:
+                          '"Roboto", "Helvetica", "Arial", sans-serif',
+                        border: "1px solid #c4c4c4",
+                        borderRadius: "4px",
+                        resize: "vertical",
+                        marginTop: "8px",
+                      },
+                    }}
+                  >
+                    <textarea
+                      id="emails"
+                      placeholder="Enter recipients separated by commas"
+                      value={emails}
+                      onChange={(e) => setEmails(e.target.value)}
+                      rows={4}
+                    />
+                  </Box>
+                  {emailError && <Alert severity="error">{emailError}</Alert>}
+                </FormControl>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2, color: "white !important" }}
+                >
+                  Send Invitation
+                </Button>
+              </Box>
+            </Card>
+            <Card sx={{ mt: 3 }}>
+              {deleteError && <Alert severity="error">{deleteError}</Alert>}
+              {deleteSuccessMessage && (
+                <Alert severity="success">{deleteSuccessMessage}</Alert>
+              )}
+              <CompleteTable
+                columns={columns}
+                rows={rows}
+                numerOfRowsPerPage={5}
+                height={200}
+              />
+            </Card>
+          </MDBox>
+          <br></br>
+        </Container>
+      </MDBox>
       <Footer />
     </DashboardLayout>
   );

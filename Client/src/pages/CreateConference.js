@@ -303,346 +303,363 @@ export default function CreateConference() {
   return (
     <DashboardLayout>
       <UpperNavBar />
-
-      <MDBox
-        mb={3}
-        mt={2}
-        textAlign="left"
-        sx={{
-          maxWidth: 700,
-          margin: "auto",
-          marginBottom: 2,
-        }}
-      >
-        <Card>
-          <MDTypography ml={2} variant="h6">
-            Create Conference
-          </MDTypography>
-          <MDTypography ml={2} variant="body2">
-            Fill the form to create a conference
-          </MDTypography>
-        </Card>
-      </MDBox>
-
-      <MDBox mb={3}>
-        <Card
+      <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        <MDBox
+          mb={3}
+          mt={2}
+          textAlign="left"
           sx={{
             maxWidth: 700,
             margin: "auto",
-            marginBottom: "50px",
+            marginBottom: 2,
           }}
         >
-          <Container component="main" maxWidth="sm">
-            <CssBaseline />
-            <Box>
-              <Box component="form" noValidate onSubmit={handleSubmit}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <TextField
-                      autoComplete="given-name"
-                      name="title"
-                      required
-                      fullWidth
-                      id="title"
-                      label="Title"
-                      autoFocus
-                      sx={{ mt: 3 }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <Select
-                      id="confType"
-                      onChange={handleTypeChange}
-                      value={confType}
-                      fullWidth
-                      required
-                      displayEmpty
-                    >
-                      <MenuItem value="" disabled>
-                        Select Conference Type
-                      </MenuItem>
-                      {conferenceTypes.map((conferenceType) => (
-                        <MenuItem
-                          key={conferenceType.conftypename}
-                          value={conferenceType.conftypename}
-                        >
-                          {conferenceType.conftypename}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <Select
-                      id="confArea"
-                      onChange={handleAreaChange}
-                      value={confArea}
-                      fullWidth
-                      required
-                      displayEmpty
-                    >
-                      <MenuItem value="" disabled>
-                        Select Conference Area
-                      </MenuItem>
-                      {conferenceAreas.map((conferenceArea) => (
-                        <MenuItem
-                          key={conferenceArea.confareaname}
-                          value={conferenceArea.confareaname}
-                        >
-                          {conferenceArea.confareaname}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      required
-                      fullWidth
-                      name="country"
-                      label="Country"
-                      type="text"
-                      id="country"
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      required
-                      fullWidth
-                      autoComplete="given-name"
-                      name="city"
-                      id="city"
-                      label="City"
-                      autoFocus
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      required
-                      fullWidth
-                      multiline
-                      rows={rows}
-                      name="description"
-                      label="Description"
-                      type="text"
-                      id="description"
-                      autoComplete="off"
-                      sx={{ "& .MuiInputBase-root": { paddingRight: "20px" } }}
-                      InputProps={{
-                        endAdornment: (
-                          <div
-                            style={{
-                              display: "inline-block",
-                              height: "100%",
-                              marginRight: "10px",
-                            }}
-                          >
-                            <div
-                              style={{ position: "absolute", top: 0, right: 0 }}
-                            >
-                              <IconButton
-                                onClick={handleIncreaseRows}
-                                style={{ fontSize: "15px" }}
-                                title="Increase text box size"
-                              >
-                                <AddIcon />
-                              </IconButton>
-                              <br />
-                              <IconButton
-                                onClick={handleDecreaseRows}
-                                style={{ fontSize: "15px" }}
-                                title="Decrease text box size"
-                              >
-                                <RemoveIcon />
-                              </IconButton>
-                            </div>
-                          </div>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      fullWidth
-                      name="confLink"
-                      label="Conference Webpage"
-                      type="url"
-                      id="confLink"
-                      sx={{ marginBottom: "15px" }}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <LanguageIcon />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      fullWidth
-                      name="contact"
-                      label="Support Contact"
-                      type="text"
-                      id="contact"
-                      sx={{ marginBottom: "15px" }}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <MailIcon />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <div>
-                    <Grid container spacing={2} ml={0} mr={0} sm="auto">
-                      <Grid item xs={11.5} md={6}>
-                        <TextField
-                          required
-                          fullWidth
-                          name="startDate"
-                          label="Conference Start Date"
-                          type="date"
-                          id="startDate"
-                          InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: minStartDate }}
-                          onChange={(event) => {
-                            setStartDate(event.target.value);
-                          }}
-                        />
-                      </Grid>
-                      <Grid item xs={11.5} md={6}>
-                        <TextField
-                          required
-                          fullWidth
-                          name="endDate"
-                          label="Conference End Date"
-                          type="date"
-                          id="endDate"
-                          InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: startDate }}
-                          onChange={(event) => {
-                            setEndDate(event.target.value);
-                          }}
-                        />
-                      </Grid>
-                      <Grid item xs={11.5} md={6}>
-                        <TextField
-                          required
-                          fullWidth
-                          name="submissionStartDate"
-                          label="Submission Start Date"
-                          type="date"
-                          id="submissionStartDate"
-                          InputLabelProps={{ shrink: true }}
-                          inputProps={{
-                            min: minDateSubmission,
-                            max: previousDay,
-                          }}
-                          onChange={(event) => {
-                            setSubmissionStartDate(event.target.value);
-                          }}
-                        />
-                      </Grid>
-                      <Grid item xs={11.5} md={6}>
-                        <TextField
-                          required
-                          fullWidth
-                          name="submissionEndDate"
-                          label="Submission End Date"
-                          type="date"
-                          id="submissionEndDate"
-                          InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: minDate, max: previousDay }}
-                          onChange={(event) => {
-                            setSubmissionEndDate(event.target.value);
-                          }}
-                        />
-                      </Grid>
-                      <Grid item xs={11.5} md={6}>
-                        <TextField
-                          required
-                          fullWidth
-                          name="biddingStartDate"
-                          label="Bidding Start Date"
-                          type="date"
-                          id="biddingStartDate"
-                          InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: nextDay, max: previousDay }}
-                          onChange={(event) => {
-                            setBiddingStartDate(event.target.value);
-                          }}
-                        />
-                      </Grid>
-                      <Grid item xs={11.5} md={6}>
-                        <TextField
-                          required
-                          fullWidth
-                          name="biddingEndDate"
-                          label="Bidding End Date"
-                          type="date"
-                          id="biddingEndDate"
-                          InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: minDateBidding, max: previousDay }}
-                          onChange={(event) => {
-                            setBiddingEndDate(event.target.value);
-                          }}
-                        />
-                      </Grid>
-                      <Grid item xs={11.5} md={6}>
-                        <TextField
-                          required
-                          fullWidth
-                          name="reviewStartDate"
-                          label="Review Start Date"
-                          type="date"
-                          id="reviewStartDate"
-                          InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: nextDayBidding, max: previousDay }}
-                          onChange={(event) => {
-                            setReviewStartDate(event.target.value);
-                          }}
-                        />
-                      </Grid>
-                      <Grid item xs={11.5} md={6}>
-                        <TextField
-                          required
-                          fullWidth
-                          name="reviewEndDate"
-                          label="Review End Date"
-                          type="date"
-                          id="reviewEndDate"
-                          InputLabelProps={{ shrink: true }}
-                          sx={{ mb: "15px" }}
-                          inputProps={{ min: minDateReview, max: previousDay }}
-                          onChange={(event) => {
-                            setReviewEndDate(event.target.value);
-                          }}
-                        />
-                      </Grid>
+          <Card>
+            <MDTypography ml={2} variant="h6">
+              Create Conference
+            </MDTypography>
+            <MDTypography ml={2} variant="body2">
+              Fill the form to create a conference
+            </MDTypography>
+          </Card>
+        </MDBox>
+
+        <MDBox mb={3}>
+          <Card
+            sx={{
+              maxWidth: 700,
+              margin: "auto",
+              marginBottom: "50px",
+            }}
+          >
+            <Container component="main" maxWidth="sm">
+              <CssBaseline />
+              <Box>
+                <Box component="form" noValidate onSubmit={handleSubmit}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                      <TextField
+                        autoComplete="given-name"
+                        name="title"
+                        required
+                        fullWidth
+                        id="title"
+                        label="Title"
+                        autoFocus
+                        sx={{ mt: 3 }}
+                      />
                     </Grid>
-                    {disclaimer && (
-                      <Box sx={{ ml: 2, mb: 2 }}>
-                        <Alert severity="warning">{disclaimer}</Alert>
-                      </Box>
-                    )}
-                  </div>
-                </Grid>
-                <MDButton
-                  type="submit"
-                  variant="gradient"
-                  color="info"
-                  fullWidth
-                  sx={{ mt: 2 }}
-                >
-                  Create Conference
-                </MDButton>
-                {message}
-                <MDBox mt={3} mb={1} textAlign="center"></MDBox>
+                    <Grid item xs={12} md={6}>
+                      <Select
+                        id="confType"
+                        onChange={handleTypeChange}
+                        value={confType}
+                        fullWidth
+                        required
+                        displayEmpty
+                      >
+                        <MenuItem value="" disabled>
+                          Select Conference Type
+                        </MenuItem>
+                        {conferenceTypes.map((conferenceType) => (
+                          <MenuItem
+                            key={conferenceType.conftypename}
+                            value={conferenceType.conftypename}
+                          >
+                            {conferenceType.conftypename}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <Select
+                        id="confArea"
+                        onChange={handleAreaChange}
+                        value={confArea}
+                        fullWidth
+                        required
+                        displayEmpty
+                      >
+                        <MenuItem value="" disabled>
+                          Select Conference Area
+                        </MenuItem>
+                        {conferenceAreas.map((conferenceArea) => (
+                          <MenuItem
+                            key={conferenceArea.confareaname}
+                            value={conferenceArea.confareaname}
+                          >
+                            {conferenceArea.confareaname}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <TextField
+                        required
+                        fullWidth
+                        name="country"
+                        label="Country"
+                        type="text"
+                        id="country"
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <TextField
+                        required
+                        fullWidth
+                        autoComplete="given-name"
+                        name="city"
+                        id="city"
+                        label="City"
+                        autoFocus
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        required
+                        fullWidth
+                        multiline
+                        rows={rows}
+                        name="description"
+                        label="Description"
+                        type="text"
+                        id="description"
+                        autoComplete="off"
+                        sx={{
+                          "& .MuiInputBase-root": { paddingRight: "20px" },
+                        }}
+                        InputProps={{
+                          endAdornment: (
+                            <div
+                              style={{
+                                display: "inline-block",
+                                height: "100%",
+                                marginRight: "10px",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  top: 0,
+                                  right: 0,
+                                }}
+                              >
+                                <IconButton
+                                  onClick={handleIncreaseRows}
+                                  style={{ fontSize: "15px" }}
+                                  title="Increase text box size"
+                                >
+                                  <AddIcon />
+                                </IconButton>
+                                <br />
+                                <IconButton
+                                  onClick={handleDecreaseRows}
+                                  style={{ fontSize: "15px" }}
+                                  title="Decrease text box size"
+                                >
+                                  <RemoveIcon />
+                                </IconButton>
+                              </div>
+                            </div>
+                          ),
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        fullWidth
+                        name="confLink"
+                        label="Conference Webpage"
+                        type="url"
+                        id="confLink"
+                        sx={{ marginBottom: "15px" }}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <LanguageIcon />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        fullWidth
+                        name="contact"
+                        label="Support Contact"
+                        type="text"
+                        id="contact"
+                        sx={{ marginBottom: "15px" }}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <MailIcon />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Grid>
+                    <div>
+                      <Grid container spacing={2} ml={0} mr={0} sm="auto">
+                        <Grid item xs={11.5} md={6}>
+                          <TextField
+                            required
+                            fullWidth
+                            name="startDate"
+                            label="Conference Start Date"
+                            type="date"
+                            id="startDate"
+                            InputLabelProps={{ shrink: true }}
+                            inputProps={{ min: minStartDate }}
+                            onChange={(event) => {
+                              setStartDate(event.target.value);
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={11.5} md={6}>
+                          <TextField
+                            required
+                            fullWidth
+                            name="endDate"
+                            label="Conference End Date"
+                            type="date"
+                            id="endDate"
+                            InputLabelProps={{ shrink: true }}
+                            inputProps={{ min: startDate }}
+                            onChange={(event) => {
+                              setEndDate(event.target.value);
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={11.5} md={6}>
+                          <TextField
+                            required
+                            fullWidth
+                            name="submissionStartDate"
+                            label="Submission Start Date"
+                            type="date"
+                            id="submissionStartDate"
+                            InputLabelProps={{ shrink: true }}
+                            inputProps={{
+                              min: minDateSubmission,
+                              max: previousDay,
+                            }}
+                            onChange={(event) => {
+                              setSubmissionStartDate(event.target.value);
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={11.5} md={6}>
+                          <TextField
+                            required
+                            fullWidth
+                            name="submissionEndDate"
+                            label="Submission End Date"
+                            type="date"
+                            id="submissionEndDate"
+                            InputLabelProps={{ shrink: true }}
+                            inputProps={{ min: minDate, max: previousDay }}
+                            onChange={(event) => {
+                              setSubmissionEndDate(event.target.value);
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={11.5} md={6}>
+                          <TextField
+                            required
+                            fullWidth
+                            name="biddingStartDate"
+                            label="Bidding Start Date"
+                            type="date"
+                            id="biddingStartDate"
+                            InputLabelProps={{ shrink: true }}
+                            inputProps={{ min: nextDay, max: previousDay }}
+                            onChange={(event) => {
+                              setBiddingStartDate(event.target.value);
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={11.5} md={6}>
+                          <TextField
+                            required
+                            fullWidth
+                            name="biddingEndDate"
+                            label="Bidding End Date"
+                            type="date"
+                            id="biddingEndDate"
+                            InputLabelProps={{ shrink: true }}
+                            inputProps={{
+                              min: minDateBidding,
+                              max: previousDay,
+                            }}
+                            onChange={(event) => {
+                              setBiddingEndDate(event.target.value);
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={11.5} md={6}>
+                          <TextField
+                            required
+                            fullWidth
+                            name="reviewStartDate"
+                            label="Review Start Date"
+                            type="date"
+                            id="reviewStartDate"
+                            InputLabelProps={{ shrink: true }}
+                            inputProps={{
+                              min: nextDayBidding,
+                              max: previousDay,
+                            }}
+                            onChange={(event) => {
+                              setReviewStartDate(event.target.value);
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={11.5} md={6}>
+                          <TextField
+                            required
+                            fullWidth
+                            name="reviewEndDate"
+                            label="Review End Date"
+                            type="date"
+                            id="reviewEndDate"
+                            InputLabelProps={{ shrink: true }}
+                            sx={{ mb: "15px" }}
+                            inputProps={{
+                              min: minDateReview,
+                              max: previousDay,
+                            }}
+                            onChange={(event) => {
+                              setReviewEndDate(event.target.value);
+                            }}
+                          />
+                        </Grid>
+                      </Grid>
+                      {disclaimer && (
+                        <Box sx={{ ml: 2, mb: 2 }}>
+                          <Alert severity="warning">{disclaimer}</Alert>
+                        </Box>
+                      )}
+                    </div>
+                  </Grid>
+                  <MDButton
+                    type="submit"
+                    variant="gradient"
+                    color="info"
+                    fullWidth
+                    sx={{ mt: 2 }}
+                  >
+                    Create Conference
+                  </MDButton>
+                  {message}
+                  <MDBox mt={3} mb={1} textAlign="center"></MDBox>
+                </Box>
               </Box>
-            </Box>
-          </Container>
-        </Card>
+            </Container>
+          </Card>
+        </MDBox>
       </MDBox>
+
       <Footer />
     </DashboardLayout>
   );
