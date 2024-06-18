@@ -1,10 +1,40 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import MDButton from "components/MDButton";
+import Card from "@mui/material/Card";
 import MDTypography from "components/MDTypography";
-import { Box, Card, Container } from "@mui/material";
 import MDBox from "components/MDBox";
+import { fetchAPI } from "OurFunctions/fetchAPI";
 
-export default function SubmissionDetails({ onClose, submission }) {
+export default function SubmissionDetails({
+  onClose,
+  submission,
+  userid,
+  confid,
+}) {
+  const [error, setError] = useState(null);
+  const [openLoading, setOpenLoading] = useState(false);
+
+  const [authors, setAuthors] = useState("");
+
+  useEffect(() => {
+    async function getAuthors() {
+      const response = await fetchAPI(
+        "authors",
+        "POST",
+        { userID: userid, confID: confid },
+        setError,
+        setOpenLoading
+      );
+
+      if (response) {
+        setAuthors(response[0].authors);
+        console.log(response[0]);
+      }
+    }
+
+    if (userid && confid) getAuthors();
+  }, [userid, confid]);
+
   return (
     <Card>
       <MDTypography
@@ -18,7 +48,7 @@ export default function SubmissionDetails({ onClose, submission }) {
 
       <MDBox ml={2} textAlign="left">
         <MDTypography variant="h6">Authors:</MDTypography>
-        <MDTypography variant="body2">{submission.authors}</MDTypography>
+        <MDTypography variant="body2">{authors}</MDTypography>
         <MDTypography variant="h6" sx={{ mt: 2 }}>
           Status:
         </MDTypography>

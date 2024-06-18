@@ -19,15 +19,17 @@ export default function CreateSubmission() {
   const { confID, confPhase } = useContext(ConferenceContext);
   const { user, isLoggedIn } = useContext(AuthContext);
 
-  const [openLoading, setOpenLoading] = useState(false);
-  const [message, setMessage] = useState(null);
-  const [blockCrud, setBlockCrud] = useState(false);
-
   const [authors, setAuthors] = useState([
     { firstName: "", lastName: "", email: "", affiliation: "" },
   ]);
   const [title, setTitle] = useState("");
   const [abstract, setAbstract] = useState("");
+
+  const [openLoading, setOpenLoading] = useState(false);
+  const [message, setMessage] = useState(null);
+  const [blockCrud, setBlockCrud] = useState(false);
+  const [disableSubmit, setDisableSubmit] = useState(true);
+  const [uploadButtonCliced, setUploadButtonCliced] = useState(false);
 
   const fileInput = createRef();
 
@@ -88,6 +90,12 @@ export default function CreateSubmission() {
       return () => clearTimeout(timer);
     }
   }, [message]);
+
+  useEffect(() => {
+    if (title !== "" && abstract !== "" && uploadButtonCliced)
+      setDisableSubmit(false);
+    else setDisableSubmit(true);
+  }, [title, abstract, uploadButtonCliced]);
 
   async function uploadFile(event) {
     event.preventDefault();
@@ -415,6 +423,7 @@ export default function CreateSubmission() {
                           className="form-control"
                           placeholder="file"
                           ref={fileInput}
+                          onClick={() => setUploadButtonCliced(true)}
                         />
                       </MDBox>
                     </Card>
@@ -423,6 +432,7 @@ export default function CreateSubmission() {
                       variant="gradient"
                       color="success"
                       onClick={async (event) => uploadFile(event)}
+                      disabled={disableSubmit}
                       sx={{
                         maxWidth: "60px",
                         maxHeight: "30px",

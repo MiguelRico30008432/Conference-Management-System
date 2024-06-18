@@ -11,17 +11,23 @@ import { ConferenceContext } from "conference.context";
 import { AuthContext } from "auth.context";
 
 export default function UpdateSubmission({ onClose, submissionID }) {
-  const [openLoading, setOpenLoading] = useState(false);
-  const [message, setMessage] = useState(null);
-
   const { confID } = useContext(ConferenceContext);
   const { user } = useContext(AuthContext);
 
   const [title, setTitle] = useState("");
+  const [originalTitle, setOriginalTitle] = useState("");
+
   const [abstract, setAbstract] = useState("");
+  const [originalAbstract, setOriginalAbstract] = useState("");
   const [authors, setAuthors] = useState([
     { firstName: "", lastName: "", email: "", affiliation: "", authorid: "" },
   ]);
+  const [originalAuthors, setOriginalAuthors] = useState([]);
+
+  const [openLoading, setOpenLoading] = useState(false);
+  const [message, setMessage] = useState(null);
+  const [disableSubmit, setDisableSubmit] = useState(true);
+  const [uploadButtonClicked, setUploadButtonClicked] = useState(false);
 
   const fileInput = createRef();
 
@@ -49,8 +55,9 @@ export default function UpdateSubmission({ onClose, submissionID }) {
         if (response.status === 200) {
           setTitle(jsonResponse[0].submissiontitle);
           setAbstract(jsonResponse[0].submissionabstract);
+          setOriginalTitle(jsonResponse[0].submissiontitle);
+          setOriginalAbstract(jsonResponse[0].submissionabstract);
 
-          // Organize authors
           const authorsList = jsonResponse.map((item) => ({
             authorid: item.authorid,
             userid: item.userid,
@@ -60,9 +67,10 @@ export default function UpdateSubmission({ onClose, submissionID }) {
             affiliation: item.authoraffiliation,
           }));
 
-          // Find Main author
+          const deepCopyAuthors = JSON.parse(JSON.stringify(authorsList));
+
           let mainAuthor = null;
-          const otherAuthors = authorsList.filter((author) => {
+          const otherAuthors = deepCopyAuthors.filter((author) => {
             if (author.userid === jsonResponse[0].submissionmainauthor) {
               mainAuthor = author;
               return false;
@@ -70,12 +78,12 @@ export default function UpdateSubmission({ onClose, submissionID }) {
             return true;
           });
 
-          // Make main author first of the list
           const sortedAuthors = mainAuthor
             ? [mainAuthor, ...otherAuthors]
             : otherAuthors;
 
           setAuthors(sortedAuthors);
+          setOriginalAuthors(JSON.parse(JSON.stringify(sortedAuthors)));
         } else {
           setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
         }
@@ -91,6 +99,48 @@ export default function UpdateSubmission({ onClose, submissionID }) {
 
     getSubmissionData();
   }, [submissionID]);
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage(null);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    const hasChanges = () => {
+      if (
+        title !== originalTitle ||
+        abstract !== originalAbstract ||
+        JSON.stringify(authors) !== JSON.stringify(originalAuthors)
+      ) {
+        return true;
+      }
+      return uploadButtonClicked;
+    };
+
+    setDisableSubmit(!hasChanges());
+  }, [
+    title,
+    abstract,
+    uploadButtonClicked,
+    authors,
+    originalTitle,
+    originalAbstract,
+    originalAuthors,
+  ]);
+
+  function resetToDefaultValues() {
+    setTitle("");
+    setAbstract("");
+    setAuthors([
+      { firstName: "", lastName: "", email: "", affiliation: "", authorid: "" },
+    ]);
+    setUploadButtonClicked(false);
+  }
 
   async function uploadFile(event) {
     event.preventDefault();
@@ -131,12 +181,12 @@ export default function UpdateSubmission({ onClose, submissionID }) {
         );
 
         const jsonResponse = await response.json();
-
         if (response.status === 200) {
           setMessage(
-            <Alert severity="success">Subimission updated with success</Alert>
+            <Alert severity="success">Submission updated successfully</Alert>
           );
-          onClose();
+
+          resetToDefaultValues();
         } else {
           setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
         }
@@ -197,6 +247,22 @@ export default function UpdateSubmission({ onClose, submissionID }) {
     <>
       {openLoading && <LoadingCircle />}
       <Card>{message}</Card>
+
+      <MDButton
+        variant="gradient"
+        color="info"
+        onClick={onClose}
+        sx={{
+          maxWidth: "140px",
+          maxHeight: "30px",
+          minWidth: "5px",
+          minHeight: "30px",
+
+          mb: 2,
+        }}
+      >
+        Close Update
+      </MDButton>
 
       {/*Author Information*/}
       {authors.map((author, index) =>
@@ -396,35 +462,22 @@ export default function UpdateSubmission({ onClose, submissionID }) {
             className="form-control"
             placeholder="file"
             ref={fileInput}
+            onClick={() => setUploadButtonClicked(true)}
           />
         </MDBox>
       </Card>
 
       <MDButton
         variant="gradient"
-        color="info"
-        onClick={onClose}
-        sx={{
-          maxWidth: "140px",
-          maxHeight: "30px",
-          minWidth: "5px",
-          minHeight: "30px",
-          mt: 2,
-          mb: 2,
-        }}
-      >
-        Close Update
-      </MDButton>
-      <MDButton
-        variant="gradient"
         color="success"
         onClick={async (event) => uploadFile(event)}
+        disabled={disableSubmit}
         sx={{
           maxWidth: "60px",
           maxHeight: "30px",
           minWidth: "5px",
           minHeight: "30px",
-          ml: 2,
+
           mt: 2,
           mb: 2,
         }}

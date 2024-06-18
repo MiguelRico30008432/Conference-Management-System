@@ -71,6 +71,33 @@ router.post("/mySubmissions", auth.ensureAuthenticated, async (req, res) => {
   }
 });
 
+router.post("/authors", auth.ensureAuthenticated, async (req, res) => {
+  try {
+    const { confID, userID } = req.body;
+    const submissions = await db.fetchDataCst(
+      ` SELECT    
+          STRING_AGG(CONCAT(CONCAT(a1.authorfirstname,' ',a1.authorlastname), ', ', CONCAT(a2.authorfirstname,' ',a2.authorlastname)), ', ') AS authors
+        FROM submissions
+        INNER JOIN users on userid = submissionmainauthor
+        INNER JOIN authors a1 ON submissions.submissionid = a1.submissionid
+        LEFT JOIN authors a2 ON submissions.submissionid = a2.submissionid AND a2.userid !=  ${userID}
+        WHERE 
+            a1.userid =  ${userID} AND submissions.submissionconfID =  ${confID};`
+    );
+
+    // If no submissions found, return an empty array
+    if (submissions.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    // Return the fetched data
+    return res.status(200).json(submissions);
+  } catch (error) {
+    log.addLog(error, "database", "MySubmissions -> /submissions");
+    res.status(500).send({ msg: "Error fetching submission data" });
+  }
+});
+
 router.delete(
   "/deleteSubmission",
   auth.ensureAuthenticated,

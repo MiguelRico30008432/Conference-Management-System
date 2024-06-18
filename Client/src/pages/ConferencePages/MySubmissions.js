@@ -395,6 +395,8 @@ export default function MySubmissionsPage() {
                   <SubmissionsDetails
                     submission={dataForDetails}
                     onClose={() => setDetailsOpen(false)}
+                    userid={user}
+                    confid={confID}
                   />
                 </ModalInfo>
               )}
