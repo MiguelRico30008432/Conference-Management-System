@@ -22,7 +22,8 @@ router.post("/updateSubmission", auth.ensureAuthenticated, async (req, res) => {
 
     //update submission
     await db.fetchDataCst(
-      `UPDATE submissions SET submissiontitle = '${req.body.title}', submissionabstract = '${req.body.abstract}' WHERE submissionid = ${req.body.submissionid}`
+      `UPDATE submissions SET submissiontitle = $1, submissionabstract = $2 WHERE submissionid = $3`,
+      [req.body.title, req.body.abstract, req.body.submissionid]
     );
 
     //update authors

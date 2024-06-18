@@ -22,7 +22,7 @@ router.post("/myConferences", auth.ensureAuthenticated, async (req, res) => {
         END AS confphase
     FROM conferences
     INNER JOIN userRoles ON userRoles.confid = conferences.confid
-    WHERE userRoles.userid = ${req.body.userid} AND confenddate >= NOW()
+    WHERE userRoles.userid = ${req.body.userid} AND confenddate >= NOW() AND confapproved = 2
     GROUP BY 
       userRoles.confid, confName, conferences.confid;`;
 

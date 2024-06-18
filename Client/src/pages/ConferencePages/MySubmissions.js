@@ -80,6 +80,7 @@ export default function MySubmissionsPage() {
               id: submission.id,
               title: submission.title,
               authors: submission.authors,
+              mainauthor: submission.mainauthor,
               status: submission.status, // This will now be 'Accepted', 'Rejected', or 'Pending'
               adddate: submission.adddate,
               abstract: submission.abstract,
@@ -179,7 +180,7 @@ export default function MySubmissionsPage() {
   const columns = [
     { field: "title", headerName: "Title", width: 200 },
     { field: "status", headerName: "Status", width: 120 },
-    { field: "authors", headerName: "Authors", width: 200 },
+    { field: "mainauthor", headerName: "Main Author", width: 200 },
     { field: "adddate", headerName: "Submission Date", width: 120 },
     {
       field: "edit",
@@ -387,7 +388,10 @@ export default function MySubmissionsPage() {
                 </MDBox>
               </Container>
               {!detailsOpen ? null : (
-                <ModalInfo onClose={() => setDetailsOpen(false)} height={450}>
+                <ModalInfo
+                  onClose={() => setDetailsOpen(false)}
+                  height={{ xs: "90%", sm: "90%", md: "90%" }}
+                >
                   <SubmissionsDetails
                     submission={dataForDetails}
                     onClose={() => setDetailsOpen(false)}

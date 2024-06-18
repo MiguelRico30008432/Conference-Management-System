@@ -77,7 +77,17 @@ export default function CreateSubmission() {
     }
 
     if (confPhase !== "Submission") setBlockCrud(true);
-  }, [isLoggedIn, confID]);
+  }, [isLoggedIn, confID, confPhase, user]);
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage(null);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   async function uploadFile(event) {
     event.preventDefault();
@@ -115,7 +125,7 @@ export default function CreateSubmission() {
             <Alert severity="success">Submission created with success</Alert>
           );
           window.scrollTo({ top: 0, behavior: "smooth" });
-          //Falta apagar os campos quando é criada a submissão
+          resetToDefaultValues(); // Limpar os campos após submissão bem-sucedida
         } else {
           setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
         }
@@ -132,6 +142,11 @@ export default function CreateSubmission() {
       );
     }
     setOpenLoading(false);
+  }
+
+  function resetToDefaultValues() {
+    setTitle("");
+    setAbstract("");
   }
 
   const addAuthor = () => {
@@ -357,6 +372,7 @@ export default function CreateSubmission() {
                         id="title"
                         label="Title"
                         autoFocus
+                        value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         sx={{ ml: 2, width: "80%" }}
                       />
@@ -381,6 +397,7 @@ export default function CreateSubmission() {
                         <textarea
                           id="subject"
                           placeholder="Enter your abstract here*"
+                          value={abstract}
                           onChange={(e) => setAbstract(e.target.value)}
                         />
                       </MDBox>

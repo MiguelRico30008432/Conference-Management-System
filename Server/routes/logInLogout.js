@@ -78,6 +78,35 @@ router.post("/signUp", async (req, res) => {
         useraffiliation: affiliation,
       };
 
+      //create user
+      await db.addData("users", newUser);
+      const userInfo = await db.fetchData("users", "useremail", email);
+
+      //Verify if this user is author in some submission
+      const authorsWithoutID = await db.fetchDataCst(`
+        select 
+          authorid,
+          submissionconfid 
+        from authors 
+        inner join submissions on submissions.submissionid = authors.submissionid
+        where authoremail = '${newUser.useremail}'
+        `);
+
+      if (authorsWithoutID) {
+        for (line of authorsWithoutID) {
+          await db.fetchDataCst(`
+              UPDATE authors SET userid = ${userInfo[0].userid} WHERE authorid = ${line.authorid}
+            `);
+
+          await db.addData("userroles", {
+            userid: userInfo[0].userid,
+            userrole: "Author",
+            confid: line.submissionconfid,
+          });
+        }
+      }
+
+      //invites
       if (inviteCode.length !== 0) {
         const invitationInfo = await db.fetchData(
           "invitations",
@@ -94,7 +123,6 @@ router.post("/signUp", async (req, res) => {
 
           if (inviteCode === invitationCode && email === invitationEmail) {
             inviteFound = true;
-            await db.addData("users", newUser);
             const userInfo = await db.fetchData("users", "useremail", email);
             const userId = userInfo[0].userid;
             await db.addData("userroles", {
@@ -110,17 +138,14 @@ router.post("/signUp", async (req, res) => {
           }
         }
 
-        if (inviteFound) {
-          return res.status(201).send({ msg: "User created." });
-        } else {
+        if (!inviteFound) {
           return res
             .status(403)
             .send({ msg: "This code isn't associated with your user." });
         }
-      } else {
-        await db.addData("users", newUser);
-        return res.status(201).send({ msg: "User created." });
       }
+
+      return res.status(201).send({ msg: "User created." });
     } else {
       return res.status(409).send({ msg: "User already exists." });
     }

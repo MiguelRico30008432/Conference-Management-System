@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useState, useEffect, createRef, useContext } from "react";
 import Card from "@mui/material/Card";
-import Container from "@mui/material/Container";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
@@ -403,21 +402,6 @@ export default function UpdateSubmission({ onClose, submissionID }) {
 
       <MDButton
         variant="gradient"
-        color="success"
-        onClick={async (event) => uploadFile(event)}
-        sx={{
-          maxWidth: "60px",
-          maxHeight: "30px",
-          minWidth: "5px",
-          minHeight: "30px",
-          mt: 2,
-          mb: 2,
-        }}
-      >
-        Submit
-      </MDButton>
-      <MDButton
-        variant="gradient"
         color="info"
         onClick={onClose}
         sx={{
@@ -427,10 +411,25 @@ export default function UpdateSubmission({ onClose, submissionID }) {
           minHeight: "30px",
           mt: 2,
           mb: 2,
-          ml: 2,
         }}
       >
         Close Update
+      </MDButton>
+      <MDButton
+        variant="gradient"
+        color="success"
+        onClick={async (event) => uploadFile(event)}
+        sx={{
+          maxWidth: "60px",
+          maxHeight: "30px",
+          minWidth: "5px",
+          minHeight: "30px",
+          ml: 2,
+          mt: 2,
+          mb: 2,
+        }}
+      >
+        Submit
       </MDButton>
     </>
   );

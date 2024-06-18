@@ -78,6 +78,8 @@ CREATE TABLE submissions(
     submissionconfID INT,FOREIGN KEY (confID) REFERENCES conferences(confID),
     submissionAccepted BOOLEAN DEFAULT false,
     submissionMainAuthor INT,FOREIGN KEY (userid) REFERENCES users(userid),
+    submissionabstract TEXT NOT NULL
+    submissiontitle VARCHAR(255) NOT NULL
     submissionAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
 
