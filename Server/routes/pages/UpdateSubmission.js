@@ -82,16 +82,27 @@ router.post("/updateSubmission", auth.ensureAuthenticated, async (req, res) => {
           UPDATE 
             authors
           SET 
+              userid = null,
               authoraffiliation = '${affiliation}',
               authoremail = '${email}',
               authorfirstname = '${firstName}',
               authorlastname = '${lastName}'
           WHERE authorid = ${authorid}`);
         } else {
+          const verifyUserID = await db.fetchDataCst(`
+            SELECT 
+              userid
+            FROM 
+              users
+            WHERE
+              useremail = '${userRegistered[0].useremail}'    
+          `);
+
           await db.fetchDataCst(`
           UPDATE 
             authors
           SET 
+              userid = ${verifyUserID[0].userid},
               authoraffiliation = '${userRegistered[0].useraffiliation}',
               authoremail = '${userRegistered[0].useremail}',
               authorfirstname = '${userRegistered[0].userfirstname}',
@@ -117,11 +128,46 @@ router.post("/updateSubmission", auth.ensureAuthenticated, async (req, res) => {
 
     if (missingAuthorIds.length > 0) {
       for (let i = 0; i < missingAuthorIds.length; i++) {
+        //Recolher os dados do author id para depois verificar se é necessário retirar do userroles
+        const authorInfo = await db.fetchDataCst(`
+          SELECT
+            a.userid,
+            s.submissionconfid	
+          FROM 
+            authors a
+          JOIN 
+            submissions s ON  a.submissionid = s.submissionid	
+          WHERE
+            authorid = ${missingAuthorIds[i]}
+        `);
+
+        //User deixa de ser autor da submissão
         await db.fetchDataCst(`
         DELETE FROM
           authors
         WHERE
           authorid = ${missingAuthorIds[i]}`);
+
+        const authorSubmissions = await db.fetchDataCst(`
+          SELECT 
+            a.authorid
+          FROM
+            authors a
+          JOIN 
+            submissions s ON  a.submissionid = s.submissionid
+          WHERE
+            a.userid = ${authorInfo[0].userid} AND s.submissionconfid = ${authorInfo[0].submissionconfid}
+        `);
+
+        if (authorSubmissions.length === 0) {
+          await db.fetchDataCst(`
+            DELETE
+            FROM 
+              userroles 
+            WHERE 
+              userid = ${authorInfo[0].userid} AND confid =${authorInfo[0].submissionconfid}
+          `);
+        }
       }
     }
 

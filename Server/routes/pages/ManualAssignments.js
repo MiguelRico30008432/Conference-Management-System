@@ -57,7 +57,6 @@ router.post("/getBiddings", auth.ensureAuthenticated, async (req, res) => {
     HAVING
       STRING_AGG(DISTINCT r.userfirstname || ' ' || r.userlastname, ', ') <> '';
   `);
-
     return res.status(200).send(result);
   } catch (error) {
     log.addLog(error, "database", "Manual Assignments -> /getBiddings");
@@ -74,7 +73,7 @@ router.post(
         await db.fetchDataCst(`
           INSERT INTO reviewsassignments (assignmentconfid, assignmentsubmissionid, assignmentuserid, assignmentmanually)
           VALUES (${req.body.confid}, ${req.body.info.id}, ${member.id}, TRUE)
-          `);
+        `);
 
         //Check if an automatic assignement was already created if yes then we delete it
         const automaticAssignment = await db.fetchDataCst(`
@@ -83,21 +82,106 @@ router.post(
           FROM
             reviewsassignments
           WHERE
-            assignmentconfid = ${req.body.confid} AND assignmentsubmissionid = ${req.body.info.id} AND assignmentuserid = ${member.id}
-          `);
+            assignmentconfid = ${req.body.confid} AND assignmentsubmissionid = ${req.body.info.id} AND assignmentuserid = ${member.id} AND assignmentmanually = FALSE
+        `);
 
-        if (automaticAssignment) {
+        if (automaticAssignment.length > 0) {
           await db.fetchDataCst(`
-              DELETE
-              FROM 
-                reviewsassignments
-              WHERE
-                assignmentid = ${automaticAssignment[0].assignmentid}
-              `);
+            DELETE
+            FROM 
+              reviewsassignments
+            WHERE
+              assignmentid = ${automaticAssignment[0].assignmentid}
+          `);
         }
       }
-
       return res.status(200).send({ msg: "Assignment created successfully" });
+    } catch (error) {
+      log.addLog(
+        error,
+        "database",
+        "Manual Assignments -> /createManualAssignment"
+      );
+      return res.status(500).send({ msg: "Error creating manual assignment" });
+    }
+  }
+);
+
+router.post(
+  "/getAssignmentsForDelete",
+  auth.ensureAuthenticated,
+  async (req, res) => {
+    try {
+      const result = await db.fetchDataCst(`
+        SELECT
+          s.submissionid,
+          s.submissiontitle,
+          STRING_AGG(DISTINCT u.userfirstname || ' ' || u.userlastname, ', ') AS author,
+          STRING_AGG(DISTINCT r.userid || ': ' || r.userfirstname || ' ' || r.userlastname, ', ') AS reviewers
+        FROM
+          submissions s
+        JOIN
+          users u ON s.submissionmainauthor = u.userid
+        LEFT JOIN (
+          SELECT
+            ra.assignmentsubmissionid,
+            ra.assignmentuserid,
+            u.userfirstname,
+            u.userlastname,
+            u.userid
+          FROM
+            reviewsassignments ra
+          JOIN
+            users u ON ra.assignmentuserid = u.userid
+          WHERE
+            ra.assignmentmanually = true
+            AND ra.assignmentconfid = ${req.body.confid}
+        ) r ON s.submissionid = r.assignmentsubmissionid
+        LEFT JOIN (
+          SELECT
+            ur.userid,
+            ur.confid
+          FROM
+            userroles ur
+          WHERE
+            ur.userrole IN ('Owner', 'Chair', 'Committee')
+            AND ur.confid = ${req.body.confid}
+        ) ur ON s.submissionconfid = ur.confid
+        WHERE
+          s.submissionconfid = ${req.body.confid}
+        GROUP BY
+          s.submissionid,
+          s.submissiontitle
+        HAVING
+          STRING_AGG(DISTINCT r.userid || ': ' || r.userfirstname || ' ' || r.userlastname, ', ') <> '';
+      `);
+      return res.status(200).send(result);
+    } catch (error) {
+      log.addLog(
+        error,
+        "database",
+        "Manual Assignments -> /getAssignmentsForDelete"
+      );
+      return res.status(500).send({ msg: "Error creating manual assignment" });
+    }
+  }
+);
+
+router.post(
+  "/deleteManualAssignment",
+  auth.ensureAuthenticated,
+  async (req, res) => {
+    try {
+      for (const member of req.body.info.reviewers) {
+        await db.fetchDataCst(`
+          DELETE 
+          FROM
+            reviewsassignments
+          WHERE   
+            assignmentconfid = ${req.body.confid} AND assignmentsubmissionid = ${req.body.info.id} AND assignmentuserid = ${member.id}
+        `);
+      }
+      return res.status(200).send({ msg: "Assignment deleted successfully" });
     } catch (error) {
       log.addLog(
         error,

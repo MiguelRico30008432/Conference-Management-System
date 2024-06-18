@@ -5,14 +5,14 @@ import CheckIcon from "@mui/icons-material/Check";
 export default function MultiSelect({ users, onChange }) {
   const [selectedNames, setSelectedNames] = useState([]);
 
+  useEffect(() => {
+    setSelectedNames([]);
+  }, [users]);
+
   const handleChange = (event, values) => {
     setSelectedNames(values);
     onChange(values);
   };
-
-  useEffect(() => {
-    setSelectedNames([]);
-  }, [users]);
 
   return (
     <Autocomplete
