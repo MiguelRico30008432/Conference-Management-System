@@ -25,34 +25,41 @@ export default function ManualAssignments() {
   const [selectedReviewers, setSelectedReviewers] = useState([]);
 
   const [openLoading, setOpenLoading] = useState(false);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    async function fetchReviews() {
-      const response = await fetchAPI(
-        "getBiddings",
-        "POST",
-        { confid: confID },
-        setError,
-        setOpenLoading
-      );
-
-      if (response) {
-        for (let line of response) {
-          line.id = uuidv4();
-          line.reviewers = line.reviewers.split(", ");
-          setRows((allExistingRows) => [...allExistingRows, line]);
-        }
-      }
-    }
+  useEffect(async () => {
     if (user && confID) {
-      fetchReviews();
+      fetchBidsForManualAssignments();
     }
   }, [confID, user]);
+
+  async function fetchBidsForManualAssignments() {
+    const response = await fetchAPI(
+      "getBiddings",
+      "POST",
+      { confid: confID },
+      setMessage,
+      setOpenLoading
+    );
+
+    if (response) {
+      for (let line of response) {
+        line.id = uuidv4();
+        line.reviewers = splitReviewers(line.reviewers);
+        setRows((allExistingRows) => [...allExistingRows, line]);
+      }
+    }
+  }
 
   const handleMultiSelectChange = (values) => {
     setSelectedReviewers(values);
   };
+
+  function splitReviewers(reviewers) {
+    return reviewers.split(", ").map((reviewer) => {
+      const [id, name] = reviewer.split(": ");
+      return { id: parseInt(id, 10), name: name };
+    });
+  }
 
   async function handleSubmit(info) {
     if (info.reviewers.length === 0) {
@@ -66,9 +73,11 @@ export default function ManualAssignments() {
         "createManualAssignment",
         "POST",
         { info: info, confid: confID },
-        setError,
+        setMessage,
         setOpenLoading
       );
+
+      fetchBidsForManualAssignments();
     }
   }
 
@@ -95,7 +104,7 @@ export default function ManualAssignments() {
             }}
           >
             <MultiSelect
-              users={params.formattedValue}
+              users={params.row.reviewers}
               onChange={handleMultiSelectChange}
             />
           </div>

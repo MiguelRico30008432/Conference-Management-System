@@ -14,7 +14,7 @@ router.post("/getBiddings", auth.ensureAuthenticated, async (req, res) => {
       s.submissionid,
       s.submissiontitle,
       STRING_AGG(DISTINCT u.userfirstname || ' ' || u.userlastname, ', ') AS author,
-      STRING_AGG(DISTINCT r.userfirstname || ' ' || r.userlastname, ', ') AS reviewers
+      STRING_AGG(r.userid || ': ' || r.userfirstname || ' ' || r.userlastname, ', ') AS reviewers
     FROM
       submissions s
     JOIN
@@ -57,6 +57,7 @@ router.post("/getBiddings", auth.ensureAuthenticated, async (req, res) => {
     HAVING
       STRING_AGG(DISTINCT r.userfirstname || ' ' || r.userlastname, ', ') <> '';
   `);
+
     return res.status(200).send(result);
   } catch (error) {
     log.addLog(error, "database", "Manual Assignments -> /getBiddings");
@@ -70,19 +71,9 @@ router.post(
   async (req, res) => {
     try {
       for (const member of req.body.info.reviewers) {
-        const name = member.split(" ");
-        const memberID = await db.fetchDataCst(`
-          SELECT
-            userid
-          FROM
-            users
-          WHERE
-            userfirstname	= '${name[0]}' AND userlastname	= '${name[1]}'
-          `);
-
         await db.fetchDataCst(`
           INSERT INTO reviewsassignments (assignmentconfid, assignmentsubmissionid, assignmentuserid, assignmentmanually)
-          VALUES (${req.body.confid}, ${req.body.info.id}, ${memberID[0].userid}, TRUE)
+          VALUES (${req.body.confid}, ${req.body.info.id}, ${member.id}, TRUE)
           `);
 
         //Check if an automatic assignement was already created if yes then we delete it
@@ -92,7 +83,7 @@ router.post(
           FROM
             reviewsassignments
           WHERE
-            assignmentconfid = ${req.body.confid} AND assignmentsubmissionid = ${req.body.info.id} AND assignmentuserid = ${memberID[0].userid}
+            assignmentconfid = ${req.body.confid} AND assignmentsubmissionid = ${req.body.info.id} AND assignmentuserid = ${member.id}
           `);
 
         if (automaticAssignment) {

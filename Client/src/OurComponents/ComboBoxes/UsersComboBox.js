@@ -21,7 +21,7 @@ export default function MultiSelect({ users, onChange }) {
       options={users}
       value={selectedNames}
       onChange={handleChange}
-      getOptionLabel={(option) => option}
+      getOptionLabel={(option) => option.name}
       disableCloseOnSelect
       renderInput={(params) => (
         <TextField
@@ -33,11 +33,11 @@ export default function MultiSelect({ users, onChange }) {
       renderOption={(props, option, { selected }) => (
         <MenuItem
           {...props}
-          key={option}
-          value={option}
+          key={option.id}
+          value={option.name}
           sx={{ justifyContent: "space-between" }}
         >
-          {option}
+          {option.name}
           {selected ? <CheckIcon color="info" /> : null}
         </MenuItem>
       )}
