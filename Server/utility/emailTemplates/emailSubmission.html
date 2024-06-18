@@ -31,6 +31,21 @@
             padding: 10px;
             font-size: 12px;
         }
+        .button {
+            background-color: #0078D7;
+            color: white;
+            padding: 15px 25px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .button:hover {
+            background-color: #005bb5;
+        }
     </style>
 </head>
 <body>
@@ -42,6 +57,11 @@
             <p>Dear collaborators,</p>
             <p>We would like to inform you that your submission titled <strong>{submissionTitle}</strong> has been {actionTaken}.</p>
             <p>Thank you for using our service, and we hope to see you participating in our future events.</p>
+            <p>
+                For more details, visit our website:
+                <br>
+                <a href="https://ualconf.vercel.app/HomePage" class="button">Visit Our Site</a>
+            </p>
         </div>
         <div class="footer">
             <p>&copy; 2024 CMSUAL. All rights reserved.</p>

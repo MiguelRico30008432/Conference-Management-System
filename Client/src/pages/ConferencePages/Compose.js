@@ -1,9 +1,8 @@
+import React, { useState, useContext, useEffect } from "react";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import ConfNavbar from "../../OurComponents/navBars/ConferenceNavBar";
 import { ConferenceContext } from "conference.context";
 import Footer from "OurComponents/footer/Footer";
-
-import React, { useState, useContext, useEffect } from "react";
 import Card from "@mui/material/Card";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
@@ -15,6 +14,7 @@ import FormControl from "@mui/material/FormControl";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import MDBox from "components/MDBox";
 import Alert from "@mui/material/Alert";
+import LoadingCircle from "OurComponents/loading/LoadingCircle";
 
 export default function Compose() {
   const { confID } = useContext(ConferenceContext);
@@ -29,6 +29,7 @@ export default function Compose() {
     message: "",
   });
   const [committeeMembersExist, setCommitteeMembersExist] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function getData() {
@@ -61,11 +62,13 @@ export default function Compose() {
     setRecipientError("");
     setSubjectError("");
     setDescriptionError("");
+    setLoading(true);  // Start loading indicator
 
     if (!recipient || !subject || !description) {
       if (!recipient) setRecipientError("You must select a recipient!");
       if (!subject) setSubjectError("You must enter a subject!");
       if (!description) setDescriptionError("You must enter a description!");
+      setLoading(false); // Stop loading indicator if there is an error
       return;
     }
 
@@ -103,11 +106,13 @@ export default function Compose() {
         message: error.message || "An error occurred while sending the email.",
       });
     }
+    setLoading(false);  // Stop loading indicator
   };
 
   return (
     <DashboardLayout>
       <ConfNavbar />
+      {loading && <LoadingCircle />}  {/* Display loading circle */}
       <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
         <Container maxWidth="sm">
           <MDBox mt={10} textAlign="left">
