@@ -6,17 +6,16 @@ const routes = require("./routes/index");
 const ver = require("./utility/verifications");
 const log = require("./logs/logsManagement");
 require("./passportStrategies/localStrategy");
+require("./utility/cronjobs");
 const cors = require("cors");
 const db = require("./utility/database");
-const PgSession = require('connect-pg-simple')(session);
+const PgSession = require("connect-pg-simple")(session);
 
 const app = express();
 const PORT = process.env.PORT;
 const SECRET = process.env.SECRET;
 
-const allowedOrigins = [
-  "http://localhost:3000"
-];
+const allowedOrigins = ["http://localhost:3000"];
 
 const corsOptions = {
   origin: allowedOrigins,
@@ -33,7 +32,7 @@ app.use(
   session({
     store: new PgSession({
       pool: db.pool,
-      tableName: 'session'
+      tableName: "session",
     }),
     secret: SECRET,
     saveUninitialized: false,
@@ -49,12 +48,10 @@ app.use(passport.session());
 
 app.use(routes);
 
-
 app.get("/", (request, response) => {
   request.session.visited = true;
   return response.sendStatus(200);
 });
-
 
 app.use(express.static("public"));
 app.listen(PORT, () => {
