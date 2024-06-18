@@ -18,6 +18,8 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
 import ModalInfo from "OurComponents/Modal/ModalInfo";
+import CommitteeInfo from "OurComponents/Info/CommitteeInfo";
+import { fetchAPI } from "OurFunctions/fetchAPI";
 
 export default function ComitteeManagementPage() {
   const { confID, userRole } = useContext(ConferenceContext);
@@ -39,49 +41,23 @@ export default function ComitteeManagementPage() {
 
   useEffect(() => {
     async function getRows() {
-      setOpenLoading(true);
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/comite`,
-          {
-            method: "POST",
-            body: JSON.stringify({ confid: confID }),
-            headers: {
-              "Content-type": "application/json; charset=UTF-8",
-            },
-            credentials: "include",
-          }
-        );
+      const response = await fetchAPI(
+        "comite",
+        "POST",
+        { confid: confID },
+        setError,
+        setOpenLoading
+      );
 
-        const jsonResponse = await response.json();
-
-        if (response.status === 200) {
-          for (let line of jsonResponse) {
-            line.id = uuidv4();
-            setRow((allExistingRows) => [...allExistingRows, line]);
-          }
-        } else {
-          setError(<Alert severity="error">{jsonResponse.msg}</Alert>);
+      if (response) {
+        for (let line of response) {
+          line.id = uuidv4();
+          setRow((allExistingRows) => [...allExistingRows, line]);
         }
-      } catch (error) {
-        setError(
-          <Alert severity="error">
-            Something went wrong when obtaining the lines
-          </Alert>
-        );
       }
-      setOpenLoading(false);
     }
 
-    if (confID > 0) {
-      if (userRole.includes("Chair") || userRole.includes("Owner")) {
-        getRows();
-      } else {
-        setError(
-          <Alert severity="error">User does not have permissions</Alert>
-        );
-      }
-    }
+    if (confID > 0) getRows();
   }, [confID]);
 
   const columns = [
@@ -336,96 +312,16 @@ export default function ComitteeManagementPage() {
 
               {/* Quanto info for clicado */}
               {infoOpen && (
-                <ModalInfo onClose={() => setInfoOpen(false)}>
-                  <MDBox mb={3}>
-                    <Card>
-                      <MDTypography ml={2} mb={2} mt={2} variant="h6">
-                        Information about {memberName}
-                      </MDTypography>
-
-                      <MDBox ml={2} mb={1}>
-                        <MDTypography variant="body2">
-                          <b>First name: </b>
-                          {memberInfoData.userfirstname}
-                        </MDTypography>
-
-                        <MDTypography variant="body2">
-                          <b>Last name: </b> {memberInfoData.userlastname}
-                        </MDTypography>
-
-                        <MDTypography variant="body2">
-                          <b>Email: </b> {memberInfoData.useremail}
-                        </MDTypography>
-
-                        <MDTypography variant="body2">
-                          <b>Phone: </b> {memberInfoData.userphone}
-                        </MDTypography>
-
-                        <MDTypography variant="body2">
-                          <b>Affiliation: </b> {memberInfoData.useraffiliation}
-                        </MDTypography>
-
-                        <MDTypography variant="body2">
-                          <b>Created Date: </b> {memberInfoData.useradddate}
-                        </MDTypography>
-
-                        <MDTypography mt={2} variant="body2">
-                          <b>Submitted papers:</b>
-                        </MDTypography>
-                        <MDTypography variant="body2">
-                          Missing Info
-                        </MDTypography>
-
-                        <MDTypography variant="body2">
-                          <b>Assigned submissions:</b>
-                        </MDTypography>
-                        <MDTypography variant="body2">
-                          Missing Info
-                        </MDTypography>
-
-                        <MDTypography variant="body2">
-                          <b>Bidding:</b>
-                        </MDTypography>
-
-                        <MDTypography variant="body2">
-                          Missing Info
-                        </MDTypography>
-
-                        <MDTypography variant="body2">
-                          <b>Reviewed submissions:</b>
-                        </MDTypography>
-
-                        <MDTypography variant="body2">
-                          Missing Info
-                        </MDTypography>
-
-                        <MDTypography variant="body2">
-                          <b>Conflict list:</b>
-                        </MDTypography>
-
-                        <MDTypography variant="body2">
-                          Missing Info
-                        </MDTypography>
-                      </MDBox>
-
-                      <MDButton
-                        variant="gradient"
-                        color="info"
-                        onClick={() => setInfoOpen(false)}
-                        sx={{
-                          maxWidth: "20px",
-                          maxHeight: "30px",
-                          minWidth: "5px",
-                          minHeight: "30px",
-                          mt: 1,
-                          ml: 2,
-                          mb: 2,
-                        }}
-                      >
-                        Close
-                      </MDButton>
-                    </Card>
-                  </MDBox>
+                <ModalInfo
+                  onClose={() => setInfoOpen(false)}
+                  height={{ xs: "80%", sm: "90%", md: "75%" }}
+                  width={{ xs: "95%", sm: "90%", md: "80%" }}
+                >
+                  <CommitteeInfo
+                    onClose={() => setInfoOpen(false)}
+                    memberName={memberName}
+                    memberInfoData={memberInfoData}
+                  ></CommitteeInfo>
                 </ModalInfo>
               )}
 

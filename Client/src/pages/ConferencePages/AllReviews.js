@@ -6,7 +6,6 @@ import Container from "@mui/material/Container";
 import MDTypography from "components/MDTypography";
 import MDBox from "components/MDBox";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
-import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "OurComponents/footer/Footer";
 import ConferenceNavBar from "OurComponents/navBars/ConferenceNavBar";
@@ -17,6 +16,7 @@ import { handleDownload } from "OurFunctions/DownloadFile";
 import MultiReviewsDone from "OurComponents/Info/MultiReviewsDone";
 import { AuthContext } from "auth.context";
 import { ConferenceContext } from "conference.context";
+import ModalInfo from "OurComponents/Modal/ModalInfo";
 
 export default function AllReviews() {
   const { confID } = useContext(ConferenceContext);
@@ -149,11 +149,13 @@ export default function AllReviews() {
         <ConferenceNavBar />
         <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
           {openReview ? (
-            <MultiReviewsDone
-              submissionID={submissionID}
-              title={title}
-              onClose={() => setOpenReview(false)}
-            />
+            <ModalInfo open={true} onClose={() => setOpenReview(false)}>
+              <MultiReviewsDone
+                submissionID={submissionID}
+                title={title}
+                onClose={() => setOpenReview(false)}
+              />
+            </ModalInfo>
           ) : (
             <Container maxWidth="sm">
               <MDBox mt={10} mb={2} textAlign="left">

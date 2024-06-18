@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import MDButton from "components/MDButton";
 
 export default function PopUpWithMessage({
   open,
@@ -23,20 +23,33 @@ export default function PopUpWithMessage({
         <DialogContentText>{text}</DialogContentText>
       </DialogContent>
       <DialogActions>
-        {justOneButton ? (
-          <Button onClick={handleConfirm} color="primary">
+        {!justOneButton && (
+          <MDButton
+            onClick={handleConfirm}
+            color="warning"
+            sx={{
+              maxWidth: "130px",
+              maxHeight: "30px",
+              minWidth: "5px",
+              minHeight: "5px",
+            }}
+          >
             {affirmativeButtonName}
-          </Button>
-        ) : (
-          <>
-            <Button onClick={handleConfirm} color="primary">
-              {affirmativeButtonName}
-            </Button>
-            <Button onClick={handleClose} color="primary">
-              {negativeButtonName}
-            </Button>
-          </>
+          </MDButton>
         )}
+
+        <MDButton
+          onClick={handleClose}
+          color="info"
+          sx={{
+            maxWidth: "80px",
+            maxHeight: "30px",
+            minWidth: "5px",
+            minHeight: "5px",
+          }}
+        >
+          {negativeButtonName}
+        </MDButton>
       </DialogActions>
     </Dialog>
   );

@@ -28,6 +28,65 @@ router.post("/comite", auth.ensureAuthenticated, async (req, res) => {
   }
 });
 
+router.post(
+  "/committeeDetailedInfo",
+  auth.ensureAuthenticated,
+  async (req, res) => {
+    try {
+      const userid = req.body.userid;
+
+      const submissions = await db.fetchDataCst(`
+        SELECT
+          submissiontitle
+        FROM authors
+        INNER JOIN submissions on submissions.submissionid = authors.submissionid
+        WHERE
+          authors.userid = ${userid}
+        GROUP BY submissiontitle
+      `);
+
+      const conflicts = await db.fetchDataCst(`
+          SELECT
+            submissiontitle
+          FROM conflicts
+          INNER JOIN submissions on submissions.submissionid = conflictsubmissionid
+          INNER JOIN users on conflictuseremail = useremail
+          WHERE
+           userid = ${userid}
+           GROUP BY submissiontitle
+        `);
+
+      const biddings = await db.fetchDataCst(`
+        SELECT
+          submissiontitle
+        FROM biddings
+        INNER JOIN submissions on submissions.submissionid = biddingsubmissionid
+        WHERE
+         biddinguserid = ${userid}
+        GROUP BY submissiontitle
+      `);
+      const reviews = await db.fetchDataCst(`
+          SELECT
+            submissiontitle
+          FROM ReviewsAssignments
+          INNER JOIN submissions on submissions.submissionid = assignmentsubmissionid
+          WHERE 
+            assignmentuserid = ${userid}
+      `);
+
+      return res.status(200).send({
+        submissions: submissions,
+        conflicts: conflicts,
+        biddings: biddings,
+        reviews: reviews,
+      });
+    } catch (error) {
+      log.addLog(error, "endpoint", "committeeDetailedInfo");
+      return res.status(500).send({ msg: "Internal Error" });
+    }
+  }
+);
+
 router.post("/removePCMember", auth.ensureAuthenticated, async (req, res) => {
   try {
     await db.fetchDataCst(`

@@ -15,6 +15,7 @@ import { fetchAPI } from "OurFunctions/fetchAPI";
 import { AuthContext } from "auth.context";
 import { ConferenceContext } from "conference.context";
 import { handleDownload } from "OurFunctions/DownloadFile";
+import ModalInfo from "OurComponents/Modal/ModalInfo";
 
 export default function MyReviews() {
   const { confID } = useContext(ConferenceContext);
@@ -149,11 +150,13 @@ export default function MyReviews() {
         <ConferenceNavBar />
         <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
           {openReview ? (
-            <ReviewsDone
-              assignmentID={assignmentID}
-              title={title}
-              onClose={() => setOpenReview(false)}
-            />
+            <ModalInfo open={true} onClose={() => setOpenReview(false)}>
+              <ReviewsDone
+                assignmentID={assignmentID}
+                title={title}
+                onClose={() => setOpenReview(false)}
+              />
+            </ModalInfo>
           ) : (
             <Container maxWidth="sm">
               <MDBox mt={10} mb={2} textAlign="left">

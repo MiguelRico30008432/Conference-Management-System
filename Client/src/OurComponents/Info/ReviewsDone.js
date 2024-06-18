@@ -201,87 +201,51 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
   return (
     <>
       {openLoading && <LoadingCircle />}
-      <ModalInfo open={true} onClose={onClose}>
-        <PopUpWithMessage
-          open={popMessage}
-          title={"Changes not saved!"}
-          text={
-            "Wait! You are about to lose your unsaved review, are you sure do you want to go back?"
-          }
-          negativeButtonName={"Cancel"}
-          handleClose={() => setPopMessage(false)}
-          affirmativeButtonName={"Yes, I'm Sure"}
-          handleConfirm={closeComponent}
-        />
-        <PopUpWithMessage
-          open={deletePopMessage}
-          title={"Delete Review?"}
-          text={"Wait! You are about to delete your review, are you sure?"}
-          negativeButtonName={"Cancel"}
-          handleClose={() => setDeletePopMessage(false)}
-          affirmativeButtonName={"Yes, I'm Sure"}
-          handleConfirm={async () => await deleteReview()}
-        />
-        <Card sx={{ mb: 2 }}>{error}</Card>
-        <MDButton
-          variant="gradient"
-          color="info"
-          onClick={verifyCloseReview}
-          sx={{
-            maxWidth: "140px",
-            maxHeight: "30px",
-            minWidth: "5px",
-            minHeight: "30px",
-            mb: 2,
-          }}
-        >
-          Close Review
-        </MDButton>
-        {!blockCrud && (
-          <>
-            {!addReviewActive && !hideButton && (
-              <>
-                <MDButton
-                  variant="gradient"
-                  color="info"
-                  onClick={updateReview}
-                  sx={{
-                    maxWidth: "145px",
-                    maxHeight: "30px",
-                    minWidth: "5px",
-                    minHeight: "30px",
-                    ml: 2,
-                    mb: 2,
-                  }}
-                >
-                  Update Review
-                </MDButton>
-
-                <MDButton
-                  variant="gradient"
-                  color="error"
-                  onClick={() => setDeletePopMessage(true)}
-                  sx={{
-                    maxWidth: "145px",
-                    maxHeight: "30px",
-                    minWidth: "5px",
-                    minHeight: "30px",
-                    ml: 2,
-                    mb: 2,
-                  }}
-                >
-                  Delete Review
-                </MDButton>
-              </>
-            )}
-
-            {hideButton && (
+      <PopUpWithMessage
+        open={popMessage}
+        title={"Changes not saved!"}
+        text={
+          "Wait! You are about to lose your unsaved review, are you sure do you want to go back?"
+        }
+        negativeButtonName={"Cancel"}
+        handleClose={() => setPopMessage(false)}
+        affirmativeButtonName={"Yes, I'm Sure"}
+        handleConfirm={closeComponent}
+      />
+      <PopUpWithMessage
+        open={deletePopMessage}
+        title={"Delete Review?"}
+        text={"Wait! You are about to delete your review, are you sure?"}
+        negativeButtonName={"Cancel"}
+        handleClose={() => setDeletePopMessage(false)}
+        affirmativeButtonName={"Yes, I'm Sure"}
+        handleConfirm={async () => await deleteReview()}
+      />
+      <Card sx={{ mb: 2 }}>{error}</Card>
+      <MDButton
+        variant="gradient"
+        color="info"
+        onClick={verifyCloseReview}
+        sx={{
+          maxWidth: "140px",
+          maxHeight: "30px",
+          minWidth: "5px",
+          minHeight: "30px",
+          mb: 2,
+        }}
+      >
+        Close Review
+      </MDButton>
+      {!blockCrud && (
+        <>
+          {!addReviewActive && !hideButton && (
+            <>
               <MDButton
                 variant="gradient"
-                color="success"
-                onClick={async () => await submitReview()}
+                color="info"
+                onClick={updateReview}
                 sx={{
-                  maxWidth: "150px",
+                  maxWidth: "145px",
                   maxHeight: "30px",
                   minWidth: "5px",
                   minHeight: "30px",
@@ -289,46 +253,80 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
                   mb: 2,
                 }}
               >
-                {addReviewActive ? "Add Review" : "Save Review"}
+                Update Review
               </MDButton>
-            )}
-          </>
-        )}
-        <Grid container spacing={2} mb={2}>
-          <Grid item xs={12} md={5}>
-            <Card>
-              <MDTypography ml={2} mt={2} variant="h9">
-                Title
-              </MDTypography>
-              <MDTypography ml={2} variant="body2">
-                {title}
-              </MDTypography>
-              <MDTypography ml={2} mt={2} variant="h9">
-                Abstract
-              </MDTypography>
-              <MDTypography ml={2} mb={2} mr={1} variant="body2">
-                {abstract}
-              </MDTypography>
-            </Card>
-          </Grid>
 
-          <Grid item xs={12} md={7}>
-            <ReviewsCard
-              reviewName={review.username}
-              reviewDate={review.reviewadddate}
-              review={review.reviewtext}
-              grade={review.reviewgrade}
-              read={review.read}
-              onReviewTextChange={(value) =>
-                handleReviewChange("reviewtext", value)
-              }
-              onReviewGradeChange={(value) =>
-                handleReviewChange("reviewgrade", value)
-              }
-            />
-          </Grid>
+              <MDButton
+                variant="gradient"
+                color="error"
+                onClick={() => setDeletePopMessage(true)}
+                sx={{
+                  maxWidth: "145px",
+                  maxHeight: "30px",
+                  minWidth: "5px",
+                  minHeight: "30px",
+                  ml: 2,
+                  mb: 2,
+                }}
+              >
+                Delete Review
+              </MDButton>
+            </>
+          )}
+
+          {hideButton && (
+            <MDButton
+              variant="gradient"
+              color="success"
+              onClick={async () => await submitReview()}
+              sx={{
+                maxWidth: "150px",
+                maxHeight: "30px",
+                minWidth: "5px",
+                minHeight: "30px",
+                ml: 2,
+                mb: 2,
+              }}
+            >
+              {addReviewActive ? "Add Review" : "Save Review"}
+            </MDButton>
+          )}
+        </>
+      )}
+      <Grid container spacing={2} mb={2}>
+        <Grid item xs={12} md={5}>
+          <Card>
+            <MDTypography ml={2} mt={2} variant="h9">
+              Title
+            </MDTypography>
+            <MDTypography ml={2} variant="body2">
+              {title}
+            </MDTypography>
+            <MDTypography ml={2} mt={2} variant="h9">
+              Abstract
+            </MDTypography>
+            <MDTypography ml={2} mb={2} mr={1} variant="body2">
+              {abstract}
+            </MDTypography>
+          </Card>
         </Grid>
-      </ModalInfo>
+
+        <Grid item xs={12} md={7}>
+          <ReviewsCard
+            reviewName={review.username}
+            reviewDate={review.reviewadddate}
+            review={review.reviewtext}
+            grade={review.reviewgrade}
+            read={review.read}
+            onReviewTextChange={(value) =>
+              handleReviewChange("reviewtext", value)
+            }
+            onReviewGradeChange={(value) =>
+              handleReviewChange("reviewgrade", value)
+            }
+          />
+        </Grid>
+      </Grid>
     </>
   );
 }
