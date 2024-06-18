@@ -134,11 +134,6 @@ export default function UpdateSubmission({ onClose, submissionID }) {
   ]);
 
   function resetToDefaultValues() {
-    setTitle("");
-    setAbstract("");
-    setAuthors([
-      { firstName: "", lastName: "", email: "", affiliation: "", authorid: "" },
-    ]);
     setUploadButtonClicked(false);
   }
 
