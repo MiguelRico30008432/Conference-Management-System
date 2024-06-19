@@ -37,3 +37,23 @@ cron.schedule("0 0 0 * * *", async () => {
     log.addLog(error, "cronjobs", "Review Assignments Cron Job");
   }
 });
+
+// Delete expired cookies Cron Job
+cron.schedule("0 0 0 * * *", async () => {
+  try {
+    const sessionsExpired = await db.fetchDataCst(`
+      SELECT sid FROM session WHERE expire < NOW() 
+    `);
+
+    if (sessionsExpired.length > 0) {
+      for (const session of sessionsExpired) {
+        await db.fetchDataCst(`
+          DELETE FROM session
+          WHERE sid = ${session[0].sid}  
+        `);
+      }
+    }
+  } catch (error) {
+    log.addLog(error, "cronjobs", "Delete expired cookies Cron Job");
+  }
+});

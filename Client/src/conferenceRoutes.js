@@ -89,6 +89,14 @@ const ConfRoutes = [
   },
   {
     type: "collapse", //Done
+    name: "Conflicts Of Interest",
+    submenu: "Bidding",
+    route: "/MyConferences/Conference/ConflictsOfInterest",
+    component: <Conflicts />,
+    permissions: ["Owner", "Chair"],
+  },
+  {
+    type: "collapse", //Done
     name: "Bidding Process",
     submenu: "Bidding",
     route: "/MyConferences/Conference/Bidding",
@@ -102,14 +110,6 @@ const ConfRoutes = [
     route: "/MyConferences/Conference/MyBidding",
     component: <MyBiddings />,
     permissions: ["Owner", "Chair", "Committee"],
-  },
-  {
-    type: "collapse", //Done
-    name: "Conflicts Of Interest",
-    submenu: "Bidding",
-    route: "/MyConferences/Conference/ConflictsOfInterest",
-    component: <Conflicts />,
-    permissions: ["Owner", "Chair"],
   },
   {
     type: "collapse", //Done

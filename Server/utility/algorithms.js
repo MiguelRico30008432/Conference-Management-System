@@ -311,6 +311,7 @@ async function ReviewsAssignmentAlgorihtm(confid) {
       reviewersNeededPerReview
     );
   }
+  return "Algorithm runned successfully";
 }
 
 //------------SUPPORT FUNCTIONS FOR AUTOMATIC ASSIGNMENTS ALGORITHM----------
@@ -462,8 +463,6 @@ async function getWorkload(confid, committe) {
         }
       }
     }
-    console.log("WORKLOAD");
-    console.log(workload);
     return workload;
   } catch (error) {
     log.addLog(error, "database", "Bidding -> getWorkload()");
