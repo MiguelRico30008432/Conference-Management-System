@@ -140,15 +140,23 @@ export default function DefinitionsPage() {
     }
   }, [isLoggedIn, confID]);
 
-  const formatDate = (dateString) => {
-    try {
-      const date = new Date(dateString);
-      const formattedDate = date.toISOString().split("T")[0];
-      return formattedDate;
-    } catch (error) {
-      return dateString;
-    }
-  };
+  function addDays(date, days) {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return formatDate(result);
+  }
+
+  function formatDate(date) {
+    const d = new Date(date);
+    let month = "" + (d.getMonth() + 1);
+    let day = "" + d.getDate();
+    const year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -373,13 +381,6 @@ export default function DefinitionsPage() {
     return dateToCompare < currentDate;
   }
 
-  function addOneDay(dateToAdd) {
-    const date = new Date(dateToAdd);
-    date.setDate(date.getDate() + 1);
-    const updatedDate = formatDate(date);
-    return updatedDate;
-  }
-
   async function handleUpdateConflicts() {
     setOpenLoading(true);
 
@@ -448,6 +449,10 @@ export default function DefinitionsPage() {
 
     setOpenLoading(false);
   }
+
+  const handleKeyDown = (event) => {
+    event.preventDefault();
+  };
 
   return (
     <>
@@ -634,6 +639,7 @@ export default function DefinitionsPage() {
                           onChange={(e) =>
                             setNewSubmissionStart(formatDate(e.target.value))
                           }
+                          onKeyDown={handleKeyDown}
                           sx={{ ml: 2, mt: 2, width: "90%" }}
                         />
                       </Grid>
@@ -646,7 +652,7 @@ export default function DefinitionsPage() {
                           name="confendsubmission"
                           type="date"
                           InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: addOneDay(newSubmissionsStart) }}
+                          inputProps={{ min: addDays(newSubmissionsStart, 1) }}
                           value={newSubmissionsEnd}
                           disabled={
                             !editModeActive || isDatePast(submissionsEnd)
@@ -654,6 +660,7 @@ export default function DefinitionsPage() {
                           onChange={(e) =>
                             setNewSubmissionEnd(formatDate(e.target.value))
                           }
+                          onKeyDown={handleKeyDown}
                           sx={{ ml: 2, mt: 2, width: "90%" }}
                         />
                       </Grid>
@@ -666,12 +673,13 @@ export default function DefinitionsPage() {
                           name="confstartbidding"
                           type="date"
                           InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: addOneDay(newSubmissionsEnd) }}
+                          inputProps={{ min: addDays(newSubmissionsEnd, 1) }}
                           value={newBiddingStart}
                           disabled={!editModeActive || isDatePast(biddingStart)}
                           onChange={(e) =>
                             setNewBiddingStart(formatDate(e.target.value))
                           }
+                          onKeyDown={handleKeyDown}
                           sx={{ ml: 2, mt: 2, width: "90%" }}
                         />
                       </Grid>
@@ -684,12 +692,13 @@ export default function DefinitionsPage() {
                           name="confendbidding"
                           type="date"
                           InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: addOneDay(newBiddingStart) }}
+                          inputProps={{ min: addDays(newBiddingStart, 1) }}
                           value={newBiddingEnd}
                           disabled={!editModeActive || isDatePast(biddingEnd)}
                           onChange={(e) =>
                             setNewBiddingEnd(formatDate(e.target.value))
                           }
+                          onKeyDown={handleKeyDown}
                           sx={{ ml: 2, mt: 2, width: "90%" }}
                         />
                       </Grid>
@@ -702,12 +711,13 @@ export default function DefinitionsPage() {
                           name="confstartreview"
                           type="date"
                           InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: addOneDay(newBiddingEnd) }}
+                          inputProps={{ min: addDays(newBiddingEnd, 1) }}
                           value={newReviewStart}
                           disabled={!editModeActive || isDatePast(reviewStart)}
                           onChange={(e) =>
                             setNewReviewStart(formatDate(e.target.value))
                           }
+                          onKeyDown={handleKeyDown}
                           sx={{ ml: 2, mt: 2, width: "90%" }}
                         />
                       </Grid>
@@ -720,12 +730,13 @@ export default function DefinitionsPage() {
                           name="confendreview"
                           type="date"
                           InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: addOneDay(newReviewStart) }}
+                          inputProps={{ min: addDays(newReviewStart, 1) }}
                           value={newReviewEnd}
                           disabled={!editModeActive || isDatePast(reviewEnd)}
                           onChange={(e) =>
                             setNewReviewEnd(formatDate(e.target.value))
                           }
+                          onKeyDown={handleKeyDown}
                           sx={{ ml: 2, mt: 2, width: "90%" }}
                         />
                       </Grid>
@@ -738,12 +749,13 @@ export default function DefinitionsPage() {
                           name="confstartdate"
                           type="date"
                           InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: addOneDay(newReviewEnd) }}
+                          inputProps={{ min: addDays(newReviewEnd, 1) }}
                           value={newConfStart}
                           disabled={!editModeActive || isDatePast(confStart)}
                           onChange={(e) =>
                             setNewConfStart(formatDate(e.target.value))
                           }
+                          onKeyDown={handleKeyDown}
                           sx={{ ml: 2, mt: 2, width: "90%" }}
                         />
                       </Grid>
@@ -756,12 +768,13 @@ export default function DefinitionsPage() {
                           name="confenddate"
                           type="date"
                           InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: addOneDay(newConfStart) }}
+                          inputProps={{ min: addDays(newConfStart, 1) }}
                           value={newConfEnd}
                           disabled={!editModeActive || isDatePast(confEnd)}
                           onChange={(e) =>
                             setNewConfEnd(formatDate(e.target.value))
                           }
+                          onKeyDown={handleKeyDown}
                           sx={{ ml: 2, mt: 2, width: "90%" }}
                         />
                       </Grid>
