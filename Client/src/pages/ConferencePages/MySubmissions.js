@@ -105,7 +105,7 @@ export default function MySubmissionsPage() {
     if (error) {
       const timer = setTimeout(() => {
         setError(null);
-      }, 5000);
+      }, 6000);
 
       return () => clearTimeout(timer);
     }

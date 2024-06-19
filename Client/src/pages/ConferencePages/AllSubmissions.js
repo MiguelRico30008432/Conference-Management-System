@@ -67,7 +67,7 @@ export default function AllSubmissions() {
     if (error) {
       const timer = setTimeout(() => {
         setError(null);
-      }, 5000);
+      }, 6000);
 
       return () => clearTimeout(timer);
     }

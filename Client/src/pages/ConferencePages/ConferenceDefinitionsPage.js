@@ -149,7 +149,7 @@ export default function DefinitionsPage() {
     if (message) {
       const timer = setTimeout(() => {
         setMessage(null);
-      }, 2000);
+      }, 6000);
 
       return () => clearTimeout(timer);
     }

@@ -72,6 +72,16 @@ export default function Conflicts() {
     }
   }, [confID, isLoggedIn, confPhase]);
 
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage(null);
+      }, 6000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
   async function getInfoForDeclareConflicts() {
     setOpenLoading(true);
     setRowsToDeclareConflicts([]);
@@ -254,7 +264,9 @@ export default function Conflicts() {
                         </MDTypography>
                       </Card>
 
-                      {message && <Alert severity="error">{message}</Alert>}
+                      <MDBox mt={3} mb={3} textAlign="left">
+                        <Card>{message}</Card>
+                      </MDBox>
 
                       <MDBox mb={3} mt={4} textAlign="left">
                         <MDButton

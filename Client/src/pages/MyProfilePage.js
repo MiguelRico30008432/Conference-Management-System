@@ -21,7 +21,6 @@ export default function MyProfilePage() {
   const [openEmailChangeDialog, setOpenEmailChangeDialog] = useState(false);
   const [openLoading, setOpenLoading] = useState(false);
   const [message, setMessage] = useState(null);
-  const [inviteMessage, setInviteMessage] = useState(null);
 
   const [firstName, setFirstName] = useState("");
   const [originalFirstName, setOriginalFirstName] = useState("");
@@ -40,6 +39,7 @@ export default function MyProfilePage() {
   const [disableSavePassword, setDisableSavePassword] = useState(true);
 
   const [code, setInviteCode] = useState("");
+  const [disableInvite, setDisableInvite] = useState(true);
 
   useEffect(() => {
     async function getUserData() {
@@ -92,10 +92,15 @@ export default function MyProfilePage() {
   }, [password, repeatPassword]);
 
   useEffect(() => {
+    if (code === "") setDisableInvite(true);
+    else setDisableInvite(false);
+  }, [code]);
+
+  useEffect(() => {
     if (message) {
       const timer = setTimeout(() => {
         setMessage(null);
-      }, 8000);
+      }, 6000);
 
       return () => clearTimeout(timer);
     }
@@ -463,6 +468,7 @@ export default function MyProfilePage() {
                     onClick={() => {
                       handleInvitationCode();
                     }}
+                    disabled={disableInvite}
                   >
                     Join Conference
                   </MDButton>

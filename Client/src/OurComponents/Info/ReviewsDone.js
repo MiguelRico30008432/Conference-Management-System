@@ -67,7 +67,7 @@ export default function ReviewsDone({
     if (error) {
       const timer = setTimeout(() => {
         setError(null);
-      }, 2000);
+      }, 6000);
 
       return () => clearTimeout(timer);
     }
