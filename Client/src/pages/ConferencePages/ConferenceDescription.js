@@ -3,7 +3,6 @@ import ConfNavbar from "../../OurComponents/navBars/ConferenceNavBar";
 import { ConferenceContext } from "conference.context";
 import * as React from "react";
 import { useEffect, useState, useContext } from "react";
-import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import Container from "@mui/material/Container";
 import Footer from "OurComponents/footer/Footer";
@@ -103,9 +102,7 @@ export default function ConferenceDetails() {
             <MDBox mt={2} mb={2} textAlign="left">
               {message}
               <MDBox mb={3} textAlign="left">
-                <Card>
-                  <ConfereceDetails text={dataForDetails} />
-                </Card>
+                <ConfereceDetails text={dataForDetails} />
               </MDBox>
             </MDBox>
           </Container>

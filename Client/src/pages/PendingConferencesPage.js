@@ -7,12 +7,11 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "OurComponents/footer/Footer";
 import UpperNavBar from "OurComponents/navBars/UpperNavBar";
 import CompleteTable from "OurComponents/Table/CompleteTable";
-import MoreDetails from "OurComponents/Info/MoreDetails";
+import ConfereceDetails from "OurComponents/Info/ConfereceDetails";
 import { AuthContext } from "../auth.context";
 import { fetchAPI } from "OurFunctions/fetchAPI";
 import ModalInfo from "OurComponents/Modal/ModalInfo";
 import MDBox from "components/MDBox";
-import Box from "@mui/material/Box";
 
 export default function PendingConferencesPage() {
   const { isLoggedIn, isAdmin } = useContext(AuthContext);
@@ -229,8 +228,9 @@ export default function PendingConferencesPage() {
           </>
         ) : (
           <ModalInfo onClose={() => setDetailsOpen(false)}>
-            <MoreDetails
+            <ConfereceDetails
               text={dataForDetails}
+              displayCloseButton={true}
               onClose={() => setDetailsOpen(false)}
             />
           </ModalInfo>

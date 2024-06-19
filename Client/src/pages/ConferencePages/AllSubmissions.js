@@ -242,7 +242,8 @@ export default function AllSubmissions() {
       resizable: false,
       width: 150,
       renderCell: (params) => {
-        if (userRole.includes("Committee")) return null;
+        if (userRole.includes("Committee") || params.row.status !== "Pending")
+          return null;
 
         return (
           <div

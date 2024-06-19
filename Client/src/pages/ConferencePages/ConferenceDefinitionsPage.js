@@ -17,16 +17,18 @@ import FormControl from "@mui/material/FormControl";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
 import Footer from "OurComponents/footer/Footer";
 import { FormControlLabel, Checkbox } from "@mui/material";
+import FieldInfo from "OurComponents/ToolTip/FieldInfo";
 
 export default function DefinitionsPage() {
-  const { confID } = useContext(ConferenceContext);
+  const { confID, confPhase } = useContext(ConferenceContext);
   const { isLoggedIn } = useContext(AuthContext);
 
   const currentDate = new Date().toISOString().split("T")[0]; // Valor base para a data minima que o calendário vai mostrar
 
   const [openLoading, setOpenLoading] = useState(false);
   const [message, setMessage] = useState(null);
-  const [editModeActive, setEditModeActive] = useState(false);
+  const [disabledSaveChanges, setDisabledSaveChanges] = useState(true);
+  const [disabledOptions, setDisabledOptions] = useState(true);
 
   //original value
   const [name, setName] = useState("");
@@ -138,7 +140,63 @@ export default function DefinitionsPage() {
     if (isLoggedIn && confID) {
       getConfData();
     }
-  }, [isLoggedIn, confID]);
+
+    if (confPhase === "Bidding") setDisabledOptions(false);
+    else setDisabledOptions(true);
+  }, [isLoggedIn, confID, confPhase]);
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage(null);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    if (changesDetected()) setDisabledSaveChanges(false);
+    else setDisabledSaveChanges(true);
+  }, [
+    newName,
+    newWebpage,
+    newCity,
+    newCountry,
+    newContact,
+    newSubmissionsStart,
+    newSubmissionsEnd,
+    newBiddingStart,
+    newBiddingEnd,
+    newReviewStart,
+    newReviewEnd,
+    newConfStart,
+    newConfEnd,
+    newSubmissionUpdate,
+  ]);
+
+  function changesDetected() {
+    if (
+      newName !== name ||
+      newWebpage !== webpage ||
+      newCity !== city ||
+      newCountry !== country ||
+      newContact !== contact ||
+      newSubmissionsStart !== submissionsStart ||
+      newSubmissionsEnd !== submissionsEnd ||
+      newBiddingStart !== biddingStart ||
+      newBiddingEnd !== biddingEnd ||
+      newReviewStart !== reviewStart ||
+      newReviewEnd !== reviewEnd ||
+      newConfStart !== confStart ||
+      newConfEnd !== confEnd ||
+      newSubmissionUpdate !== submissionUpdate
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   function addDays(date, days) {
     const result = new Date(date);
@@ -160,33 +218,8 @@ export default function DefinitionsPage() {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    if (makeRequest() && valideInputs() && datesBetweenStarEndVerifications()) {
-      setEditModeActive(false);
+    if (valideInputs() && datesBetweenStarEndVerifications()) {
       await saveUserData();
-    }
-  }
-
-  function makeRequest() {
-    if (
-      name !== newName ||
-      webpage !== newWebpage ||
-      city !== newCity ||
-      country !== newCountry ||
-      contact !== newContact ||
-      submissionsStart !== newSubmissionsStart ||
-      submissionsEnd !== newSubmissionsEnd ||
-      biddingStart !== newBiddingStart ||
-      biddingEnd !== newBiddingEnd ||
-      reviewStart !== newReviewStart ||
-      reviewEnd !== newReviewEnd ||
-      confStart !== newConfStart ||
-      confEnd !== newConfEnd ||
-      submissionUpdate !== newSubmissionUpdate
-    ) {
-      return true;
-    } else {
-      setMessage(<Alert severity="error">No changes were registered!</Alert>);
-      return false;
     }
   }
 
@@ -473,55 +506,41 @@ export default function DefinitionsPage() {
                 </Card>
               </MDBox>
 
-              {message}
-
+              <MDBox mb={2} textAlign="left">
+                <Card>{message}</Card>
+              </MDBox>
               <MDBox mb={3} textAlign="left">
                 <MDButton
                   variant="gradient"
-                  color="info"
-                  sx={{ mt: 2, mb: 2 }}
-                  onClick={() => {
-                    setEditModeActive(true);
-                    setMessage(null);
-                  }}
-                >
-                  Edit Conference Definitions
-                </MDButton>
-
-                <MDButton
-                  variant="gradient"
-                  color="success"
+                  color="warning"
                   onClick={async () => handleUpdateConflicts()}
+                  disabled={disabledOptions}
                   sx={{
-                    maxWidth: "300px",
-                    maxHeight: "100px",
+                    maxWidth: "200px",
+                    maxHeight: "30px",
                     minWidth: "5px",
                     minHeight: "30px",
-                    mt: 2,
-                    mb: 2,
-                    ml: 2,
+                    mb: 1,
                   }}
                 >
                   Check for Conflicts
                 </MDButton>
-
                 <MDButton
                   variant="gradient"
-                  color="success"
+                  color="warning"
                   onClick={async () => handleAssignmentAlgorithm()}
+                  disabled={disabledOptions}
                   sx={{
                     maxWidth: "300px",
-                    maxHeight: "100px",
+                    maxHeight: "30px",
                     minWidth: "5px",
                     minHeight: "30px",
-                    mt: 2,
-                    mb: 2,
                     ml: 2,
+                    mb: 1,
                   }}
                 >
                   Run Review Assignment Algorithm
-                </MDButton>
-
+                </MDButton>{" "}
                 <Card sx={{ maxWidth: 1400 }}>
                   <MDBox mt={1} mb={1} textAlign="center"></MDBox>
                   <Box component="form" noValidate onSubmit={handleSubmit}>
@@ -537,7 +556,6 @@ export default function DefinitionsPage() {
                           InputLabelProps={{ shrink: true }}
                           value={newName}
                           onChange={(e) => setNewName(e.target.value)}
-                          disabled={!editModeActive}
                           sx={{ ml: 2, mt: 2, width: "90%" }}
                         />
                       </Grid>
@@ -550,7 +568,6 @@ export default function DefinitionsPage() {
                           InputLabelProps={{ shrink: true }}
                           value={newWebpage}
                           onChange={(e) => setNewWebpage(e.target.value)}
-                          disabled={!editModeActive}
                           sx={{ ml: 2, mt: 2, width: "90%" }}
                         />
                       </Grid>
@@ -564,7 +581,6 @@ export default function DefinitionsPage() {
                           InputLabelProps={{ shrink: true }}
                           value={newCity}
                           onChange={(e) => setNewCity(e.target.value)}
-                          disabled={!editModeActive}
                           sx={{ ml: 2, mt: 2, width: "90%" }}
                         />
                       </Grid>
@@ -578,7 +594,6 @@ export default function DefinitionsPage() {
                           InputLabelProps={{ shrink: true }}
                           value={newCountry}
                           onChange={(e) => setNewCountry(e.target.value)}
-                          disabled={!editModeActive}
                           sx={{ ml: 2, mt: 2, width: "90%" }}
                         />
                       </Grid>
@@ -591,36 +606,40 @@ export default function DefinitionsPage() {
                           name="confcontact"
                           InputLabelProps={{ shrink: true }}
                           value={newContact}
-                          disabled={!editModeActive}
                           onChange={(e) => setNewContact(e.target.value)}
                           sx={{ ml: 2, mt: 2, width: "90%" }}
                         />
                       </Grid>
                       <Grid item xs={12} sm={5}>
-                        <FormControl fullWidth>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={newSubmissionUpdate}
-                                onChange={(e) =>
-                                  setNewSubmissionUpdate(e.target.checked)
-                                }
-                                disabled={!editModeActive}
-                                sx={{ ml: -1 }}
-                              />
-                            }
-                            label="Submissions Update"
-                            sx={{
-                              ml: 2,
-                              mt: 2,
-                              width: "90%",
-                              alignItems: "center",
-                              "& .MuiFormControlLabel-label": {
-                                fontWeight: "normal",
-                              },
-                            }}
-                          />
-                        </FormControl>
+                        <FieldInfo
+                          text={
+                            "With this check, all submissions can be updated"
+                          }
+                        >
+                          <FormControl fullWidth>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={newSubmissionUpdate}
+                                  onChange={(e) =>
+                                    setNewSubmissionUpdate(e.target.checked)
+                                  }
+                                  sx={{ ml: -1 }}
+                                />
+                              }
+                              label="Submissions Update"
+                              sx={{
+                                ml: 2,
+                                mt: 2,
+                                width: "90%",
+                                alignItems: "center",
+                                "& .MuiFormControlLabel-label": {
+                                  fontWeight: "normal",
+                                },
+                              }}
+                            />
+                          </FormControl>
+                        </FieldInfo>
                       </Grid>
                       <Grid item xs={12} sm={5}>
                         <TextField
@@ -633,9 +652,7 @@ export default function DefinitionsPage() {
                           InputLabelProps={{ shrink: true }}
                           inputProps={{ min: currentDate }}
                           value={newSubmissionsStart}
-                          disabled={
-                            !editModeActive || isDatePast(submissionsStart)
-                          }
+                          disabled={isDatePast(submissionsStart)}
                           onChange={(e) =>
                             setNewSubmissionStart(formatDate(e.target.value))
                           }
@@ -654,9 +671,7 @@ export default function DefinitionsPage() {
                           InputLabelProps={{ shrink: true }}
                           inputProps={{ min: addDays(newSubmissionsStart, 1) }}
                           value={newSubmissionsEnd}
-                          disabled={
-                            !editModeActive || isDatePast(submissionsEnd)
-                          }
+                          disabled={isDatePast(submissionsEnd)}
                           onChange={(e) =>
                             setNewSubmissionEnd(formatDate(e.target.value))
                           }
@@ -675,7 +690,7 @@ export default function DefinitionsPage() {
                           InputLabelProps={{ shrink: true }}
                           inputProps={{ min: addDays(newSubmissionsEnd, 1) }}
                           value={newBiddingStart}
-                          disabled={!editModeActive || isDatePast(biddingStart)}
+                          disabled={isDatePast(biddingStart)}
                           onChange={(e) =>
                             setNewBiddingStart(formatDate(e.target.value))
                           }
@@ -694,7 +709,7 @@ export default function DefinitionsPage() {
                           InputLabelProps={{ shrink: true }}
                           inputProps={{ min: addDays(newBiddingStart, 1) }}
                           value={newBiddingEnd}
-                          disabled={!editModeActive || isDatePast(biddingEnd)}
+                          disabled={isDatePast(biddingEnd)}
                           onChange={(e) =>
                             setNewBiddingEnd(formatDate(e.target.value))
                           }
@@ -713,7 +728,7 @@ export default function DefinitionsPage() {
                           InputLabelProps={{ shrink: true }}
                           inputProps={{ min: addDays(newBiddingEnd, 1) }}
                           value={newReviewStart}
-                          disabled={!editModeActive || isDatePast(reviewStart)}
+                          disabled={isDatePast(reviewStart)}
                           onChange={(e) =>
                             setNewReviewStart(formatDate(e.target.value))
                           }
@@ -732,7 +747,7 @@ export default function DefinitionsPage() {
                           InputLabelProps={{ shrink: true }}
                           inputProps={{ min: addDays(newReviewStart, 1) }}
                           value={newReviewEnd}
-                          disabled={!editModeActive || isDatePast(reviewEnd)}
+                          disabled={isDatePast(reviewEnd)}
                           onChange={(e) =>
                             setNewReviewEnd(formatDate(e.target.value))
                           }
@@ -751,7 +766,7 @@ export default function DefinitionsPage() {
                           InputLabelProps={{ shrink: true }}
                           inputProps={{ min: addDays(newReviewEnd, 1) }}
                           value={newConfStart}
-                          disabled={!editModeActive || isDatePast(confStart)}
+                          disabled={isDatePast(confStart)}
                           onChange={(e) =>
                             setNewConfStart(formatDate(e.target.value))
                           }
@@ -770,7 +785,7 @@ export default function DefinitionsPage() {
                           InputLabelProps={{ shrink: true }}
                           inputProps={{ min: addDays(newConfStart, 1) }}
                           value={newConfEnd}
-                          disabled={!editModeActive || isDatePast(confEnd)}
+                          disabled={isDatePast(confEnd)}
                           onChange={(e) =>
                             setNewConfEnd(formatDate(e.target.value))
                           }
@@ -782,13 +797,17 @@ export default function DefinitionsPage() {
                     <MDButton
                       type="submit"
                       variant="gradient"
-                      color="info"
+                      color="success"
                       sx={{
+                        maxWidth: "200px",
+                        maxHeight: "30px",
+                        minWidth: "5px",
+                        minHeight: "30px",
                         ml: 2,
                         mt: 2,
-                        mb: 2,
-                        display: editModeActive ? "block" : "none",
+                        mt: 2,
                       }}
+                      disabled={disabledSaveChanges}
                     >
                       Save Changes
                     </MDButton>
