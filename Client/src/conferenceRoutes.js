@@ -34,6 +34,7 @@ const ConfRoutes = [
     name: "Conference",
     parentkey: "Details",
     permissions: ["All"],
+    icon: "copyall",
   },
   {
     type: "collapse", //Done
@@ -42,6 +43,7 @@ const ConfRoutes = [
     route: "/MyConferences/ConferenceDescription",
     component: <ConferenceDescription />,
     permissions: ["All"],
+    icon: "dashboard",
   },
   {
     type: "collapse", //Done
@@ -50,12 +52,14 @@ const ConfRoutes = [
     route: "/MyConferences/Events",
     component: <Events />,
     permissions: ["Owner", "Chair", "Committee"],
+    icon: "dashboard",
   },
   {
     type: "title",
     name: "Submissions",
     parentkey: "Submissions",
     permissions: ["All"],
+    icon: "publish",
   },
   {
     type: "collapse", //Done
@@ -64,6 +68,7 @@ const ConfRoutes = [
     route: "/MyConferences/Conference/CreateSubmission",
     component: <CreateSubmission />,
     permissions: ["All"],
+    icon: "dashboard",
   },
   {
     type: "collapse", //Done
@@ -72,6 +77,7 @@ const ConfRoutes = [
     route: "/MyConferences/Conference/MySubmissions",
     component: <MySubmissions />,
     permissions: ["All"],
+    icon: "dashboard",
   },
   {
     type: "collapse", //Done
@@ -80,12 +86,14 @@ const ConfRoutes = [
     route: "/MyConferences/Conference/AllSubmissions",
     component: <AllSubmissions />,
     permissions: ["Owner", "Chair", "Committee"],
+    icon: "dashboard",
   },
   {
     type: "title",
     name: "Bidding",
     parentkey: "Bidding",
     permissions: ["Owner", "Chair", "Committee"],
+    icon: "accessibility",
   },
   {
     type: "collapse", //Done
@@ -94,6 +102,7 @@ const ConfRoutes = [
     route: "/MyConferences/Conference/ConflictsOfInterest",
     component: <Conflicts />,
     permissions: ["Owner", "Chair"],
+    icon: "dashboard",
   },
   {
     type: "collapse", //Done
@@ -102,6 +111,7 @@ const ConfRoutes = [
     route: "/MyConferences/Conference/Bidding",
     component: <Bidding />,
     permissions: ["Owner", "Chair", "Committee"],
+    icon: "dashboard",
   },
   {
     type: "collapse", //Done
@@ -110,6 +120,7 @@ const ConfRoutes = [
     route: "/MyConferences/Conference/MyBidding",
     component: <MyBiddings />,
     permissions: ["Owner", "Chair", "Committee"],
+    icon: "dashboard",
   },
   {
     type: "collapse", //Done
@@ -118,12 +129,14 @@ const ConfRoutes = [
     route: "/MyConferences/Conference/ManualAssignments",
     component: <ManualAssignments />,
     permissions: ["Owner", "Chair"],
+    icon: "dashboard",
   },
   {
     type: "title",
     name: "Reviews",
     parentkey: "Reviews",
     permissions: ["Owner", "Chair", "Committee"],
+    icon: "visibility",
   },
   {
     type: "collapse", //Done
@@ -132,6 +145,7 @@ const ConfRoutes = [
     route: "/MyConferences/Conference/AllReviews",
     component: <AllReviews />,
     permissions: ["Owner", "Chair", "Committee"],
+    icon: "dashboard",
   },
   {
     type: "collapse", //Done
@@ -140,12 +154,14 @@ const ConfRoutes = [
     route: "/MyConferences/Conference/MyReviews",
     component: <MyReviews />,
     permissions: ["Owner", "Chair", "Committee"],
+    icon: "dashboard",
   },
   {
     type: "title",
     name: "Emails",
     parentkey: "Emails",
     permissions: ["Owner", "Chair", "Committee"],
+    icon: "email",
   },
   {
     type: "collapse", //Done
@@ -154,6 +170,7 @@ const ConfRoutes = [
     route: "/MyConferences/Conference/EMails/Compose",
     component: <Compose />,
     permissions: ["Owner", "Chair", "Committee"],
+    icon: "email",
   },
   {
     type: "collapse", //Done
@@ -162,12 +179,14 @@ const ConfRoutes = [
     route: "/MyConferences/Conference/EMails/SendInvitation",
     component: <SendInvitation />,
     permissions: ["Owner", "Chair", "Committee"],
+    icon: "dashboard",
   },
   {
     type: "title",
     name: "Administration",
     parentkey: "Settings",
     permissions: ["Owner", "Chair"],
+    icon: "apartment",
   },
   {
     type: "collapse", //Done
@@ -176,6 +195,7 @@ const ConfRoutes = [
     route: "/MyConferences/Conference/ComiteManagement",
     component: <ComiteManagement />,
     permissions: ["Owner", "Chair"],
+    icon: "dashboard",
   },
   {
     type: "collapse", //Done
@@ -184,6 +204,7 @@ const ConfRoutes = [
     route: "/MyConferences/Conference/ConferenceSettings",
     component: <ConferenceDefinitions />,
     permissions: ["Owner", "Chair"],
+    icon: "dashboard",
   },
   {
     type: "collapse", //Done
@@ -192,6 +213,7 @@ const ConfRoutes = [
     route: "/MyConferences/Conference/SubmissionsDecision",
     component: <SubmissionsDecision />,
     permissions: ["Owner", "Chair"],
+    icon: "dashboard",
   },
   {
     type: "404",
@@ -200,6 +222,7 @@ const ConfRoutes = [
     route: "/PageNotFound",
     component: <PageNotFound />,
     display: false,
+    icon: "dashboard",
   },
 ];
 

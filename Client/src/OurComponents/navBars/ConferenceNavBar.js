@@ -194,6 +194,7 @@ export default function ConferenceNavBar({ transparent, light, action }) {
                     aria-haspopup="true"
                     style={{ textTransform: "none", color: "black" }}
                     onClick={(e) => handleClick(e, item.parentkey)}
+                    startIcon={<Icon>{item.icon}</Icon>}
                   >
                     {item.name}
                   </Button>
@@ -221,6 +222,7 @@ export default function ConferenceNavBar({ transparent, light, action }) {
                     key={subMenu.name}
                     onClick={() => handleSubMenuClick(subMenu.route)}
                   >
+                    <Icon style={{ marginRight: 8 }}>{subMenu.icon}</Icon>
                     {subMenu.name}
                   </MenuItem>
                 );
