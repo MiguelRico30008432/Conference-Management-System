@@ -149,7 +149,7 @@ export default function CallForPapers() {
       <DashboardLayout>
         <UpperNavBar />
         <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-          <MDBox mb={3} textAlign="left">
+          <MDBox mt={2} textAlign="left">
             <Card>
               <MDTypography ml={2} mt={1} variant="h6">
                 Call For Papers

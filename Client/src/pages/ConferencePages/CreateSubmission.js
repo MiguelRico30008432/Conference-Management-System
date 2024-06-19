@@ -14,6 +14,7 @@ import Alert from "@mui/material/Alert";
 import MDButton from "components/MDButton";
 import TextField from "@mui/material/TextField";
 import BlockPageForConfStatus from "OurComponents/errorHandling/BlockPageForConfStatus";
+import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
 
 export default function CreateSubmission() {
   const { confID, confPhase } = useContext(ConferenceContext);
@@ -27,9 +28,10 @@ export default function CreateSubmission() {
 
   const [openLoading, setOpenLoading] = useState(false);
   const [message, setMessage] = useState(null);
+  const [openPopUpMessage, setOpenPopUpMessage] = useState(false);
   const [blockCrud, setBlockCrud] = useState(false);
   const [disableSubmit, setDisableSubmit] = useState(true);
-  const [uploadButtonCliced, setUploadButtonCliced] = useState(false);
+  const [uploadButtonClicked, setUploadButtonClicked] = useState(false);
 
   const fileInput = createRef();
 
@@ -62,14 +64,10 @@ export default function CreateSubmission() {
             },
           ]);
         } else {
-          setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
+          setMessage(`${jsonResponse.msg}`);
         }
       } catch {
-        setMessage(
-          <Alert severity="error">
-            Something went wrong when obtaining your information.
-          </Alert>
-        );
+        setMessage("Something went wrong when obtaining your information.");
       }
       setOpenLoading(false);
     }
@@ -82,73 +80,65 @@ export default function CreateSubmission() {
   }, [isLoggedIn, confID, confPhase, user]);
 
   useEffect(() => {
-    if (message) {
-      const timer = setTimeout(() => {
-        setMessage(null);
-      }, 2000);
-
-      return () => clearTimeout(timer);
-    }
+    if (message !== null) setOpenPopUpMessage(true);
+    else setOpenPopUpMessage(false);
   }, [message]);
 
   useEffect(() => {
-    if (title !== "" && abstract !== "" && uploadButtonCliced)
+    if (title !== "" && abstract !== "" && uploadButtonClicked)
       setDisableSubmit(false);
     else setDisableSubmit(true);
-  }, [title, abstract, uploadButtonCliced]);
+  }, [title, abstract, uploadButtonClicked]);
 
   async function uploadFile(event) {
     event.preventDefault();
 
+    if (!inputsAreOk()) {
+      setMessage("All fields marked with * are required.");
+      return;
+    }
+
+    if (authorsDuplicated()) {
+      setMessage("There are duplicated authors!");
+      return;
+    }
+
     setOpenLoading(true);
 
-    if (validateInputs()) {
-      const formData = new FormData();
-      formData.append("confID", confID);
-      formData.append("userid", user);
-      formData.append("title", title.trim());
-      formData.append("abstract", abstract.trim());
-      formData.append("file", fileInput.current.files[0]);
-      authors.forEach((author, index) => {
-        formData.append(`author[${index}][firstName]`, author.firstName);
-        formData.append(`author[${index}][lastName]`, author.lastName);
-        formData.append(`author[${index}][email]`, author.email);
-        formData.append(`author[${index}][affiliation]`, author.affiliation);
-      });
+    const formData = new FormData();
+    formData.append("confID", confID);
+    formData.append("userid", user);
+    formData.append("title", title.trim());
+    formData.append("abstract", abstract.trim());
+    formData.append("file", fileInput.current.files[0]);
+    authors.forEach((author, index) => {
+      formData.append(`author[${index}][firstName]`, author.firstName);
+      formData.append(`author[${index}][lastName]`, author.lastName);
+      formData.append(`author[${index}][email]`, author.email);
+      formData.append(`author[${index}][affiliation]`, author.affiliation);
+    });
 
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/createSubmission`,
-          {
-            method: "POST",
-            body: formData,
-            credentials: "include",
-          }
-        );
-
-        const jsonResponse = await response.json();
-
-        if (response.status === 200) {
-          setMessage(
-            <Alert severity="success">Submission created with success</Alert>
-          );
-          window.scrollTo({ top: 0, behavior: "smooth" });
-          resetToDefaultValues(); // Limpar os campos após submissão bem-sucedida
-        } else {
-          setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/createSubmission`,
+        {
+          method: "POST",
+          body: formData,
+          credentials: "include",
         }
-      } catch (error) {
-        setMessage(
-          <Alert severity="error">
-            Something went wrong when obtaining your informations
-          </Alert>
-        );
-      }
-    } else {
-      setMessage(
-        <Alert severity="error">All fields marked with * are required.</Alert>
       );
+
+      const jsonResponse = await response.json();
+      if (response.status === 200) {
+        setMessage("Submission created with success");
+        resetToDefaultValues();
+      } else {
+        setMessage(`${jsonResponse.msg}`);
+      }
+    } catch (error) {
+      setMessage("Something went wrong when obtaining your informations");
     }
+
     setOpenLoading(false);
   }
 
@@ -176,9 +166,20 @@ export default function CreateSubmission() {
     setAuthors(newAuthors);
   };
 
-  function validateInputs() {
-    for (let i = 0; i < authors.length; i++) {
-      const author = authors[i];
+  function authorsDuplicated() {
+    for (let author of authors) {
+      const duplicatedAuthors = authors.filter((x) => x.email === author.email);
+      if (duplicatedAuthors.length > 1) {
+        setMessage("There are duplicated authors!");
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  function inputsAreOk() {
+    for (let author of authors) {
       if (
         author.firstName === "" ||
         author.lastName === "" ||
@@ -198,6 +199,15 @@ export default function CreateSubmission() {
 
   return (
     <>
+      <PopUpWithMessage
+        open={openPopUpMessage}
+        handleClose={() => setOpenPopUpMessage(false)}
+        justOneButton={true}
+        negativeButtonName={"Ok"}
+        title={"Information"}
+        text={message}
+      />
+
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
         <ConfNavbar />
@@ -215,8 +225,6 @@ export default function CreateSubmission() {
                         For each author please fill out the form below.
                       </MDTypography>
                     </Card>
-
-                    <Card sx={{ mt: 2 }}>{message}</Card>
 
                     {/*Author Information*/}
                     {authors.map((author, index) =>
@@ -422,8 +430,9 @@ export default function CreateSubmission() {
                           type="file"
                           className="form-control"
                           placeholder="file"
+                          accept=".pdf"
                           ref={fileInput}
-                          onClick={() => setUploadButtonCliced(true)}
+                          onClick={() => setUploadButtonClicked(true)}
                         />
                       </MDBox>
                     </Card>

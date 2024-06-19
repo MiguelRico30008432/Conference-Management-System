@@ -9,6 +9,7 @@ import MDButton from "components/MDButton";
 import TextField from "@mui/material/TextField";
 import { ConferenceContext } from "conference.context";
 import { AuthContext } from "auth.context";
+import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
 
 export default function UpdateSubmission({ onClose, submissionID }) {
   const { confID } = useContext(ConferenceContext);
@@ -26,6 +27,7 @@ export default function UpdateSubmission({ onClose, submissionID }) {
 
   const [openLoading, setOpenLoading] = useState(false);
   const [message, setMessage] = useState(null);
+  const [openPopUpMessage, setOpenPopUpMessage] = useState(false);
   const [disableSubmit, setDisableSubmit] = useState(true);
   const [uploadButtonClicked, setUploadButtonClicked] = useState(false);
 
@@ -101,13 +103,8 @@ export default function UpdateSubmission({ onClose, submissionID }) {
   }, [submissionID]);
 
   useEffect(() => {
-    if (message) {
-      const timer = setTimeout(() => {
-        setMessage(null);
-      }, 2000);
-
-      return () => clearTimeout(timer);
-    }
+    if (message !== null) setOpenPopUpMessage(true);
+    else setOpenPopUpMessage(false);
   }, [message]);
 
   useEffect(() => {
@@ -140,63 +137,62 @@ export default function UpdateSubmission({ onClose, submissionID }) {
   async function uploadFile(event) {
     event.preventDefault();
 
+    if (!inputsAreOk()) {
+      setMessage("All fields marked with * are required.");
+      return;
+    }
+
+    if (authorsDuplicated()) {
+      setMessage("There are duplicated authors!");
+      return;
+    }
+
     setOpenLoading(true);
 
-    if (validateInputs()) {
-      const formData = new FormData();
+    const formData = new FormData();
 
-      formData.append("confID", confID);
-      formData.append("submissionid", submissionID);
-      formData.append("userid", user);
-      formData.append("title", title.trim());
-      formData.append("abstract", abstract.trim());
-      authors.forEach((author, index) => {
-        formData.append(`author[${index}][firstName]`, author.firstName.trim());
-        formData.append(`author[${index}][lastName]`, author.lastName.trim());
-        formData.append(`author[${index}][email]`, author.email.trim());
-        formData.append(
-          `author[${index}][affiliation]`,
-          author.affiliation.trim()
-        );
-        formData.append(`author[${index}][authorid]`, author.authorid);
-      });
-
-      if (fileInput.current.files[0]) {
-        formData.append("file", fileInput.current.files[0]);
-      }
-
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/updateSubmission`,
-          {
-            method: "POST",
-            body: formData,
-            credentials: "include",
-          }
-        );
-
-        const jsonResponse = await response.json();
-        if (response.status === 200) {
-          setMessage(
-            <Alert severity="success">Submission updated successfully</Alert>
-          );
-
-          resetToDefaultValues();
-        } else {
-          setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
-        }
-      } catch (error) {
-        setMessage(
-          <Alert severity="error">
-            Something went wrong when updating your submission.
-          </Alert>
-        );
-      }
-    } else {
-      setMessage(
-        <Alert severity="error">All fields marked with * are required.</Alert>
+    formData.append("confID", confID);
+    formData.append("submissionid", submissionID);
+    formData.append("userid", user);
+    formData.append("title", title.trim());
+    formData.append("abstract", abstract.trim());
+    authors.forEach((author, index) => {
+      formData.append(`author[${index}][firstName]`, author.firstName.trim());
+      formData.append(`author[${index}][lastName]`, author.lastName.trim());
+      formData.append(`author[${index}][email]`, author.email.trim());
+      formData.append(
+        `author[${index}][affiliation]`,
+        author.affiliation.trim()
       );
+      formData.append(`author[${index}][authorid]`, author.authorid);
+    });
+
+    if (fileInput.current.files[0]) {
+      formData.append("file", fileInput.current.files[0]);
     }
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/updateSubmission`,
+        {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        }
+      );
+
+      const jsonResponse = await response.json();
+      if (response.status === 200) {
+        setMessage("Submission updated successfully");
+
+        resetToDefaultValues();
+      } else {
+        setMessage(`${jsonResponse.msg}`);
+      }
+    } catch (error) {
+      setMessage("Something went wrong when updating your submission.");
+    }
+
     setOpenLoading(false);
   }
 
@@ -219,7 +215,7 @@ export default function UpdateSubmission({ onClose, submissionID }) {
     setAuthors(newAuthors);
   };
 
-  function validateInputs() {
+  function inputsAreOk() {
     for (let i = 0; i < authors.length; i++) {
       const author = authors[i];
       if (
@@ -238,10 +234,30 @@ export default function UpdateSubmission({ onClose, submissionID }) {
     return true;
   }
 
+  function authorsDuplicated() {
+    for (let author of authors) {
+      const duplicatedAuthors = authors.filter((x) => x.email === author.email);
+      if (duplicatedAuthors.length > 1) {
+        setMessage(" There are duplicated authors!");
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   return (
     <>
+      <PopUpWithMessage
+        open={openPopUpMessage}
+        handleClose={() => setOpenPopUpMessage(false)}
+        justOneButton={true}
+        negativeButtonName={"Ok"}
+        title={"Information"}
+        text={message}
+      />
+
       {openLoading && <LoadingCircle />}
-      <Card>{message}</Card>
 
       <MDButton
         variant="gradient"
@@ -456,6 +472,7 @@ export default function UpdateSubmission({ onClose, submissionID }) {
             type="file"
             className="form-control"
             placeholder="file"
+            accept=".pdf"
             ref={fileInput}
             onClick={() => setUploadButtonClicked(true)}
           />

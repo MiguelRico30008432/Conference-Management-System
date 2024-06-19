@@ -102,6 +102,16 @@ export default function MySubmissionsPage() {
     }
   }, [confID, user]);
 
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
   const handleDelete = async () => {
     setError(null);
     setOpenLoading(true);
@@ -192,7 +202,12 @@ export default function MySubmissionsPage() {
       resizable: false,
       width: 55,
       renderCell: (params) => {
-        if (confPhase !== "Submission" || !subUpdate) return null;
+        if (
+          confPhase !== "Submission" ||
+          !subUpdate ||
+          params.row.status !== "Pending"
+        )
+          return null;
 
         return (
           <div
@@ -310,7 +325,8 @@ export default function MySubmissionsPage() {
       resizable: false,
       width: 150,
       renderCell: (params) => {
-        if (confPhase !== "Submission") return null;
+        if (confPhase !== "Submission" || params.row.status !== "Pending")
+          return null;
 
         return (
           <div

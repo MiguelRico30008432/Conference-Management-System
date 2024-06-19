@@ -141,7 +141,7 @@ export default function SignUpPage() {
       ) : null
     );
     setAffiliationAlert(
-      password === "" ? (
+      affiliation === "" ? (
         <Alert severity="error">You must insert your Affiliation!</Alert>
       ) : null
     );

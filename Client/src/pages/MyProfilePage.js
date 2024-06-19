@@ -239,7 +239,7 @@ export default function MyProfilePage() {
       <DashboardLayout>
         <UpperNavBar />
         <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-          <MDBox mb={3} textAlign="left">
+          <MDBox mt={2} textAlign="left">
             <Card>
               <MDTypography ml={2} variant="h6">
                 My Profile
@@ -255,7 +255,7 @@ export default function MyProfilePage() {
             <Card>{message}</Card>
           </MDBox>
 
-          <MDBox mb={3}>
+          <MDBox>
             <Card>
               {/*User change*/}
               <MDTypography ml={2} mb={2} mt={2} variant="body2">

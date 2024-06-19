@@ -131,8 +131,11 @@ export default function MyConferences() {
       <DashboardLayout>
         <UpperNavBar />
         <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-          <MDBox mb={5} textAlign="left">
+          <MDBox mb={3} mt={2} textAlign="left">
             <Card>
+              <MDTypography ml={2} variant="h6">
+                My Conferences
+              </MDTypography>
               <MDTypography ml={2} variant="body2">
                 On this page, you'll find a comprehensive list of all the
                 conferences you are participating in. Once inside, you'll have
