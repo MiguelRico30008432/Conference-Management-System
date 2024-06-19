@@ -251,7 +251,7 @@ export default function MyProfilePage() {
       />
 
       <DashboardLayout>
-        <UpperNavBar />
+        <UpperNavBar whereIAm={"My Profile"} />
         <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
           <MDBox mt={2} textAlign="left">
             <Card>

@@ -35,14 +35,15 @@ function Breadcrumbs({ icon, title, route, light }) {
       <MuiBreadcrumbs
         sx={{
           "& .MuiBreadcrumbs-separator": {
-            color: ({ palette: { white, grey } }) => (light ? white.main : grey[600]),
+            color: ({ palette: { white, grey } }) =>
+              light ? white.main : grey[600],
           },
         }}
       >
         <Link to="/">
           <MDTypography
             component="span"
-            variant="body2"
+            variant="h9"
             color={light ? "white" : "dark"}
             opacity={light ? 0.8 : 0.5}
             sx={{ lineHeight: 0 }}
@@ -75,15 +76,6 @@ function Breadcrumbs({ icon, title, route, light }) {
           {title.replace("-", " ")}
         </MDTypography>
       </MuiBreadcrumbs>
-      <MDTypography
-        fontWeight="bold"
-        textTransform="capitalize"
-        variant="h6"
-        color={light ? "white" : "dark"}
-        noWrap
-      >
-        {title.replace("-", " ")}
-      </MDTypography>
     </MDBox>
   );
 }

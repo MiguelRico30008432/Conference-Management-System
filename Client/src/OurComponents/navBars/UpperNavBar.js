@@ -40,7 +40,7 @@ import {
 
 import { AuthContext } from "../../auth.context";
 
-export default function UpperNavBar({ absolute, light, isMini }) {
+export default function UpperNavBar({ absolute, light, isMini, whereIAm }) {
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentNavbar, fixedNavbar, darkMode } = controller;
@@ -138,7 +138,7 @@ export default function UpperNavBar({ absolute, light, isMini }) {
         >
           <Breadcrumbs
             icon="home"
-            title={route[route.length - 1]}
+            title={whereIAm}
             route={route}
             light={light}
           />

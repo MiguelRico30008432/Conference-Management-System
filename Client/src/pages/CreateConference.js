@@ -302,7 +302,7 @@ export default function CreateConference() {
 
   return (
     <DashboardLayout>
-      <UpperNavBar />
+      <UpperNavBar whereIAm={"Create Conference"} />
       <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
         <MDBox mb={3}>
           <Card

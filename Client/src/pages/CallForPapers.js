@@ -147,7 +147,7 @@ export default function CallForPapers() {
     <>
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
-        <UpperNavBar />
+        <UpperNavBar whereIAm={"Call For Papers"} />
         <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
           <MDBox mt={2} textAlign="left">
             <Card>

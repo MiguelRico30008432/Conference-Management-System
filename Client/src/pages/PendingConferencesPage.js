@@ -209,7 +209,7 @@ export default function PendingConferencesPage() {
 
   return (
     <DashboardLayout>
-      <UpperNavBar />
+      <UpperNavBar whereIAm={"Pending Conferences"} />
       <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
         <>
           <MDBox mb={3} textAlign="left">

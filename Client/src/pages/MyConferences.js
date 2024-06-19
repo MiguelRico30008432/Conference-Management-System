@@ -129,7 +129,7 @@ export default function MyConferences() {
     <>
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
-        <UpperNavBar />
+        <UpperNavBar whereIAm={"My Conferences"} />
         <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
           <MDBox mb={3} mt={2} textAlign="left">
             <Card>
