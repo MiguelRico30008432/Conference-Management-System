@@ -10,11 +10,11 @@ export default function CompleteTable({
   withCheckBoxSelection = false,
   height,
   rowHeight = 41,
-  numerOfRowsPerPage = 5,
+  numberOfRowsPerPage = 5,
 }) {
   const [selectedRows, setSelectedRows] = useState([]);
 
-  // Ajusta a largurada das colunas consoante a resolução do ecrão, mas nunca fica menos que o seu minWidth
+  // Ajusta a largura das colunas consoante a resolução do ecrã, mas nunca fica menos que o seu minWidth
   const columnsWithFlexAndMinWidth = columns.map((column) => ({
     ...column,
     flex: 1,
@@ -32,10 +32,10 @@ export default function CompleteTable({
             columns={columnsWithFlexAndMinWidth}
             initialState={{
               pagination: {
-                paginationModel: { page: 0, pageSize: numerOfRowsPerPage },
+                paginationModel: { page: 0, pageSize: numberOfRowsPerPage },
               },
             }}
-            pageSizeOptions={[10, 50, { value: 100, label: "100" }]}
+            pageSizeOptions={[5, 10, 50, 100]}
             checkboxSelection={withCheckBoxSelection}
             onRowSelectionModelChange={
               withCheckBoxSelection ? (itm) => setSelectedRows(itm) : null

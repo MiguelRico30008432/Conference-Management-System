@@ -101,7 +101,7 @@ export default function Events() {
                   <CompleteTable
                     columns={columns}
                     rows={rows}
-                    numerOfRowsPerPage={10}
+                    numberOfRowsPerPage={10}
                     height={350}
                   />
                 </Card>

@@ -32,12 +32,11 @@ export default function BiddingPage() {
   //O use effect não tem a função defina dentro do mesmo para, na função handleSubmit;
   //poder ser chamada fetchAllSubmissionsForBidding() sem dar refresh a pagina
   useEffect(() => {
-    if (isLoggedIn && confID && confPhase === "Bidding") {
-      fetchAllSubmissionsForBidding();
+    if (isLoggedIn && confID && confPhase) {
+      if (confPhase !== "Bidding") setBlockCrud(true);
+      else fetchAllSubmissionsForBidding();
     }
-
-    if (confPhase !== "Bidding") setBlockCrud(true);
-  }, [confID, isLoggedIn]);
+  }, [confID, isLoggedIn, confPhase]);
 
   async function fetchAllSubmissionsForBidding() {
     setOpenLoading(true);
@@ -270,7 +269,7 @@ export default function BiddingPage() {
                     <CompleteTable
                       columns={columns}
                       rows={rows}
-                      numberOfRowsPerPage={100}
+                      numberOfRowsPerPage={10}
                       height={200}
                     />
                   </Card>

@@ -15,10 +15,11 @@ import CompleteTable from "OurComponents/Table/CompleteTable";
 import { fetchAPI } from "OurFunctions/fetchAPI";
 import { AuthContext } from "auth.context";
 import { ConferenceContext } from "conference.context";
+import BlockPageForConfStatus from "OurComponents/errorHandling/BlockPageForConfStatus";
 
 export default function ManualAssignments() {
-  const { confID } = useContext(ConferenceContext);
-  const { user } = useContext(AuthContext);
+  const { confID, confPhase } = useContext(ConferenceContext);
+  const { isLoggedIn, user } = useContext(AuthContext);
 
   const [rows, setRows] = useState([]);
   const [rowsForDelete, setRowsForDelete] = useState([]);
@@ -28,17 +29,19 @@ export default function ManualAssignments() {
     []
   );
   const [openLoading, setOpenLoading] = useState(false);
+  const [blockCrud, setBlockCrud] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (user && confID) {
-        await fetchBidsForManualAssignments();
-        await fetchAssignmentsForDelete();
-      }
+      await fetchBidsForManualAssignments();
+      await fetchAssignmentsForDelete();
     };
 
-    fetchData();
-  }, [confID, user]);
+    if (isLoggedIn && confID && confPhase) {
+      if (confPhase !== "Bidding") setBlockCrud(true);
+      else fetchData();
+    }
+  }, [confID, user, confPhase]);
 
   async function fetchBidsForManualAssignments() {
     setRows([]);
@@ -289,42 +292,55 @@ export default function ManualAssignments() {
         <ConferenceNavBar />
         <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
           <Container maxWidth="sm">
-            <MDBox mt={10} mb={2} textAlign="left">
-              <MDBox mb={3} textAlign="left">
-                <Card>
-                  <MDTypography ml={2} variant="h6">
-                    Manual Assignments
-                  </MDTypography>
-                  <MDTypography ml={2} variant="body2">
-                    TEXT
-                  </MDTypography>
-                </Card>
-              </MDBox>
-            </MDBox>
+            {!blockCrud && (
+              <>
+                <MDBox mt={10} mb={2} textAlign="left">
+                  <MDBox mb={3} textAlign="left">
+                    <Card>
+                      <MDTypography ml={2} variant="h6">
+                        Manual Assignments
+                      </MDTypography>
+                      <MDTypography ml={2} variant="body2">
+                        TEXT
+                      </MDTypography>
+                    </Card>
+                  </MDBox>
+                </MDBox>
 
-            <Card sx={{ mt: 2, mb: 2 }}>{message}</Card>
+                <Card sx={{ mt: 2, mb: 2 }}>{message}</Card>
 
-            <MDBox mb={3} textAlign="left">
-              <Card>
-                <CompleteTable
-                  columns={columns}
-                  rows={rows}
-                  numberOfRowsPerPage={100}
-                  height={200}
+                <MDBox mb={3} textAlign="left">
+                  <Card>
+                    <CompleteTable
+                      columns={columns}
+                      rows={rows}
+                      numberOfRowsPerPage={5}
+                      height={200}
+                    />
+                  </Card>
+                </MDBox>
+
+                <MDBox mb={3} textAlign="left">
+                  <Card>
+                    <CompleteTable
+                      columns={columnsForDelete}
+                      rows={rowsForDelete}
+                      numberOfRowsPerPage={5}
+                      height={200}
+                    />
+                  </Card>
+                </MDBox>
+              </>
+            )}
+            {blockCrud && (
+              <>
+                <BlockPageForConfStatus
+                  text={
+                    "It seems that this conference is not in the bidding phase"
+                  }
                 />
-              </Card>
-            </MDBox>
-
-            <MDBox mb={3} textAlign="left">
-              <Card>
-                <CompleteTable
-                  columns={columnsForDelete}
-                  rows={rowsForDelete}
-                  numberOfRowsPerPage={100}
-                  height={200}
-                />
-              </Card>
-            </MDBox>
+              </>
+            )}
           </Container>
         </MDBox>
         <Footer />

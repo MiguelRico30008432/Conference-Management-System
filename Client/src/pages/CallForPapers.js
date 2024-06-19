@@ -174,7 +174,7 @@ export default function CallForPapers() {
               <CompleteTable
                 columns={columns}
                 rows={rows}
-                numerOfRowsPerPage={100}
+                numberOfRowsPerPage={100}
                 height={200}
               />
             </Card>

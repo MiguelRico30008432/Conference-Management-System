@@ -66,12 +66,11 @@ export default function Conflicts() {
       setOpenLoading(false);
     }
 
-    if (isLoggedIn && confID && confPhase === "Bidding") {
-      fetchAllConflicts();
+    if (isLoggedIn && confID && confPhase) {
+      if (confPhase !== "Bidding") setBlockCrud(true);
+      else fetchAllConflicts();
     }
-
-    if (confPhase !== "Bidding") setBlockCrud(true);
-  }, [confID, isLoggedIn]);
+  }, [confID, isLoggedIn, confPhase]);
 
   async function getInfoForDeclareConflicts() {
     setOpenLoading(true);
@@ -280,7 +279,7 @@ export default function Conflicts() {
                           <CompleteTable
                             columns={columns}
                             rows={rows}
-                            numberOfRowsPerPage={100}
+                            numberOfRowsPerPage={10}
                             height={200}
                           />
                         </Card>
@@ -327,7 +326,7 @@ export default function Conflicts() {
                           <CompleteTable
                             columns={columsForDeclareConflicts}
                             rows={rowsToDeclareConflicts}
-                            numberOfRowsPerPage={100}
+                            numberOfRowsPerPage={10}
                             height={200}
                           />
                         </Card>

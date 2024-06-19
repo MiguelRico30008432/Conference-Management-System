@@ -184,7 +184,7 @@ export default function SendInvitation() {
       return;
     }
 
-    setOpenLoading(true);  // Start loading indicator
+    setOpenLoading(true); // Start loading indicator
 
     // Send the list of emails to the backend
     try {
@@ -247,11 +247,11 @@ export default function SendInvitation() {
               </MDTypography>
               <MDTypography ml={2} variant="body2">
                 On this page you can send invites so new members can join your
-                conference, you can send an email to multiple users, each one will
-                have a different code. Make sure to choose the role you want the
-                user's to have. After sending the invitation, in case there was an
-                error or you sent to the incorrect user, you can always delete the
-                invitation if it has not been already used.
+                conference, you can send an email to multiple users, each one
+                will have a different code. Make sure to choose the role you
+                want the user's to have. After sending the invitation, in case
+                there was an error or you sent to the incorrect user, you can
+                always delete the invitation if it has not been already used.
               </MDTypography>
             </Card>
             <Card sx={{ mt: 3, p: 3 }}>
@@ -302,7 +302,8 @@ export default function SendInvitation() {
                         width: "100%",
                         padding: "18.5px 14px",
                         fontSize: "0.9rem",
-                        fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+                        fontFamily:
+                          '"Roboto", "Helvetica", "Arial", sans-serif',
                         border: "1px solid #c4c4c4",
                         borderRadius: "4px",
                         resize: "vertical",
@@ -337,7 +338,7 @@ export default function SendInvitation() {
               <CompleteTable
                 columns={columns}
                 rows={rows}
-                numerOfRowsPerPage={5}
+                numberOfRowsPerPage={5}
                 height={200}
               />
             </Card>

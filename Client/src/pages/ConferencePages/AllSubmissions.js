@@ -318,7 +318,7 @@ export default function AllSubmissions() {
                     <CompleteTable
                       columns={columns}
                       rows={rows}
-                      numberOfRowsPerPage={100}
+                      numberOfRowsPerPage={10}
                       height={200}
                     />
                   </Card>
