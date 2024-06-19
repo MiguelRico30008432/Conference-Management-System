@@ -9,11 +9,11 @@ router.post(
   "/determineConflicts",
   auth.ensureAuthenticated,
   async (req, res) => {
-    try{
+    try {
       const response = await al.conflicAlgorithm(req.body.confid);
-      return res.status(200).send({ msg: response})
+      return res.status(200).send({ msg: response });
     } catch (error) {
-      return res.status(500).send({ msg: response})
+      return res.status(500).send({ msg: response });
     }
   }
 );
@@ -27,7 +27,7 @@ router.post("/getConflicts", auth.ensureAuthenticated, async (req, res) => {
       c.conflictreason
     FROM 
       conflicts c
-    JOIN users u ON c.conflictuseremail = u.useremail
+    JOIN users u ON c.conflictuserid = u.userid
     JOIN submissions s ON c.conflictsubmissionid = s.submissionid
     WHERE
       c.conflictconfid = ${req.body.confid}
@@ -50,7 +50,7 @@ router.post(
       s.submissiontitle,
       STRING_AGG(DISTINCT a.authorfirstname || ' ' || a.authorlastname, ', ') AS authorfullnames,
       STRING_AGG(DISTINCT u.userfirstname || ' ' || u.userlastname, ', ') AS committeefullnames,
-      STRING_AGG(DISTINCT u.useremail, ', ') AS committeeemails
+      STRING_AGG(DISTINCT u.userid, ', ') AS committeeids
     FROM 
       submissions s
     JOIN 
@@ -62,7 +62,7 @@ router.post(
     LEFT JOIN 
       conflicts c ON c.conflictconfid = ${req.body.confid} 
         AND c.conflictsubmissionid = s.submissionid 
-        AND c.conflictuseremail = u.useremail
+        AND c.conflictuserid = u.userid
     WHERE 
       s.submissionconfid = ${req.body.confid}
       AND c.conflictid IS NULL
@@ -83,7 +83,7 @@ router.post(
 router.post("/declareConflict", auth.ensureAuthenticated, async (req, res) => {
   try {
     await db.fetchDataCst(`
-    INSERT INTO conflicts (conflictconfid, conflictsubmissionid, conflictreason, conflictuseremail)
+    INSERT INTO conflicts (conflictconfid, conflictsubmissionid, conflictreason, conflictuserid)
     VALUES (${req.body.confid}, ${req.body.dataToAddConflict.submissionid}, 'Conflict Added By The Committee' , '${req.body.dataToAddConflict.committeeemails}')
     `);
     verifyBiddingsAfterConflictCheck();
@@ -101,7 +101,7 @@ async function verifyBiddingsAfterConflictCheck() {
   FROM biddings b
   JOIN conflicts c ON b.biddingconfid = c.conflictconfid 
     AND b.biddingsubmissionid = c.conflictsubmissionid
-  JOIN users u ON c.conflictuseremail = u.useremail
+  JOIN users u ON c.conflictuserid = u.userid
   WHERE b.biddinguserid = u.userid
   `);
 

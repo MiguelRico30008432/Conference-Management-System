@@ -24,8 +24,7 @@ router.post("/getBiddings", auth.ensureAuthenticated, async (req, res) => {
           ur.userid,
           ur.confid,
           us.userfirstname,
-          us.userlastname,
-          us.useremail
+          us.userlastname
       FROM
         userroles ur
       JOIN
@@ -39,7 +38,7 @@ router.post("/getBiddings", auth.ensureAuthenticated, async (req, res) => {
       FROM conflicts c
       WHERE c.conflictconfid = s.submissionconfid
         AND c.conflictsubmissionid = s.submissionid
-        AND c.conflictuseremail = r.useremail
+        AND c.conflictuserid = r.userid
     )
     AND NOT EXISTS (
       SELECT 1

@@ -41,7 +41,7 @@ router.post(
       AND NOT EXISTS (
           SELECT 1
           FROM conflicts c
-          JOIN users u ON u.useremail = c.conflictuseremail
+          JOIN users u ON u.userid = c.conflictuserid
           WHERE c.conflictsubmissionid = s.submissionid
             AND u.userid = ${req.body.userid})
     `);

@@ -5,10 +5,10 @@ const log = require("../logs/logsManagement");
 async function conflicAlgorithm(confid) {
   try {
     //Obter lista com os emails do comite, chair, owner e respetivas afiliações
-    const committeeEmailsAffiliation = await db.fetchDataCst(`
+    const committeeIdsAffiliation = await db.fetchDataCst(`
         SELECT 
           ur.userrole,
-          u.useremail,
+          u.userid,
           u.useraffiliation
         FROM 
           userroles ur
@@ -36,7 +36,7 @@ async function conflicAlgorithm(confid) {
         const authorsEmails = await db.fetchDataCst(`
               SELECT
                   authorid,
-                  authoremail,
+                  userid,
                   authoraffiliation
               FROM 
                   authors
@@ -45,7 +45,7 @@ async function conflicAlgorithm(confid) {
             `);
 
         //Por membro do comite verificar se faz parte dos autores ou se é da mesma afiliação que os autores
-        for (const committee of committeeEmailsAffiliation) {
+        for (const committee of committeeIdsAffiliation) {
           for (const author of authorsEmails) {
             const conflictExists = await db.fetchDataCst(`
                   SELECT
@@ -53,24 +53,24 @@ async function conflicAlgorithm(confid) {
                   FROM
                     conflicts
                   WHERE
-                    conflictconfid = ${confid} AND conflictuseremail = '${committee.useremail}' AND conflictsubmissionid = ${submission.submissionid}
+                    conflictconfid = ${confid} AND conflictuserid = '${committee.userid}' AND conflictsubmissionid = ${submission.submissionid}
                 `);
 
             //Verificar primeiro se o conflito já existe
             if (conflictExists.length === 0) {
               //Se o membro do comitte for autor ou se tiver a mesma afiliação que, pelo menos, 1 dos autores, então adicionar na tabela de conflitos
 
-              if (committee.useremail === author.authoremail) {
+              if (committee.userid === author.userid) {
                 await db.fetchDataCst(`
-                    INSERT INTO conflicts(conflictconfid, conflictreason, conflictsubmissionid, conflictuseremail)
-                    VALUES(${confid}, 'Part of the committee as ${committee.userrole} and registered as author.', ${submission.submissionid}, '${committee.useremail}')
+                    INSERT INTO conflicts(conflictconfid, conflictreason, conflictsubmissionid, conflictuserid)
+                    VALUES(${confid}, 'Part of the committee as ${committee.userrole} and registered as author.', ${submission.submissionid}, '${committee.userid}')
                     `);
               } else if (
                 committee.useraffiliation === author.authoraffiliation
               ) {
                 await db.fetchDataCst(`
-                    INSERT INTO conflicts(conflictconfid, conflictreason, conflictsubmissionid, conflictuseremail)
-                    VALUES(${confid}, 'Same affiliation has 1 or more authors.', ${submission.submissionid}, '${committee.useremail}')
+                    INSERT INTO conflicts(conflictconfid, conflictreason, conflictsubmissionid, conflictuserid)
+                    VALUES(${confid}, 'Same affiliation has 1 or more authors.', ${submission.submissionid}, '${committee.userid}')
                     `);
               }
             }
@@ -98,7 +98,7 @@ async function verifyBiddingsAfterConflictCheck() {
     FROM biddings b
     JOIN conflicts c ON b.biddingconfid = c.conflictconfid 
       AND b.biddingsubmissionid = c.conflictsubmissionid
-    JOIN users u ON c.conflictuseremail = u.useremail
+    JOIN users u ON c.conflictuserid = u.userid
     WHERE b.biddinguserid = u.userid
     `);
 
@@ -114,7 +114,7 @@ async function verifyBiddingsAfterConflictCheck() {
 //------------ALORITHM FOR AUTOMATIC ASSIGNMENTS----------------------------
 async function ReviewsAssignmentAlgorihtm(confid) {
   //get committe list
-  const committeeEmails = await getCommitteeEmails(confid);
+  const committeeIds = await getcommitteeIds(confid);
 
   //get submissions list
   const submissions = await getSubmissions(confid);
@@ -129,11 +129,11 @@ async function ReviewsAssignmentAlgorihtm(confid) {
   const conflicts = await getConflicts(confid);
 
   //get workload of each member in the committe
-  let workload = await getWorkload(confid, committeeEmails);
+  let workload = await getWorkload(confid, committeeIds);
 
   //Average reviewers needed per submission (if its a decimal number, round down)
   const reviewersNeededPerReview = Math.floor(
-    submissions.length / committeeEmails.length
+    submissions.length / committeeIds.length
   );
 
   //Variable used in the while loop (will be true when all submission have the minimun number of reviewers assigned)
@@ -143,11 +143,11 @@ async function ReviewsAssignmentAlgorihtm(confid) {
     for (const submission of submissions) {
       let membersToAddWorkload = [];
       //Create temporary list with committee members with no conflict with the current submission
-      const submissionNoConflictCommittee = committeeEmails.filter((user) => {
+      const submissionNoConflictCommittee = committeeIds.filter((user) => {
         return !conflicts.some(
           (conflict) =>
             conflict.conflictsubmissionid === submission.submissionid &&
-            conflict.conflictuseremail === user.useremail
+            conflict.conflictuserid === user.userid
         );
       });
 
@@ -226,7 +226,7 @@ async function ReviewsAssignmentAlgorihtm(confid) {
           //Get list of the users who have new assignments to add on the workload
           membersToAddWorkload = [];
           for (const bid of submissionBiddings) {
-            membersToAddWorkload.push(bid.useremail);
+            membersToAddWorkload.push(bid.userid);
           }
 
           workload = await addWorkload(workload, membersToAddWorkload); //Apos ter esta função em todo o lado necessario ver qual a melhor maneira de processar e o que enviar para a função
@@ -255,7 +255,7 @@ async function ReviewsAssignmentAlgorihtm(confid) {
 
           membersToAddWorkload = [];
           for (const bid of preferedBiddings) {
-            membersToAddWorkload.push(bid.useremail);
+            membersToAddWorkload.push(bid.userid);
           }
 
           workload = await addWorkload(workload, membersToAddWorkload);
@@ -315,13 +315,12 @@ async function ReviewsAssignmentAlgorihtm(confid) {
 }
 
 //------------SUPPORT FUNCTIONS FOR AUTOMATIC ASSIGNMENTS ALGORITHM----------
-async function getCommitteeEmails(confid) {
+async function getcommitteeIds(confid) {
   try {
-    const committeeEmails = await db.fetchDataCst(`
+    const committeeIds = await db.fetchDataCst(`
       SELECT 
           u.userid,
           ur.userrole,
-          u.useremail,
           u.useraffiliation
         FROM 
           userroles ur
@@ -331,9 +330,9 @@ async function getCommitteeEmails(confid) {
           ur.confid = ${confid}
         AND ur.userrole IN ('Chair', 'Owner', 'Committee')
       `);
-    return committeeEmails;
+    return committeeIds;
   } catch (error) {
-    log.addLog(error, "database", "Bidding -> getCommitteeEmails()");
+    log.addLog(error, "database", "Bidding -> getCommitteeIds()");
   }
 }
 
@@ -361,7 +360,7 @@ async function getBiddings(confid) {
     const biddings = await db.fetchDataCst(`
       SELECT
         s.submissiontitle,
-        u.useremail,
+        u.userid,
         b.biddingconfidence,
         b.biddingadddata,
         b.biddingconfid,
@@ -391,7 +390,7 @@ async function getAssignments(confid) {
       SELECT
         r.assignmentid,
         r.assignmentsubmissionid,
-        u.useremail,
+        u.userid,
         r.assignmentmanually
       FROM
         reviewsassignments r
@@ -414,7 +413,7 @@ async function getConflicts(confid) {
     const conflicts = await db.fetchDataCst(`
       SELECT
         conflictsubmissionid,
-        conflictuseremail
+        conflictuserid
       FROM
         conflicts
       WHERE
@@ -434,7 +433,6 @@ async function getWorkload(confid, committe) {
     const workload = await db.fetchDataCst(`
       SELECT 
         u.userid,
-        u.useremail,
         ur.userrole,
         COUNT(ra.assignmentid) AS assignment_count
       FROM 
@@ -449,7 +447,6 @@ async function getWorkload(confid, committe) {
         ur.confid = ${confid}
         AND ur.userrole IN ('Chair', 'Owner', 'Committee')
       GROUP BY 
-        u.useremail,
         ur.userrole,
         u.userid
       `);
@@ -472,7 +469,7 @@ async function getWorkload(confid, committe) {
 async function addWorkload(workload, addingInfo) {
   for (const user of addingInfo) {
     for (const member of workload) {
-      if (member.useremail === user || member.userid === user) {
+      if (member.userid === user) {
         member.assignment_count = member.assignment_count + 1;
       }
     }
@@ -552,7 +549,7 @@ async function getCommitteMembersWithLessWorkload(
     if (
       //checking if the committee member we want to choose has no conflict with the current submission
       membersWithNoConflict.some(
-        (noConflictMember) => noConflictMember.useremail === member.useremail
+        (noConflictMember) => noConflictMember.userid === member.userid
       )
     ) {
       choosenMembers.push(member);
@@ -580,7 +577,7 @@ async function pickPreferableAutomaticAssignments(
     //When preferedAssignments.length === assignmentsNeeded we return preferedAssignments
     for (const member of workload) {
       for (const assignment of automaticAssignments) {
-        if (member.useremail === assignment.useremail) {
+        if (member.userid === assignment.userid) {
           preferedAssignments.push(assignment);
 
           if (preferedAssignments.length === assignmentsNeeded) {
@@ -611,16 +608,12 @@ async function pickPreferableBiddings(
 
     for (const bid of biddingsList) {
       //We will check each bid until we have the equal ammount of bids needed
-      if (
-        !assignments.find(
-          (assignment) => assignment.useremail === bid.useremail
-        )
-      ) {
+      if (!assignments.find((assignment) => assignment.userid === bid.userid)) {
         //If the bid doesnt exist has an assignment already then we continue
         for (const memberWorkload of workload) {
           //If the member workload is less than minReviewers + minReviewers/2  then we had the bid has a prefered bid
           if (
-            bid.useremail === memberWorkload.useremail &&
+            bid.userid === memberWorkload.userid &&
             memberWorkload.assignment_count <
               minReviewers + Math.floor(minReviewers / 2)
           ) {
@@ -635,11 +628,7 @@ async function pickPreferableBiddings(
 
     if (preferedBids.length < bidsNeeded) {
       // If there was not enougth biddings selected we will just pick the first one with high confidence level
-      if (
-        !assignments.find(
-          (assignment) => assignment.useremail === bid.useremail
-        )
-      ) {
+      if (!assignments.find((assignment) => assignment.userid === bid.userid)) {
         preferedBids.push(bid);
         if (preferedBids.length === bidsNeeded) {
           return preferedBids;
