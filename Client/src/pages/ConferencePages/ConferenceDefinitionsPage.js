@@ -671,7 +671,7 @@ export default function DefinitionsPage() {
                           InputLabelProps={{ shrink: true }}
                           inputProps={{
                             min:
-                              addDays(newSubmissionsStart, 1) < currentDate
+                              addDays(newSubmissionsStart, 1) > currentDate
                                 ? addDays(newSubmissionsStart, 1)
                                 : currentDate,
                           }}
@@ -695,7 +695,7 @@ export default function DefinitionsPage() {
                           InputLabelProps={{ shrink: true }}
                           inputProps={{
                             min:
-                              addDays(newSubmissionsEnd, 1) < currentDate
+                              addDays(newSubmissionsEnd, 1) > currentDate
                                 ? addDays(newSubmissionsEnd, 1)
                                 : currentDate,
                           }}
@@ -719,7 +719,7 @@ export default function DefinitionsPage() {
                           InputLabelProps={{ shrink: true }}
                           inputProps={{
                             min:
-                              addDays(newBiddingStart, 1) < currentDate
+                              addDays(newBiddingStart, 1) > currentDate
                                 ? addDays(newBiddingStart, 1)
                                 : currentDate,
                           }}
@@ -743,7 +743,7 @@ export default function DefinitionsPage() {
                           InputLabelProps={{ shrink: true }}
                           inputProps={{
                             min:
-                              addDays(newBiddingEnd, 1) < currentDate
+                              addDays(newBiddingEnd, 1) > currentDate
                                 ? addDays(newBiddingEnd, 1)
                                 : currentDate,
                           }}
@@ -767,7 +767,7 @@ export default function DefinitionsPage() {
                           InputLabelProps={{ shrink: true }}
                           inputProps={{
                             min:
-                              addDays(newReviewStart, 1) < currentDate
+                              addDays(newReviewStart, 1) > currentDate
                                 ? addDays(newReviewStart, 1)
                                 : currentDate,
                           }}
@@ -791,7 +791,7 @@ export default function DefinitionsPage() {
                           InputLabelProps={{ shrink: true }}
                           inputProps={{
                             min:
-                              addDays(newReviewEnd, 1) < currentDate
+                              addDays(newReviewEnd, 1) > currentDate
                                 ? addDays(newReviewEnd, 1)
                                 : currentDate,
                           }}
@@ -815,7 +815,7 @@ export default function DefinitionsPage() {
                           InputLabelProps={{ shrink: true }}
                           inputProps={{
                             min:
-                              addDays(newConfStart, 1) < currentDate
+                              addDays(newConfStart, 1) > currentDate
                                 ? addDays(newConfStart, 1)
                                 : currentDate,
                           }}
