@@ -7,8 +7,8 @@ const sb = require("../../utility/supabase");
 
 router.post("/updateSubmission", auth.ensureAuthenticated, async (req, res) => {
   try {
-    const authors = [];
-    const missingAuthorIds = [];
+    let authors = [];
+    let newAuthorsIds = [];
     let index = 0;
 
     const beforeUpdateListOfAuthorsIDS = await db.fetchDataCst(
@@ -33,7 +33,7 @@ router.post("/updateSubmission", auth.ensureAuthenticated, async (req, res) => {
         lastName: req.body[`author[${index}][lastName]`],
         email: req.body[`author[${index}][email]`],
         affiliation: req.body[`author[${index}][affiliation]`],
-        authorid: req.body[`author[${index}][authorid]`],
+        authorid: parseInt(req.body[`author[${index}][authorid]`]),
       });
       index++;
     }
@@ -45,30 +45,40 @@ router.post("/updateSubmission", auth.ensureAuthenticated, async (req, res) => {
       const affiliation = author.affiliation;
       const authorid = author.authorid;
 
+      console.log(author);
+
       //verificar se o autor tem conta no site
       const userRegistered = await db.fetchData("users", "useremail", email);
 
       //tratamento dependendo se o autor já está ou não associado a submissao
       if (authorid === "undefined") {
         //Autor não se encontra associado à submissão
+        console.log("Undefined ");
         if (!userRegistered || userRegistered.length === 0) {
           await db.fetchDataCst(
             `INSERT INTO authors (authorAffiliation, authorEmail, authorFirstName, authorLastName, submissionid, userid)
               VALUES ('${affiliation}', '${email}', '${firstName}', '${lastName}', ${req.body.submissionid}, null)`
           );
         } else {
+          console.log("Undefined com conta");
           await db.fetchDataCst(
             `INSERT INTO authors (authorAffiliation, authorEmail, authorFirstName, authorLastName, submissionid, userid)
               VALUES ('${userRegistered[0].useraffiliation}', '${userRegistered[0].useremail}', '${userRegistered[0].userfirstname}', '${userRegistered[0].userlastname}', ${req.body.submissionid}, ${userRegistered[0].userid})`
           );
 
           const userRole = await db.fetchDataCst(`
-          SELECT userRole AS role 
+          SELECT userrole  
           FROM userroles 
           WHERE 
             userid = ${userRegistered[0].userid} AND confid = ${req.body.confID} AND userrole = 'Author'`);
 
+          console.log("userRole");
+
+          console.log(userRole);
+
           if (userRole.length === 0) {
+            console.log("Entrei no if do useRole");
+
             await db.fetchDataCst(
               `INSERT INTO userroles (userid, userrole, confid) 
               VALUES (${userRegistered[0].userid}, 'Author', ${req.body.confID})`
@@ -78,16 +88,14 @@ router.post("/updateSubmission", auth.ensureAuthenticated, async (req, res) => {
       } else {
         //Autor está associado à submissão
         if (!userRegistered || userRegistered.length === 0) {
-          await db.fetchDataCst(`
-          UPDATE 
-            authors
-          SET 
-              userid = null,
-              authoraffiliation = '${affiliation}',
-              authoremail = '${email}',
-              authorfirstname = '${firstName}',
-              authorlastname = '${lastName}'
-          WHERE authorid = ${authorid}`);
+          //Insert new author id
+          const newID = await db.fetchDataCst(`
+            INSERT INTO authors (authorAffiliation, authorEmail, authorFirstName, authorLastName, submissionid, userid)
+            VALUES ('${affiliation}', '${email}', '${firstName}', '${lastName}',  ${req.body.submissionid}, null)
+            RETURNING authorid;
+          `);
+
+          newAuthorsIds.push(newID[0].authorid);
         } else {
           const verifyUserID = await db.fetchDataCst(`
             SELECT 
@@ -98,55 +106,59 @@ router.post("/updateSubmission", auth.ensureAuthenticated, async (req, res) => {
               useremail = '${userRegistered[0].useremail}'    
           `);
 
-          await db.fetchDataCst(`
-          UPDATE 
-            authors
-          SET 
-              userid = ${verifyUserID[0].userid},
-              authoraffiliation = '${userRegistered[0].useraffiliation}',
-              authoremail = '${userRegistered[0].useremail}',
-              authorfirstname = '${userRegistered[0].userfirstname}',
-              authorlastname = '${userRegistered[0].userlastname}'
-          WHERE authorid = ${authorid}`);
+          //Insert new author id
+          const newID = await db.fetchDataCst(`
+            INSERT INTO authors (authorAffiliation, authorEmail, authorFirstName, authorLastName, submissionid, userid)
+            VALUES ('${userRegistered[0].useraffiliation}', '${userRegistered[0].useremail}', '${userRegistered[0].userfirstname}', '${userRegistered[0].userlastname}',${req.body.submissionid}, ${verifyUserID[0].userid} )
+            RETURNING authorid;
+          `);
+
+          newAuthorsIds.push(newID[0].authorid);
+
+          const userRole = await db.fetchDataCst(`
+            SELECT userrole  
+            FROM userroles 
+            WHERE 
+              userid = ${userRegistered[0].userid} AND confid = ${req.body.confID} AND userrole = 'Author'`);
+
+          console.log("userRole");
+
+          console.log(userRole);
+
+          if (userRole.length === 0) {
+            console.log("Entrei no if do useRole");
+
+            await db.fetchDataCst(
+              `INSERT INTO userroles (userid, userrole, confid) 
+                VALUES (${userRegistered[0].userid}, 'Author', ${req.body.confID})`
+            );
+          }
         }
       }
     }
     //Verificar a necessidade de tirar autores
     //Guardar os Ids dos autores registados na base de dados e os que estão a ser passados para atualizar
-    const newAuthorsIds = authors.map((item) => parseInt(item.authorid));
-    const oldAuthorsIds = beforeUpdateListOfAuthorsIDS.map(
-      (item) => item.authorid
-    );
-
-    // Verificar se o ID de autor antigo não está presente na lista de novos IDs de autor
-    for (const oldAuthorId of oldAuthorsIds) {
-      if (!newAuthorsIds.includes(oldAuthorId)) {
-        // Adicionar o ID do autor ausente à lista
-        missingAuthorIds.push(oldAuthorId);
-      }
-    }
-
-    if (missingAuthorIds.length > 0) {
-      for (let i = 0; i < missingAuthorIds.length; i++) {
-        //Recolher os dados do author id para depois verificar se é necessário retirar do userroles
+    if (beforeUpdateListOfAuthorsIDS.length > 0) {
+      for (let i = 0; i < beforeUpdateListOfAuthorsIDS.length; i++) {
+        //Recolher os dados do author para depois verificar se é necessário retirar do userroles
         const authorInfo = await db.fetchDataCst(`
           SELECT
             a.userid,
-            s.submissionconfid	
+            s.submissionconfid,
+            a.authoremail	
           FROM 
             authors a
           JOIN 
             submissions s ON  a.submissionid = s.submissionid	
           WHERE
-            authorid = ${missingAuthorIds[i]}
+            authorid = ${beforeUpdateListOfAuthorsIDS[i].authorid}
         `);
-
         //User deixa de ser autor da submissão
         await db.fetchDataCst(`
         DELETE FROM
           authors
         WHERE
-          authorid = ${missingAuthorIds[i]}`);
+          authorid = ${beforeUpdateListOfAuthorsIDS[i].authorid}`);
 
         const authorSubmissions = await db.fetchDataCst(`
           SELECT 
@@ -156,16 +168,16 @@ router.post("/updateSubmission", auth.ensureAuthenticated, async (req, res) => {
           JOIN 
             submissions s ON  a.submissionid = s.submissionid
           WHERE
-            a.userid = ${authorInfo[0].userid} AND s.submissionconfid = ${authorInfo[0].submissionconfid}
+            s.submissionconfid = ${authorInfo[0].submissionconfid} AND (a.userid = ${authorInfo[0].userid} OR  a.authoremail = '${authorInfo[0].email}')
         `);
 
-        if (authorSubmissions.length === 0) {
+        if (authorSubmissions.length === 0 && authorInfo[0].userid != null) {
           await db.fetchDataCst(`
             DELETE
             FROM 
               userroles 
             WHERE 
-              userid = ${authorInfo[0].userid} AND confid =${authorInfo[0].submissionconfid}
+              userid = ${authorInfo[0].userid} AND confid =${authorInfo[0].submissionconfid} AND userrole = 'Author'
           `);
         }
       }
