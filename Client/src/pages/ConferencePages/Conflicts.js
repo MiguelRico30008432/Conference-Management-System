@@ -9,12 +9,12 @@ import Container from "@mui/material/Container";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import CompleteTable from "OurComponents/Table/CompleteTable";
+import MultiSelect from "OurComponents/ComboBoxes/UsersComboBox";
 import Alert from "@mui/material/Alert";
 import MDButton from "components/MDButton";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
 import Footer from "OurComponents/footer/Footer";
 import { v4 as uuidv4 } from "uuid";
-import { Select, FormControl, InputLabel, MenuItem } from "@mui/material";
 import BlockPageForConfStatus from "OurComponents/errorHandling/BlockPageForConfStatus";
 
 export default function Conflicts() {
@@ -24,50 +24,18 @@ export default function Conflicts() {
   const [message, setMessage] = useState(null);
   const [rows, setRows] = useState([]);
   const [rowsToDeclareConflicts, setRowsToDeclareConflicts] = useState([]);
+  const [selectedMembersWithConflicts, setSelectedMembersWithConflicts] =
+    useState([]);
   const [openLoading, setOpenLoading] = useState(false);
   const [blockCrud, setBlockCrud] = useState(false);
 
   useEffect(() => {
-    async function fetchAllConflicts() {
-      setOpenLoading(true);
-      setRows([]);
-
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/getConflicts`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json; charset=UTF-8",
-            },
-            credentials: "include",
-            body: JSON.stringify({
-              confid: confID,
-            }),
-          }
-        );
-
-        const jsonResponse = await response.json();
-
-        if (response.status === 200) {
-          for (let line of jsonResponse) {
-            line.id = uuidv4();
-            setRows((allExistingRows) => [...allExistingRows, line]);
-          }
-        } else {
-          setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
-        }
-      } catch (error) {
-        setMessage(
-          <Alert severity="error">Failed to fetch conference conflicts!</Alert>
-        );
-      }
-      setOpenLoading(false);
-    }
-
     if (isLoggedIn && confID && confPhase) {
       if (confPhase !== "Bidding") setBlockCrud(true);
-      else fetchAllConflicts();
+      else {
+        fetchAllConflicts();
+        getInfoForDeclareConflicts();
+      }
     }
   }, [confID, isLoggedIn, confPhase]);
 
@@ -80,6 +48,43 @@ export default function Conflicts() {
       return () => clearTimeout(timer);
     }
   }, [message]);
+
+  async function fetchAllConflicts() {
+    setOpenLoading(true);
+    setRows([]);
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/getConflicts`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            confid: confID,
+          }),
+        }
+      );
+
+      const jsonResponse = await response.json();
+
+      if (response.status === 200) {
+        for (let line of jsonResponse) {
+          line.id = uuidv4();
+          setRows((allExistingRows) => [...allExistingRows, line]);
+        }
+      } else {
+        setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
+      }
+    } catch (error) {
+      setMessage(
+        <Alert severity="error">Failed to fetch conference conflicts!</Alert>
+      );
+    }
+    setOpenLoading(false);
+  }
 
   async function getInfoForDeclareConflicts() {
     setOpenLoading(true);
@@ -105,6 +110,7 @@ export default function Conflicts() {
       if (response.status === 200) {
         for (let line of jsonResponse) {
           line.id = uuidv4();
+          line.committeefullnames = splitCommitMembers(line.committeefullnames);
           setRowsToDeclareConflicts((allExistingRows) => [
             ...allExistingRows,
             line,
@@ -123,17 +129,64 @@ export default function Conflicts() {
     setOpenLoading(false);
   }
 
-  async function handleDeleteConflict() {}
+  const splitCommitMembers = (reviewers) => {
+    return reviewers.split(", ").map((reviewer) => {
+      const [id, name] = reviewer.split(": ");
+      return { id: parseInt(id, 10), name };
+    });
+  };
+
+  async function handleMultiSelectToCreateConflicts(values) {
+    setSelectedMembersWithConflicts(values);
+  }
+
+  async function handleDeleteConflict(info) {
+    console.log(info);
+    setOpenLoading(true);
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/deleteConflict`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            info: info,
+            confid: confID,
+          }),
+        }
+      );
+
+      const jsonResponse = await response.json();
+
+      if (response.status === 200) {
+        setMessage(
+          <Alert severity="success">Conflict Deleted With Success</Alert>
+        );
+
+        afterRefresh();
+      } else {
+        setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
+      }
+    } catch (error) {
+      setMessage(<Alert severity="error">Failed to delete conflict!</Alert>);
+    }
+    setOpenLoading(false);
+  }
 
   const columns = [
-    { field: "submissiontitle", headerName: "Submission Title", width: 400 },
-    { field: "fullname", headerName: "Commite Member", width: 400 },
-    { field: "conflictreason", headerName: "Conflict Reason", width: 500 },
+    { field: "submissiontitle", headerName: "Submission Title", width: 100 },
+    { field: "fullname", headerName: "Commite Member", width: 100 },
+    { field: "conflictreason", headerName: "Conflict Reason", width: 100 },
     {
       field: "",
       width: 100,
       renderCell: (params) => {
-        return (
+        return params.row.conflictreason ===
+          "Conflict Added By The Committee" ? (
           <div
             style={{
               display: "flex",
@@ -156,43 +209,41 @@ export default function Conflicts() {
               Delete
             </MDButton>
           </div>
-        );
+        ) : null;
       },
     },
   ];
 
   const columsForDeclareConflicts = [
-    { field: "submissiontitle", headerName: "Submission Title", width: 400 },
+    { field: "submissiontitle", headerName: "Submission Title", width: 100 },
     {
       field: "authorfullnames",
       headerName: "Submission Author(s)",
-      width: 400,
+      width: 100,
     },
     {
       field: "committeefullnames",
-      headerName: "Committee Member",
-      width: 400,
-      renderCell: (params) => {
-        const committeeList = params.value ? params.value.split(", ") : [];
-        return (
-          <FormControl fullWidth>
-            <InputLabel id={`select-label-${params.id}`}>
-              Select Committee Member
-            </InputLabel>
-            <Select
-              labelId={`select-label-${params.id}`}
-              id={`select-${params.id}`}
-              label="Member in Conflict"
-            >
-              {committeeList.map((memberName, index) => (
-                <MenuItem key={index} value={memberName}>
-                  {memberName}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        );
-      },
+      headerName: "Committee Members",
+      description: "",
+      sortable: false,
+      disableColumnMenu: true,
+      resizable: false,
+      width: 130,
+      renderCell: (params) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          <MultiSelect
+            users={params.row.committeefullnames}
+            onChange={handleMultiSelectToCreateConflicts}
+          />
+        </div>
+      ),
     },
     {
       field: "",
@@ -210,7 +261,13 @@ export default function Conflicts() {
             <MDButton
               variant="gradient"
               color="info"
-              onClick={async () => handleSubmitConflict(params.row)}
+              onClick={() => {
+                const info = {
+                  id: params.row.submissionid,
+                  committee: selectedMembersWithConflicts,
+                };
+                handleSubmitConflict(info);
+              }}
               sx={{
                 maxWidth: "100px",
                 maxHeight: "30px",
@@ -227,40 +284,56 @@ export default function Conflicts() {
   ];
 
   async function handleSubmitConflict(info) {
-    setOpenLoading(true);
-
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/declareConflict`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            dataToAddConflict: info,
-            confid: confID,
-          }),
-        }
-      );
-
-      const jsonResponse = await response.json();
-
-      if (response.status === 200) {
-        getInfoForDeclareConflicts();
-        setMessage(
-          <Alert severity="success">Conflict Added With Success</Alert>
-        );
-      } else {
-        setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
-      }
-    } catch (error) {
+    if (info.committee.length === 0) {
       setMessage(
-        <Alert severity="error">Failed to declare new conflict!</Alert>
+        <Alert severity="error">
+          You must select at least one member to create a conflict.
+        </Alert>
       );
+    } else {
+      setOpenLoading(true);
+
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/declareConflict`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json; charset=UTF-8",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              info: info,
+              confid: confID,
+            }),
+          }
+        );
+
+        const jsonResponse = await response.json();
+
+        if (response.status === 200) {
+          getInfoForDeclareConflicts();
+          setMessage(
+            <Alert severity="success">Conflict Added With Success</Alert>
+          );
+
+          afterRefresh();
+        } else {
+          setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
+        }
+      } catch (error) {
+        setMessage(
+          <Alert severity="error">Failed to declare new conflict!</Alert>
+        );
+      }
+      setOpenLoading(false);
     }
-    setOpenLoading(false);
+  }
+
+  async function afterRefresh() {
+    setSelectedMembersWithConflicts([]);
+    fetchAllConflicts();
+    getInfoForDeclareConflicts();
   }
 
   return (

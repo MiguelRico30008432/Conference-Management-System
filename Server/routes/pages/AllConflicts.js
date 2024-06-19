@@ -22,9 +22,11 @@ router.post("/getConflicts", auth.ensureAuthenticated, async (req, res) => {
   try {
     const result = await db.fetchDataCst(`
     SELECT 
+      conflictid,
       CONCAT(u.userfirstname, ' ', u.userlastname) AS fullname,
       s.submissiontitle,
-      c.conflictreason
+      c.conflictreason,
+      c.conflictuserid
     FROM 
       conflicts c
     JOIN users u ON c.conflictuserid = u.userid
@@ -49,8 +51,7 @@ router.post(
       s.submissionid,
       s.submissiontitle,
       STRING_AGG(DISTINCT a.authorfirstname || ' ' || a.authorlastname, ', ') AS authorfullnames,
-      STRING_AGG(DISTINCT u.userfirstname || ' ' || u.userlastname, ', ') AS committeefullnames,
-      STRING_AGG(DISTINCT u.userid, ', ') AS committeeids
+      STRING_AGG(DISTINCT u.userid || ': ' || u.userfirstname || ' ' || u.userlastname, ', ') AS committeefullnames
     FROM 
       submissions s
     JOIN 
@@ -82,11 +83,15 @@ router.post(
 
 router.post("/declareConflict", auth.ensureAuthenticated, async (req, res) => {
   try {
-    await db.fetchDataCst(`
-    INSERT INTO conflicts (conflictconfid, conflictsubmissionid, conflictreason, conflictuserid)
-    VALUES (${req.body.confid}, ${req.body.dataToAddConflict.submissionid}, 'Conflict Added By The Committee' , '${req.body.dataToAddConflict.committeeemails}')
-    `);
-    verifyBiddingsAfterConflictCheck();
+    for (const member of req.body.info.committee) {
+      await db.fetchDataCst(`
+        INSERT INTO conflicts (conflictconfid, conflictsubmissionid, conflictreason, conflictuserid)
+        VALUES (${req.body.confid}, ${req.body.info.id}, 'Conflict Added By The Committee' , ${member.id})
+      `);
+
+      verifyBiddingsAfterConflictCheck();
+    }
+
     return res.status(200).send({ msg: "Conflict Created With Success." });
   } catch (error) {
     log.addLog(error, "database", "AllConflicts -> /declareConflict");
@@ -113,5 +118,17 @@ async function verifyBiddingsAfterConflictCheck() {
     }
   }
 }
+
+router.post("/deleteConflict", auth.ensureAuthenticated, async (req, res) => {
+  try {
+    await db.fetchDataCst(`
+      DELETE FROM conflicts WHERE conflictid = ${req.body.info.conflictid}  
+    `);
+
+    return res.status(200).send({ msg: "Conflict Deleted With Success." });
+  } catch (error) {
+    return res.status(500).send({ msg: "Error deleting conflict." });
+  }
+});
 
 module.exports = router;
