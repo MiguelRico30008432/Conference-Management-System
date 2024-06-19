@@ -669,7 +669,12 @@ export default function DefinitionsPage() {
                           name="confendsubmission"
                           type="date"
                           InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: addDays(newSubmissionsStart, 1) }}
+                          inputProps={{
+                            min:
+                              addDays(newSubmissionsStart, 1) < currentDate
+                                ? addDays(newSubmissionsStart, 1)
+                                : currentDate,
+                          }}
                           value={newSubmissionsEnd}
                           disabled={isDatePast(submissionsEnd)}
                           onChange={(e) =>
@@ -688,7 +693,12 @@ export default function DefinitionsPage() {
                           name="confstartbidding"
                           type="date"
                           InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: addDays(newSubmissionsEnd, 1) }}
+                          inputProps={{
+                            min:
+                              addDays(newSubmissionsEnd, 1) < currentDate
+                                ? addDays(newSubmissionsEnd, 1)
+                                : currentDate,
+                          }}
                           value={newBiddingStart}
                           disabled={isDatePast(biddingStart)}
                           onChange={(e) =>
@@ -707,7 +717,12 @@ export default function DefinitionsPage() {
                           name="confendbidding"
                           type="date"
                           InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: addDays(newBiddingStart, 1) }}
+                          inputProps={{
+                            min:
+                              addDays(newBiddingStart, 1) < currentDate
+                                ? addDays(newBiddingStart, 1)
+                                : currentDate,
+                          }}
                           value={newBiddingEnd}
                           disabled={isDatePast(biddingEnd)}
                           onChange={(e) =>
@@ -726,7 +741,12 @@ export default function DefinitionsPage() {
                           name="confstartreview"
                           type="date"
                           InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: addDays(newBiddingEnd, 1) }}
+                          inputProps={{
+                            min:
+                              addDays(newBiddingEnd, 1) < currentDate
+                                ? addDays(newBiddingEnd, 1)
+                                : currentDate,
+                          }}
                           value={newReviewStart}
                           disabled={isDatePast(reviewStart)}
                           onChange={(e) =>
@@ -745,7 +765,12 @@ export default function DefinitionsPage() {
                           name="confendreview"
                           type="date"
                           InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: addDays(newReviewStart, 1) }}
+                          inputProps={{
+                            min:
+                              addDays(newReviewStart, 1) < currentDate
+                                ? addDays(newReviewStart, 1)
+                                : currentDate,
+                          }}
                           value={newReviewEnd}
                           disabled={isDatePast(reviewEnd)}
                           onChange={(e) =>
@@ -764,7 +789,12 @@ export default function DefinitionsPage() {
                           name="confstartdate"
                           type="date"
                           InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: addDays(newReviewEnd, 1) }}
+                          inputProps={{
+                            min:
+                              addDays(newReviewEnd, 1) < currentDate
+                                ? addDays(newReviewEnd, 1)
+                                : currentDate,
+                          }}
                           value={newConfStart}
                           disabled={isDatePast(confStart)}
                           onChange={(e) =>
@@ -783,7 +813,12 @@ export default function DefinitionsPage() {
                           name="confenddate"
                           type="date"
                           InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: addDays(newConfStart, 1) }}
+                          inputProps={{
+                            min:
+                              addDays(newConfStart, 1) < currentDate
+                                ? addDays(newConfStart, 1)
+                                : currentDate,
+                          }}
                           value={newConfEnd}
                           disabled={isDatePast(confEnd)}
                           onChange={(e) =>
