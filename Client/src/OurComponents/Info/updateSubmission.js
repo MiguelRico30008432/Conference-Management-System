@@ -28,6 +28,8 @@ export default function UpdateSubmission({ onClose, submissionID }) {
   const [openLoading, setOpenLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [openPopUpMessage, setOpenPopUpMessage] = useState(false);
+  const [openPopUpUnsavedChanges, setOpenPopUpUnsavedChanges] = useState(false);
+
   const [disableSubmit, setDisableSubmit] = useState(true);
   const [uploadButtonClicked, setUploadButtonClicked] = useState(false);
 
@@ -107,18 +109,18 @@ export default function UpdateSubmission({ onClose, submissionID }) {
     else setOpenPopUpMessage(false);
   }, [message]);
 
-  useEffect(() => {
-    const hasChanges = () => {
-      if (
-        title !== originalTitle ||
-        abstract !== originalAbstract ||
-        JSON.stringify(authors) !== JSON.stringify(originalAuthors)
-      ) {
-        return true;
-      }
-      return uploadButtonClicked;
-    };
+  function hasChanges() {
+    if (
+      title !== originalTitle ||
+      abstract !== originalAbstract ||
+      JSON.stringify(authors) !== JSON.stringify(originalAuthors)
+    ) {
+      return true;
+    }
+    return false;
+  }
 
+  useEffect(() => {
     setDisableSubmit(!hasChanges());
   }, [
     title,
@@ -246,6 +248,11 @@ export default function UpdateSubmission({ onClose, submissionID }) {
     return false;
   }
 
+  function verifyCloseComponent() {
+    if (hasChanges()) setOpenPopUpUnsavedChanges(true);
+    else onClose();
+  }
+
   return (
     <>
       <PopUpWithMessage
@@ -257,12 +264,24 @@ export default function UpdateSubmission({ onClose, submissionID }) {
         text={message}
       />
 
+      <PopUpWithMessage
+        open={openPopUpUnsavedChanges}
+        negativeButtonName={"Cancel"}
+        handleClose={() => setOpenPopUpUnsavedChanges(false)}
+        affirmativeButtonName={"Yes, I'm Sure"}
+        handleConfirm={onClose}
+        title={"Changes not saved!"}
+        text={
+          "Wait! You are about to lose your unsaved submission, are you sure do you want to go back?"
+        }
+      />
+
       {openLoading && <LoadingCircle />}
 
       <MDButton
         variant="gradient"
         color="info"
-        onClick={onClose}
+        onClick={() => verifyCloseComponent()}
         sx={{
           maxWidth: "140px",
           maxHeight: "30px",
