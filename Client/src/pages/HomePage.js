@@ -1,245 +1,207 @@
-import React, { useContext, useState, useEffect, useRef } from "react";
+import React from "react";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "OurComponents/footer/Footer";
 import imageroom from "../assets/images/imageroom.jpg";
 import imageroom1 from "../assets/images/imageroom1.jpg";
 import imageroom2 from "../assets/images/imageroom2.jpg";
 import MDBox from "components/MDBox";
+import { Typography, Box, Container, Grid, Avatar } from "@mui/material";
+import { styled } from "@mui/system";
+import PersonIcon from "@mui/icons-material/Person";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
-// @material-ui core components
-import IconButton from "@mui/material/IconButton";
-import Icon from "@mui/material/Icon";
+const ImageBox = styled(Box)(({ theme }) => ({
+  position: "relative",
+  height: "400px",
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  borderRadius: "8px",
+  margin: theme.spacing(2, 0),
+  transition: "all 0.3s ease",
+  "&:hover": {
+    filter: "brightness(0.7)",
+  },
+}));
 
-// Custom styles for DashboardNavbar
-import { navbarMobileMenu } from "examples/Navbars/DashboardNavbar/styles";
-
-// Material Dashboard 2 React example components
-import MDTypography from "components/MDTypography";
-
-// Material Dashboard 2 React context
-import { useMaterialUIController, setMiniSidenav } from "context";
-
-export default function HomePage() {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const targetRef = useRef(null);
-  const conferenceManagementRef = useRef(null);
-  const submitPapersRef = useRef(null);
-  const reviewProcessRef = useRef(null);
-  const [controller, dispatch] = useMaterialUIController();
-  const { miniSidenav } = controller;
-  const durationInSeconds = 4;
+const HomePage = () => {
   const images = [
-    { src: imageroom, text: "", sectionId: "conference-management" },
-    { src: imageroom2, text: "", sectionId: "submit-papers" },
-    { src: imageroom1, text: "", sectionId: "review-process" },
+    {
+      src: imageroom,
+      text: "Conference Management",
+      sectionId: "conference-management",
+    },
+    { src: imageroom2, text: "Submit Papers", sectionId: "submit-papers" },
+    { src: imageroom1, text: "Review Process", sectionId: "review-process" },
   ];
 
-  const handleMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, durationInSeconds * 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleDotClick = (index) => {
-    setCurrentImageIndex(index);
-  };
-
-  const handleImageClick = (id) => {
-    let sectionRef;
-    switch (id) {
-      case "conference-management":
-        sectionRef = conferenceManagementRef;
-        break;
-      case "submit-papers":
-        sectionRef = submitPapersRef;
-        break;
-      case "review-process":
-        sectionRef = reviewProcessRef;
-        break;
-      default:
-        break;
-    }
-
-    if (sectionRef && sectionRef.current) {
-      const offsetTop = sectionRef.current.offsetTop;
-      window.scrollTo({
-        top: offsetTop,
-        behavior: "smooth",
-      });
-    }
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 5000,
   };
 
   return (
     <DashboardLayout>
       <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <IconButton
-            size="small"
-            disableRipple
-            color="inherit"
-            sx={navbarMobileMenu}
-            onClick={() => handleMiniSidenav()}
-          >
-            <Icon fontSize="medium">{miniSidenav ? "menu_open" : "menu"}</Icon>
-            <MDTypography variant="body2" color="text">
-              {" "}
-              Menu{" "}
-            </MDTypography>
-          </IconButton>
-        </div>
-        <div style={{ position: "relative", textAlign: "center" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              height: "400px",
-              overflow: "hidden",
-              position: "relative",
-            }}
-          >
-            <img
-              src={images[currentImageIndex].src}
-              alt={`Image ${currentImageIndex + 1}`}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                cursor: "pointer",
-              }}
-              onClick={() =>
-                handleImageClick(images[currentImageIndex].sectionId)
-              }
-              title="Click to discover more"
-            />
-            <div
-              ref={targetRef}
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                padding: "20px",
-                fontSize: "70px",
-                color: "white",
-                width: "100%",
-                opacity: 1,
-              }}
-            >
-              {images[currentImageIndex].text}
-            </div>
-          </div>
-        </div>
-        <div
-          style={{
-            position: "absolute",
-            padding: "5px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            display: "flex",
-          }}
-        >
-          {images.map((image, index) => (
-            <div
-              key={index}
-              onClick={() => handleDotClick(index)}
-              style={{
-                width: "10px",
-                height: "10px",
-                borderRadius: "50%",
-                backgroundColor: currentImageIndex === index ? "#000" : "#ccc",
-                margin: "0 5px",
-                cursor: "pointer",
-                opacity: 0.6,
-              }}
-              title="Click to change section"
-            />
-          ))}
-        </div>
-
-        {/* Render Conference Management section */}
-        {currentImageIndex === 0 && (
-          <div
-            ref={conferenceManagementRef}
-            id="conference-management"
-            style={{ textAlign: "center", padding: "20px 20px" }}
-          >
-            <div style={{ padding: "20px" }}>
-              <h2
-                style={{
-                  padding: "10px",
-                  borderRadius: "5px",
-                  color: "#6495ED",
-                }}
-              >
-                Conference Management
-              </h2>
-              <p>
-                Organize, manage, and coordinate with authors and reviewers.
-                <br></br>
-                <strong>UAL Conf</strong> simplifies the creation, organization
-                and management of your conference.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Render Submit Papers section */}
-        {currentImageIndex === 1 && (
-          <div
-            ref={submitPapersRef}
-            id="submit-papers"
-            style={{ textAlign: "center", padding: "20px 20px" }}
-          >
-            <div style={{ padding: "20px" }}>
-              <h2
-                style={{
-                  padding: "10px",
-                  borderRadius: "5px",
-                  color: "#6495ED",
-                }}
-              >
-                Submit Papers
-              </h2>
-              <p>
-                Submit your papers effortlessly. <br></br>
-                <strong>UAL Conf</strong> simplifies the submition of all the
-                necessary documents for your conference.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Render Review Process section */}
-        {currentImageIndex === 2 && (
-          <div
-            ref={reviewProcessRef}
-            id="review-process"
-            style={{ textAlign: "center", padding: "20px 20px" }}
-          >
-            <div style={{ padding: "20px" }}>
-              <h2
-                style={{
-                  padding: "10px",
-                  borderRadius: "5px",
-                  color: "#6495ED",
-                }}
-              >
-                Review Process
-              </h2>
-              <p>
-                Efficiently review papers and manage the entire review process.
-                <br></br>
-                <strong>UAL Conf</strong> simplifies the review process, from
-                day one until the final version of your conference.
-              </p>
-            </div>
-          </div>
-        )}
+        <Container maxWidth="lg">
+          <Box sx={{ textAlign: "center", my: 4 }}>
+            <Typography variant="h2" component="h1" gutterBottom>
+              Conference Management
+            </Typography>
+            <Typography variant="h5" color="textSecondary">
+              Simplify your conference management with our integrated system.
+            </Typography>
+          </Box>
+          <Box sx={{ my: 4 }}>
+            <Slider {...settings}>
+              {images.map((image, index) => (
+                <ImageBox
+                  key={index}
+                  sx={{ backgroundImage: `url(${image.src})` }}
+                />
+              ))}
+            </Slider>
+          </Box>
+          <Box sx={{ my: 4 }}>
+            <Typography variant="h4" gutterBottom>
+              Key Features
+            </Typography>
+            <Grid container spacing={4}>
+              <Grid item xs={12} md={4}>
+                <ImageBox sx={{ backgroundImage: `url(${imageroom})` }} />
+                <Box sx={{ textAlign: "center", p: 2 }}>
+                  <Typography variant="h6">Conference Management</Typography>
+                  <Typography color="textSecondary">
+                    Organize and manage all aspects of your conference with
+                    ease.
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <ImageBox sx={{ backgroundImage: `url(${imageroom2})` }} />
+                <Box sx={{ textAlign: "center", p: 2 }}>
+                  <Typography variant="h6">Submit Papers</Typography>
+                  <Typography color="textSecondary">
+                    Facilitate paper submission and keep everything organized in
+                    one place.
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <ImageBox sx={{ backgroundImage: `url(${imageroom1})` }} />
+                <Box sx={{ textAlign: "center", p: 2 }}>
+                  <Typography variant="h6">Review Process</Typography>
+                  <Typography color="textSecondary">
+                    Manage the article review process efficiently and
+                    collaboratively.
+                  </Typography>
+                </Box>
+              </Grid>
+            </Grid>
+          </Box>
+          <Box sx={{ my: 4 }}>
+            <Typography variant="h4" gutterBottom>
+              Bidding Process
+            </Typography>
+            <Grid container spacing={4}>
+              <Grid item xs={12} md={6}>
+                <ImageBox sx={{ backgroundImage: `url(${imageroom})` }} />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Typography variant="body1" color="textSecondary" paragraph>
+                  The bidding process allows the assignment of reviewers to
+                  submissions either manually or automatically. This method
+                  ensures that articles are evaluated by the most qualified
+                  reviewers, promoting fair and thorough analysis.
+                </Typography>
+                <Typography variant="body1" color="textSecondary" paragraph>
+                  Our platform is dynamic and flexible, adapting to the specific
+                  needs of your conference. Whether through the manual process,
+                  where reviewers select the papers they wish to review, or the
+                  automatic process, where papers are assigned based on advanced
+                  algorithms, management becomes efficient and precise.
+                </Typography>
+              </Grid>
+            </Grid>
+          </Box>
+          <Box sx={{ my: 4 }}>
+            <Typography variant="h4" gutterBottom>
+              Dynamism and Flexibility
+            </Typography>
+            <Grid container spacing={4}>
+              <Grid item xs={12} md={6}>
+                <ImageBox sx={{ backgroundImage: `url(${imageroom1})` }} />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Typography variant="body1" color="textSecondary" paragraph>
+                  The platform offers a dynamic environment, facilitating
+                  interaction between organizers, authors, and reviewers. With
+                  an intuitive interface and powerful tools, you can manage all
+                  aspects of the conference efficiently.
+                </Typography>
+                <Typography variant="body1" color="textSecondary" paragraph>
+                  Our features include everything from submission and review of
+                  articles to scheduling and communication with participants,
+                  all in one place. Experience the flexibility and convenience
+                  our platform provides.
+                </Typography>
+              </Grid>
+            </Grid>
+          </Box>
+          <Box sx={{ my: 4 }}>
+            <Typography variant="h4" gutterBottom>
+              Testimonials
+            </Typography>
+            <Grid container spacing={4}>
+              <Grid item xs={12} md={4}>
+                <Box sx={{ textAlign: "center", p: 2 }}>
+                  <Avatar sx={{ width: 80, height: 80, margin: "0 auto" }}>
+                    <PersonIcon sx={{ fontSize: 50 }} />
+                  </Avatar>
+                  <Typography variant="h6">John Doe</Typography>
+                  <Typography color="textSecondary">
+                    "The platform transformed how we organize our conference.
+                    Everything became simpler and more organized."
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <Box sx={{ textAlign: "center", p: 2 }}>
+                  <Avatar sx={{ width: 80, height: 80, margin: "0 auto" }}>
+                    <PersonIcon sx={{ fontSize: 50 }} />
+                  </Avatar>
+                  <Typography variant="h6">Jane Smith</Typography>
+                  <Typography color="textSecondary">
+                    "The submission and review process has never been easier.
+                    The reviewers loved the intuitive interface."
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <Box sx={{ textAlign: "center", p: 2 }}>
+                  <Avatar sx={{ width: 80, height: 80, margin: "0 auto" }}>
+                    <PersonIcon sx={{ fontSize: 50 }} />
+                  </Avatar>
+                  <Typography variant="h6">Carlos Santos</Typography>
+                  <Typography color="textSecondary">
+                    "Automatic reviewer assignment saved a lot of time and
+                    improved the quality of the reviews."
+                  </Typography>
+                </Box>
+              </Grid>
+            </Grid>
+          </Box>
+        </Container>
       </MDBox>
-
       <Footer />
     </DashboardLayout>
   );
-}
+};
+
+export default HomePage;
