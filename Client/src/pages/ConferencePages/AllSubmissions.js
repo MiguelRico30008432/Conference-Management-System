@@ -45,7 +45,6 @@ export default function AllSubmissions() {
         );
 
         const jsonResponse = await response.json();
-
         if (response.status === 200) {
           setRows(jsonResponse);
         } else {
@@ -63,6 +62,16 @@ export default function AllSubmissions() {
       fetchAllSubmissions();
     }
   }, [confID, isLoggedIn]);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   const handleDelete = async () => {
     setError(null);
@@ -147,7 +156,7 @@ export default function AllSubmissions() {
   const columns = [
     { field: "title", headerName: "Title", width: 200 },
     { field: "status", headerName: "Status", width: 120 },
-    { field: "authors", headerName: "Authors", width: 200 },
+    { field: "mainauthor", headerName: "Main Author", width: 200 },
     { field: "adddate", headerName: "Submission Date", width: 120 },
     {
       field: "download",
@@ -186,7 +195,7 @@ export default function AllSubmissions() {
       },
     },
     {
-      field: "moreInfo",
+      field: "details",
       headerName: "",
       sortable: false,
       filterable: false,
@@ -223,49 +232,47 @@ export default function AllSubmissions() {
         );
       },
     },
-    ...(userRole === "Chair" || userRole === "Owner"
-      ? [
-          {
-            field: "delete",
-            filterable: false,
-            headerName: "",
-            description: "",
-            sortable: false,
-            disableColumnMenu: true,
-            resizable: false,
-            width: 150,
-            renderCell: (params) => {
-              return (
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "100%",
-                  }}
-                >
-                  <MDButton
-                    variant="gradient"
-                    color="error"
-                    onClick={() => {
-                      setDataForDelete(params.row.id);
-                      setOpenPopUpMessage(true);
-                    }}
-                    sx={{
-                      maxWidth: "130px",
-                      maxHeight: "23px",
-                      minWidth: "30px",
-                      minHeight: "23px",
-                    }}
-                  >
-                    Delete Submission
-                  </MDButton>
-                </div>
-              );
-            },
-          },
-        ]
-      : []),
+    {
+      field: "delete",
+      filterable: false,
+      headerName: "",
+      description: "",
+      sortable: false,
+      disableColumnMenu: true,
+      resizable: false,
+      width: 150,
+      renderCell: (params) => {
+        if (userRole.includes("Committee")) return null;
+
+        return (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <MDButton
+              variant="gradient"
+              color="error"
+              onClick={() => {
+                setDataForDelete(params.row.id);
+                setOpenPopUpMessage(true);
+              }}
+              sx={{
+                maxWidth: "130px",
+                maxHeight: "23px",
+                minWidth: "30px",
+                minHeight: "23px",
+              }}
+            >
+              Delete Submission
+            </MDButton>
+          </div>
+        );
+      },
+    },
   ];
 
   return (
@@ -324,6 +331,7 @@ export default function AllSubmissions() {
               <SubmissionDetails
                 submission={dataForDetails}
                 onClose={() => setDetailsOpen(false)}
+                getUpdatedAuthors={false}
               />
             </ModalInfo>
           )}

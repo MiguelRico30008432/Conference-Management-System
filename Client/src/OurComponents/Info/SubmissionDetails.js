@@ -10,6 +10,7 @@ export default function SubmissionDetails({
   submission,
   userid,
   confid,
+  getUpdatedAuthors = true,
 }) {
   const [error, setError] = useState(null);
   const [openLoading, setOpenLoading] = useState(false);
@@ -32,8 +33,9 @@ export default function SubmissionDetails({
       }
     }
 
-    if (userid && confid) getAuthors();
-  }, [userid, confid]);
+    if (userid && confid && getUpdatedAuthors) getAuthors();
+    else setAuthors(submission.authors);
+  }, [userid, confid, getUpdatedAuthors]);
 
   return (
     <Card>
