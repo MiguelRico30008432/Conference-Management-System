@@ -72,11 +72,10 @@ export default function CreateSubmission() {
       setOpenLoading(false);
     }
 
-    if (isLoggedIn && confID && confPhase === "Submission") {
-      getAuthorData();
+    if (isLoggedIn && confID && confPhase) {
+      if (confPhase !== "Submission") setBlockCrud(true);
+      else getAuthorData();
     }
-
-    if (confPhase !== "Submission") setBlockCrud(true);
   }, [isLoggedIn, confID, confPhase, user]);
 
   useEffect(() => {

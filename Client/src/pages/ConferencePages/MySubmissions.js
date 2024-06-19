@@ -36,71 +36,70 @@ export default function MySubmissionsPage() {
     async function fetchSubmissions() {
       setOpenLoading(true);
 
-      if (confID && user) {
-        try {
-          const update = await fetch(
-            `${process.env.REACT_APP_API_URL}/getUpdateInfo`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json; charset=UTF-8",
-              },
-              credentials: "include",
-              body: JSON.stringify({
-                confid: confID,
-              }),
-            }
-          );
-
-          const updateResponse = await update.json();
-
-          if (update.status === 200) {
-            setSubUpdate(updateResponse[0].update);
+      try {
+        const update = await fetch(
+          `${process.env.REACT_APP_API_URL}/getUpdateInfo`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json; charset=UTF-8",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              confid: confID,
+            }),
           }
+        );
 
-          const response = await fetch(
-            `${process.env.REACT_APP_API_URL}/mySubmissions`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json; charset=UTF-8",
-              },
-              credentials: "include",
-              body: JSON.stringify({
-                userID: user,
-                confID: confID,
-              }),
-            }
-          );
+        const updateResponse = await update.json();
 
-          const jsonResponse = await response.json();
-
-          if (response.ok) {
-            const transformedData = jsonResponse.map((submission) => ({
-              id: submission.id,
-              title: submission.title,
-              authors: submission.authors,
-              mainauthor: submission.mainauthor,
-              status: submission.status, // This will now be 'Accepted', 'Rejected', or 'Pending'
-              adddate: submission.adddate,
-              abstract: submission.abstract,
-              fileUrl: submission.fileUrl,
-            }));
-            setRows(transformedData);
-          } else {
-            setError(<Alert severity="error">{jsonResponse.message}</Alert>);
-          }
-        } catch (error) {
-          setError(<Alert severity="error">Could not fetch submissions</Alert>);
+        if (update.status === 200) {
+          setSubUpdate(updateResponse[0].update);
         }
+
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/mySubmissions`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json; charset=UTF-8",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              userID: user,
+              confID: confID,
+            }),
+          }
+        );
+
+        const jsonResponse = await response.json();
+
+        if (response.ok) {
+          const transformedData = jsonResponse.map((submission) => ({
+            id: submission.id,
+            title: submission.title,
+            authors: submission.authors,
+            mainauthor: submission.mainauthor,
+            status: submission.status, // This will now be 'Accepted', 'Rejected', or 'Pending'
+            adddate: submission.adddate,
+            abstract: submission.abstract,
+            fileUrl: submission.fileUrl,
+          }));
+          setRows(transformedData);
+        } else {
+          setError(<Alert severity="error">{jsonResponse.message}</Alert>);
+        }
+      } catch (error) {
+        setError(<Alert severity="error">Could not fetch submissions</Alert>);
       }
+
       setOpenLoading(false);
     }
 
-    if (user && confID) {
+    if (user && confID && confPhase) {
       fetchSubmissions();
     }
-  }, [confID, user]);
+  }, [confID, user, confPhase]);
 
   useEffect(() => {
     if (error) {

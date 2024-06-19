@@ -18,7 +18,7 @@ import { handleDownload } from "OurFunctions/DownloadFile";
 import ModalInfo from "OurComponents/Modal/ModalInfo";
 
 export default function MyReviews() {
-  const { confID } = useContext(ConferenceContext);
+  const { confID, confPhase } = useContext(ConferenceContext);
   const { user } = useContext(AuthContext);
 
   const [title, setTile] = useState(null);
@@ -47,10 +47,10 @@ export default function MyReviews() {
       }
     }
 
-    if (user && confID) {
+    if (user && confID && confPhase) {
       fetchReviews();
     }
-  }, [confID, user]);
+  }, [confID, user, confPhase]);
 
   const columns = [
     { field: "submissiontitle", headerName: "Submission Title", width: 300 },
@@ -152,6 +152,9 @@ export default function MyReviews() {
           {openReview ? (
             <ModalInfo open={true} onClose={() => setOpenReview(false)}>
               <ReviewsDone
+                user={user}
+                confID={confID}
+                confPhase={confPhase}
                 assignmentID={assignmentID}
                 title={title}
                 onClose={() => setOpenReview(false)}
@@ -182,7 +185,7 @@ export default function MyReviews() {
                   <CompleteTable
                     columns={columns}
                     rows={rows}
-                    numberOfRowsPerPage={100}
+                    numberOfRowsPerPage={10}
                     height={200}
                   />
                 </Card>

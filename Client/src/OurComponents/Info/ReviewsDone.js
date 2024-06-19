@@ -1,24 +1,23 @@
 import * as React from "react";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import Card from "@mui/material/Card";
-import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
-import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
 import Alert from "@mui/material/Alert";
 import MDButton from "components/MDButton";
 import { fetchAPI } from "OurFunctions/fetchAPI";
-import { AuthContext } from "auth.context";
-import { ConferenceContext } from "conference.context";
 import ReviewsCard from "./ReviewsCard";
 import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
-import ModalInfo from "OurComponents/Modal/ModalInfo";
 
-export default function ReviewsDone({ assignmentID, title, onClose }) {
-  const { user } = useContext(AuthContext);
-  const { confID, confPhase } = useContext(ConferenceContext);
-
+export default function ReviewsDone({
+  user,
+  confID,
+  confPhase,
+  assignmentID,
+  title,
+  onClose,
+}) {
   const [abstract, setAbstract] = useState(null);
   const [review, setReview] = useState("");
   const [originReview, setOriginReview] = useState(null);
@@ -58,9 +57,11 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
       }
     }
 
-    if (assignmentID) fetchSingleReviews();
-    if (confPhase !== "Review") setBlockCrud(true);
-  }, [assignmentID]);
+    if (assignmentID && confPhase && user) {
+      if (assignmentID) fetchSingleReviews();
+      if (confPhase !== "Review") setBlockCrud(true);
+    }
+  }, [confPhase, assignmentID, user]);
 
   useEffect(() => {
     if (error) {
@@ -168,8 +169,10 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
   }
 
   function changeDetected() {
-    const text = review.reviewtext ?? null;
-    const grade = review.reviewgrade ?? null;
+    let text = review.reviewtext ?? null;
+    let grade = review.reviewgrade ?? null;
+    if (text === "") text = null;
+    if (grade === 1) grade = null;
 
     if (text !== originReview || grade !== originGrade) {
       return true;
