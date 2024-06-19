@@ -21,7 +21,6 @@ export default function MyProfilePage() {
   const [openEmailChangeDialog, setOpenEmailChangeDialog] = useState(false);
   const [openLoading, setOpenLoading] = useState(false);
   const [message, setMessage] = useState(null);
-  const [passwordMessage, setPasswordMessage] = useState(null);
   const [inviteMessage, setInviteMessage] = useState(null);
 
   const [firstName, setFirstName] = useState("");
@@ -74,7 +73,18 @@ export default function MyProfilePage() {
   useEffect(() => {
     if (changesDetected()) setDisableSaveUser(false);
     else setDisableSaveUser(true);
-  }, [firstName, lastName, affiliation, email, phone]);
+  }, [
+    firstName,
+    lastName,
+    affiliation,
+    email,
+    phone,
+    originalFirstName,
+    originalLastName,
+    originalAffiliation,
+    originalEmail,
+    originalPhone,
+  ]);
 
   useEffect(() => {
     if (password === "" || repeatPassword === "") setDisableSavePassword(true);
@@ -85,21 +95,19 @@ export default function MyProfilePage() {
     if (message) {
       const timer = setTimeout(() => {
         setMessage(null);
-      }, 2000);
+      }, 8000);
 
       return () => clearTimeout(timer);
     }
   }, [message]);
 
-  useEffect(() => {
-    if (passwordMessage) {
-      const timer = setTimeout(() => {
-        setPasswordMessage(null);
-      }, 2000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [passwordMessage]);
+  function saveDefaultValues() {
+    setOriginalAffiliation(affiliation);
+    setOriginalEmail(email);
+    setOriginalFirstName(firstName);
+    setOriginalLastName(lastName);
+    setOriginalPhone(phone);
+  }
 
   async function changeUserData() {
     if (valideInputs()) {
@@ -107,6 +115,7 @@ export default function MyProfilePage() {
         setOpenEmailChangeDialog(true);
       } else {
         await saveUserData();
+        saveDefaultValues();
       }
     } else {
       setMessage(
@@ -117,7 +126,7 @@ export default function MyProfilePage() {
 
   async function changePassword() {
     if (password !== repeatPassword) {
-      setPasswordMessage(
+      setMessage(
         <Alert severity="error">
           The first password does not match with the second one.
         </Alert>
@@ -181,19 +190,19 @@ export default function MyProfilePage() {
       "saveUserPassword",
       "POST",
       { userID: user, userPassword: password },
-      setPasswordMessage,
+      setMessage,
       setOpenLoading
     );
 
     if (response) {
-      setPasswordMessage(<Alert severity="success">Password changed</Alert>);
+      setMessage(<Alert severity="success">Password changed</Alert>);
     }
   }
 
   async function handleInvitationCode() {
     const inviteCode = code.trim();
     if (inviteCode === "") {
-      setInviteMessage(
+      setMessage(
         <Alert severity="error">Please enter an invitation code.</Alert>
       );
       return;
@@ -206,12 +215,12 @@ export default function MyProfilePage() {
         userID: user,
         inviteCode: inviteCode,
       },
-      setInviteMessage,
+      setMessage,
       setOpenLoading
     );
 
     if (response) {
-      setInviteMessage(
+      setMessage(
         <Alert severity="success">
           Invitation code accepted. You have joined the conference.
         </Alert>
@@ -251,7 +260,7 @@ export default function MyProfilePage() {
             </Card>
           </MDBox>
 
-          <MDBox mb={3} textAlign="left">
+          <MDBox mt={3} mb={3} textAlign="left">
             <Card>{message}</Card>
           </MDBox>
 
@@ -358,12 +367,7 @@ export default function MyProfilePage() {
             </Card>
           </MDBox>
 
-          <MDBox mb={3} textAlign="left">
-            <Card>
-              {passwordMessage}
-              {inviteMessage}
-            </Card>
-          </MDBox>
+          <MDBox mb={3} textAlign="left"></MDBox>
 
           <MDBox mb={3}>
             <Grid container spacing={3}>
@@ -415,7 +419,6 @@ export default function MyProfilePage() {
                       }}
                       disabled={disableSavePassword}
                       onClick={() => {
-                        setPasswordMessage(null);
                         changePassword();
                       }}
                     >
@@ -441,7 +444,6 @@ export default function MyProfilePage() {
                     value={code}
                     onChange={(e) => {
                       setInviteCode(e.target.value);
-                      setInviteMessage(null);
                     }}
                     sx={{ ml: 2, width: "90%" }}
                   />

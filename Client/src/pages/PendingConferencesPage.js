@@ -211,22 +211,22 @@ export default function PendingConferencesPage() {
     <DashboardLayout>
       <UpperNavBar />
       <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-        {!detailsOpen ? (
-          <>
-            <MDBox mb={3} textAlign="left">
-              <Card>{error}</Card>
-            </MDBox>
+        <>
+          <MDBox mb={3} textAlign="left">
+            <Card>{error}</Card>
+          </MDBox>
 
-            <Card>
-              <CompleteTable
-                columns={columns}
-                rows={rows}
-                numerOfRowsPerPage={10}
-                height={200}
-              />
-            </Card>
-          </>
-        ) : (
+          <Card>
+            <CompleteTable
+              columns={columns}
+              rows={rows}
+              numerOfRowsPerPage={10}
+              height={200}
+            />
+          </Card>
+        </>
+
+        {detailsOpen && (
           <ModalInfo onClose={() => setDetailsOpen(false)}>
             <ConfereceDetails
               text={dataForDetails}

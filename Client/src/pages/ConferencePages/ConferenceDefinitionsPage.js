@@ -220,7 +220,25 @@ export default function DefinitionsPage() {
     event.preventDefault();
     if (valideInputs() && datesBetweenStarEndVerifications()) {
       await saveUserData();
+      saveDefaultValues();
     }
+  }
+
+  function saveDefaultValues() {
+    setName(newName);
+    setCity(newCity);
+    setCountry(newCountry);
+    setContact(newContact);
+    setSubmissionStart(newSubmissionsStart);
+    setSubmissionEnd(newSubmissionsEnd);
+    setBiddingStart(newBiddingStart);
+    setSubmissionEnd(newBiddingEnd);
+    setReviewStart(newReviewStart);
+    setReviewEnd(newReviewEnd);
+    setConfStart(newConfStart);
+    setConfEnd(newConfEnd);
+    setSubmissionUpdate(newSubmissionUpdate);
+    setDisabledSaveChanges(true);
   }
 
   function valideInputs() {
