@@ -21,8 +21,11 @@ router.post(
     const confInfo = await db.fetchData("conferences", "confID", confID);
     const confName = confInfo[0].confname;
 
+    
+    const lowerCaseRecipients = recipients.map(email => email.toLowerCase());
+
     // Check for existing invitations
-    const { alreadyInvited, newRecipients } = await checkExistingInvitations(confID, recipients);
+    const { alreadyInvited, newRecipients } = await checkExistingInvitations(confID, lowerCaseRecipients);
 
     if (newRecipients.length === 0) {
       return res.status(400).json({
@@ -50,7 +53,7 @@ router.post(
           generatedCode: randomCode,
         };
 
-        // Send email with invitation
+        
         sendEmail(
           recipient,
           "Conference Invitation",
@@ -59,9 +62,9 @@ router.post(
           async (error, info) => {
             if (error) {
               console.error("Error sending email:", error);
-              // Skip adding invitation to the database if email sending fails
+              
             } else {
-              // Add invitation to the database if email sending succeeds
+              
               try {
                 await db.addData("invitations", {
                   confid: confID,
@@ -75,14 +78,14 @@ router.post(
               }
             }
 
-            // Continue sending invitations recursively after a delay of 1 second
+            
             setTimeout(() => {
               sendInvitations(index + 1);
             }, 50);
           }
         );
       } else {
-        // If all invitations have been sent, respond with success message
+        
         res.status(200).json({
           success: true,
           message: "Invitations sent successfully.",
@@ -107,8 +110,6 @@ router.get("/checkInvitations", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-
 
 router.post("/deleteInvitation", auth.ensureAuthenticated, async (req, res) => {
   const { invitationId } = req.body;
