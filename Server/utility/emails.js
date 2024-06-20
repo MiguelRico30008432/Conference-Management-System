@@ -4,7 +4,13 @@ const nodemailer = require("nodemailer");
 const emailFrom = process.env.EMAILFROM;
 const emailPassword = process.env.EMAILPASSWORD;
 
-function sendEmail(to, subject, replacements, file, callback) {
+function sendEmail(to, subject, replacements, file, callback = (err) => {
+    if (err) {
+        console.error('Default callback error:', err);
+    } else {
+        console.log('Email sent successfully');
+    }
+}) {
   const filePath = path.join(__dirname, "emailTemplates", file);
 
   fs.readFile(filePath, { encoding: "utf-8" }, (err, html) => {
