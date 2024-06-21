@@ -107,9 +107,9 @@ const ConfRoutes = [
   },
   {
     type: "collapse", //Done
-    name: "Automatic Assignments",
+    name: "All Assignments",
     submenu: "Bidding",
-    route: "/MyConferences/Conference/AutomaticAssignments",
+    route: "/MyConferences/Conference/AllAssignments",
     component: <AutomaticAssignments />,
     permissions: ["Owner", "Chair"],
     icon: "dashboard",

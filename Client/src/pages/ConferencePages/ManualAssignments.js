@@ -299,7 +299,11 @@ export default function ManualAssignments() {
                         Manual Assignments
                       </MDTypography>
                       <MDTypography ml={2} variant="body2">
-                        TEXT
+                        In this page you are able to declare and delete
+                        assignments.
+                        <br />
+                        Manual assignments are above automatic assignments and
+                        are not used or deleted by the algorithm.
                       </MDTypography>
                     </Card>
                   </MDBox>

@@ -6,11 +6,14 @@ const log = require("../../logs/logsManagement");
 const email = require("../../utility/emails");
 
 // Fetch all submissions with their average grades
-router.post("/allSubmissionsDecisions", auth.ensureAuthenticated, async (req, res) => {
-  const { confid } = req.body;
+router.post(
+  "/allSubmissionsDecisions",
+  auth.ensureAuthenticated,
+  async (req, res) => {
+    const { confid } = req.body;
 
-  try {
-    const queryText = `
+    try {
+      const queryText = `
       SELECT
         submissions.submissionid,
         submissions.submissiontitle,
@@ -35,23 +38,26 @@ router.post("/allSubmissionsDecisions", auth.ensureAuthenticated, async (req, re
       ORDER BY
         submissions.submissionid;
     `;
-    const result = await db.pool.query(queryText, [confid]);
+      const result = await db.pool.query(queryText, [confid]);
 
-
-    res.status(200).json(result.rows);
-  } catch (err) {
-    console.error("Error in /allSubmissionsDecisions:", err); // Improved logging
-    log.addLog(err, "backend", "allSubmissionsDecisions");
-    res.status(500).json({ message: "Failed to fetch submissions" });
+      res.status(200).json(result.rows);
+    } catch (err) {
+      console.error("Error in /allSubmissionsDecisions:", err); // Improved logging
+      log.addLog(err, "backend", "allSubmissionsDecisions");
+      res.status(500).json({ message: "Failed to fetch submissions" });
+    }
   }
-});
+);
 
 // Fetch detailed review information for a specific submission
-router.post("/submissionDecisionDetails", auth.ensureAuthenticated, async (req, res) => {
-  const { submissionId } = req.body;
+router.post(
+  "/submissionDecisionDetails",
+  auth.ensureAuthenticated,
+  async (req, res) => {
+    const { submissionId } = req.body;
 
-  try {
-    const queryText = `
+    try {
+      const queryText = `
       SELECT
         users.userfirstname,
         users.userlastname,
@@ -66,44 +72,49 @@ router.post("/submissionDecisionDetails", auth.ensureAuthenticated, async (req, 
       WHERE
         reviewsassignments.assignmentsubmissionid = $1;
     `;
-    const result = await db.pool.query(queryText, [submissionId]);
+      const result = await db.pool.query(queryText, [submissionId]);
 
-    res.status(200).json(result.rows);
-  } catch (err) {
-    log.addLog(err, "backend", "submissionDecisionDetails");
-    res.status(500).json({ message: "Failed to fetch submission details" });
+      res.status(200).json(result.rows);
+    } catch (err) {
+      log.addLog(err, "backend", "submissionDecisionDetails");
+      res.status(500).json({ message: "Failed to fetch submission details" });
+    }
   }
-});
+);
 
-router.post("/acceptOrRejectDecision", auth.ensureAuthenticated, async (req, res) => {
-  const { submissionId, acceptOrReject } = req.body;
+router.post(
+  "/acceptOrRejectDecision",
+  auth.ensureAuthenticated,
+  async (req, res) => {
+    const { submissionId, acceptOrReject } = req.body;
+    console.log(req.body);
 
-  try {
-    let queryText = '';
-    let actionTaken = '';
+    try {
+      let queryText = "";
+      let actionTaken = "";
 
-    if (acceptOrReject === 2) {
-      queryText = `
+      if (acceptOrReject === 2) {
+        queryText = `
         UPDATE submissions 
         SET submissionaccepted = true, 
             submissiondecisionmade = true 
         WHERE submissionid = $1;
       `;
-      actionTaken = 'accepted';
-    } else if (acceptOrReject === 1) {
-      queryText = `
+        actionTaken = "accepted";
+      } else if (acceptOrReject === 1) {
+        queryText = `
         UPDATE submissions 
         SET submissiondecisionmade = true 
         WHERE submissionid = $1;
       `;
-      actionTaken = 'rejected';
-    }
+        actionTaken = "rejected";
+      }
 
-    // Execute the update query
-    await db.pool.query(queryText, [submissionId]);
+      // Execute the update query
+      await db.pool.query(queryText, [submissionId]);
 
-    // Fetch submission and all author details
-    const submissionDetailsQuery = `
+      // Fetch submission and all author details
+      const submissionDetailsQuery = `
       SELECT 
         submissions.submissiontitle,
         authors.authoremail 
@@ -115,39 +126,52 @@ router.post("/acceptOrRejectDecision", auth.ensureAuthenticated, async (req, res
         submissions.submissionid = $1;
     `;
 
-    const submissionDetailsResult = await db.pool.query(submissionDetailsQuery, [submissionId]);
-
-    if (submissionDetailsResult.rows.length === 0) {
-      return res.status(404).send({ msg: "Submission or author not found." });
-    }
-
-    const emailSubject = `Submission Status Update`;
-    const submissiontitle = submissionDetailsResult.rows[0].submissiontitle;
-    
-    
-    const emailAddresses = submissionDetailsResult.rows.map(row => row.authoremail);
-    const toEmails = emailAddresses.join(", ");
-
-    const replacements = {
-      submissionTitle: submissiontitle,
-      actionTaken: actionTaken
-    };
-
-    // Send email notification to all authors at once
-    email.sendEmail(toEmails, emailSubject, replacements, "emailSubmission.html", (error, info) => {
-      if (error) {
-        console.error("Error sending email:", error);
-      } else {
-        console.log("Email sent:", info.response);
+      const submissionDetailsResult = await db.pool.query(
+        submissionDetailsQuery,
+        [submissionId]
+      );
+      console.log(submissionDetailsResult);
+      if (submissionDetailsResult.rows.length === 0) {
+        return res.status(404).send({ msg: "Submission or author not found." });
       }
-    });
 
-    res.status(200).send({ msg: "Submission decision updated successfully." });
-  } catch (error) {
-    console.error("Error in /acceptOrRejectDecision:", error);
-    log.addLog(error, "backend", "acceptOrRejectDecision");
-    res.status(500).send({ msg: "Internal Error" });
+      const emailSubject = `Submission Status Update`;
+      const submissiontitle = submissionDetailsResult.rows[0].submissiontitle;
+
+      const emailAddresses = submissionDetailsResult.rows.map(
+        (row) => row.authoremail
+      );
+      const toEmails = emailAddresses.join(", ");
+
+      const replacements = {
+        submissionTitle: submissiontitle,
+        actionTaken: actionTaken,
+      };
+
+      // Send email notification to all authors at once
+      email.sendEmail(
+        toEmails,
+        emailSubject,
+        replacements,
+        "emailSubmission.html",
+        (error, info) => {
+          if (error) {
+            console.error("Error sending email:", error);
+          } else {
+            console.log("Email sent:", info.response);
+          }
+        }
+      );
+
+      res
+        .status(200)
+        .send({ msg: "Submission decision updated successfully." });
+    } catch (error) {
+      console.error("Error in /acceptOrRejectDecision:", error);
+      log.addLog(error, "backend", "acceptOrRejectDecision");
+      res.status(500).send({ msg: "Internal Error" });
+    }
   }
-});
+);
 
 module.exports = router;

@@ -13,13 +13,17 @@ router.post(
       const result = await db.fetchDataCst(`
       SELECT
         s.submissiontitle,
-        u.userfirstname || ' ' || u.userlastname AS committeeMember
+        u.userfirstname || ' ' || u.userlastname AS committeeMember,
+        CASE 
+                WHEN ra.assignmentmanually = false THEN 'No'
+                ELSE 'Yes'
+        END AS assignmentmanually
       FROM
-        reviewsassignments
+        reviewsassignments ra
       INNER JOIN submissions s ON s.submissionid = assignmentsubmissionid
       INNER JOIN users u ON u.userid = assignmentuserid
       WHERE
-        assignmentconfid = 100 AND assignmentmanually = FALSE
+        assignmentconfid = ${req.body.confid} 
       ORDER BY
         s.submissiontitle, u.userfirstname, u.userlastname;
       `);

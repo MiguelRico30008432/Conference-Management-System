@@ -91,8 +91,13 @@ export default function AutomaticAssignments() {
   }
 
   const columns = [
-    { field: "submissiontitle", headerName: "Submission Title", width: 300 },
+    { field: "submissiontitle", headerName: "Submission Title", width: 200 },
     { field: "committeemember", headerName: "Committee Member", width: 200 },
+    {
+      field: "assignmentmanually",
+      headerName: "Mannually Declared",
+      width: 200,
+    },
   ];
 
   return (
@@ -115,11 +120,15 @@ export default function AutomaticAssignments() {
                 <MDBox mb={3} textAlign="left">
                   <Card>
                     <MDTypography ml={2} variant="h6">
-                      Automatic Reviews
+                      Check All Assignments
                     </MDTypography>
                     <MDTypography ml={2} variant="body2">
                       Here you can run the algorithm that assigns submissions to
-                      reviewers and see the assignments made.
+                      reviewers and are able to see all assignments declared.
+                      <br />
+                      Automatic assignments cannot be deleted and manual
+                      assignments must be created and deleted in the manual
+                      assignments page.
                     </MDTypography>
                   </Card>
                 </MDBox>
