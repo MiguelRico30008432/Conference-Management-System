@@ -129,7 +129,7 @@ export default function PendingConferencesPage() {
           await acceptOrRejectConference(
             params.row.id,
             2,
-            params.row.confowner,
+            params.row.confownerid,
             params.row.confname
           );
         };
@@ -174,7 +174,7 @@ export default function PendingConferencesPage() {
           await acceptOrRejectConference(
             params.row.id,
             1,
-            params.row.confowner,
+            params.row.confownerid,
             params.row.confname
           );
         };

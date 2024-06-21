@@ -11,6 +11,7 @@ router.get(
     try {
       const queryText = `
       SELECT 
+        conferences.confowner AS confownerID,
         conferences.confid AS "id",
         conferences.confname,
         conferences.confdescription,
@@ -87,7 +88,6 @@ router.post("/acceptOrRejectConference", async function (req, res) {
       "userid",
       req.body.confowner
     );
-
     const userEmail = userRecords[0].useremail;
     const userName =
       userRecords[0].userfirstname + " " + userRecords[0].userlastname;
@@ -100,7 +100,7 @@ router.post("/acceptOrRejectConference", async function (req, res) {
       actionTaken: req.body.acceptOrReject === 2 ? "accepted" : "rejected",
       additionalInfo: "For more information, please contact our support team.",
     };
-
+    console.log("Cheguei aqui 5");
     email.sendEmail(
       userEmail,
       emailSubject,
