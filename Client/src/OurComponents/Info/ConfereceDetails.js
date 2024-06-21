@@ -12,10 +12,11 @@ export default function ConferenceDetails({
   onClose,
   text,
 }) {
-  const [value, setValue] = React.useState("1");
+  const [value, setValue] = useState("1");
   const [showCloseButton, setShowCloseButton] = useState(true);
 
   useEffect(() => {
+    console.log(text);
     if (displayCloseButton) setShowCloseButton(true);
     else setShowCloseButton(false);
   }, [displayCloseButton]);
@@ -198,7 +199,7 @@ export default function ConferenceDetails({
                     <TextField
                       name="Conference Location"
                       disabled
-                      value={`${text.confcity} (${text.confcountry})`}
+                      value={text.conflocation}
                       fullWidth
                       sx={{ mt: 1, mb: 2 }}
                     />
@@ -210,7 +211,7 @@ export default function ConferenceDetails({
                     <TextField
                       name="Conference Area"
                       disabled
-                      value={text.confareaid}
+                      value={text.confareaname}
                       fullWidth
                       sx={{ mt: 1, mb: 2 }}
                     />
@@ -222,7 +223,7 @@ export default function ConferenceDetails({
                     <TextField
                       name="Conference Type"
                       disabled
-                      value={text.conftype}
+                      value={text.conftypename}
                       fullWidth
                       sx={{ mt: 1, mb: 2 }}
                     />

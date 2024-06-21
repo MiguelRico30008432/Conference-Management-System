@@ -21,14 +21,39 @@ router.get(
         to_char(conferences.confstartreview, 'DD-MM-YYYY') AS confstartreview,
         to_char(conferences.confendreview, 'DD-MM-YYYY') AS confendreview,
         to_char(conferences.confstartbidding, 'DD-MM-YYYY') AS confstartbidding,
-        to_char(conferences.confendbidding, 'DD-MM-YYYY ') AS confendbidding,
-        confAreas.confareaname,
-        conferences.confadddate,
+        to_char(conferences.confendbidding, 'DD-MM-YYYY') AS confendbidding,
+        to_char(conferences.confadddate, 'DD-MM-YYYY') AS confadddate,
+        STRING_AGG(users.userfirstname || ' ' || users.userlastname, ', ') AS confowner,
+        STRING_AGG(conferences.confcountry || ' (' || conferences.confcity || ')', ', ') AS confLocation,
+        confareas.confareaname,
+        conferences.confwebpage,
         conferences.confapproved,
-        conferences.confOwner
+        conferences.confcontact,
+        conftypes.conftypename
       FROM conferences
       INNER JOIN confareas ON confareas.confareaid = conferences.confareaid
-      WHERE confapproved = 0`;
+      INNER JOIN users ON users.userid = conferences.confowner
+      INNER JOIN conftypes ON conftypes.conftypeid = conferences.conftype
+      WHERE conferences.confapproved = 0
+      GROUP BY 
+        conferences.confid, 
+        conferences.confname, 
+        conferences.confdescription, 
+        conferences.confstartdate, 
+        conferences.confenddate, 
+        conferences.confstartsubmission, 
+        conferences.confendsubmission, 
+        conferences.confstartreview, 
+        conferences.confendreview, 
+        conferences.confstartbidding, 
+        conferences.confendbidding, 
+        conferences.confadddate, 
+        confareas.confareaname, 
+        conferences.confwebpage, 
+        conferences.confapproved,
+        conferences.confcontact,
+        conftypes.conftypename
+`;
 
       const result = await db.fetchDataCst(queryText);
       return res.status(200).send(result);
