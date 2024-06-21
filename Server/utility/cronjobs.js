@@ -29,7 +29,6 @@ cron.schedule("0 0 0 * * *", async () => {
 
     if (conferencesStartingReviewPhase.length > 0) {
       for (const conference of conferencesStartingReviewPhase) {
-        console.log(conference.confid);
         await al.ReviewsAssignmentAlgorihtm(conference.confid);
       }
     }

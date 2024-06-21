@@ -141,7 +141,6 @@ export default function Conflicts() {
   }
 
   async function handleDeleteConflict(info) {
-    console.log(info);
     setOpenLoading(true);
 
     try {

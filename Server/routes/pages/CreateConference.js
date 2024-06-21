@@ -26,10 +26,7 @@ router.post("/createConference", auth.ensureAuthenticated, async (req, res) => {
       contact,
     } = req.body;
 
-    console.log(user);
-    console.log(contact);
-
-    if (!contact) {
+      if (!contact) {
       try {
         const userEmail = await db.fetchDataCst(`
           SELECT 

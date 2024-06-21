@@ -52,8 +52,6 @@ export default function SubmissionsDecision() {
 
       const data = await response.json();
 
-      console.log("Fetched Submissions Data:", data); // Debug log
-
       // Filter submissions where submissiondecisionmade is false
       const filteredData = data.filter((item) => !item.submissiondecisionmade);
       setRows(filteredData.map((item) => ({ ...item, id: uuidv4() })));
@@ -67,7 +65,6 @@ export default function SubmissionsDecision() {
   const sendDecision = async (submissionId, decisionValue) => {
     setOpenLoading(true);
     try {
-      console.log(decisionValue);
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/acceptOrRejectDecision`,
         {

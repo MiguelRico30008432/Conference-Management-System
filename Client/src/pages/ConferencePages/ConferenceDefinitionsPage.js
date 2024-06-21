@@ -465,41 +465,6 @@ export default function DefinitionsPage() {
     setOpenLoading(false);
   }
 
-  async function handleAssignmentAlgorithm() {
-    setOpenLoading(true);
-
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/reviewsAssignmentsAlgorithm`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            confid: confID,
-          }),
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-          credentials: "include",
-        }
-      );
-
-      if (response.status === 200) {
-        setMessage(
-          <Alert severity="success">
-            Reviews Assignments list has been updated.
-          </Alert>
-        );
-      }
-    } catch (error) {
-      setMessage(
-        <Alert severity="error">
-          Something went wrong running the algorithm
-        </Alert>
-      );
-    }
-
-    setOpenLoading(false);
-  }
 
   const handleKeyDown = (event) => {
     event.preventDefault();
@@ -543,22 +508,6 @@ export default function DefinitionsPage() {
                 >
                   Check for Conflicts
                 </MDButton>
-                <MDButton
-                  variant="gradient"
-                  color="warning"
-                  onClick={async () => handleAssignmentAlgorithm()}
-                  disabled={disabledOptions}
-                  sx={{
-                    maxWidth: "300px",
-                    maxHeight: "30px",
-                    minWidth: "5px",
-                    minHeight: "30px",
-                    ml: 2,
-                    mb: 1,
-                  }}
-                >
-                  Run Review Assignment Algorithm
-                </MDButton>{" "}
                 <Card sx={{ maxWidth: 1400 }}>
                   <MDBox mt={1} mb={1} textAlign="center"></MDBox>
                   <Box component="form" noValidate onSubmit={handleSubmit}>

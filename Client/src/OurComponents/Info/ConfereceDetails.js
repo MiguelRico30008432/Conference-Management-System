@@ -16,7 +16,6 @@ export default function ConferenceDetails({
   const [showCloseButton, setShowCloseButton] = useState(true);
 
   useEffect(() => {
-    console.log(text);
     if (displayCloseButton) setShowCloseButton(true);
     else setShowCloseButton(false);
   }, [displayCloseButton]);

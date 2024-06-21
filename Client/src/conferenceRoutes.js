@@ -10,6 +10,7 @@ import Bidding from "pages/ConferencePages/BiddingPage";
 import Conflicts from "pages/ConferencePages/Conflicts";
 import MyBiddings from "pages/ConferencePages/MyBiddings";
 import ManualAssignments from "pages/ConferencePages/ManualAssignments";
+import AutomaticAssignments from "pages/ConferencePages/AutomaticAssignments";
 
 //Reviews
 import MyReviews from "pages/ConferencePages/MyReviews";
@@ -106,6 +107,24 @@ const ConfRoutes = [
   },
   {
     type: "collapse", //Done
+    name: "Automatic Assignments",
+    submenu: "Bidding",
+    route: "/MyConferences/Conference/AutomaticAssignments",
+    component: <AutomaticAssignments />,
+    permissions: ["Owner", "Chair"],
+    icon: "dashboard",
+  },
+  {
+    type: "collapse", //Done
+    name: "Manual Assignments",
+    submenu: "Bidding",
+    route: "/MyConferences/Conference/ManualAssignments",
+    component: <ManualAssignments />,
+    permissions: ["Owner", "Chair"],
+    icon: "dashboard",
+  },
+  {
+    type: "collapse", //Done
     name: "Bidding Process",
     submenu: "Bidding",
     route: "/MyConferences/Conference/Bidding",
@@ -120,15 +139,6 @@ const ConfRoutes = [
     route: "/MyConferences/Conference/MyBidding",
     component: <MyBiddings />,
     permissions: ["Owner", "Chair", "Committee"],
-    icon: "dashboard",
-  },
-  {
-    type: "collapse", //Done
-    name: "Manual Assignments",
-    submenu: "Bidding",
-    route: "/MyConferences/Conference/ManualAssignments",
-    component: <ManualAssignments />,
-    permissions: ["Owner", "Chair"],
     icon: "dashboard",
   },
   {

@@ -58,7 +58,6 @@ export default function ManualAssignments() {
         line.id = uuidv4();
         line.reviewers = splitReviewers(line.reviewers);
         setRows((allExistingRows) => [...allExistingRows, line]);
-        console.log(rows);
       }
     }
   }
@@ -78,7 +77,6 @@ export default function ManualAssignments() {
         line.id = uuidv4();
         line.reviewers = splitReviewers(line.reviewers);
         setRowsForDelete((allExistingRows) => [...allExistingRows, line]);
-        console.log(rowsForDelete);
       }
     }
   }

@@ -29,7 +29,6 @@ export default function SubmissionDetails({
 
       if (response) {
         setAuthors(response[0].authors);
-        console.log(response[0]);
       }
     }
 

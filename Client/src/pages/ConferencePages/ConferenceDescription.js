@@ -41,26 +41,21 @@ export default function ConferenceDetails() {
         if (response.status === 200) {
           setDataForDetails({
             confname: jsonResponse[0].confname,
-            confcity: jsonResponse[0].confcity,
-            confcountry: jsonResponse[0].confcountry,
+            conflocation: jsonResponse[0].conflocation,
             confwebpage: jsonResponse[0].confwebpage,
             confowner: jsonResponse[0].confowner,
             confdescription: jsonResponse[0].confdescription,
-            confstartsubmission: formatDate(
-              jsonResponse[0].confstartsubmission
-            ),
-            confendsubmission: formatDate(jsonResponse[0].confendsubmission),
-            confstartreview: formatDate(jsonResponse[0].confstartreview),
-            confendreview: formatDate(jsonResponse[0].confendreview),
-            confstartbidding: formatDate(jsonResponse[0].confstartbidding),
-            confendbidding: formatDate(jsonResponse[0].confendbidding),
-            confstartdate: formatDate(jsonResponse[0].confstartdate),
-            confenddate: formatDate(jsonResponse[0].confenddate),
-            conftype: jsonResponse[0].conftype,
-            confareaid: jsonResponse[0].confareaid,
-            confmaxreviewers: jsonResponse[0].confmaxreviewers,
-            confminreviewers: jsonResponse[0].confminreviewers,
-            confadddate: formatDate(jsonResponse[0].confadddate),
+            confstartsubmission: jsonResponse[0].confstartsubmission,
+            confendsubmission: jsonResponse[0].confendsubmission,
+            confstartreview: jsonResponse[0].confstartreview,
+            confendreview: jsonResponse[0].confendreview,
+            confstartbidding: jsonResponse[0].confstartbidding,
+            confendbidding: jsonResponse[0].confendbidding,
+            confstartdate: jsonResponse[0].confstartdate,
+            confenddate: jsonResponse[0].confenddate,
+            conftypename: jsonResponse[0].conftypename,
+            confareaname: jsonResponse[0].confareaname,
+            confadddate: jsonResponse[0].confadddate,
             confcontact: jsonResponse[0].confcontact,
           });
         } else {

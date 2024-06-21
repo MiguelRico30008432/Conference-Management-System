@@ -27,6 +27,7 @@ const myReviews = require("./pages/MyReviews");
 const allReviews = require("./pages/AllReviews");
 const submissionsDecision = require("./pages/SubmissionsDecision");
 const manualAssignments = require("./pages/ManualAssignments");
+const AutomaticAssignments = require("./pages/AutomaticAssignments");
 
 router.use(fileUpload());
 
@@ -55,5 +56,6 @@ router.use(myReviews);
 router.use(allReviews);
 router.use(submissionsDecision);
 router.use(manualAssignments);
+router.use(AutomaticAssignments);
 
 module.exports = router;

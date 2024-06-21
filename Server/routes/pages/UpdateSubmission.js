@@ -45,22 +45,18 @@ router.post("/updateSubmission", auth.ensureAuthenticated, async (req, res) => {
       const affiliation = author.affiliation;
       const authorid = author.authorid;
 
-      console.log(author);
-
       //verificar se o autor tem conta no site
       const userRegistered = await db.fetchData("users", "useremail", email);
 
       //tratamento dependendo se o autor já está ou não associado a submissao
       if (authorid === "undefined") {
         //Autor não se encontra associado à submissão
-        console.log("Undefined ");
         if (!userRegistered || userRegistered.length === 0) {
           await db.fetchDataCst(
             `INSERT INTO authors (authorAffiliation, authorEmail, authorFirstName, authorLastName, submissionid, userid)
               VALUES ('${affiliation}', '${email}', '${firstName}', '${lastName}', ${req.body.submissionid}, null)`
           );
         } else {
-          console.log("Undefined com conta");
           await db.fetchDataCst(
             `INSERT INTO authors (authorAffiliation, authorEmail, authorFirstName, authorLastName, submissionid, userid)
               VALUES ('${userRegistered[0].useraffiliation}', '${userRegistered[0].useremail}', '${userRegistered[0].userfirstname}', '${userRegistered[0].userlastname}', ${req.body.submissionid}, ${userRegistered[0].userid})`
@@ -72,13 +68,7 @@ router.post("/updateSubmission", auth.ensureAuthenticated, async (req, res) => {
           WHERE 
             userid = ${userRegistered[0].userid} AND confid = ${req.body.confID} AND userrole = 'Author'`);
 
-          console.log("userRole");
-
-          console.log(userRole);
-
           if (userRole.length === 0) {
-            console.log("Entrei no if do useRole");
-
             await db.fetchDataCst(
               `INSERT INTO userroles (userid, userrole, confid) 
               VALUES (${userRegistered[0].userid}, 'Author', ${req.body.confID})`
@@ -121,13 +111,7 @@ router.post("/updateSubmission", auth.ensureAuthenticated, async (req, res) => {
             WHERE 
               userid = ${userRegistered[0].userid} AND confid = ${req.body.confID} AND userrole = 'Author'`);
 
-          console.log("userRole");
-
-          console.log(userRole);
-
           if (userRole.length === 0) {
-            console.log("Entrei no if do useRole");
-
             await db.fetchDataCst(
               `INSERT INTO userroles (userid, userrole, confid) 
                 VALUES (${userRegistered[0].userid}, 'Author', ${req.body.confID})`

@@ -83,7 +83,6 @@ router.post("/acceptOrRejectDecision", auth.ensureAuthenticated, async (req, res
     let actionTaken = '';
 
     if (acceptOrReject === 2) {
-      console.log("Accepting submission");
       queryText = `
         UPDATE submissions 
         SET submissionaccepted = true, 
@@ -92,7 +91,6 @@ router.post("/acceptOrRejectDecision", auth.ensureAuthenticated, async (req, res
       `;
       actionTaken = 'accepted';
     } else if (acceptOrReject === 1) {
-      console.log("Rejecting submission");
       queryText = `
         UPDATE submissions 
         SET submissiondecisionmade = true 
