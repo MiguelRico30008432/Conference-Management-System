@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../auth.context";
 import MDBox from "components/MDBox";
@@ -22,14 +21,12 @@ import LanguageIcon from "@mui/icons-material/Language";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import IconButton from "@mui/material/IconButton";
-import MDTypography from "components/MDTypography";
 import moment from "moment";
 
 export default function CreateConference() {
-  const navigate = useNavigate();
-  const [startDate, setStartDate] = React.useState("");
-  const [endDate, setEndDate] = React.useState("");
-  const [disclaimer, setDisclaimer] = React.useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [disclaimer, setDisclaimer] = useState("");
   const [message, setMessage] = useState(null);
   const [confType, setConfType] = useState("");
   const [confArea, setConfArea] = useState("");
@@ -44,6 +41,7 @@ export default function CreateConference() {
   const { user, isLoggedIn } = useContext(AuthContext);
   const [rows, setRows] = useState(4);
   const MIN_ROWS = 3;
+  const currentDate = new Date().toISOString().split("T")[0];
 
   // Handles description text box size
   const handleIncreaseRows = () => {
@@ -123,94 +121,190 @@ export default function CreateConference() {
 
     const allFieldsEmpty = Object.values(formData).every((value) => !value);
 
-    if (allFieldsEmpty) {
+    if (datesBetweenStarEndVerifications()) {
+      if (allFieldsEmpty) {
+        setMessage(
+          <Alert severity="error">
+            All the fields are empty. <br></br>Please provide values.
+          </Alert>
+        );
+        return;
+      }
+
+      const requiredFields = [
+        "title",
+        "startDate",
+        "endDate",
+        "submissionStartDate",
+        "submissionEndDate",
+        "reviewStartDate",
+        "reviewEndDate",
+        "biddingStartDate",
+        "biddingEndDate",
+        "description",
+        "country",
+        "city",
+      ];
+
+      const fieldMappings = {
+        title: "Title",
+        startDate: "Conference Start Date",
+        endDate: "Conference End Date",
+        submissionStartDate: "Submission Start Date",
+        submissionEndDate: "Submission End Date",
+        reviewStartDate: "Review Start Date",
+        reviewEndDate: "Review End Date",
+        biddingStartDate: "Bidding Start Date",
+        biddingEndDate: "Bidding End Date",
+        description: "Description",
+        country: "Country",
+        city: "City",
+      };
+
+      const missingFields = requiredFields
+        .filter((field) => !formData[field])
+        .map((field) => fieldMappings[field] || field);
+
+      if (missingFields.length > 0) {
+        const missingFieldsMessage = `Please provide values for the following fields: ${missingFields.join(
+          ", "
+        )}`;
+        setMessage(<Alert severity="error">{missingFieldsMessage}</Alert>);
+        return;
+      }
+
+      const {
+        title,
+        startDate,
+        endDate,
+        submissionStartDate,
+        submissionEndDate,
+        reviewStartDate,
+        reviewEndDate,
+        biddingStartDate,
+        biddingEndDate,
+        description,
+        country,
+        city,
+        confLink,
+        contact,
+      } = formData;
+
+      await createConference(
+        title.trim(),
+        user,
+        confType,
+        confArea,
+        startDate,
+        endDate,
+        submissionStartDate,
+        submissionEndDate,
+        reviewStartDate,
+        reviewEndDate,
+        biddingStartDate,
+        biddingEndDate,
+        description.trim(),
+        country.trim(),
+        city.trim(),
+        confLink.trim(),
+        contact.trim()
+      );
+    }
+  };
+
+  function datesBetweenStarEndVerifications() {
+    //---------------------Submissions------------------//
+    if (submissionEndDate <= submissionStartDate) {
       setMessage(
         <Alert severity="error">
-          All the fields are empty. <br></br>Please provide values.
+          Submission End Date must be after Submission Start Date
         </Alert>
       );
-      return;
+      return false;
+    }
+    //---------------------Bidding------------------//
+    if (biddingEndDate <= biddingStartDate) {
+      setMessage(
+        <Alert severity="error">
+          Bidding End Date must be after Bidding Start Date
+        </Alert>
+      );
+      return false;
+    }
+    //---------------------Reviews------------------//
+    if (reviewEndDate <= reviewStartDate) {
+      setMessage(
+        <Alert severity="error">
+          Review End Date must be after Review Start Date
+        </Alert>
+      );
+      return false;
+    }
+    //---------------------Conference------------------//
+    if (endDate <= startDate) {
+      setMessage(
+        <Alert severity="error">
+          Conference End Date must be after Conference Start Date
+        </Alert>
+      );
+      return false;
+    }
+    //---------------------Between Them------------------//
+    if (
+      submissionStartDate >= biddingStartDate ||
+      submissionStartDate >= biddingEndDate ||
+      submissionStartDate >= reviewStartDate ||
+      submissionStartDate >= reviewEndDate ||
+      submissionStartDate >= startDate ||
+      submissionStartDate >= endDate ||
+      submissionEndDate >= biddingStartDate ||
+      submissionEndDate >= biddingEndDate ||
+      submissionEndDate >= reviewStartDate ||
+      submissionEndDate >= reviewEndDate ||
+      submissionEndDate >= startDate ||
+      submissionEndDate >= endDate
+    ) {
+      setMessage(
+        <Alert severity="error">
+          Biddings / Reviews / Conference dates must be after Submissions Dates
+        </Alert>
+      );
+      return false;
     }
 
-    const requiredFields = [
-      "title",
-      "startDate",
-      "endDate",
-      "submissionStartDate",
-      "submissionEndDate",
-      "reviewStartDate",
-      "reviewEndDate",
-      "biddingStartDate",
-      "biddingEndDate",
-      "description",
-      "country",
-      "city",
-    ];
-
-    const fieldMappings = {
-      title: "Title",
-      startDate: "Conference Start Date",
-      endDate: "Conference End Date",
-      submissionStartDate: "Submission Start Date",
-      submissionEndDate: "Submission End Date",
-      reviewStartDate: "Review Start Date",
-      reviewEndDate: "Review End Date",
-      biddingStartDate: "Bidding Start Date",
-      biddingEndDate: "Bidding End Date",
-      description: "Description",
-      country: "Country",
-      city: "City",
-    };
-
-    const missingFields = requiredFields
-      .filter((field) => !formData[field])
-      .map((field) => fieldMappings[field] || field);
-
-    if (missingFields.length > 0) {
-      const missingFieldsMessage = `Please provide values for the following fields: ${missingFields.join(
-        ", "
-      )}`;
-      setMessage(<Alert severity="error">{missingFieldsMessage}</Alert>);
-      return;
+    if (
+      biddingStartDate >= reviewStartDate ||
+      biddingStartDate >= reviewEndDate ||
+      biddingStartDate >= startDate ||
+      biddingStartDate >= endDate ||
+      biddingEndDate >= reviewStartDate ||
+      biddingEndDate >= reviewEndDate ||
+      biddingEndDate >= startDate ||
+      biddingEndDate >= endDate
+    ) {
+      setMessage(
+        <Alert severity="error">
+          Reviews / Conference dates must be after Bidding Dates
+        </Alert>
+      );
+      return false;
     }
 
-    const {
-      title,
-      startDate,
-      endDate,
-      submissionStartDate,
-      submissionEndDate,
-      reviewStartDate,
-      reviewEndDate,
-      biddingStartDate,
-      biddingEndDate,
-      description,
-      country,
-      city,
-      confLink,
-      contact,
-    } = formData;
-
-    await createConference(
-      title.trim(),
-      user,
-      confType,
-      confArea,
-      startDate,
-      endDate,
-      submissionStartDate,
-      submissionEndDate,
-      reviewStartDate,
-      reviewEndDate,
-      biddingStartDate,
-      biddingEndDate,
-      description.trim(),
-      country.trim(),
-      city.trim(),
-      confLink.trim(),
-      contact.trim()
-    );
-  };
+    if (
+      reviewStartDate >= startDate ||
+      reviewStartDate >= endDate ||
+      reviewEndDate >= startDate ||
+      reviewEndDate >= endDate
+    ) {
+      setMessage(
+        <Alert severity="error">
+          Conference dates must be after Review Dates
+        </Alert>
+      );
+      return false;
+    }
+    return true;
+  }
 
   const createConference = async (
     title,
@@ -279,26 +373,27 @@ export default function CreateConference() {
     }
   };
 
-  //Handles the disclaimers in the Date picker
-  const today = moment().format("YYYY-MM-DD");
-  const minStartDate = moment().add(9, "days").format("YYYY-MM-DD");
-  const previousDay = moment(startDate)
-    .subtract(1, "days")
-    .format("YYYY-MM-DD");
-  const minDate = moment(submissionStartDate)
-    .add(1, "days")
-    .format("YYYY-MM-DD");
-  const nextDay = moment(submissionEndDate).add(1, "days").format("YYYY-MM-DD");
-  const minDateSubmission = moment(today).add(3, "days").format("YYYY-MM-DD");
-  const minDateBidding = moment(biddingStartDate)
-    .add(1, "days")
-    .format("YYYY-MM-DD");
-  const minDateReview = moment(reviewStartDate)
-    .add(1, "days")
-    .format("YYYY-MM-DD");
-  const nextDayBidding = moment(biddingEndDate)
-    .add(1, "days")
-    .format("YYYY-MM-DD");
+  function formatDate(date) {
+    const d = new Date(date);
+    let month = "" + (d.getMonth() + 1);
+    let day = "" + d.getDate();
+    const year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
+  }
+
+  const handleKeyDown = (event) => {
+    event.preventDefault();
+  };
+
+  function addDays(date, days) {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return formatDate(result);
+  }
 
   return (
     <DashboardLayout>
@@ -480,138 +575,163 @@ export default function CreateConference() {
                       />
                     </Grid>
                     <div>
-                      <Grid container spacing={2} ml={0} mr={0} sm="auto">
-                        <Grid item xs={11.5} md={6}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={6}>
                           <TextField
                             required
                             fullWidth
-                            name="startDate"
-                            label="Conference Start Date"
-                            type="date"
-                            id="startDate"
-                            InputLabelProps={{ shrink: true }}
-                            inputProps={{ min: minStartDate }}
-                            onChange={(event) => {
-                              setStartDate(event.target.value);
-                            }}
-                          />
-                        </Grid>
-                        <Grid item xs={11.5} md={6}>
-                          <TextField
-                            required
-                            fullWidth
-                            name="endDate"
-                            label="Conference End Date"
-                            type="date"
-                            id="endDate"
-                            InputLabelProps={{ shrink: true }}
-                            inputProps={{ min: startDate }}
-                            onChange={(event) => {
-                              setEndDate(event.target.value);
-                            }}
-                          />
-                        </Grid>
-                        <Grid item xs={11.5} md={6}>
-                          <TextField
-                            required
-                            fullWidth
-                            name="submissionStartDate"
-                            label="Submission Start Date"
-                            type="date"
                             id="submissionStartDate"
+                            label="Submissions Start Date"
+                            name="submissionStartDate"
+                            type="date"
                             InputLabelProps={{ shrink: true }}
-                            inputProps={{
-                              min: minDateSubmission,
-                              max: previousDay,
-                            }}
-                            onChange={(event) => {
-                              setSubmissionStartDate(event.target.value);
-                            }}
+                            inputProps={{ min: currentDate }}
+                            value={submissionStartDate}
+                            onChange={(e) =>
+                              setSubmissionStartDate(formatDate(e.target.value))
+                            }
+                            onKeyDown={handleKeyDown}
+                            sx={{ ml: 2, mt: 2, width: "90%" }}
                           />
                         </Grid>
-                        <Grid item xs={11.5} md={6}>
+                        <Grid item xs={6}>
                           <TextField
                             required
                             fullWidth
-                            name="submissionEndDate"
-                            label="Submission End Date"
-                            type="date"
                             id="submissionEndDate"
+                            label="Submissions End Date"
+                            name="submissionEndDate"
+                            type="date"
                             InputLabelProps={{ shrink: true }}
-                            inputProps={{ min: minDate, max: previousDay }}
-                            onChange={(event) => {
-                              setSubmissionEndDate(event.target.value);
+                            inputProps={{
+                              min: addDays(submissionStartDate, 1),
                             }}
+                            value={submissionEndDate}
+                            onChange={(e) =>
+                              setSubmissionEndDate(formatDate(e.target.value))
+                            }
+                            onKeyDown={handleKeyDown}
+                            sx={{ ml: 2, mt: 2, width: "90%" }}
                           />
                         </Grid>
-                        <Grid item xs={11.5} md={6}>
+                        <Grid item xs={6}>
                           <TextField
                             required
                             fullWidth
-                            name="biddingStartDate"
-                            label="Bidding Start Date"
-                            type="date"
                             id="biddingStartDate"
+                            label="Bidding Start Date"
+                            name="biddingStartDate"
+                            type="date"
                             InputLabelProps={{ shrink: true }}
-                            inputProps={{ min: nextDay, max: previousDay }}
-                            onChange={(event) => {
-                              setBiddingStartDate(event.target.value);
+                            inputProps={{
+                              min: addDays(submissionEndDate, 1),
                             }}
+                            value={biddingStartDate}
+                            onChange={(e) =>
+                              setBiddingStartDate(formatDate(e.target.value))
+                            }
+                            onKeyDown={handleKeyDown}
+                            sx={{ ml: 2, mt: 2, width: "90%" }}
                           />
                         </Grid>
-                        <Grid item xs={11.5} md={6}>
+                        <Grid item xs={6}>
                           <TextField
                             required
                             fullWidth
-                            name="biddingEndDate"
-                            label="Bidding End Date"
-                            type="date"
                             id="biddingEndDate"
+                            label="Bidding End Date"
+                            name="biddingEndDate"
+                            type="date"
                             InputLabelProps={{ shrink: true }}
                             inputProps={{
-                              min: minDateBidding,
-                              max: previousDay,
+                              min: addDays(biddingStartDate, 1),
                             }}
-                            onChange={(event) => {
-                              setBiddingEndDate(event.target.value);
-                            }}
+                            value={biddingEndDate}
+                            onChange={(e) =>
+                              setBiddingEndDate(formatDate(e.target.value))
+                            }
+                            onKeyDown={handleKeyDown}
+                            sx={{ ml: 2, mt: 2, width: "90%" }}
                           />
                         </Grid>
-                        <Grid item xs={11.5} md={6}>
+                        <Grid item xs={6}>
                           <TextField
                             required
                             fullWidth
-                            name="reviewStartDate"
-                            label="Review Start Date"
-                            type="date"
                             id="reviewStartDate"
+                            label="Reviews Start Date"
+                            name="reviewStartDate"
+                            type="date"
                             InputLabelProps={{ shrink: true }}
                             inputProps={{
-                              min: nextDayBidding,
-                              max: previousDay,
+                              min: addDays(biddingEndDate, 1),
                             }}
-                            onChange={(event) => {
-                              setReviewStartDate(event.target.value);
-                            }}
+                            value={reviewStartDate}
+                            onChange={(e) =>
+                              setReviewStartDate(formatDate(e.target.value))
+                            }
+                            onKeyDown={handleKeyDown}
+                            sx={{ ml: 2, mt: 2, width: "90%" }}
                           />
                         </Grid>
-                        <Grid item xs={11.5} md={6}>
+                        <Grid item xs={6}>
                           <TextField
                             required
                             fullWidth
-                            name="reviewEndDate"
-                            label="Review End Date"
-                            type="date"
                             id="reviewEndDate"
+                            label="Reviews End Date"
+                            name="reviewEndDate"
+                            type="date"
                             InputLabelProps={{ shrink: true }}
-                            sx={{ mb: "15px" }}
                             inputProps={{
-                              min: minDateReview,
-                              max: previousDay,
+                              min: addDays(reviewStartDate, 1),
                             }}
-                            onChange={(event) => {
-                              setReviewEndDate(event.target.value);
+                            value={reviewEndDate}
+                            onChange={(e) =>
+                              setReviewEndDate(formatDate(e.target.value))
+                            }
+                            onKeyDown={handleKeyDown}
+                            sx={{ ml: 2, mt: 2, width: "90%" }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField
+                            required
+                            fullWidth
+                            id="startDate"
+                            label="Conferance Start Date"
+                            name="startDate"
+                            type="date"
+                            InputLabelProps={{ shrink: true }}
+                            inputProps={{
+                              min: addDays(reviewEndDate, 1),
                             }}
+                            value={startDate}
+                            onChange={(e) =>
+                              setStartDate(formatDate(e.target.value))
+                            }
+                            onKeyDown={handleKeyDown}
+                            sx={{ ml: 2, mt: 2, width: "90%" }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField
+                            required
+                            fullWidth
+                            id="endDate"
+                            label="Conference End Date"
+                            name="endDate"
+                            type="date"
+                            InputLabelProps={{ shrink: true }}
+                            inputProps={{
+                              min: addDays(startDate, 1),
+                            }}
+                            value={endDate}
+                            onChange={(e) =>
+                              setEndDate(formatDate(e.target.value))
+                            }
+                            onKeyDown={handleKeyDown}
+                            sx={{ ml: 2, mt: 2, width: "90%" }}
                           />
                         </Grid>
                       </Grid>

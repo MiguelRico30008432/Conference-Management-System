@@ -28,7 +28,7 @@ router.post("/confDefinitions", auth.ensureAuthenticated, async (req, res) => {
     const result = await db.fetchDataCst(query);
     return res.status(200).send(result);
   } catch (error) {
-    log.addLog(err, "database", "ConferenceDefinitions -> /confDefinitions");
+    log.addLog(error, "database", "ConferenceDefinitions -> /confDefinitions");
     return res.status(500).send({ msg: "Internal Error" });
   }
 });

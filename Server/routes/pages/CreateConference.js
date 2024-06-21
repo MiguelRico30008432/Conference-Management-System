@@ -1,11 +1,12 @@
 const express = require("express");
 const db = require("../../utility/database");
 const auth = require("../../utility/verifications");
+const log = require("../../logs/logsManagement");
 const router = express.Router();
 
 router.post("/createConference", auth.ensureAuthenticated, async (req, res) => {
   try {
-    const {
+    let {
       title,
       user,
       confType,
@@ -24,6 +25,29 @@ router.post("/createConference", auth.ensureAuthenticated, async (req, res) => {
       confLink,
       contact,
     } = req.body;
+
+    console.log(user);
+    console.log(contact);
+
+    if (!contact) {
+      try {
+        const userEmail = await db.fetchDataCst(`
+          SELECT 
+            useremail
+          FROM 
+            users
+          WHERE 
+            userid = ${user}
+        `);
+
+        contact = userEmail[0].useremail;
+      } catch (error) {
+        log.addLog(error, "database", "CreateConference -> /createConference");
+        return res
+          .status(500)
+          .send({ msg: "Internal Error Getting User Contact" });
+      }
+    }
 
     const findTypeId = await db.fetchData(
       "conftypes",
