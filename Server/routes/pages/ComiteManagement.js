@@ -50,10 +50,9 @@ router.post(
             submissiontitle
           FROM conflicts
           INNER JOIN submissions on submissions.submissionid = conflictsubmissionid
-          INNER JOIN users on conflictuseremail = useremail
           WHERE
-           userid = ${userid}
-           GROUP BY submissiontitle
+           conflictuserid = ${userid}
+          GROUP BY submissiontitle
         `);
 
       const biddings = await db.fetchDataCst(`

@@ -26,7 +26,7 @@ router.post("/createConference", auth.ensureAuthenticated, async (req, res) => {
       contact,
     } = req.body;
 
-      if (!contact) {
+    if (!contact) {
       try {
         const userEmail = await db.fetchDataCst(`
           SELECT 
@@ -59,6 +59,36 @@ router.post("/createConference", auth.ensureAuthenticated, async (req, res) => {
       confArea
     );
     const [{ confareaid }] = findAreaId;
+
+    await db.fetchDataCst(
+      `INSERT INTO conferences (
+        confname, confowner, conftype, confareaid, confstartdate, confenddate, 
+        confstartsubmission, confendsubmission, confstartreview, confendreview, 
+        confstartbidding, confendbidding, confdescription, confcountry, confcity, 
+        confwebpage, confcontact
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17
+      )`,
+      [
+        title,
+        user,
+        conftypeid,
+        confareaid,
+        startDate,
+        endDate,
+        submissionStartDate,
+        submissionEndDate,
+        reviewStartDate,
+        reviewEndDate,
+        biddingStartDate,
+        biddingEndDate,
+        description,
+        country,
+        city,
+        confLink,
+        contact,
+      ]
+    );
 
     await db.addData("conferences", {
       confname: title,

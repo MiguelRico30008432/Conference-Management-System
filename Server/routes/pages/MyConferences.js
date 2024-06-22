@@ -16,15 +16,16 @@ router.post("/myConferences", auth.ensureAuthenticated, async (req, res) => {
        CASE 
           WHEN NOW() < confstartsubmission THEN 'Configuration'
           WHEN confstartsubmission <= NOW() AND confendsubmission >= NOW() THEN 'Submission'
-          WHEN confstartreview <= NOW() AND confendreview >= NOW() THEN 'Review'
           WHEN confstartbidding <= NOW() AND confendbidding >= NOW() THEN 'Bidding'
+          WHEN confstartreview <= NOW() AND confendreview >= NOW() THEN 'Review'
           WHEN NOW() > confendreview THEN 'Pre-Conference'
         END AS confphase
     FROM conferences
     INNER JOIN userRoles ON userRoles.confid = conferences.confid
     WHERE userRoles.userid = ${req.body.userid} AND confenddate >= NOW() AND confapproved = 2
     GROUP BY 
-      userRoles.confid, confName, conferences.confid;`;
+      userRoles.confid, confName, conferences.confid
+    ORDER BY confadddate ASC;`;
 
     const result = await db.fetchDataCst(query);
     return res.status(200).send(result);

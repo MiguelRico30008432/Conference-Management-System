@@ -87,7 +87,6 @@ router.post(
   auth.ensureAuthenticated,
   async (req, res) => {
     const { submissionId, acceptOrReject } = req.body;
-    console.log(req.body);
 
     try {
       let queryText = "";
@@ -130,7 +129,6 @@ router.post(
         submissionDetailsQuery,
         [submissionId]
       );
-      console.log(submissionDetailsResult);
       if (submissionDetailsResult.rows.length === 0) {
         return res.status(404).send({ msg: "Submission or author not found." });
       }

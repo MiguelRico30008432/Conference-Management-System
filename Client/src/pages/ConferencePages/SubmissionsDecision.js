@@ -12,22 +12,31 @@ import { v4 as uuidv4 } from "uuid";
 import ConferenceNavBar from "OurComponents/navBars/ConferenceNavBar";
 import CompleteTable from "OurComponents/Table/CompleteTable";
 import SubmissionDecisionDetails from "OurComponents/Info/SubmissionDecisionDetails";
+import BlockPageForConfStatus from "OurComponents/errorHandling/BlockPageForConfStatus";
 
 import { AuthContext } from "auth.context";
 import { ConferenceContext } from "conference.context";
 
 export default function SubmissionsDecision() {
-  const { confID } = useContext(ConferenceContext);
+  const { confID, confPhase } = useContext(ConferenceContext);
   const { user } = useContext(AuthContext);
 
   const [openLoading, setOpenLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [blockCrud, setBlockCrud] = useState(false);
   const [rows, setRows] = useState([]);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [dataForDetails, setDataForDetails] = useState({
     title: "",
     reviews: [],
   });
+
+  useEffect(() => {
+    if (user && confID && confPhase) {
+      if (confPhase !== "Pre-Conference") setBlockCrud(true);
+      else fetchSubmissions();
+    }
+  }, [confID, user, confPhase]);
 
   const fetchSubmissions = async () => {
     setOpenLoading(true);
@@ -91,12 +100,6 @@ export default function SubmissionsDecision() {
     }
     setOpenLoading(false);
   };
-
-  useEffect(() => {
-    if (user && confID) {
-      fetchSubmissions();
-    }
-  }, [confID, user]);
 
   const fetchDetails = async (submissionId, submissionTitle) => {
     setOpenLoading(true);
@@ -245,39 +248,51 @@ export default function SubmissionsDecision() {
       <DashboardLayout>
         <ConferenceNavBar />
         <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-          <Container maxWidth="sm">
-            <MDBox mt={10} mb={2} textAlign="left">
-              <MDBox mb={3} textAlign="left">
-                <Card>
-                  <MDTypography ml={2} variant="h6">
-                    Submissions Decision
-                  </MDTypography>
-                  <MDTypography ml={2} variant="body2">
-                    Here you can view and manage submissions decisions.
-                  </MDTypography>
-                </Card>
+          {!blockCrud && (
+            <>
+              <Container maxWidth="sm">
+                <MDBox mt={10} mb={2} textAlign="left">
+                  <MDBox mb={3} textAlign="left">
+                    <Card>
+                      <MDTypography ml={2} variant="h6">
+                        Submissions Decision
+                      </MDTypography>
+                      <MDTypography ml={2} variant="body2">
+                        Here you can view and manage submissions decisions.
+                      </MDTypography>
+                    </Card>
 
-                <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
+                    <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
 
-                <MDBox mb={3} textAlign="left">
-                  <Card>
-                    <CompleteTable
-                      columns={columns}
-                      rows={rows}
-                      numberOfRowsPerPage={100}
-                      height={200}
-                    />
-                  </Card>
+                    <MDBox mb={3} textAlign="left">
+                      <Card>
+                        <CompleteTable
+                          columns={columns}
+                          rows={rows}
+                          numberOfRowsPerPage={100}
+                          height={200}
+                        />
+                      </Card>
+                    </MDBox>
+                  </MDBox>
                 </MDBox>
-              </MDBox>
-            </MDBox>
-          </Container>
-
-          {detailsOpen && (
-            <SubmissionDecisionDetails
-              submission={dataForDetails}
-              onClose={() => setDetailsOpen(false)}
-            />
+              </Container>
+              {detailsOpen && (
+                <SubmissionDecisionDetails
+                  submission={dataForDetails}
+                  onClose={() => setDetailsOpen(false)}
+                />
+              )}
+            </>
+          )}
+          {blockCrud && (
+            <>
+              <BlockPageForConfStatus
+                text={
+                  "It seems that this conference is not in the Pre-Conference phase"
+                }
+              />
+            </>
           )}
         </MDBox>
         <Footer />

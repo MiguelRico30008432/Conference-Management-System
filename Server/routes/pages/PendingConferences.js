@@ -100,7 +100,6 @@ router.post("/acceptOrRejectConference", async function (req, res) {
       actionTaken: req.body.acceptOrReject === 2 ? "accepted" : "rejected",
       additionalInfo: "For more information, please contact our support team.",
     };
-    console.log("Cheguei aqui 5");
     email.sendEmail(
       userEmail,
       emailSubject,

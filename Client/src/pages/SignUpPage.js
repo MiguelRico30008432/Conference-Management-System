@@ -1,4 +1,3 @@
-// react-router-dom components
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import MDBox from "components/MDBox";

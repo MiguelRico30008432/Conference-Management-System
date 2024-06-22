@@ -41,7 +41,7 @@ CREATE TABLE conferences (
     confWebPage VARCHAR(250) NOT NULL,
     confOwner INT,
     FOREIGN KEY (confOwner) REFERENCES users(userID),
-    confDescription VARCHAR(2048) NOT NULL,
+    confDescription TEXT NOT NULL,
     confStartDate TIMESTAMP NOT NULL,
     confEndDate TIMESTAMP NOT NULL,
     confStartSubmission TIMESTAMP NOT NULL,

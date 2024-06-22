@@ -17,7 +17,7 @@ import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
 import ModalInfo from "OurComponents/Modal/ModalInfo";
 
 export default function AllSubmissions() {
-  const { confID, userRole } = useContext(ConferenceContext);
+  const { confID, userRole, confPhase } = useContext(ConferenceContext);
   const { isLoggedIn } = useContext(AuthContext);
   const [openLoading, setOpenLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -242,7 +242,11 @@ export default function AllSubmissions() {
       resizable: false,
       width: 150,
       renderCell: (params) => {
-        if (userRole.includes("Committee") || params.row.status !== "Pending")
+        if (
+          userRole.includes("Committee") ||
+          params.row.status !== "Pending" ||
+          confPhase !== "Submission"
+        )
           return null;
 
         return (
@@ -328,7 +332,7 @@ export default function AllSubmissions() {
           </Container>
 
           {detailsOpen && (
-            <ModalInfo onClose={() => setDetailsOpen(false)} height={450}>
+            <ModalInfo onClose={() => setDetailsOpen(false)}>
               <SubmissionDetails
                 submission={dataForDetails}
                 onClose={() => setDetailsOpen(false)}
