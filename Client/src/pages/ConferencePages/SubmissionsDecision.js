@@ -258,7 +258,8 @@ export default function SubmissionsDecision() {
                         Submissions Decision
                       </MDTypography>
                       <MDTypography ml={2} variant="body2">
-                        Here you can view and manage submissions decisions.
+                        Here you can view and manage submissions decisions. This
+                        is the last step of your conference.
                       </MDTypography>
                     </Card>
 

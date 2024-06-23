@@ -585,7 +585,7 @@ export default function CreateConference() {
                             name="submissionStartDate"
                             type="date"
                             InputLabelProps={{ shrink: true }}
-                            inputProps={{ min: currentDate }}
+                            inputProps={{ min: addDays(currentDate, 3) }}
                             value={submissionStartDate}
                             onChange={(e) =>
                               setSubmissionStartDate(formatDate(e.target.value))

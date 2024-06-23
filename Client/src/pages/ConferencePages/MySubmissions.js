@@ -384,7 +384,9 @@ export default function MySubmissionsPage() {
                       My Submissions
                     </MDTypography>
                     <MDTypography ml={2} variant="body2">
-                      Here you can view and manage your submissions.
+                      Here you can view and manage your submissions.<br></br>
+                      Note: You can only edit or delete your submissions if the
+                      current phase of the conference is the submission phase.
                     </MDTypography>
                   </Card>
 

@@ -176,6 +176,39 @@ export default function Conflicts() {
     setOpenLoading(false);
   }
 
+  async function handleUpdateConflicts() {
+    setOpenLoading(true);
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/determineConflicts`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            confid: confID,
+          }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (response.status === 200) {
+        setMessage(
+          <Alert severity="success">Conflicts list has been updated.</Alert>
+        );
+      }
+    } catch (error) {
+      setMessage(
+        <Alert severity="error">
+          Something went wrong when obtaining your informations
+        </Alert>
+      );
+    }
+    setOpenLoading(false);
+  }
+
   const columns = [
     { field: "submissiontitle", headerName: "Submission Title", width: 100 },
     { field: "fullname", headerName: "Commite Member", width: 100 },
@@ -351,24 +384,38 @@ export default function Conflicts() {
                         Conflicts of Interest
                       </MDTypography>
                       <MDTypography ml={2} variant="body2">
-                        In this page, you will be able to observe the conflicts
-                        of interest present in the conference.
-                        <br />
-                        You will be able to declare conflicts of interest
-                        manually, by clicking the "Declare Conflicts" button.
+                        In the first table, you can observe the conflicts of
+                        interest present in the conference. In the second table,
+                        you can declare any conflicts manually. We also have an
+                        automatic trigger to execute our algorithm that detects
+                        conflicts.
                         <br />
                         There are two ways to run the algorithm that determines
-                        the conflicts:
+                        conflicts:
                         <br />
-                        - Pressing the "Check for Conflicts" in Administration
-                        -&gt; Conference Settings;
-                        <br />- Automatically when the bidding process begins.
+                        - By pressing "Check for Conflicts"
+                        <br />- Automatically when the bidding process begins
                       </MDTypography>
                     </Card>
 
                     <MDBox mt={3} mb={3} textAlign="left">
                       <Card>{message}</Card>
                     </MDBox>
+
+                    <MDButton
+                      variant="gradient"
+                      color="warning"
+                      onClick={async () => handleUpdateConflicts()}
+                      sx={{
+                        maxWidth: "200px",
+                        maxHeight: "30px",
+                        minWidth: "5px",
+                        minHeight: "30px",
+                        mb: 1,
+                      }}
+                    >
+                      Check for Conflicts
+                    </MDButton>
 
                     <MDBox mb={3} mt={4} textAlign="left">
                       <Card>

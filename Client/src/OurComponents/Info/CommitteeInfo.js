@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -8,7 +8,6 @@ import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import { fetchAPI } from "OurFunctions/fetchAPI";
 import Accordion from "@mui/material/Accordion";
-import AccordionActions from "@mui/material/AccordionActions";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";

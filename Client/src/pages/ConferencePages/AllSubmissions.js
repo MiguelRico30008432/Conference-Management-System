@@ -305,13 +305,9 @@ export default function AllSubmissions() {
                     All Submissions
                   </MDTypography>
                   <MDTypography ml={2} variant="body2">
-                    Welcome to the My Submissions Page! Here, you can manage all
-                    your conference submissions. You can view details of each
-                    submission, including title, authors, status, and date.
-                    Easily update your submissions by clicking the "Edit"
-                    button, download submitted files by clicking "Download
-                    File," and remove a submission by clicking "Delete
-                    Submission" and confirming your action.
+                    Here you can view and manage all submissions.<br></br>
+                    Note: You can only delete submissions if the current phase
+                    of the conference is the submission phase.
                   </MDTypography>
                 </Card>
 
