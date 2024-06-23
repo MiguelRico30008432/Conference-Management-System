@@ -20,7 +20,7 @@ import { FormControlLabel, Checkbox } from "@mui/material";
 import FieldInfo from "OurComponents/ToolTip/FieldInfo";
 
 export default function DefinitionsPage() {
-  const { confID, confPhase } = useContext(ConferenceContext);
+  const { confID } = useContext(ConferenceContext);
   const { isLoggedIn } = useContext(AuthContext);
 
   const currentDate = new Date().toISOString().split("T")[0]; // Valor base para a data minima que o calendário vai mostrar
@@ -28,7 +28,6 @@ export default function DefinitionsPage() {
   const [openLoading, setOpenLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [disabledSaveChanges, setDisabledSaveChanges] = useState(true);
-  const [disabledOptions, setDisabledOptions] = useState(true);
 
   //original value
   const [name, setName] = useState("");
@@ -140,10 +139,7 @@ export default function DefinitionsPage() {
     if (isLoggedIn && confID) {
       getConfData();
     }
-
-    if (confPhase === "Bidding") setDisabledOptions(false);
-    else setDisabledOptions(true);
-  }, [isLoggedIn, confID, confPhase]);
+  }, [isLoggedIn, confID]);
 
   useEffect(() => {
     if (message) {
@@ -432,40 +428,6 @@ export default function DefinitionsPage() {
     return dateToCompare < currentDate;
   }
 
-  async function handleUpdateConflicts() {
-    setOpenLoading(true);
-
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/determineConflicts`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            confid: confID,
-          }),
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-          credentials: "include",
-        }
-      );
-
-      if (response.status === 200) {
-        setMessage(
-          <Alert severity="success">Conflicts list has been updated.</Alert>
-        );
-      }
-    } catch (error) {
-      setMessage(
-        <Alert severity="error">
-          Something went wrong when obtaining your informations
-        </Alert>
-      );
-    }
-    setOpenLoading(false);
-  }
-
-
   const handleKeyDown = (event) => {
     event.preventDefault();
   };
@@ -481,10 +443,12 @@ export default function DefinitionsPage() {
               <MDBox mb={3} textAlign="left">
                 <Card>
                   <MDTypography ml={2} variant="h6">
-                    Definitions
+                    Conference Settings
                   </MDTypography>
                   <MDTypography ml={2} variant="body2">
-                    To edit details from your conference simply click on 'edit'
+                    Here you can edit some settings for your conference,
+                    inclusive the dates to fowartd or backward some specific
+                    phase for your conference.
                   </MDTypography>
                 </Card>
               </MDBox>
@@ -493,21 +457,6 @@ export default function DefinitionsPage() {
                 <Card>{message}</Card>
               </MDBox>
               <MDBox mb={3} textAlign="left">
-                <MDButton
-                  variant="gradient"
-                  color="warning"
-                  onClick={async () => handleUpdateConflicts()}
-                  disabled={disabledOptions}
-                  sx={{
-                    maxWidth: "200px",
-                    maxHeight: "30px",
-                    minWidth: "5px",
-                    minHeight: "30px",
-                    mb: 1,
-                  }}
-                >
-                  Check for Conflicts
-                </MDButton>
                 <Card sx={{ maxWidth: 1400 }}>
                   <MDBox mt={1} mb={1} textAlign="center"></MDBox>
                   <Box component="form" noValidate onSubmit={handleSubmit}>

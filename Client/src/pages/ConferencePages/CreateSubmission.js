@@ -220,7 +220,11 @@ export default function CreateSubmission() {
                         Create Submission
                       </MDTypography>
                       <MDTypography ml={2} variant="body2">
-                        For each author please fill out the form below.
+                        For each author, please fill out the form below. In the
+                        end, click "Submit" to create your submission. If you
+                        need to change something afterward, do not worry, you
+                        can update it on the "My Submissions" page. <br></br>
+                        Atention: We only accept PDF files.
                       </MDTypography>
                     </Card>
 
