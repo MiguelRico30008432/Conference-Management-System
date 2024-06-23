@@ -73,6 +73,16 @@ export default function MyBiddingPage() {
     setOpenLoading(false);
   }
 
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage(null);
+      }, 6000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
   function constructColumns() {
     if (confPhase === "Bidding") {
       setColumns([

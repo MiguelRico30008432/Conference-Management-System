@@ -78,6 +78,16 @@ export default function ConferenceDetails() {
     }
   }, [confID]);
 
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage(null);
+      }, 6000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
   return (
     <>
       {openLoading && <LoadingCircle />}

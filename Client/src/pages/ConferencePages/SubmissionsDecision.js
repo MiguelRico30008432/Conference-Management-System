@@ -38,6 +38,16 @@ export default function SubmissionsDecision() {
     }
   }, [confID, user, confPhase]);
 
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 6000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
   const fetchSubmissions = async () => {
     setOpenLoading(true);
     setError(null);

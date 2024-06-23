@@ -77,6 +77,16 @@ export default function BiddingPage() {
     setOpenLoading(false);
   }
 
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage(null);
+      }, 6000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
   const columns = [
     // Nome da Submission
     { field: "submissiontitle", headerName: "Submission Title", width: 400 },

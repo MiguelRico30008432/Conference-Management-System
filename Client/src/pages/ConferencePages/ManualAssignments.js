@@ -62,6 +62,16 @@ export default function ManualAssignments() {
     }
   }
 
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage(null);
+      }, 6000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
   async function fetchAssignmentsForDelete() {
     setRowsForDelete([]);
     const response = await fetchAPI(

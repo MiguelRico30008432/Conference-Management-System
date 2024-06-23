@@ -22,7 +22,7 @@ export default function SubmissionDetails({
       const response = await fetchAPI(
         "authors",
         "POST",
-        { userID: userid, confID: confid },
+        { confID: confid, submissionID: submission.id },
         setError,
         setOpenLoading
       );

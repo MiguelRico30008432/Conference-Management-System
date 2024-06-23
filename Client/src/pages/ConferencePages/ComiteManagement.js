@@ -60,6 +60,16 @@ export default function ComitteeManagementPage() {
     if (confID > 0) getRows();
   }, [confID]);
 
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 6000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
   const columns = [
     { field: "userfirstname", headerName: "First Name", width: 150 },
     { field: "userlastname", headerName: "Last Name", width: 150 },

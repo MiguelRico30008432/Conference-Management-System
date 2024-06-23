@@ -198,6 +198,8 @@ export default function Conflicts() {
         setMessage(
           <Alert severity="success">Conflicts list has been updated.</Alert>
         );
+        fetchAllConflicts();
+        getInfoForDeclareConflicts();
       }
     } catch (error) {
       setMessage(

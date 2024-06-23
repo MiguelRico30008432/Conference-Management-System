@@ -50,6 +50,16 @@ export default function AllReviews() {
     if (user && confID) fetchReviews();
   }, [confID, user]);
 
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 6000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
   const columns = [
     { field: "submissiontitle", headerName: "Submission Title", width: 300 },
     { field: "submissionadddate", headerName: "Submission Date", width: 150 },

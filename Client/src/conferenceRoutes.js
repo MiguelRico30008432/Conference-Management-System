@@ -146,7 +146,7 @@ const ConfRoutes = [
     type: "title",
     name: "Reviews",
     parentkey: "Reviews",
-    permissions: ["Owner", "Chair", "Committee"],
+    permissions: ["All"],
     icon: "visibility",
   },
   {

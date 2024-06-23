@@ -37,6 +37,16 @@ export default function SendInvitation() {
   const [invitationEmailSuccess, setInvitationEmailSuccess] = useState("");
   const [alreadyInvitedEmails, setAlreadyInvitedEmails] = useState([]);
 
+  useEffect(() => {
+    if (emailError) {
+      const timer = setTimeout(() => {
+        setEmailError(null);
+      }, 6000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [emailError]);
+
   const columns = [
     { field: "recipient", headerName: "Recipient", width: 200 },
     { field: "role", headerName: "Role", width: 200 },
