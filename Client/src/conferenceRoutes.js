@@ -4,7 +4,7 @@ import PageNotFound from "pages/PageNotFound";
 import CreateSubmission from "pages/ConferencePages/CreateSubmission";
 import MySubmissions from "pages/ConferencePages/MySubmissions";
 import AllSubmissions from "pages/ConferencePages/AllSubmissions";
-import MySubmissionReviews from "pages/ConferencePages/MySubmissionReviews";
+
 
 //Bidding
 import Bidding from "pages/ConferencePages/BiddingPage";
@@ -16,6 +16,7 @@ import AutomaticAssignments from "pages/ConferencePages/AutomaticAssignments";
 //Reviews
 import MyReviews from "pages/ConferencePages/MyReviews";
 import AllReviews from "pages/ConferencePages/AllReviews";
+import MySubmissionReviews from "pages/ConferencePages/MySubmissionReviews";
 
 //Emails
 import Compose from "pages/ConferencePages/Compose";

@@ -7,22 +7,22 @@ import MDBox from "components/MDBox";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "OurComponents/footer/Footer";
-import { v4 as uuidv4 } from "uuid";
 import ConferenceNavBar from "OurComponents/navBars/ConferenceNavBar";
 import CompleteTable from "OurComponents/Table/CompleteTable";
-import ReviewsDone from "OurComponents/Info/ReviewsDone";
 import { fetchAPI } from "OurFunctions/fetchAPI";
+import { v4 as uuidv4 } from "uuid";
+import { handleDownload } from "OurFunctions/DownloadFile";
+import MultiReviewsDone from "OurComponents/Info/MultiReviewsDone";
 import { AuthContext } from "auth.context";
 import { ConferenceContext } from "conference.context";
-import { handleDownload } from "OurFunctions/DownloadFile";
 import ModalInfo from "OurComponents/Modal/ModalInfo";
 
-export default function MyReviews() {
-  const { confID, confPhase } = useContext(ConferenceContext);
+export default function MySubmissionReviews() {
+  const { confID } = useContext(ConferenceContext);
   const { user } = useContext(AuthContext);
 
   const [title, setTile] = useState(null);
-  const [assignmentID, setAssignmentID] = useState(null);
+  const [submissionID, setSubmissionID] = useState(null);
   const [rows, setRows] = useState([]);
 
   const [openLoading, setOpenLoading] = useState(false);
@@ -32,7 +32,7 @@ export default function MyReviews() {
   useEffect(() => {
     async function fetchReviews() {
       const response = await fetchAPI(
-        "myReviews",
+        "MySubmissionReviews",
         "POST",
         { userid: user, confid: confID },
         setError,
@@ -47,10 +47,8 @@ export default function MyReviews() {
       }
     }
 
-    if (user && confID && confPhase) {
-      fetchReviews();
-    }
-  }, [confID, user, confPhase]);
+    if (user && confID) fetchReviews();
+  }, [confID, user]);
 
   const columns = [
     { field: "submissiontitle", headerName: "Submission Title", width: 300 },
@@ -107,7 +105,7 @@ export default function MyReviews() {
       sortable: false,
       disableColumnMenu: true,
       resizable: false,
-      width: 70,
+      width: 120,
       renderCell: (params) => {
         return (
           <div
@@ -123,18 +121,18 @@ export default function MyReviews() {
                 variant="gradient"
                 color="info"
                 onClick={() => {
-                  setAssignmentID(params.row.assignmentid);
+                  setSubmissionID(params.row.submissionid);
                   setTile(params.row.submissiontitle);
                   setOpenReview(true);
                 }}
                 sx={{
-                  maxWidth: "70px",
+                  maxWidth: "100px",
                   maxHeight: "23px",
                   minWidth: "30px",
                   minHeight: "23px",
                 }}
               >
-                Review
+                Check Reviews
               </MDButton>
             }
           </div>
@@ -151,11 +149,8 @@ export default function MyReviews() {
         <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
           {openReview ? (
             <ModalInfo open={true} onClose={() => setOpenReview(false)}>
-              <ReviewsDone
-                user={user}
-                confID={confID}
-                confPhase={confPhase}
-                assignmentID={assignmentID}
+              <MultiReviewsDone
+                submissionID={submissionID}
                 title={title}
                 onClose={() => setOpenReview(false)}
               />
@@ -166,11 +161,13 @@ export default function MyReviews() {
                 <MDBox mb={3} textAlign="left">
                   <Card>
                     <MDTypography ml={2} variant="h6">
-                      My Reviews
+                      All Reviews
                     </MDTypography>
                     <MDTypography ml={2} variant="body2">
-                      Here, you as a conference owner you can browse and consult the reviews to your submissions.
-                      <br></br>Gain insights from detailed feedback provided by our reviewers. 
+                    Here as a Owner you can browse and consult all reviews for your
+                      submissions. <br></br>Gain insights from detailed feedback provided
+                      by our reviewers. This resource ensures transparency and
+                      helps maintain the high standards of our conference.
                     </MDTypography>
                   </Card>
                 </MDBox>
@@ -183,7 +180,7 @@ export default function MyReviews() {
                   <CompleteTable
                     columns={columns}
                     rows={rows}
-                    numberOfRowsPerPage={10}
+                    numberOfRowsPerPage={100}
                     height={200}
                   />
                 </Card>

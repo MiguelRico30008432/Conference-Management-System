@@ -15,7 +15,7 @@ router.post("/myReviews", auth.ensureAuthenticated, async (req, res) => {
             Concat(userfirstname, ' ', userlastname) AS username
         FROM ReviewsAssignments
         INNER JOIN submissions ON submissionid = assignmentsubmissionid
-        INNER JOIN users users ON submissionmainauthor = userid
+        INNER JOIN users ON submissionmainauthor = userid
         WHERE 
             assignmentuserid = ${req.body.userid}
         AND assignmentconfid = ${req.body.confid}

@@ -4,7 +4,7 @@ const db = require("../../utility/database");
 const auth = require("../../utility/verifications");
 const log = require("../../logs/logsManagement");
 
-router.post("/AllReviews", auth.ensureAuthenticated, async (req, res) => {
+router.post("/MySubmissionReviews", auth.ensureAuthenticated, async (req, res) => {
   try {
     const result = await db.fetchDataCst(`
         SELECT
@@ -14,16 +14,17 @@ router.post("/AllReviews", auth.ensureAuthenticated, async (req, res) => {
             Concat(userfirstname, ' ', userlastname) AS username
         FROM ReviewsAssignments
         INNER JOIN submissions ON submissionid = assignmentsubmissionid
+        INNER JOIN reviews ON reviewassignmentid = assignmentid
         INNER JOIN users ON submissionmainauthor = userid
         WHERE 
-           assignmentconfid = ${req.body.confid}
+            assignmentconfid = ${req.body.confid}
         GROUP BY
           submissionid, submissiontitle, submissionadddate, userfirstname, userlastname          
         `);
 
     return res.status(200).send(result);
   } catch (error) {
-    log.addLog(error, "myReviews", "AllReviews");
+    log.addLog(error, "MySubmissionReviews", "MySubmissionReviews");
     return res.status(500);
   }
 });
