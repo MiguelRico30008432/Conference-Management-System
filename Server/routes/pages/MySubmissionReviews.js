@@ -13,7 +13,7 @@ router.post("/MySubmissionReviews", auth.ensureAuthenticated, async (req, res) =
             to_char(submissionadddate, 'DD-MM-YYYY') AS submissionadddate,
             Concat(userfirstname, ' ', userlastname) AS username
         FROM ReviewsAssignments
-        INNER JOIN submissions ON submissionid = assignmentsubmissionid
+        INNER JOIN submissions ON submissionid = assignmentsubmissionid AND submissionaccepted = 't'
         INNER JOIN reviews ON reviewassignmentid = assignmentid
         INNER JOIN users ON submissionmainauthor = userid
         WHERE 

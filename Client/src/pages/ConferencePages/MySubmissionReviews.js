@@ -40,6 +40,7 @@ export default function MySubmissionReviews() {
       );
 
       if (response) {
+        console.log(response)
         for (let line of response) {
           line.id = uuidv4();
           setRows((allExistingRows) => [...allExistingRows, line]);
@@ -180,7 +181,7 @@ export default function MySubmissionReviews() {
                   <CompleteTable
                     columns={columns}
                     rows={rows}
-                    numberOfRowsPerPage={100}
+                    numberOfRowsPerPage={10}
                     height={200}
                   />
                 </Card>
