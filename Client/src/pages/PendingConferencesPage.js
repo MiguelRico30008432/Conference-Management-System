@@ -3,21 +3,24 @@ import { useEffect, useState, useContext } from "react";
 import MDButton from "components/MDButton";
 import Alert from "@mui/material/Alert";
 import Card from "@mui/material/Card";
-
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "OurComponents/footer/Footer";
 import UpperNavBar from "OurComponents/navBars/UpperNavBar";
 import CompleteTable from "OurComponents/Table/CompleteTable";
-import MoreDetails from "OurComponents/Info/MoreDetails";
-
+import ConfereceDetails from "OurComponents/Info/ConfereceDetails";
 import { AuthContext } from "../auth.context";
+import { fetchAPI } from "OurFunctions/fetchAPI";
+import ModalInfo from "OurComponents/Modal/ModalInfo";
+import MDBox from "components/MDBox";
 
 export default function PendingConferencesPage() {
+  const { isLoggedIn, isAdmin } = useContext(AuthContext);
+
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [dataForDetails, setDataForDetails] = useState({});
   const [rows, setRow] = useState([]);
   const [error, setError] = useState(null);
-  const { isLoggedIn, isAdmin } = useContext(AuthContext);
+  const [openLoading, setOpenLoading] = useState(false);
 
   useEffect(() => {
     async function getRows() {
@@ -57,32 +60,21 @@ export default function PendingConferencesPage() {
   }, [isLoggedIn]);
 
   async function acceptOrRejectConference(id, accept, owner, name) {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/acceptOrRejectConference`,
-        {
-          method: "POST",
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            confid: id,
-            acceptOrReject: accept,
-            confowner: owner,
-            confname: name,
-          }),
-        }
-      );
-      if (response.ok) {
-        window.location.reload();
-      }
-    } catch (error) {
-      setError(
-        <Alert severity="error">
-          Something went wrong when obtaining the lines
-        </Alert>
-      );
+    const response = await fetchAPI(
+      "acceptOrRejectConference",
+      "POST",
+      {
+        confid: id,
+        acceptOrReject: accept,
+        confowner: owner,
+        confname: name,
+      },
+      setError,
+      setOpenLoading
+    );
+
+    if (response) {
+      window.location.reload();
     }
   }
 
@@ -112,10 +104,10 @@ export default function PendingConferencesPage() {
             color="info"
             onClick={handleMoreDetailsButtonClick}
             sx={{
-              maxWidth: "80px",
-              maxHeight: "30px",
+              maxWidth: "60px",
+              maxHeight: "23px",
               minWidth: "30px",
-              minHeight: "30px",
+              minHeight: "23px",
             }}
           >
             Details
@@ -137,7 +129,7 @@ export default function PendingConferencesPage() {
           await acceptOrRejectConference(
             params.row.id,
             2,
-            params.row.confowner,
+            params.row.confownerid,
             params.row.confname
           );
         };
@@ -156,10 +148,10 @@ export default function PendingConferencesPage() {
               color="success"
               onClick={handleAcceptButtonClick}
               sx={{
-                maxWidth: "80px",
-                maxHeight: "30px",
+                maxWidth: "60px",
+                maxHeight: "23px",
                 minWidth: "30px",
-                minHeight: "30px",
+                minHeight: "23px",
               }}
             >
               Accept
@@ -172,7 +164,7 @@ export default function PendingConferencesPage() {
       field: "Reject",
       filterable: false,
       headerName: "",
-      description: "This column has a button to reject the conference",
+      description: "",
       sortable: false,
       disableColumnMenu: true,
       resizable: false,
@@ -182,7 +174,7 @@ export default function PendingConferencesPage() {
           await acceptOrRejectConference(
             params.row.id,
             1,
-            params.row.confowner,
+            params.row.confownerid,
             params.row.confname
           );
         };
@@ -201,10 +193,10 @@ export default function PendingConferencesPage() {
               color="error"
               onClick={handleRejectButtonClick}
               sx={{
-                maxWidth: "80px",
-                maxHeight: "30px",
+                maxWidth: "60px",
+                maxHeight: "23px",
                 minWidth: "30px",
-                minHeight: "30px",
+                minHeight: "23px",
               }}
             >
               Reject
@@ -217,26 +209,33 @@ export default function PendingConferencesPage() {
 
   return (
     <DashboardLayout>
-      <UpperNavBar />
-      {!detailsOpen ? (
+      <UpperNavBar whereIAm={"Pending Conferences"} />
+      <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
         <>
-          {error}
+          <MDBox mb={3} textAlign="left">
+            <Card>{error}</Card>
+          </MDBox>
+
           <Card>
             <CompleteTable
               columns={columns}
               rows={rows}
-              numerOfRowsPerPage={100}
+              numberOfRowsPerPage={10}
               height={200}
             />
           </Card>
         </>
-      ) : (
-        <MoreDetails
-          text={dataForDetails}
-          onClose={() => setDetailsOpen(false)}
-        />
-      )}
-      <br></br>
+
+        {detailsOpen && (
+          <ModalInfo onClose={() => setDetailsOpen(false)}>
+            <ConfereceDetails
+              text={dataForDetails}
+              displayCloseButton={true}
+              onClose={() => setDetailsOpen(false)}
+            />
+          </ModalInfo>
+        )}
+      </MDBox>
       <Footer />
     </DashboardLayout>
   );

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 
-
 // @mui material components
 import Divider from "@mui/material/Divider";
 import Switch from "@mui/material/Switch";
@@ -36,7 +35,14 @@ export default function NavBarSettings() {
     darkMode,
   } = controller;
   const [disabled, setDisabled] = useState(false);
-  const sidenavColors = ["primary", "dark", "info", "success", "warning", "error"];
+  const sidenavColors = [
+    "primary",
+    "dark",
+    "info",
+    "success",
+    "warning",
+    "error",
+  ];
 
   // Use the useEffect hook to change the button state for the sidenav type based on window size.
   useEffect(() => {
@@ -94,11 +100,15 @@ export default function NavBarSettings() {
     palette: { white, gradients, background },
   }) => ({
     height: pxToRem(39),
-    background: darkMode ? white.main : linearGradient(gradients.dark.main, gradients.dark.state),
+    background: darkMode
+      ? white.main
+      : linearGradient(gradients.dark.main, gradients.dark.state),
     color: darkMode ? background.sidenav : white.main,
 
     "&:hover, &:focus, &:focus:not(:hover)": {
-      background: darkMode ? white.main : linearGradient(gradients.dark.main, gradients.dark.state),
+      background: darkMode
+        ? white.main
+        : linearGradient(gradients.dark.main, gradients.dark.state),
       color: darkMode ? background.sidenav : white.main,
     },
   });
@@ -107,7 +117,7 @@ export default function NavBarSettings() {
     <ConfiguratorRoot variant="permanent" ownerState={{ openConfigurator }}>
       <MDBox
         display="flex"
-        justifyContent="space-between"  
+        justifyContent="space-between"
         alignItems="baseline"
         pt={4}
         pb={0.5}
@@ -153,7 +163,9 @@ export default function NavBarSettings() {
                   width: "24px",
                   height: "24px",
                   padding: 0,
-                  border: `${borderWidth[1]} solid ${darkMode ? background.sidenav : white.main}`,
+                  border: `${borderWidth[1]} solid ${
+                    darkMode ? background.sidenav : white.main
+                  }`,
                   borderColor: () => {
                     let borderColorValue = sidenavColor === color && dark.main;
 
@@ -167,8 +179,14 @@ export default function NavBarSettings() {
                     easing: transitions.easing.sharp,
                     duration: transitions.duration.shorter,
                   }),
-                  backgroundImage: ({ functions: { linearGradient }, palette: { gradients } }) =>
-                    linearGradient(gradients[color].main, gradients[color].state),
+                  backgroundImage: ({
+                    functions: { linearGradient },
+                    palette: { gradients },
+                  }) =>
+                    linearGradient(
+                      gradients[color].main,
+                      gradients[color].state
+                    ),
 
                   "&:not(:last-child)": {
                     mr: 1,
@@ -244,12 +262,7 @@ export default function NavBarSettings() {
           </MDBox>
         </MDBox>
         <Divider />
-        <MDBox display="flex" justifyContent="space-between" alignItems="center" lineHeight={1}>
-          <MDTypography variant="h6">Light / Dark</MDTypography>
 
-          <Switch checked={darkMode} onChange={handleDarkMode} />
-        </MDBox>
-        <Divider />
         <MDBox mt={3} mb={2}>
           <MDButton
             component={Link}

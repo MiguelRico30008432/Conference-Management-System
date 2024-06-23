@@ -5,26 +5,33 @@ export async function fetchAPI(url, method, body, setError, setOpenLoading) {
   setOpenLoading(true);
 
   try {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/${url}`, {
+    const options = {
       method: method,
       headers: {
         "Content-Type": "application/json; charset=UTF-8",
       },
       credentials: "include",
-      body: JSON.stringify(body),
-    });
+    };
+
+    if (method === "POST") {
+      options.body = JSON.stringify(body);
+    }
+
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/${url}`,
+      options
+    );
 
     const jsonResponse = await response.json();
-    if (response.ok) {
-      setOpenLoading(false);
+    setOpenLoading(false);
+    if (response.status === 200) {
       return jsonResponse;
     } else {
       setError(<Alert severity="error">{jsonResponse.msg}</Alert>);
-      setOpenLoading(false);
       return null;
     }
   } catch (error) {
-    setError(<Alert severity="error">{error.message}</Alert>);
+    setError(<Alert severity="error">{error}</Alert>);
     setOpenLoading(false);
     return null;
   }

@@ -29,25 +29,58 @@ router.post("/mySubmissions", auth.ensureAuthenticated, async (req, res) => {
   try {
     const { confID, userID } = req.body;
     const submissions = await db.fetchDataCst(
-      `SELECT 
+      ` SELECT 
             submissions.submissionid AS id, 
             submissions.submissiontitle AS title, 
+            CONCAT(userfirstname,' ',userlastname) AS mainauthor,
             STRING_AGG(CONCAT(CONCAT(a1.authorfirstname,' ',a1.authorlastname), ', ', CONCAT(a2.authorfirstname,' ',a2.authorlastname)), ', ') AS authors,
-            submissions.submissionaccepted AS status,
-            to_char(submissions.submissionadddate, 'DD-MM-YYYY') AS addDate,
+            CASE 
+                WHEN submissions.submissionaccepted = false AND submissions.submissiondecisionmade = true THEN 'Rejected'
+                WHEN submissions.submissionaccepted = true THEN 'Accepted'
+                ELSE 'Pending'
+            END AS status,
+            to_char(submissions.submissionadddate, 'DD-MM-YYYY') AS adddate,
             submissions.submissionabstract AS abstract
         FROM submissions
+        INNER JOIN users on userid = submissionmainauthor
         INNER JOIN authors a1 ON submissions.submissionid = a1.submissionid
-        LEFT JOIN authors a2 ON submissions.submissionid = a2.submissionid AND a2.userid != ${userID}
+        LEFT JOIN authors a2 ON submissions.submissionid = a2.submissionid AND a2.userid !=  ${userID}
         WHERE 
-            a1.userid = ${userID} AND submissions.submissionconfID = ${confID}
+            a1.userid =  ${userID} AND submissions.submissionconfID =  ${confID}
         GROUP BY
             submissions.submissionid,
             submissions.submissiontitle,
             submissions.submissionaccepted,
+            submissions.submissiondecisionmade,
             submissions.submissionadddate,
-            submissions.submissionabstract;`
+            submissions.submissionabstract,
+            userfirstname,
+            userlastname;`
     );
+
+    // If no submissions found, return an empty array
+    if (submissions.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    // Return the fetched data
+    return res.status(200).json(submissions);
+  } catch (error) {
+    log.addLog(error, "database", "MySubmissions -> /submissions");
+    res.status(500).send({ msg: "Error fetching submission data" });
+  }
+});
+
+router.post("/authors", auth.ensureAuthenticated, async (req, res) => {
+  try {
+    const { confID, submissionID } = req.body;
+    const submissions = await db.fetchDataCst(`   
+      SELECT
+        STRING_AGG(CONCAT(a1.authorfirstname,' ',a1.authorlastname), ' ') AS authors
+      FROM submissions
+      INNER JOIN authors a1 ON submissions.submissionid = a1.submissionid
+      WHERE
+        submissions.submissionconfID = ${confID} AND submissions.submissionid = ${submissionID}`);
 
     // If no submissions found, return an empty array
     if (submissions.length === 0) {

@@ -17,6 +17,7 @@ import FormControl from "@mui/material/FormControl";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
 import Footer from "OurComponents/footer/Footer";
 import { FormControlLabel, Checkbox } from "@mui/material";
+import FieldInfo from "OurComponents/ToolTip/FieldInfo";
 
 export default function DefinitionsPage() {
   const { confID } = useContext(ConferenceContext);
@@ -26,7 +27,7 @@ export default function DefinitionsPage() {
 
   const [openLoading, setOpenLoading] = useState(false);
   const [message, setMessage] = useState(null);
-  const [editModeActive, setEditModeActive] = useState(false);
+  const [disabledSaveChanges, setDisabledSaveChanges] = useState(true);
 
   //original value
   const [name, setName] = useState("");
@@ -42,8 +43,6 @@ export default function DefinitionsPage() {
   const [reviewEnd, setReviewEnd] = useState("");
   const [confStart, setConfStart] = useState("");
   const [confEnd, setConfEnd] = useState("");
-  const [minReviewers, setMinReviewers] = useState("");
-  const [maxReviewers, setMaxReviewers] = useState("");
   const [submissionUpdate, setSubmissionUpdate] = useState("");
 
   //new values
@@ -60,8 +59,6 @@ export default function DefinitionsPage() {
   const [newReviewEnd, setNewReviewEnd] = useState("");
   const [newConfStart, setNewConfStart] = useState("");
   const [newConfEnd, setNewConfEnd] = useState("");
-  const [newMinReviewers, setNewMinReviewers] = useState("");
-  const [newMaxReviewers, setNewMaxReviewers] = useState("");
   const [newSubmissionUpdate, setNewSubmissionUpdate] = useState("");
 
   useEffect(() => {
@@ -124,12 +121,6 @@ export default function DefinitionsPage() {
           setConfEnd(formatDate(jsonResponse[0].confenddate));
           setNewConfEnd(formatDate(jsonResponse[0].confenddate));
 
-          setMinReviewers(jsonResponse[0].confminreviewers);
-          setNewMinReviewers(jsonResponse[0].confminreviewers);
-
-          setMaxReviewers(jsonResponse[0].confmaxreviewers);
-          setNewMaxReviewers(jsonResponse[0].confmaxreviewers);
-
           setSubmissionUpdate(jsonResponse[0].confsubupdate);
           setNewSubmissionUpdate(jsonResponse[0].confsubupdate);
         } else {
@@ -150,82 +141,100 @@ export default function DefinitionsPage() {
     }
   }, [isLoggedIn, confID]);
 
-  const formatDate = (dateString) => {
-    try {
-      const date = new Date(dateString);
-      const formattedDate = date.toISOString().split("T")[0];
-      return formattedDate;
-    } catch (error) {
-      return dateString;
-    }
-  };
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage(null);
+      }, 6000);
 
-  function reviewersVerification() {
-    if (newMinReviewers < 1) {
-      setMessage(
-        <Alert severity="error">
-          You must set, at least, 1 reviewer (minimum)
-        </Alert>
-      );
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    if (changesDetected()) setDisabledSaveChanges(false);
+    else setDisabledSaveChanges(true);
+  }, [
+    newName,
+    newWebpage,
+    newCity,
+    newCountry,
+    newContact,
+    newSubmissionsStart,
+    newSubmissionsEnd,
+    newBiddingStart,
+    newBiddingEnd,
+    newReviewStart,
+    newReviewEnd,
+    newConfStart,
+    newConfEnd,
+    newSubmissionUpdate,
+  ]);
+
+  function changesDetected() {
+    if (
+      newName !== name ||
+      newWebpage !== webpage ||
+      newCity !== city ||
+      newCountry !== country ||
+      newContact !== contact ||
+      newSubmissionsStart !== submissionsStart ||
+      newSubmissionsEnd !== submissionsEnd ||
+      newBiddingStart !== biddingStart ||
+      newBiddingEnd !== biddingEnd ||
+      newReviewStart !== reviewStart ||
+      newReviewEnd !== reviewEnd ||
+      newConfStart !== confStart ||
+      newConfEnd !== confEnd ||
+      newSubmissionUpdate !== submissionUpdate
+    ) {
+      return true;
+    } else {
       return false;
     }
-    if (newMaxReviewers > 10) {
-      setMessage(
-        <Alert severity="error">
-          You must not set more than 10 reviewers (maximum)
-        </Alert>
-      );
-      return false;
-    }
-    if (newMaxReviewers < newMinReviewers) {
-      setMessage(
-        <Alert severity="error">
-          Maximum number of reviewers cannot be lower than the minimum number of
-          reviewers
-        </Alert>
-      );
-      return false;
-    }
-    return true;
+  }
+
+  function addDays(date, days) {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return formatDate(result);
+  }
+
+  function formatDate(date) {
+    const d = new Date(date);
+    let month = "" + (d.getMonth() + 1);
+    let day = "" + d.getDate();
+    const year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
-    if (
-      makeRequest() &&
-      valideInputs() &&
-      datesBetweenStarEndVerifications() &&
-      reviewersVerification()
-    ) {
-      setEditModeActive(false);
+    if (valideInputs() && datesBetweenStarEndVerifications()) {
       await saveUserData();
+      saveDefaultValues();
     }
   }
 
-  function makeRequest() {
-    if (
-      name !== newName ||
-      webpage !== newWebpage ||
-      city !== newCity ||
-      country !== newCountry ||
-      contact !== newContact ||
-      submissionsStart !== newSubmissionsStart ||
-      submissionsEnd !== newSubmissionsEnd ||
-      biddingStart !== newBiddingStart ||
-      biddingEnd !== newBiddingEnd ||
-      reviewStart !== newReviewStart ||
-      reviewEnd !== newReviewEnd ||
-      confStart !== newConfStart ||
-      confEnd !== newConfEnd ||
-      minReviewers !== newMinReviewers ||
-      maxReviewers !== newMaxReviewers ||
-      submissionUpdate !== newSubmissionUpdate
-    ) {
-      return true;
-    } else {
-      setMessage(<Alert severity="error">No changes were registered!</Alert>);
-      return false;
-    }
+  function saveDefaultValues() {
+    setName(newName);
+    setCity(newCity);
+    setCountry(newCountry);
+    setContact(newContact);
+    setSubmissionStart(newSubmissionsStart);
+    setSubmissionEnd(newSubmissionsEnd);
+    setBiddingStart(newBiddingStart);
+    setSubmissionEnd(newBiddingEnd);
+    setReviewStart(newReviewStart);
+    setReviewEnd(newReviewEnd);
+    setConfStart(newConfStart);
+    setConfEnd(newConfEnd);
+    setSubmissionUpdate(newSubmissionUpdate);
+    setDisabledSaveChanges(true);
   }
 
   function valideInputs() {
@@ -243,8 +252,6 @@ export default function DefinitionsPage() {
       newConfStart === "" ||
       newConfEnd === "" ||
       newReviewEnd === "" ||
-      newMinReviewers === "" ||
-      newMaxReviewers === "" ||
       newSubmissionUpdate === ""
     ) {
       setMessage(
@@ -278,8 +285,6 @@ export default function DefinitionsPage() {
             confendreview: newReviewEnd,
             confstartdate: newConfStart,
             confenddate: newConfEnd,
-            confminreviewers: newMinReviewers,
-            confmaxreviewers: newMaxReviewers,
             confsubupdate: newSubmissionUpdate,
           }),
           headers: {
@@ -311,8 +316,6 @@ export default function DefinitionsPage() {
         setReviewEnd(newReviewEnd);
         setConfStart(newConfStart);
         setConfEnd(newConfEnd);
-        setMinReviewers(newMinReviewers);
-        setMaxReviewers(newMaxReviewers);
         setSubmissionUpdate(newSubmissionUpdate);
       } else {
         setMessage(<Alert severity="error">{jsonResponse.msg}</Alert>);
@@ -425,443 +428,347 @@ export default function DefinitionsPage() {
     return dateToCompare < currentDate;
   }
 
-  function addOneDay(dateToAdd) {
-    const date = new Date(dateToAdd);
-    date.setDate(date.getDate() + 1);
-    const updatedDate = formatDate(date);
-    return updatedDate;
-  }
-
-  async function handleUpdateConflicts() {
-    setOpenLoading(true);
-
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/determineConflicts`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            confid: confID,
-          }),
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-          credentials: "include",
-        }
-      );
-
-      if (response.status === 200) {
-        setMessage(
-          <Alert severity="success">Conflicts list has been updated.</Alert>
-        );
-      }
-    } catch (error) {
-      setMessage(
-        <Alert severity="error">
-          Something went wrong when obtaining your informations
-        </Alert>
-      );
-    }
-    setOpenLoading(false);
-  }
-
-  async function handleAssignmentAlgorithm() {
-    setOpenLoading(true);
-
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/reviewsAssignmentsAlgorithm`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            confid: confID,
-          }),
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-          credentials: "include",
-        }
-      );
-
-      if (response.status === 200) {
-        setMessage(
-          <Alert severity="success">
-            Reviews Assignments list has been updated.
-          </Alert>
-        );
-      }
-    } catch (error) {
-      setMessage(
-        <Alert severity="error">
-          Something went wrong running the algorithm
-        </Alert>
-      );
-    }
-
-    setOpenLoading(false);
-  }
+  const handleKeyDown = (event) => {
+    event.preventDefault();
+  };
 
   return (
     <>
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
         <ConfNavbar />
-        <Container maxWidth="sm">
-          <MDBox mt={10} mb={2} textAlign="left">
-            <MDBox mb={3} textAlign="left">
-              <Card>
-                <MDTypography ml={2} variant="h6">
-                  Definitions
-                </MDTypography>
-                <MDTypography ml={2} variant="body2">
-                  To edit details from your conference simply click on 'edit'
-                </MDTypography>
-              </Card>
-            </MDBox>
+        <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <Container maxWidth="sm">
+            <MDBox mt={10} mb={2} textAlign="left">
+              <MDBox mb={3} textAlign="left">
+                <Card>
+                  <MDTypography ml={2} variant="h6">
+                    Conference Settings
+                  </MDTypography>
+                  <MDTypography ml={2} variant="body2">
+                    Here you can edit some settings for your conference,
+                    inclusive the dates to fowartd or backward some specific
+                    phase for your conference.
+                  </MDTypography>
+                </Card>
+              </MDBox>
 
-            {message}
-
-            <MDBox mb={3} textAlign="left">
-              <MDButton
-                variant="gradient"
-                color="info"
-                sx={{ mt: 2, mb: 2 }}
-                onClick={() => {
-                  setEditModeActive(true);
-                  setMessage(null);
-                }}
-              >
-                Edit Conference Definitions
-              </MDButton>
-
-              <MDButton
-                variant="gradient"
-                color="success"
-                onClick={async () => handleUpdateConflicts()}
-                sx={{
-                  maxWidth: "300px",
-                  maxHeight: "100px",
-                  minWidth: "5px",
-                  minHeight: "30px",
-                  mt: 2,
-                  mb: 2,
-                  ml: 2,
-                }}
-              >
-                Check for Conflicts
-              </MDButton>
-
-              <MDButton
-                variant="gradient"
-                color="success"
-                onClick={async () => handleAssignmentAlgorithm()}
-                sx={{
-                  maxWidth: "300px",
-                  maxHeight: "100px",
-                  minWidth: "5px",
-                  minHeight: "30px",
-                  mt: 2,
-                  mb: 2,
-                  ml: 2,
-                }}
-              >
-                Run Review Assignment Algorithm
-              </MDButton>
-
-              <Card sx={{ maxWidth: 1400 }}>
-                <MDBox mt={1} mb={1} textAlign="center"></MDBox>
-                <Box component="form" noValidate onSubmit={handleSubmit}>
-                  <Grid container spacing={1}>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        name="confname"
-                        required
-                        fullWidth
-                        id="confname"
-                        label="Conference Name"
-                        autoFocus
-                        InputLabelProps={{ shrink: true }}
-                        value={newName}
-                        onChange={(e) => setNewName(e.target.value)}
-                        disabled={!editModeActive}
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        fullWidth
-                        id="confwebpage"
-                        label="Conference Web Page"
-                        name="confwebpage"
-                        InputLabelProps={{ shrink: true }}
-                        value={newWebpage}
-                        onChange={(e) => setNewWebpage(e.target.value)}
-                        disabled={!editModeActive}
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confcity"
-                        label="City"
-                        name="confcity"
-                        InputLabelProps={{ shrink: true }}
-                        value={newCity}
-                        onChange={(e) => setNewCity(e.target.value)}
-                        disabled={!editModeActive}
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confcountry"
-                        label="Country"
-                        name="confcountry"
-                        InputLabelProps={{ shrink: true }}
-                        value={newCountry}
-                        onChange={(e) => setNewCountry(e.target.value)}
-                        disabled={!editModeActive}
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confcontact"
-                        label="Support Contact"
-                        name="confcontact"
-                        InputLabelProps={{ shrink: true }}
-                        value={newContact}
-                        disabled={!editModeActive}
-                        onChange={(e) => setNewContact(e.target.value)}
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <FormControl fullWidth>
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              checked={newSubmissionUpdate}
-                              onChange={(e) =>
-                                setNewSubmissionUpdate(e.target.checked)
-                              }
-                              disabled={!editModeActive}
-                              sx={{ ml: -1 }}
-                            />
-                          }
-                          label="Submissions Update"
-                          sx={{
-                            ml: 2,
-                            mt: 2,
-                            width: "90%",
-                            alignItems: "center",
-                            "& .MuiFormControlLabel-label": {
-                              fontWeight: "normal",
-                            },
-                          }}
+              <MDBox mb={2} textAlign="left">
+                <Card>{message}</Card>
+              </MDBox>
+              <MDBox mb={3} textAlign="left">
+                <Card sx={{ maxWidth: 1400 }}>
+                  <MDBox mt={1} mb={1} textAlign="center"></MDBox>
+                  <Box component="form" noValidate onSubmit={handleSubmit}>
+                    <Grid container spacing={1}>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          name="confname"
+                          required
+                          fullWidth
+                          id="confname"
+                          label="Conference Name"
+                          autoFocus
+                          InputLabelProps={{ shrink: true }}
+                          value={newName}
+                          onChange={(e) => setNewName(e.target.value)}
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
                         />
-                      </FormControl>
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          fullWidth
+                          id="confwebpage"
+                          label="Conference Web Page"
+                          name="confwebpage"
+                          InputLabelProps={{ shrink: true }}
+                          value={newWebpage}
+                          onChange={(e) => setNewWebpage(e.target.value)}
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confcity"
+                          label="City"
+                          name="confcity"
+                          InputLabelProps={{ shrink: true }}
+                          value={newCity}
+                          onChange={(e) => setNewCity(e.target.value)}
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confcountry"
+                          label="Country"
+                          name="confcountry"
+                          InputLabelProps={{ shrink: true }}
+                          value={newCountry}
+                          onChange={(e) => setNewCountry(e.target.value)}
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confcontact"
+                          label="Support Contact"
+                          name="confcontact"
+                          InputLabelProps={{ shrink: true }}
+                          value={newContact}
+                          onChange={(e) => setNewContact(e.target.value)}
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <FieldInfo
+                          text={
+                            "With this check, all submissions can be updated"
+                          }
+                        >
+                          <FormControl fullWidth>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={newSubmissionUpdate}
+                                  onChange={(e) =>
+                                    setNewSubmissionUpdate(e.target.checked)
+                                  }
+                                  sx={{ ml: -1 }}
+                                />
+                              }
+                              label="Submissions Update"
+                              sx={{
+                                ml: 2,
+                                mt: 2,
+                                width: "90%",
+                                alignItems: "center",
+                                "& .MuiFormControlLabel-label": {
+                                  fontWeight: "normal",
+                                },
+                              }}
+                            />
+                          </FormControl>
+                        </FieldInfo>
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confstartsubmission"
+                          label="Submissions Start Date"
+                          name="confstartsubmission"
+                          type="date"
+                          InputLabelProps={{ shrink: true }}
+                          inputProps={{ min: currentDate }}
+                          value={newSubmissionsStart}
+                          disabled={isDatePast(submissionsStart)}
+                          onChange={(e) =>
+                            setNewSubmissionStart(formatDate(e.target.value))
+                          }
+                          onKeyDown={handleKeyDown}
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confendsubmission"
+                          label="Submissions End Date"
+                          name="confendsubmission"
+                          type="date"
+                          InputLabelProps={{ shrink: true }}
+                          inputProps={{
+                            min:
+                              addDays(newSubmissionsStart, 1) > currentDate
+                                ? addDays(newSubmissionsStart, 1)
+                                : currentDate,
+                          }}
+                          value={newSubmissionsEnd}
+                          disabled={isDatePast(submissionsEnd)}
+                          onChange={(e) =>
+                            setNewSubmissionEnd(formatDate(e.target.value))
+                          }
+                          onKeyDown={handleKeyDown}
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confstartbidding"
+                          label="Bidding Start Date"
+                          name="confstartbidding"
+                          type="date"
+                          InputLabelProps={{ shrink: true }}
+                          inputProps={{
+                            min:
+                              addDays(newSubmissionsEnd, 1) > currentDate
+                                ? addDays(newSubmissionsEnd, 1)
+                                : currentDate,
+                          }}
+                          value={newBiddingStart}
+                          disabled={isDatePast(biddingStart)}
+                          onChange={(e) =>
+                            setNewBiddingStart(formatDate(e.target.value))
+                          }
+                          onKeyDown={handleKeyDown}
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confendbidding"
+                          label="Bidding End Date"
+                          name="confendbidding"
+                          type="date"
+                          InputLabelProps={{ shrink: true }}
+                          inputProps={{
+                            min:
+                              addDays(newBiddingStart, 1) > currentDate
+                                ? addDays(newBiddingStart, 1)
+                                : currentDate,
+                          }}
+                          value={newBiddingEnd}
+                          disabled={isDatePast(biddingEnd)}
+                          onChange={(e) =>
+                            setNewBiddingEnd(formatDate(e.target.value))
+                          }
+                          onKeyDown={handleKeyDown}
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confstartreview"
+                          label="Reviews Start Date"
+                          name="confstartreview"
+                          type="date"
+                          InputLabelProps={{ shrink: true }}
+                          inputProps={{
+                            min:
+                              addDays(newBiddingEnd, 1) > currentDate
+                                ? addDays(newBiddingEnd, 1)
+                                : currentDate,
+                          }}
+                          value={newReviewStart}
+                          disabled={isDatePast(reviewStart)}
+                          onChange={(e) =>
+                            setNewReviewStart(formatDate(e.target.value))
+                          }
+                          onKeyDown={handleKeyDown}
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confendreview"
+                          label="Reviews End Date"
+                          name="confendreview"
+                          type="date"
+                          InputLabelProps={{ shrink: true }}
+                          inputProps={{
+                            min:
+                              addDays(newReviewStart, 1) > currentDate
+                                ? addDays(newReviewStart, 1)
+                                : currentDate,
+                          }}
+                          value={newReviewEnd}
+                          disabled={isDatePast(reviewEnd)}
+                          onChange={(e) =>
+                            setNewReviewEnd(formatDate(e.target.value))
+                          }
+                          onKeyDown={handleKeyDown}
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confstartdate"
+                          label="Conferance Start Date"
+                          name="confstartdate"
+                          type="date"
+                          InputLabelProps={{ shrink: true }}
+                          inputProps={{
+                            min:
+                              addDays(newReviewEnd, 1) > currentDate
+                                ? addDays(newReviewEnd, 1)
+                                : currentDate,
+                          }}
+                          value={newConfStart}
+                          disabled={isDatePast(confStart)}
+                          onChange={(e) =>
+                            setNewConfStart(formatDate(e.target.value))
+                          }
+                          onKeyDown={handleKeyDown}
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          required
+                          fullWidth
+                          id="confenddate"
+                          label="Conference End Date"
+                          name="confenddate"
+                          type="date"
+                          InputLabelProps={{ shrink: true }}
+                          inputProps={{
+                            min:
+                              addDays(newConfStart, 1) > currentDate
+                                ? addDays(newConfStart, 1)
+                                : currentDate,
+                          }}
+                          value={newConfEnd}
+                          disabled={isDatePast(confEnd)}
+                          onChange={(e) =>
+                            setNewConfEnd(formatDate(e.target.value))
+                          }
+                          onKeyDown={handleKeyDown}
+                          sx={{ ml: 2, mt: 2, width: "90%" }}
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confstartsubmission"
-                        label="Submissions Start Date"
-                        name="confstartsubmission"
-                        type="date"
-                        InputLabelProps={{ shrink: true }}
-                        inputProps={{ min: currentDate }}
-                        value={newSubmissionsStart}
-                        disabled={
-                          !editModeActive || isDatePast(submissionsStart)
-                        }
-                        onChange={(e) =>
-                          setNewSubmissionStart(formatDate(e.target.value))
-                        }
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confendsubmission"
-                        label="Submissions End Date"
-                        name="confendsubmission"
-                        type="date"
-                        InputLabelProps={{ shrink: true }}
-                        inputProps={{ min: addOneDay(newSubmissionsStart) }}
-                        value={newSubmissionsEnd}
-                        disabled={!editModeActive || isDatePast(submissionsEnd)}
-                        onChange={(e) =>
-                          setNewSubmissionEnd(formatDate(e.target.value))
-                        }
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confstartbidding"
-                        label="Bidding Start Date"
-                        name="confstartbidding"
-                        type="date"
-                        InputLabelProps={{ shrink: true }}
-                        inputProps={{ min: addOneDay(newSubmissionsEnd) }}
-                        value={newBiddingStart}
-                        disabled={!editModeActive || isDatePast(biddingStart)}
-                        onChange={(e) =>
-                          setNewBiddingStart(formatDate(e.target.value))
-                        }
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confendbidding"
-                        label="Bidding End Date"
-                        name="confendbidding"
-                        type="date"
-                        InputLabelProps={{ shrink: true }}
-                        inputProps={{ min: addOneDay(newBiddingStart) }}
-                        value={newBiddingEnd}
-                        disabled={!editModeActive || isDatePast(biddingEnd)}
-                        onChange={(e) =>
-                          setNewBiddingEnd(formatDate(e.target.value))
-                        }
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confstartreview"
-                        label="Reviews Start Date"
-                        name="confstartreview"
-                        type="date"
-                        InputLabelProps={{ shrink: true }}
-                        inputProps={{ min: addOneDay(newBiddingEnd) }}
-                        value={newReviewStart}
-                        disabled={!editModeActive || isDatePast(reviewStart)}
-                        onChange={(e) =>
-                          setNewReviewStart(formatDate(e.target.value))
-                        }
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confendreview"
-                        label="Reviews End Date"
-                        name="confendreview"
-                        type="date"
-                        InputLabelProps={{ shrink: true }}
-                        inputProps={{ min: addOneDay(newReviewStart) }}
-                        value={newReviewEnd}
-                        disabled={!editModeActive || isDatePast(reviewEnd)}
-                        onChange={(e) =>
-                          setNewReviewEnd(formatDate(e.target.value))
-                        }
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confstartdate"
-                        label="Conferance Start Date"
-                        name="confstartdate"
-                        type="date"
-                        InputLabelProps={{ shrink: true }}
-                        inputProps={{ min: addOneDay(newReviewEnd) }}
-                        value={newConfStart}
-                        disabled={!editModeActive || isDatePast(confStart)}
-                        onChange={(e) =>
-                          setNewConfStart(formatDate(e.target.value))
-                        }
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confenddate"
-                        label="Conference End Date"
-                        name="confenddate"
-                        type="date"
-                        InputLabelProps={{ shrink: true }}
-                        inputProps={{ min: addOneDay(newConfStart) }}
-                        value={newConfEnd}
-                        disabled={!editModeActive || isDatePast(confEnd)}
-                        onChange={(e) =>
-                          setNewConfEnd(formatDate(e.target.value))
-                        }
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confminreviewers"
-                        label="Minimun Number of Reviews"
-                        name="confminreviewers"
-                        InputLabelProps={{ shrink: true }}
-                        value={newMinReviewers}
-                        disabled={!editModeActive}
-                        onChange={(e) => setNewMinReviewers(e.target.value)}
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={5}>
-                      <TextField
-                        required
-                        fullWidth
-                        id="confmaxreviewers"
-                        label="Maximum Number of Reviews"
-                        name="confmaxreviewers"
-                        InputLabelProps={{ shrink: true }}
-                        value={newMaxReviewers}
-                        disabled={!editModeActive}
-                        onChange={(e) => setNewMaxReviewers(e.target.value)}
-                        sx={{ ml: 2, mt: 2, width: "90%" }}
-                      />
-                    </Grid>
-                  </Grid>
-                  <MDButton
-                    type="submit"
-                    variant="gradient"
-                    color="info"
-                    sx={{
-                      ml: 2,
-                      mt: 2,
-                      mb: 2,
-                      display: editModeActive ? "block" : "none",
-                    }}
-                  >
-                    Save Changes
-                  </MDButton>
-                  <MDBox mt={3} mb={1} textAlign="center"></MDBox>
-                </Box>
-              </Card>
+                    <MDButton
+                      type="submit"
+                      variant="gradient"
+                      color="success"
+                      sx={{
+                        maxWidth: "200px",
+                        maxHeight: "30px",
+                        minWidth: "5px",
+                        minHeight: "30px",
+                        ml: 2,
+                        mt: 2,
+                        mt: 2,
+                      }}
+                      disabled={disabledSaveChanges}
+                    >
+                      Save Changes
+                    </MDButton>
+                    <MDBox mt={3} mb={1} textAlign="center"></MDBox>
+                  </Box>
+                </Card>
+              </MDBox>
             </MDBox>
-          </MDBox>
-        </Container>
+          </Container>
+        </MDBox>
         <Footer />
       </DashboardLayout>
     </>

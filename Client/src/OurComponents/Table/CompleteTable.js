@@ -2,33 +2,40 @@ import * as React from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { useState } from "react";
 import Card from "@mui/material/Card";
+import MDButton from "@mui/material/Button"; // Certifique-se de que o MDButton é importado corretamente
 
 export default function CompleteTable({
   columns,
   rows,
   withCheckBoxSelection = false,
   height,
-  width = "100%",
   rowHeight = 41,
-  numerOfRowsPerPage = 5,
+  numberOfRowsPerPage = 5,
 }) {
   const [selectedRows, setSelectedRows] = useState([]);
+
+  // Ajusta a largura das colunas consoante a resolução do ecrã, mas nunca fica menos que o seu minWidth
+  const columnsWithFlexAndMinWidth = columns.map((column) => ({
+    ...column,
+    flex: 1,
+    minWidth: column.width,
+  }));
 
   return (
     <>
       <Card>
         <div
-          style={{ height: rows.length > 0 ? "100%" : height, width: width }}
+          style={{ height: rows.length > 0 ? "100%" : height, width: "100%" }}
         >
           <DataGrid
             rows={rows}
-            columns={columns}
+            columns={columnsWithFlexAndMinWidth}
             initialState={{
               pagination: {
-                paginationModel: { page: 0, pageSize: numerOfRowsPerPage },
+                paginationModel: { page: 0, pageSize: numberOfRowsPerPage },
               },
             }}
-            pageSizeOptions={[10, 50, { value: 100, label: "100" }]}
+            pageSizeOptions={[5, 10, 50, 100]}
             checkboxSelection={withCheckBoxSelection}
             onRowSelectionModelChange={
               withCheckBoxSelection ? (itm) => setSelectedRows(itm) : null
@@ -42,12 +49,19 @@ export default function CompleteTable({
                 fontWeight: 11,
                 fontSize: "0.875rem",
               },
+              // cabeçalho da coluna ao focar
+              "& .MuiDataGrid-columnHeader:focus": {
+                outline: "none",
+              },
               // linhas
               "& .MuiDataGrid-cell": {
                 backgroundColor: "white",
                 color: "#1F4576",
                 fontWeight: 11,
                 fontSize: "0.875rem",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
               },
               // contorno aquando a seleção da célula
               "& .MuiDataGrid-cell.MuiDataGrid-cell:focus": {

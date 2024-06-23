@@ -147,10 +147,9 @@ export default function CallForPapers() {
     <>
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
-        <UpperNavBar />
-
-        <MDBox mt={2} mb={2} textAlign="left">
-          <MDBox mb={3} textAlign="left">
+        <UpperNavBar whereIAm={"Call For Papers"} />
+        <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <MDBox mt={2} textAlign="left">
             <Card>
               <MDTypography ml={2} mt={1} variant="h6">
                 Call For Papers
@@ -175,13 +174,12 @@ export default function CallForPapers() {
               <CompleteTable
                 columns={columns}
                 rows={rows}
-                numerOfRowsPerPage={100}
+                numberOfRowsPerPage={100}
                 height={200}
               />
             </Card>
           </MDBox>
         </MDBox>
-
         <Footer />
       </DashboardLayout>
     </>

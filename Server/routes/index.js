@@ -25,7 +25,10 @@ const bidding = require("./pages/Bidding");
 const myBiddings = require("./pages/MyBiddings");
 const myReviews = require("./pages/MyReviews");
 const allReviews = require("./pages/AllReviews");
+const mySubmissionReviews = require("./pages/MySubmissionReviews");
 const submissionsDecision = require("./pages/SubmissionsDecision");
+const manualAssignments = require("./pages/ManualAssignments");
+const AutomaticAssignments = require("./pages/AutomaticAssignments");
 
 router.use(fileUpload());
 
@@ -52,6 +55,9 @@ router.use(bidding);
 router.use(myBiddings);
 router.use(myReviews);
 router.use(allReviews);
+router.use(mySubmissionReviews)
 router.use(submissionsDecision);
+router.use(manualAssignments);
+router.use(AutomaticAssignments);
 
 module.exports = router;

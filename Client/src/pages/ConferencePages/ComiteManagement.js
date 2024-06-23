@@ -17,9 +17,12 @@ import { FormControl, MenuItem, Select } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
+import ModalInfo from "OurComponents/Modal/ModalInfo";
+import CommitteeInfo from "OurComponents/Info/CommitteeInfo";
+import { fetchAPI } from "OurFunctions/fetchAPI";
 
 export default function ComitteeManagementPage() {
-  const { confID, userRole } = useContext(ConferenceContext);
+  const { confID, userRole, confPhase } = useContext(ConferenceContext);
   const { user } = useContext(AuthContext);
 
   const [infoOpen, setInfoOpen] = useState(false);
@@ -38,50 +41,34 @@ export default function ComitteeManagementPage() {
 
   useEffect(() => {
     async function getRows() {
-      setOpenLoading(true);
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/comite`,
-          {
-            method: "POST",
-            body: JSON.stringify({ confid: confID }),
-            headers: {
-              "Content-type": "application/json; charset=UTF-8",
-            },
-            credentials: "include",
-          }
-        );
+      const response = await fetchAPI(
+        "comite",
+        "POST",
+        { confid: confID },
+        setError,
+        setOpenLoading
+      );
 
-        const jsonResponse = await response.json();
-
-        if (response.status === 200) {
-          for (let line of jsonResponse) {
-            line.id = uuidv4();
-            setRow((allExistingRows) => [...allExistingRows, line]);
-          }
-        } else {
-          setError(<Alert severity="error">{jsonResponse.msg}</Alert>);
+      if (response) {
+        for (let line of response) {
+          line.id = uuidv4();
+          setRow((allExistingRows) => [...allExistingRows, line]);
         }
-      } catch (error) {
-        setError(
-          <Alert severity="error">
-            Something went wrong when obtaining the lines
-          </Alert>
-        );
       }
-      setOpenLoading(false);
     }
 
-    if (confID > 0) {
-      if (userRole.includes("Chair") || userRole.includes("Owner")) {
-        getRows();
-      } else {
-        setError(
-          <Alert severity="error">User does not have permissions</Alert>
-        );
-      }
-    }
+    if (confID > 0) getRows();
   }, [confID]);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 6000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   const columns = [
     { field: "userfirstname", headerName: "First Name", width: 150 },
@@ -118,10 +105,10 @@ export default function ComitteeManagementPage() {
                 setInfoOpen(true);
               }}
               sx={{
-                maxWidth: "20px",
-                maxHeight: "30px",
+                maxWidth: "10px",
+                maxHeight: "20px",
                 minWidth: "5px",
-                minHeight: "30px",
+                minHeight: "5px",
               }}
             >
               Info
@@ -164,10 +151,10 @@ export default function ComitteeManagementPage() {
                 setEditOpen(true);
               }}
               sx={{
-                maxWidth: "20px",
-                maxHeight: "30px",
+                maxWidth: "10px",
+                maxHeight: "20px",
                 minWidth: "5px",
-                minHeight: "30px",
+                minHeight: "5px",
               }}
             >
               Edit
@@ -186,7 +173,12 @@ export default function ComitteeManagementPage() {
       resizable: false,
       width: 110,
       renderCell: (params) => {
-        if (params.row.userid === user || params.row.userrole === "Owner")
+        if (
+          params.row.userid === user ||
+          params.row.userrole === "Owner" ||
+          confPhase !== "Submission" ||
+          confPhase !== "Configuration"
+        )
           return null;
 
         return (
@@ -207,9 +199,9 @@ export default function ComitteeManagementPage() {
               }}
               sx={{
                 maxWidth: "100px",
-                maxHeight: "30px",
-                minWidth: "30px",
-                minHeight: "30px",
+                maxHeight: "20px",
+                minWidth: "5px",
+                minHeight: "5px",
               }}
             >
               Remove User
@@ -288,224 +280,166 @@ export default function ComitteeManagementPage() {
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
         <ConfNavbar />
-        <Container maxWidth="sm">
-          {/*Mensagem de erro*/}
-          <PopUpWithMessage
-            open={popMessage}
-            handleClose={() => setPopMessage(false)}
-            handleConfirm={async () => {
-              await deleteMember();
-              setPopMessage(false);
-            }}
-            affirmativeButtonName={"Yes, I'm Sure"}
-            negativeButtonName={"Cancel"}
-            title={"Confirm Remove Member?"}
-            text={"Are you sure you want to remove the selected user?"}
-          />
+        <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <Container maxWidth="sm">
+            {/*Mensagem de erro*/}
+            <PopUpWithMessage
+              open={popMessage}
+              handleClose={() => setPopMessage(false)}
+              handleConfirm={async () => {
+                await deleteMember();
+                setPopMessage(false);
+              }}
+              affirmativeButtonName={"Yes, I'm Sure"}
+              negativeButtonName={"Cancel"}
+              title={"Confirm Remove Member?"}
+              text={"Are you sure you want to remove the selected user?"}
+            />
 
-          <MDBox mt={10} mb={2} textAlign="left">
-            <MDBox mb={3} textAlign="left">
-              <Card>
-                <MDTypography ml={2} variant="h6">
-                  Committee Management
-                </MDTypography>
-                <MDTypography ml={2} variant="body2">
-                  To access additional details, modify roles, or remove a PC
-                  member, simply click on 'info', 'edit', or 'remove user'
-                </MDTypography>
-              </Card>
-            </MDBox>
-
-            <MDBox mb={3} textAlign="left">
-              <Card>{error}</Card>
-            </MDBox>
-
-            {/* Tabela principal */}
-            <MDBox mb={3}>
-              <Card>
-                <CompleteTable
-                  columns={columns}
-                  rows={rows}
-                  numerOfRowsPerPage={5}
-                  height={350}
-                />
-              </Card>
-            </MDBox>
-
-            {/* Quanto info for clicado */}
-            {infoOpen && (
-              <MDBox mb={3}>
+            <MDBox mt={10} mb={2} textAlign="left">
+              <MDBox mb={3} textAlign="left">
                 <Card>
-                  <MDTypography ml={2} mb={2} mt={2} variant="h6">
-                    Information about {memberName}
+                  <MDTypography ml={2} variant="h6">
+                    Committee Management
                   </MDTypography>
-
-                  <MDBox ml={2} mb={1}>
-                    <MDTypography variant="body2">
-                      <b>First name: </b>
-                      {memberInfoData.userfirstname}
-                    </MDTypography>
-
-                    <MDTypography variant="body2">
-                      <b>Last name: </b> {memberInfoData.userlastname}
-                    </MDTypography>
-
-                    <MDTypography variant="body2">
-                      <b>Email: </b> {memberInfoData.useremail}
-                    </MDTypography>
-
-                    <MDTypography variant="body2">
-                      <b>Phone: </b> {memberInfoData.userphone}
-                    </MDTypography>
-
-                    <MDTypography variant="body2">
-                      <b>Affiliation: </b> {memberInfoData.useraffiliation}
-                    </MDTypography>
-
-                    <MDTypography variant="body2">
-                      <b>Created Date: </b> {memberInfoData.useradddate}
-                    </MDTypography>
-
-                    <MDTypography mt={2} variant="body2">
-                      <b>Submitted papers:</b>
-                    </MDTypography>
-                    <MDTypography variant="body2">Missing Info</MDTypography>
-
-                    <MDTypography variant="body2">
-                      <b>Assigned submissions:</b>
-                    </MDTypography>
-                    <MDTypography variant="body2">Missing Info</MDTypography>
-
-                    <MDTypography variant="body2">
-                      <b>Bidding:</b>
-                    </MDTypography>
-
-                    <MDTypography variant="body2">Missing Info</MDTypography>
-
-                    <MDTypography variant="body2">
-                      <b>Reviewed submissions:</b>
-                    </MDTypography>
-
-                    <MDTypography variant="body2">Missing Info</MDTypography>
-
-                    <MDTypography variant="body2">
-                      <b>Conflict list:</b>
-                    </MDTypography>
-
-                    <MDTypography variant="body2">Missing Info</MDTypography>
-                  </MDBox>
-
-                  <MDButton
-                    variant="gradient"
-                    color="info"
-                    onClick={() => setInfoOpen(false)}
-                    sx={{
-                      maxWidth: "20px",
-                      maxHeight: "30px",
-                      minWidth: "5px",
-                      minHeight: "30px",
-                      mt: 1,
-                      ml: 2,
-                      mb: 2,
-                    }}
-                  >
-                    Close
-                  </MDButton>
+                  <MDTypography ml={2} variant="body2">
+                    To access additional details, modify roles, or remove a PC
+                    member, simply click on 'info', 'edit', or 'remove user'
+                  </MDTypography>
                 </Card>
               </MDBox>
-            )}
 
-            {/* Quanto edit for clicado */}
-            {editOpen && (
-              <Card>
-                <MDTypography ml={2} mt={2} variant="h6">
-                  Edit {memberName} roles
-                </MDTypography>
+              <MDBox mb={3} textAlign="left">
+                <Card>{error}</Card>
+              </MDBox>
 
-                <MDBox mb={3}>
-                  <MDTypography mt={1} ml={2} variant="body2">
-                    Change the role using the dropdown menu below
-                  </MDTypography>
+              {/* Tabela principal */}
+              <MDBox mb={3}>
+                <Card>
+                  <CompleteTable
+                    columns={columns}
+                    rows={rows}
+                    numberOfRowsPerPage={10}
+                    height={350}
+                  />
+                </Card>
+              </MDBox>
 
-                  <FormControl
-                    variant="outlined"
-                    sx={{ mt: 1, ml: 2, width: 200 }}
-                  >
-                    <Select
-                      id="recipient"
-                      displayEmpty
-                      IconComponent={() => <ArrowDropDownIcon />}
-                      sx={{ height: 30 }}
-                      value={selectValueRole}
-                      onChange={(event) => {
-                        if (event.target.value === "Choose a role") {
-                          setSelectValueRole("Choose a role");
-                          setShowSaveButton(false);
-                        } else {
-                          setSelectValueRole(event.target.value);
-                          setShowSaveButton(true);
-                        }
-                      }}
-                    >
-                      <MenuItem value="Choose a role">Choose a role</MenuItem>
-                      {!memberRoles.includes("Chair") && (
-                        <MenuItem value="Chair">Chair</MenuItem>
-                      )}
-                      {!memberRoles.includes("Committee") && (
-                        <MenuItem value="Committee">Committee</MenuItem>
-                      )}
-                    </Select>
-                  </FormControl>
+              {/* Quanto info for clicado */}
+              {infoOpen && (
+                <ModalInfo
+                  onClose={() => setInfoOpen(false)}
+                  height={{ xs: "80%", sm: "90%", md: "75%" }}
+                  width={{ xs: "95%", sm: "90%", md: "80%" }}
+                >
+                  <CommitteeInfo
+                    onClose={() => setInfoOpen(false)}
+                    memberName={memberName}
+                    memberInfoData={memberInfoData}
+                  ></CommitteeInfo>
+                </ModalInfo>
+              )}
 
-                  <div style={{ display: "flex", gap: 1 }}>
-                    <MDButton
-                      variant="gradient"
-                      color="info"
-                      onClick={() => {
-                        setEditOpen(false);
-                        setShowSaveButton(false);
-                      }}
-                      sx={{
-                        maxWidth: "20px",
-                        maxHeight: "30px",
-                        minWidth: "5px",
-                        minHeight: "30px",
-                        mt: 2,
-                        ml: 2,
-                        mb: 1,
-                      }}
-                    >
-                      Close
-                    </MDButton>
+              {/* Quanto edit for clicado */}
+              {editOpen && (
+                <ModalInfo
+                  onClose={() => setEditOpen(false)}
+                  height={{ xs: 300, sm: "90%", md: 260 }}
+                  width={{ xs: "95%", sm: "90%", md: 700 }}
+                >
+                  <Card>
+                    <MDTypography ml={2} mt={2} variant="h6">
+                      Edit {memberName} roles
+                    </MDTypography>
 
-                    {showSaveButton && (
-                      <MDButton
-                        variant="gradient"
-                        color="success"
-                        onClick={async () => {
-                          setEditOpen(false);
-                          setShowSaveButton(false);
-                          await changeMemberRole();
-                        }}
-                        sx={{
-                          maxWidth: "20px",
-                          maxHeight: "30px",
-                          minWidth: "5px",
-                          minHeight: "30px",
-                          mt: 2,
-                          ml: 2,
-                          mb: 1,
-                        }}
+                    <MDBox mb={3}>
+                      <MDTypography mt={1} ml={2} variant="body2">
+                        Change the role using the dropdown menu below
+                      </MDTypography>
+
+                      <FormControl
+                        variant="outlined"
+                        sx={{ mt: 1, ml: 2, width: 200 }}
                       >
-                        Save
-                      </MDButton>
-                    )}
-                  </div>
-                </MDBox>
-              </Card>
-            )}
-          </MDBox>
-        </Container>
+                        <Select
+                          id="recipient"
+                          displayEmpty
+                          IconComponent={() => <ArrowDropDownIcon />}
+                          sx={{ height: 30 }}
+                          value={selectValueRole}
+                          onChange={(event) => {
+                            if (event.target.value === "Choose a role") {
+                              setSelectValueRole("Choose a role");
+                              setShowSaveButton(false);
+                            } else {
+                              setSelectValueRole(event.target.value);
+                              setShowSaveButton(true);
+                            }
+                          }}
+                        >
+                          <MenuItem value="Choose a role">
+                            Choose a role
+                          </MenuItem>
+                          {!memberRoles.includes("Chair") && (
+                            <MenuItem value="Chair">Chair</MenuItem>
+                          )}
+                          {!memberRoles.includes("Committee") && (
+                            <MenuItem value="Committee">Committee</MenuItem>
+                          )}
+                        </Select>
+                      </FormControl>
+
+                      <div style={{ display: "flex", gap: 1 }}>
+                        <MDButton
+                          variant="gradient"
+                          color="info"
+                          onClick={() => {
+                            setEditOpen(false);
+                            setShowSaveButton(false);
+                          }}
+                          sx={{
+                            maxWidth: "20px",
+                            maxHeight: "30px",
+                            minWidth: "5px",
+                            minHeight: "30px",
+                            mt: 2,
+                            ml: 2,
+                            mb: 1,
+                          }}
+                        >
+                          Close
+                        </MDButton>
+
+                        {showSaveButton && (
+                          <MDButton
+                            variant="gradient"
+                            color="success"
+                            onClick={async () => {
+                              setEditOpen(false);
+                              setShowSaveButton(false);
+                              await changeMemberRole();
+                            }}
+                            sx={{
+                              maxWidth: "20px",
+                              maxHeight: "30px",
+                              minWidth: "5px",
+                              minHeight: "30px",
+                              mt: 2,
+                              ml: 2,
+                              mb: 1,
+                            }}
+                          >
+                            Save
+                          </MDButton>
+                        )}
+                      </div>
+                    </MDBox>
+                  </Card>
+                </ModalInfo>
+              )}
+            </MDBox>
+          </Container>
+        </MDBox>
         <Footer />
       </DashboardLayout>
     </>

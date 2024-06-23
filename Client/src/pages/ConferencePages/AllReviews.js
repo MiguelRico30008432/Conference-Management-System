@@ -1,12 +1,10 @@
 import React, { useEffect, useState, useContext } from "react";
 import MDButton from "components/MDButton";
-import Alert from "@mui/material/Alert";
 import Card from "@mui/material/Card";
 import Container from "@mui/material/Container";
 import MDTypography from "components/MDTypography";
 import MDBox from "components/MDBox";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
-import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "OurComponents/footer/Footer";
 import ConferenceNavBar from "OurComponents/navBars/ConferenceNavBar";
@@ -17,6 +15,7 @@ import { handleDownload } from "OurFunctions/DownloadFile";
 import MultiReviewsDone from "OurComponents/Info/MultiReviewsDone";
 import { AuthContext } from "auth.context";
 import { ConferenceContext } from "conference.context";
+import ModalInfo from "OurComponents/Modal/ModalInfo";
 
 export default function AllReviews() {
   const { confID } = useContext(ConferenceContext);
@@ -50,6 +49,16 @@ export default function AllReviews() {
 
     if (user && confID) fetchReviews();
   }, [confID, user]);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 6000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   const columns = [
     { field: "submissiontitle", headerName: "Submission Title", width: 300 },
@@ -106,7 +115,7 @@ export default function AllReviews() {
       sortable: false,
       disableColumnMenu: true,
       resizable: false,
-      width: 70,
+      width: 120,
       renderCell: (params) => {
         return (
           <div
@@ -127,13 +136,13 @@ export default function AllReviews() {
                   setOpenReview(true);
                 }}
                 sx={{
-                  maxWidth: "70px",
+                  maxWidth: "100px",
                   maxHeight: "23px",
                   minWidth: "30px",
                   minHeight: "23px",
                 }}
               >
-                Review
+                Check Reviews
               </MDButton>
             }
           </div>
@@ -147,44 +156,48 @@ export default function AllReviews() {
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
         <ConferenceNavBar />
-        {openReview ? (
-          <MultiReviewsDone
-            submissionID={submissionID}
-            title={title}
-            onClose={() => setOpenReview(false)}
-          />
-        ) : (
-          <Container maxWidth="sm">
-            <MDBox mt={10} mb={2} textAlign="left">
+        <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          {openReview ? (
+            <ModalInfo open={true} onClose={() => setOpenReview(false)}>
+              <MultiReviewsDone
+                submissionID={submissionID}
+                title={title}
+                onClose={() => setOpenReview(false)}
+              />
+            </ModalInfo>
+          ) : (
+            <Container maxWidth="sm">
+              <MDBox mt={10} mb={2} textAlign="left">
+                <MDBox mb={3} textAlign="left">
+                  <Card>
+                    <MDTypography ml={2} variant="h6">
+                      All Reviews
+                    </MDTypography>
+                    <MDTypography ml={2} variant="body2">
+                      Here you can browse and consult all reviews for each
+                      submission. Gain insights from detailed feedback provided
+                      by our reviewers. This resource ensures transparency and
+                      helps maintain the high standards of our conference.
+                    </MDTypography>
+                  </Card>
+                </MDBox>
+              </MDBox>
+
+              <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
+
               <MDBox mb={3} textAlign="left">
                 <Card>
-                  <MDTypography ml={2} variant="h6">
-                    All Reviews
-                  </MDTypography>
-                  <MDTypography ml={2} variant="body2">
-                    Here you can browse and consult all reviews for each
-                    submission. Gain insights from detailed feedback provided by
-                    our reviewers. This resource ensures transparency and helps
-                    maintain the high standards of our conference.
-                  </MDTypography>
+                  <CompleteTable
+                    columns={columns}
+                    rows={rows}
+                    numberOfRowsPerPage={100}
+                    height={200}
+                  />
                 </Card>
               </MDBox>
-            </MDBox>
-
-            <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
-
-            <MDBox mb={3} textAlign="left">
-              <Card>
-                <CompleteTable
-                  columns={columns}
-                  rows={rows}
-                  numberOfRowsPerPage={100}
-                  height={200}
-                />
-              </Card>
-            </MDBox>
-          </Container>
-        )}
+            </Container>
+          )}
+        </MDBox>
         <Footer />
       </DashboardLayout>
     </>

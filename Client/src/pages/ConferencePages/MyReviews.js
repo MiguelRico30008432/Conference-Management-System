@@ -15,9 +15,10 @@ import { fetchAPI } from "OurFunctions/fetchAPI";
 import { AuthContext } from "auth.context";
 import { ConferenceContext } from "conference.context";
 import { handleDownload } from "OurFunctions/DownloadFile";
+import ModalInfo from "OurComponents/Modal/ModalInfo";
 
 export default function MyReviews() {
-  const { confID } = useContext(ConferenceContext);
+  const { confID, confPhase } = useContext(ConferenceContext);
   const { user } = useContext(AuthContext);
 
   const [title, setTile] = useState(null);
@@ -46,10 +47,20 @@ export default function MyReviews() {
       }
     }
 
-    if (user && confID) {
+    if (user && confID && confPhase) {
       fetchReviews();
     }
-  }, [confID, user]);
+  }, [confID, user, confPhase]);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 6000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   const columns = [
     { field: "submissiontitle", headerName: "Submission Title", width: 300 },
@@ -147,44 +158,51 @@ export default function MyReviews() {
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
         <ConferenceNavBar />
-        {openReview ? (
-          <ReviewsDone
-            assignmentID={assignmentID}
-            title={title}
-            onClose={() => setOpenReview(false)}
-          />
-        ) : (
-          <Container maxWidth="sm">
-            <MDBox mt={10} mb={2} textAlign="left">
+        <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          {openReview ? (
+            <ModalInfo open={true} onClose={() => setOpenReview(false)}>
+              <ReviewsDone
+                user={user}
+                confID={confID}
+                confPhase={confPhase}
+                assignmentID={assignmentID}
+                title={title}
+                onClose={() => setOpenReview(false)}
+              />
+            </ModalInfo>
+          ) : (
+            <Container maxWidth="sm">
+              <MDBox mt={10} mb={2} textAlign="left">
+                <MDBox mb={3} textAlign="left">
+                  <Card>
+                    <MDTypography ml={2} variant="h6">
+                      My Reviews
+                    </MDTypography>
+                    <MDTypography ml={2} variant="body2">
+                      Here, you as reviewer can add, edit, and delete reviews
+                      for submissions. Your feedback ensures the high quality of
+                      our conference. Please provide thorough and objective
+                      reviews. Thank you for your valuable contributions.
+                    </MDTypography>
+                  </Card>
+                </MDBox>
+              </MDBox>
+
+              <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
+
               <MDBox mb={3} textAlign="left">
                 <Card>
-                  <MDTypography ml={2} variant="h6">
-                    My Reviews
-                  </MDTypography>
-                  <MDTypography ml={2} variant="body2">
-                    Here, you as reviewer can add, edit, and delete reviews for
-                    submissions. Your feedback ensures the high quality of our
-                    conference. Please provide thorough and objective reviews.
-                    Thank you for your valuable contributions.
-                  </MDTypography>
+                  <CompleteTable
+                    columns={columns}
+                    rows={rows}
+                    numberOfRowsPerPage={10}
+                    height={200}
+                  />
                 </Card>
               </MDBox>
-            </MDBox>
-
-            <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
-
-            <MDBox mb={3} textAlign="left">
-              <Card>
-                <CompleteTable
-                  columns={columns}
-                  rows={rows}
-                  numberOfRowsPerPage={100}
-                  height={200}
-                />
-              </Card>
-            </MDBox>
-          </Container>
-        )}
+            </Container>
+          )}
+        </MDBox>
         <Footer />
       </DashboardLayout>
     </>

@@ -5,11 +5,12 @@ const router = express.Router();
 const { sendEmail } = require("../../utility/emails");
 const crypto = require("crypto");
 
-function generateRandomCode(length) {
-  return crypto
-    .randomBytes(Math.ceil(length / 2))
-    .toString("hex") // Convert to hexadecimal string
-    .slice(0, length); // Trim to desired length
+async function checkExistingInvitations(confID, recipients) {
+  const existingInvitations = await db.fetchData("invitations", "confid", confID);
+  const invitedEmails = existingInvitations.map(invitation => invitation.invitationemail);
+  const alreadyInvited = recipients.filter(email => invitedEmails.includes(email));
+  const newRecipients = recipients.filter(email => !invitedEmails.includes(email));
+  return { alreadyInvited, newRecipients };
 }
 
 router.post(
@@ -19,6 +20,20 @@ router.post(
     const { role, recipients, confID } = req.body;
     const confInfo = await db.fetchData("conferences", "confID", confID);
     const confName = confInfo[0].confname;
+
+    
+    const lowerCaseRecipients = recipients.map(email => email.toLowerCase());
+
+    // Check for existing invitations
+    const { alreadyInvited, newRecipients } = await checkExistingInvitations(confID, lowerCaseRecipients);
+
+    if (newRecipients.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "All recipients have already received an invitation.",
+        alreadyInvited
+      });
+    }
 
     // Function to generate a random invitation code
     function generateRandomCode(length) {
@@ -30,15 +45,15 @@ router.post(
 
     // Function to send invitations recursively with a delay between each email
     async function sendInvitations(index) {
-      if (index < recipients.length) {
-        const recipient = recipients[index];
+      if (index < newRecipients.length) {
+        const recipient = newRecipients[index];
         const randomCode = generateRandomCode(8);
         let emailReplacements = {
           confName: confName,
           generatedCode: randomCode,
         };
 
-        // Send email with invitation
+        
         sendEmail(
           recipient,
           "Conference Invitation",
@@ -47,9 +62,9 @@ router.post(
           async (error, info) => {
             if (error) {
               console.error("Error sending email:", error);
-              // Skip adding invitation to the database if email sending fails
+              
             } else {
-              // Add invitation to the database if email sending succeeds
+              
               try {
                 await db.addData("invitations", {
                   confid: confID,
@@ -63,17 +78,19 @@ router.post(
               }
             }
 
-            // Continue sending invitations recursively after a delay of 1 second
+            
             setTimeout(() => {
               sendInvitations(index + 1);
             }, 50);
           }
         );
       } else {
-        // If all invitations have been sent, respond with success message
-        res
-          .status(200)
-          .json({ success: true, message: "Invitations sent successfully." });
+        
+        res.status(200).json({
+          success: true,
+          message: "Invitations sent successfully.",
+          alreadyInvited
+        });
       }
     }
 

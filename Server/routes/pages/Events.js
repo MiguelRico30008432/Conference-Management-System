@@ -43,9 +43,9 @@ async function verifyConferenceDates(confid) {
       END AS bidding
     FROM conferences c
     LEFT JOIN events e ON c.confid = e.eventconfid AND (
-        e.eventname LIKE '%The submission period has started%' 
-        OR e.eventname LIKE '%The Bidding period has started%' 
-        OR e.eventname LIKE '%The Review period has started%'
+        e.eventname = 'The submission period has started' 
+        OR e.eventname = 'The Bidding period has started' 
+        OR e.eventname = 'The review period has started'
     )
     WHERE 
       c.confid = ${confid}

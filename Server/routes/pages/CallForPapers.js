@@ -19,8 +19,8 @@ router.post("/callForPapers", auth.ensureAuthenticated, async (req, res) => {
         CASE 
           WHEN NOW() < confstartsubmission THEN 'Configuration'
           WHEN confstartsubmission <= NOW() AND confendsubmission >= NOW() THEN 'Submission'
-          WHEN confstartreview <= NOW() AND confendreview >= NOW() THEN 'Review'
           WHEN confstartbidding <= NOW() AND confendbidding >= NOW() THEN 'Bidding'
+          WHEN confstartreview <= NOW() AND confendreview >= NOW() THEN 'Review'
           WHEN NOW() > confendreview THEN 'Pre-Conference'
         END AS confphase
       FROM conferences conf
@@ -28,7 +28,7 @@ router.post("/callForPapers", auth.ensureAuthenticated, async (req, res) => {
       LEFT  JOIN userRoles ON userRoles.confid = conf.confid AND userRoles.userid = ${req.body.userid}
       WHERE
         confapproved = 2
-      AND confstartsubmission <= NOW() AND confendsubmission >= NOW()
+      AND confstartsubmission <= NOW() AND confendsubmission >= NOW() AND confenddate >= NOW()
       GROUP BY
         conf.confid, confname, confcountry, confendsubmission, confstartdate, confareaname
       `);

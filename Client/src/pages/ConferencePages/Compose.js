@@ -1,9 +1,8 @@
+import React, { useState, useContext, useEffect } from "react";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import ConfNavbar from "../../OurComponents/navBars/ConferenceNavBar";
 import { ConferenceContext } from "conference.context";
 import Footer from "OurComponents/footer/Footer";
-
-import React, { useState, useContext, useEffect } from "react";
 import Card from "@mui/material/Card";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
@@ -15,6 +14,7 @@ import FormControl from "@mui/material/FormControl";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import MDBox from "components/MDBox";
 import Alert from "@mui/material/Alert";
+import LoadingCircle from "OurComponents/loading/LoadingCircle";
 
 export default function Compose() {
   const { confID } = useContext(ConferenceContext);
@@ -29,6 +29,7 @@ export default function Compose() {
     message: "",
   });
   const [committeeMembersExist, setCommitteeMembersExist] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function getData() {
@@ -61,14 +62,16 @@ export default function Compose() {
     setRecipientError("");
     setSubjectError("");
     setDescriptionError("");
-  
+    setLoading(true);  // Start loading indicator
+
     if (!recipient || !subject || !description) {
       if (!recipient) setRecipientError("You must select a recipient!");
       if (!subject) setSubjectError("You must enter a subject!");
       if (!description) setDescriptionError("You must enter a description!");
+      setLoading(false); // Stop loading indicator if there is an error
       return;
     }
-  
+
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/sendComposeEmail`,
@@ -86,13 +89,13 @@ export default function Compose() {
           credentials: "include",
         }
       );
-  
+
       const data = await response.json();
-  
+
       if (!response.ok) {
         throw new Error(data.message || "Failed to send email.");
       }
-  
+
       setSendResponse({ success: true, message: "Email sent successfully." });
       setRecipient("");
       setSubject("");
@@ -103,136 +106,146 @@ export default function Compose() {
         message: error.message || "An error occurred while sending the email.",
       });
     }
+    setLoading(false);  // Stop loading indicator
   };
 
   return (
     <DashboardLayout>
       <ConfNavbar />
-      <Container maxWidth="sm">
-        <MDBox mt={10} textAlign="left">
-          <Card>
-            <MDTypography ml={2} variant="h6">
-              Send Email
-            </MDTypography>
-            <MDTypography ml={2} variant="body2">
-              Here you can send an email to either the chair, committee members or both. The subject and description are to your
-              liking so the text is according to the theme in the subject you mention.
-            </MDTypography>
-          </Card>
-          <Card sx={{ mt: 3, p: 3 }}>
-            {sendResponse.message && (
-              <Alert severity={sendResponse.success ? "success" : "error"}>
-                {sendResponse.message}
-              </Alert>
-            )}
-            <Box component="form" onSubmit={handleSendEmail} noValidate>
-              <FormControl
-                fullWidth
-                margin="normal"
-                variant="outlined"
-                error={Boolean(recipientError)}
-              >
-                <MDTypography variant="body2">Send To *</MDTypography>
-                <Select
-                  id="recipient"
-                  value={recipient}
-                  onChange={(e) => setRecipient(e.target.value)}
-                  displayEmpty
-                  inputProps={{ "aria-label": "Without label" }}
-                  IconComponent={ArrowDropDownIcon}
-                  sx={{ height: "3rem" }}
-                >
-                  <MenuItem value="" disabled>
-                    Choose a Group to Send the Email
-                  </MenuItem>
-                  <MenuItem value="chair">Chair</MenuItem>
-                  {committeeMembersExist && (
-                    <MenuItem value="committee">Committee</MenuItem>
-                  )}
-                  {committeeMembersExist && (
-                    <MenuItem value="all">Chair and Committee</MenuItem>
-                  )}
-                </Select>
-                {recipientError && (
-                  <Alert severity="error">{recipientError}</Alert>
-                )}
-              </FormControl>
-              <FormControl fullWidth error={Boolean(subjectError)}>
-                <MDTypography variant="body2" sx={{ mt: 2, mb: 1 }}>
-                  Subject *
-                </MDTypography>
-                <Box
-                  sx={{
-                    "& textarea": {
-                      width: "100%",
-                      padding: "18.5px 14px",
-                      fontSize: "0.9rem",
-                      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-                      border: "1px solid #c4c4c4",
-                      borderRadius: "4px",
-                      resize: "none",
-                      marginTop: "8px",
-                    },
-                  }}
-                >
-                  <textarea
-                    id="subject"
-                    placeholder="Enter your subject here"
-                    value={subject}
-                    onChange={(e) => setSubject(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                      }
-                    }}
-                    rows={1}
-                  />
-                </Box>
-                {subjectError && <Alert severity="error">{subjectError}</Alert>}
-              </FormControl>
-              <FormControl fullWidth error={Boolean(descriptionError)}>
-                <MDTypography variant="body2" sx={{ mt: 2, mb: 1 }}>
-                  Description *
-                </MDTypography>
-                <Box
-                  sx={{
-                    "& textarea": {
-                      width: "100%",
-                      padding: "18.5px 14px",
-                      fontSize: "0.9rem",
-                      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-                      border: "1px solid #c4c4c4",
-                      borderRadius: "4px",
-                      resize: "vertical",
-                      marginTop: "8px",
-                    },
-                  }}
-                >
-                  <textarea
-                    id="description"
-                    placeholder="Enter your description here"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    rows={4}
-                  />
-                </Box>
-                {descriptionError && (
-                  <Alert severity="error">{descriptionError}</Alert>
-                )}
-              </FormControl>
-              
-              <Button
-                type="submit"
-                variant="contained"
-                sx={{ mt: 3, mb: 2, color: "white !important" }}
-              >
+      {loading && <LoadingCircle />}  {/* Display loading circle */}
+      <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        <Container maxWidth="sm">
+          <MDBox mt={10} textAlign="left">
+            <Card>
+              <MDTypography ml={2} variant="h6">
                 Send Email
-              </Button>
-            </Box>
-          </Card>
-        </MDBox>
-        <br />
-      </Container>
+              </MDTypography>
+              <MDTypography ml={2} variant="body2">
+                Here you can send an email to either the chair, committee
+                members or both. The subject and description are to your liking
+                so the text is according to the theme in the subject you
+                mention.
+              </MDTypography>
+            </Card>
+            <Card sx={{ mt: 3, p: 3 }}>
+              {sendResponse.message && (
+                <Alert severity={sendResponse.success ? "success" : "error"}>
+                  {sendResponse.message}
+                </Alert>
+              )}
+              <Box component="form" onSubmit={handleSendEmail} noValidate>
+                <FormControl
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  error={Boolean(recipientError)}
+                >
+                  <MDTypography variant="body2">Send To *</MDTypography>
+                  <Select
+                    id="recipient"
+                    value={recipient}
+                    onChange={(e) => setRecipient(e.target.value)}
+                    displayEmpty
+                    inputProps={{ "aria-label": "Without label" }}
+                    IconComponent={ArrowDropDownIcon}
+                    sx={{ height: "3rem" }}
+                  >
+                    <MenuItem value="" disabled>
+                      Choose a Group to Send the Email
+                    </MenuItem>
+                    <MenuItem value="chair">Chair</MenuItem>
+                    {committeeMembersExist && (
+                      <MenuItem value="committee">Committee</MenuItem>
+                    )}
+                    {committeeMembersExist && (
+                      <MenuItem value="all">Chair and Committee</MenuItem>
+                    )}
+                  </Select>
+                  {recipientError && (
+                    <Alert severity="error">{recipientError}</Alert>
+                  )}
+                </FormControl>
+                <FormControl fullWidth error={Boolean(subjectError)}>
+                  <MDTypography variant="body2" sx={{ mt: 2, mb: 1 }}>
+                    Subject *
+                  </MDTypography>
+                  <Box
+                    sx={{
+                      "& textarea": {
+                        width: "100%",
+                        padding: "18.5px 14px",
+                        fontSize: "0.9rem",
+                        fontFamily:
+                          '"Roboto", "Helvetica", "Arial", sans-serif',
+                        border: "1px solid #c4c4c4",
+                        borderRadius: "4px",
+                        resize: "none",
+                        marginTop: "8px",
+                      },
+                    }}
+                  >
+                    <textarea
+                      id="subject"
+                      placeholder="Enter your subject here"
+                      value={subject}
+                      onChange={(e) => setSubject(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                        }
+                      }}
+                      rows={1}
+                    />
+                  </Box>
+                  {subjectError && (
+                    <Alert severity="error">{subjectError}</Alert>
+                  )}
+                </FormControl>
+                <FormControl fullWidth error={Boolean(descriptionError)}>
+                  <MDTypography variant="body2" sx={{ mt: 2, mb: 1 }}>
+                    Description *
+                  </MDTypography>
+                  <Box
+                    sx={{
+                      "& textarea": {
+                        width: "100%",
+                        padding: "18.5px 14px",
+                        fontSize: "0.9rem",
+                        fontFamily:
+                          '"Roboto", "Helvetica", "Arial", sans-serif',
+                        border: "1px solid #c4c4c4",
+                        borderRadius: "4px",
+                        resize: "vertical",
+                        marginTop: "8px",
+                      },
+                    }}
+                  >
+                    <textarea
+                      id="description"
+                      placeholder="Enter your description here"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      rows={4}
+                    />
+                  </Box>
+                  {descriptionError && (
+                    <Alert severity="error">{descriptionError}</Alert>
+                  )}
+                </FormControl>
+
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2, color: "white !important" }}
+                >
+                  Send Email
+                </Button>
+              </Box>
+            </Card>
+          </MDBox>
+          <br />
+        </Container>
+      </MDBox>
       <Footer />
     </DashboardLayout>
   );

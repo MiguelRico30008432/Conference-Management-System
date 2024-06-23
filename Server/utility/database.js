@@ -83,9 +83,11 @@ async function updateData(table, entryParameters, tableID) {
   }
 } // testado para a tabela users
 
-async function fetchDataCst(select) {
+async function fetchDataCst(query, values) {
   try {
-    const result = await pool.query(select);
+    let result;
+    if (values) result = await pool.query(query, values);
+    else result = await pool.query(query);
     return result.rows;
   } catch (err) {
     log.addLog(err, "database", "fetchDataCst");

@@ -1,9 +1,8 @@
+import React, { useEffect, useState, useContext } from "react";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import ConfNavbar from "../../OurComponents/navBars/ConferenceNavBar";
 import { ConferenceContext } from "conference.context";
 import { AuthContext } from "auth.context";
-import * as React from "react";
-import { useEffect, useState, useContext } from "react";
 import Card from "@mui/material/Card";
 import Container from "@mui/material/Container";
 import MDBox from "components/MDBox";
@@ -14,10 +13,11 @@ import Alert from "@mui/material/Alert";
 import CompleteTable from "OurComponents/Table/CompleteTable";
 import SubmissionDetails from "OurComponents/Info/SubmissionDetails";
 import Footer from "OurComponents/footer/Footer";
-import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage"; // Ensure this import is correct
+import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
+import ModalInfo from "OurComponents/Modal/ModalInfo";
 
 export default function AllSubmissions() {
-  const { confID, userRole } = useContext(ConferenceContext);
+  const { confID, userRole, confPhase } = useContext(ConferenceContext);
   const { isLoggedIn } = useContext(AuthContext);
   const [openLoading, setOpenLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -45,18 +45,8 @@ export default function AllSubmissions() {
         );
 
         const jsonResponse = await response.json();
-
         if (response.status === 200) {
-          const transformedData = jsonResponse.map((submission) => ({
-            id: submission.id,
-            title: submission.title,
-            authors: submission.authors,
-            status: submission.status ? "Accepted" : "Pending",
-            addDate: submission.adddate,
-            abstract: submission.abstract,
-            fileUrl: submission.fileUrl,
-          }));
-          setRows(transformedData);
+          setRows(jsonResponse);
         } else {
           setError(<Alert severity="error">{jsonResponse.message}</Alert>);
         }
@@ -72,6 +62,16 @@ export default function AllSubmissions() {
       fetchAllSubmissions();
     }
   }, [confID, isLoggedIn]);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 6000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   const handleDelete = async () => {
     setError(null);
@@ -130,7 +130,11 @@ export default function AllSubmissions() {
 
       if (!response.ok) {
         const jsonResponse = await response.json();
-        setError(<Alert severity="error">Failed to download file: {jsonResponse.msg}</Alert>);
+        setError(
+          <Alert severity="error">
+            Failed to download file: {jsonResponse.msg}
+          </Alert>
+        );
         setOpenLoading(false); // Stop loading indicator
         return;
       }
@@ -152,8 +156,8 @@ export default function AllSubmissions() {
   const columns = [
     { field: "title", headerName: "Title", width: 200 },
     { field: "status", headerName: "Status", width: 120 },
-    { field: "authors", headerName: "Authors", width: 200 },
-    { field: "addDate", headerName: "Submission Date", width: 120 },
+    { field: "mainauthor", headerName: "Main Author", width: 200 },
+    { field: "adddate", headerName: "Submission Date", width: 120 },
     {
       field: "download",
       filterable: false,
@@ -191,7 +195,7 @@ export default function AllSubmissions() {
       },
     },
     {
-      field: "moreInfo",
+      field: "details",
       headerName: "",
       sortable: false,
       filterable: false,
@@ -228,7 +232,7 @@ export default function AllSubmissions() {
         );
       },
     },
-    ...(userRole === "Chair" || userRole === "Owner" ? [{
+    {
       field: "delete",
       filterable: false,
       headerName: "",
@@ -238,6 +242,13 @@ export default function AllSubmissions() {
       resizable: false,
       width: 150,
       renderCell: (params) => {
+        if (
+          userRole.includes("Committee") ||
+          params.row.status !== "Pending" ||
+          confPhase !== "Submission"
+        )
+          return null;
+
         return (
           <div
             style={{
@@ -266,7 +277,7 @@ export default function AllSubmissions() {
           </div>
         );
       },
-    }] : [])
+    },
   ];
 
   return (
@@ -285,48 +296,47 @@ export default function AllSubmissions() {
 
       <DashboardLayout>
         <ConfNavbar />
-
-        <Container maxWidth="sm">
-          <MDBox mt={8} mb={2} textAlign="left">
-            <MDBox mb={3} textAlign="left">
-              <Card>
-                <MDTypography ml={2} variant="h6">
-                  All Submissions
-                </MDTypography>
-                <MDTypography ml={2} variant="body2">
-                  Welcome to the My Submissions Page! Here, you can manage all
-                  your conference submissions. You can view details of each
-                  submission, including title, authors, status, and date. Easily
-                  update your submissions by clicking the "Edit" button,
-                  download submitted files by clicking "Download File," and
-                  remove a submission by clicking "Delete Submission" and
-                  confirming your action.
-                </MDTypography>
-              </Card>
-
-              <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
-
-              <MDBox mb={3} mt={2} textAlign="left">
+        <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <Container maxWidth="sm">
+            <MDBox mt={8} mb={2} textAlign="left">
+              <MDBox mb={3} textAlign="left">
                 <Card>
-                  <CompleteTable
-                    columns={columns}
-                    rows={rows}
-                    numberOfRowsPerPage={100}
-                    height={200}
-                  />
+                  <MDTypography ml={2} variant="h6">
+                    All Submissions
+                  </MDTypography>
+                  <MDTypography ml={2} variant="body2">
+                    Here you can view and manage all submissions.<br></br>
+                    Note: You can only delete submissions if the current phase
+                    of the conference is the submission phase.
+                  </MDTypography>
                 </Card>
+
+                <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
+
+                <MDBox mb={3} mt={2} textAlign="left">
+                  <Card>
+                    <CompleteTable
+                      columns={columns}
+                      rows={rows}
+                      numberOfRowsPerPage={10}
+                      height={200}
+                    />
+                  </Card>
+                </MDBox>
               </MDBox>
             </MDBox>
-          </MDBox>
-        </Container>
+          </Container>
 
-        {detailsOpen && (
-          <SubmissionDetails
-            submission={dataForDetails}
-            onClose={() => setDetailsOpen(false)}
-          />
-        )}
-
+          {detailsOpen && (
+            <ModalInfo onClose={() => setDetailsOpen(false)}>
+              <SubmissionDetails
+                submission={dataForDetails}
+                onClose={() => setDetailsOpen(false)}
+                getUpdatedAuthors={false}
+              />
+            </ModalInfo>
+          )}
+        </MDBox>
         <Footer />
       </DashboardLayout>
     </>

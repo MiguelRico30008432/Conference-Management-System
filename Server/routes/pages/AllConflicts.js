@@ -3,99 +3,17 @@ const router = express.Router();
 const db = require("../../utility/database");
 const auth = require("../../utility/verifications");
 const log = require("../../logs/logsManagement");
+const al = require("../../utility/algorithms");
 
 router.post(
   "/determineConflicts",
   auth.ensureAuthenticated,
   async (req, res) => {
     try {
-      //Obter lista com os emails do comite, chair, owner e respetivas afiliações
-      const committeeEmailsAffiliation = await db.fetchDataCst(`
-      SELECT 
-        ur.userrole,
-        u.useremail,
-        u.useraffiliation
-      FROM 
-        userroles ur
-      JOIN 
-        users u ON ur.userid = u.userid
-      WHERE 
-        ur.confid = ${req.body.confid}
-      AND ur.userrole IN ('Chair', 'Owner', 'Committee')
-      `);
-
-      //Obter submissões da conferência
-      const submissionsids = await db.fetchDataCst(`
-        SELECT
-            submissionid
-        FROM
-            submissions
-        WHERE
-            submissionconfid = ${req.body.confid}
-        `);
-
-      //Por submissão obter os emails dos autores
-      if (submissionsids.length > 0) {
-        for (const submission of submissionsids) {
-          const submissionid = submission.submissionid;
-          const authorsEmails = await db.fetchDataCst(`
-            SELECT
-                authorid,
-                authoremail,
-                authoraffiliation
-            FROM 
-                authors
-            WHERE
-                submissionid = ${submissionid}
-          `);
-
-          //Por membro do comite verificar se faz parte dos autores ou se é da mesma afiliação que os autores
-          for (const committee of committeeEmailsAffiliation) {
-            for (const author of authorsEmails) {
-              const conflictExists = await db.fetchDataCst(`
-                SELECT
-                  conflictid
-                FROM
-                  conflicts
-                WHERE
-                  conflictconfid = ${req.body.confid} AND conflictuseremail = '${committee.useremail}' AND conflictsubmissionid = ${submission.submissionid}
-              `);
-
-              //Verificar primeiro se o conflito já existe
-              if (conflictExists.length === 0) {
-                //Se o membro do comitte for autor ou se tiver a mesma afiliação que, pelo menos, 1 dos autores, então adicionar na tabela de conflitos
-
-                if (committee.useremail === author.authoremail) {
-                  await db.fetchDataCst(`
-                  INSERT INTO conflicts(conflictconfid, conflictreason, conflictsubmissionid, conflictuseremail)
-                  VALUES(${req.body.confid}, 'Part of the committee as ${committee.userrole} and registered as author.', ${submission.submissionid}, '${committee.useremail}')
-                  `);
-                } else if (
-                  committee.useraffiliation === author.authoraffiliation
-                ) {
-                  await db.fetchDataCst(`
-                  INSERT INTO conflicts(conflictconfid, conflictreason, conflictsubmissionid, conflictuseremail)
-                  VALUES(${req.body.confid}, 'Same affiliation has 1 or more authors.', ${submission.submissionid}, '${committee.useremail}')
-                  `);
-                }
-              }
-            }
-          }
-        }
-      } else {
-        return res
-          .status(500)
-          .send({ msg: "No submissions where detected for this conference" });
-      }
-
-      verifyBiddingsAfterConflictCheck();
-
-      return res.status(200).send({ msg: "Conflicts have been Updated" });
+      const response = await al.conflicAlgorithm(req.body.confid);
+      return res.status(200).send({ msg: response });
     } catch (error) {
-      log.addLog(error, "database", "AllConflicts -> /determineConflicts");
-      return res
-        .status(500)
-        .send({ msg: "Error declaring Conflicts (Algorithm)" });
+      return res.status(500).send({ msg: response });
     }
   }
 );
@@ -104,12 +22,14 @@ router.post("/getConflicts", auth.ensureAuthenticated, async (req, res) => {
   try {
     const result = await db.fetchDataCst(`
     SELECT 
+      conflictid,
       CONCAT(u.userfirstname, ' ', u.userlastname) AS fullname,
       s.submissiontitle,
-      c.conflictreason
+      c.conflictreason,
+      c.conflictuserid
     FROM 
       conflicts c
-    JOIN users u ON c.conflictuseremail = u.useremail
+    JOIN users u ON c.conflictuserid = u.userid
     JOIN submissions s ON c.conflictsubmissionid = s.submissionid
     WHERE
       c.conflictconfid = ${req.body.confid}
@@ -131,8 +51,7 @@ router.post(
       s.submissionid,
       s.submissiontitle,
       STRING_AGG(DISTINCT a.authorfirstname || ' ' || a.authorlastname, ', ') AS authorfullnames,
-      STRING_AGG(DISTINCT u.userfirstname || ' ' || u.userlastname, ', ') AS committeefullnames,
-      STRING_AGG(DISTINCT u.useremail, ', ') AS committeeemails
+      STRING_AGG(DISTINCT u.userid || ': ' || u.userfirstname || ' ' || u.userlastname, ', ') AS committeefullnames
     FROM 
       submissions s
     JOIN 
@@ -144,7 +63,7 @@ router.post(
     LEFT JOIN 
       conflicts c ON c.conflictconfid = ${req.body.confid} 
         AND c.conflictsubmissionid = s.submissionid 
-        AND c.conflictuseremail = u.useremail
+        AND c.conflictuserid = u.userid
     WHERE 
       s.submissionconfid = ${req.body.confid}
       AND c.conflictid IS NULL
@@ -164,11 +83,15 @@ router.post(
 
 router.post("/declareConflict", auth.ensureAuthenticated, async (req, res) => {
   try {
-    await db.fetchDataCst(`
-    INSERT INTO conflicts (conflictconfid, conflictsubmissionid, conflictreason, conflictuseremail)
-    VALUES (${req.body.confid}, ${req.body.dataToAddConflict.submissionid}, 'Conflict Added By The Committee' , '${req.body.dataToAddConflict.committeeemails}')
-    `);
-    verifyBiddingsAfterConflictCheck();
+    for (const member of req.body.info.committee) {
+      await db.fetchDataCst(`
+        INSERT INTO conflicts (conflictconfid, conflictsubmissionid, conflictreason, conflictuserid)
+        VALUES (${req.body.confid}, ${req.body.info.id}, 'Conflict Added By The Committee' , ${member.id})
+      `);
+
+      verifyBiddingsAfterConflictCheck();
+    }
+
     return res.status(200).send({ msg: "Conflict Created With Success." });
   } catch (error) {
     log.addLog(error, "database", "AllConflicts -> /declareConflict");
@@ -183,7 +106,7 @@ async function verifyBiddingsAfterConflictCheck() {
   FROM biddings b
   JOIN conflicts c ON b.biddingconfid = c.conflictconfid 
     AND b.biddingsubmissionid = c.conflictsubmissionid
-  JOIN users u ON c.conflictuseremail = u.useremail
+  JOIN users u ON c.conflictuserid = u.userid
   WHERE b.biddinguserid = u.userid
   `);
 
@@ -195,5 +118,17 @@ async function verifyBiddingsAfterConflictCheck() {
     }
   }
 }
+
+router.post("/deleteConflict", auth.ensureAuthenticated, async (req, res) => {
+  try {
+    await db.fetchDataCst(`
+      DELETE FROM conflicts WHERE conflictid = ${req.body.info.conflictid}  
+    `);
+
+    return res.status(200).send({ msg: "Conflict Deleted With Success." });
+  } catch (error) {
+    return res.status(500).send({ msg: "Error deleting conflict." });
+  }
+});
 
 module.exports = router;

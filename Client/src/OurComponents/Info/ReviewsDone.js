@@ -1,26 +1,25 @@
 import * as React from "react";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import Card from "@mui/material/Card";
-import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
-import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import LoadingCircle from "OurComponents/loading/LoadingCircle";
 import Alert from "@mui/material/Alert";
 import MDButton from "components/MDButton";
 import { fetchAPI } from "OurFunctions/fetchAPI";
-import { AuthContext } from "auth.context";
-import { ConferenceContext } from "conference.context";
 import ReviewsCard from "./ReviewsCard";
 import PopUpWithMessage from "OurComponents/Info/PopUpWithMessage";
 
-export default function ReviewsDone({ assignmentID, title, onClose }) {
-  const { user } = useContext(AuthContext);
-  const { confPhase } = useContext(ConferenceContext);
-
+export default function ReviewsDone({
+  user,
+  confID,
+  confPhase,
+  assignmentID,
+  title,
+  onClose,
+}) {
   const [abstract, setAbstract] = useState(null);
   const [review, setReview] = useState("");
-  const [userName, setUserName] = useState("");
   const [originReview, setOriginReview] = useState(null);
   const [originGrade, setOriginGrade] = useState(null);
 
@@ -30,6 +29,7 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
   const [error, setError] = useState(null);
   const [popMessage, setPopMessage] = useState(false);
   const [deletePopMessage, setDeletePopMessage] = useState(false);
+  const [blockCrud, setBlockCrud] = useState(false);
 
   useEffect(() => {
     async function fetchSingleReviews() {
@@ -51,14 +51,27 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
           setReview(response.review[0]);
           setAddReviewActive(false);
         } else {
-          setUserName(response.username[0].username);
           setAddReviewActive(true);
+          addNewReview(response.username[0].username);
         }
       }
     }
 
-    if (assignmentID) fetchSingleReviews();
-  }, [assignmentID]);
+    if (assignmentID && confPhase && user) {
+      if (assignmentID) fetchSingleReviews();
+      if (confPhase !== "Review") setBlockCrud(true);
+    }
+  }, [confPhase, assignmentID, user]);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 6000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   async function submitReview() {
     if (verifyRequiredFields()) {
@@ -68,6 +81,8 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
           "POST",
           {
             addNew: addReviewActive,
+            confid: confID,
+            responsibleUser: user,
             assignmentid: assignmentID,
             reviewgrade: review.reviewgrade,
             reviewtext: review.reviewtext,
@@ -100,6 +115,8 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
       "POST",
       {
         assignmentid: assignmentID,
+        confid: confID,
+        responsibleUser: user,
       },
       setError,
       setOpenLoading
@@ -109,18 +126,16 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
     closeComponent();
   }
 
-  function addNewReview() {
+  function addNewReview(userName) {
     setHideButton(true);
 
-    const newReview = {
+    setReview({
       username: userName,
       reviewadddate: new Date().toLocaleDateString(),
       reviewtext: "",
       reviewgrade: 1,
       read: false,
-    };
-
-    setReview(newReview);
+    });
   }
 
   function updateReview() {
@@ -154,8 +169,10 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
   }
 
   function changeDetected() {
-    const text = review.reviewtext ?? null;
-    const grade = review.reviewgrade ?? null;
+    let text = review.reviewtext ?? null;
+    let grade = review.reviewgrade ?? null;
+    if (text === "") text = null;
+    if (grade === 1) grade = null;
 
     if (text !== originReview || grade !== originGrade) {
       return true;
@@ -198,7 +215,6 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
         affirmativeButtonName={"Yes, I'm Sure"}
         handleConfirm={closeComponent}
       />
-
       <PopUpWithMessage
         open={deletePopMessage}
         title={"Delete Review?"}
@@ -208,53 +224,66 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
         affirmativeButtonName={"Yes, I'm Sure"}
         handleConfirm={async () => await deleteReview()}
       />
+      <Card sx={{ mb: 2 }}>{error}</Card>
+      <MDButton
+        variant="gradient"
+        color="info"
+        onClick={verifyCloseReview}
+        sx={{
+          maxWidth: "140px",
+          maxHeight: "30px",
+          minWidth: "5px",
+          minHeight: "30px",
+          mb: 2,
+        }}
+      >
+        Close Review
+      </MDButton>
+      {!blockCrud && (
+        <>
+          {!addReviewActive && !hideButton && (
+            <>
+              <MDButton
+                variant="gradient"
+                color="info"
+                onClick={updateReview}
+                sx={{
+                  maxWidth: "145px",
+                  maxHeight: "30px",
+                  minWidth: "5px",
+                  minHeight: "30px",
+                  ml: 2,
+                  mb: 2,
+                }}
+              >
+                Update Review
+              </MDButton>
 
-      <Container maxWidth="sm">
-        <MDBox mt={7}></MDBox>
+              <MDButton
+                variant="gradient"
+                color="error"
+                onClick={() => setDeletePopMessage(true)}
+                sx={{
+                  maxWidth: "145px",
+                  maxHeight: "30px",
+                  minWidth: "5px",
+                  minHeight: "30px",
+                  ml: 2,
+                  mb: 2,
+                }}
+              >
+                Delete Review
+              </MDButton>
+            </>
+          )}
 
-        <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
-
-        <MDButton
-          variant="gradient"
-          color="info"
-          onClick={verifyCloseReview}
-          sx={{
-            maxWidth: "140px",
-            maxHeight: "30px",
-            minWidth: "5px",
-            minHeight: "30px",
-            mb: 2,
-          }}
-        >
-          Close Review
-        </MDButton>
-
-        {addReviewActive && !hideButton && (
-          <MDButton
-            variant="gradient"
-            color="info"
-            onClick={addNewReview}
-            sx={{
-              maxWidth: "125px",
-              maxHeight: "30px",
-              minWidth: "5px",
-              minHeight: "30px",
-              ml: 2,
-              mb: 2,
-            }}
-          >
-            New Review
-          </MDButton>
-        )}
-
-        {!addReviewActive && !hideButton && (
-          <>
+          {hideButton && (
             <MDButton
               variant="gradient"
-              color="info"
-              onClick={updateReview}
+              color="success"
+              onClick={async () => await submitReview()}
               sx={{
-                maxWidth: "145px",
+                maxWidth: "150px",
                 maxHeight: "30px",
                 minWidth: "5px",
                 minHeight: "30px",
@@ -262,80 +291,45 @@ export default function ReviewsDone({ assignmentID, title, onClose }) {
                 mb: 2,
               }}
             >
-              Update Review
+              {addReviewActive ? "Add Review" : "Save Review"}
             </MDButton>
-
-            <MDButton
-              variant="gradient"
-              color="error"
-              onClick={() => setDeletePopMessage(true)}
-              sx={{
-                maxWidth: "145px",
-                maxHeight: "30px",
-                minWidth: "5px",
-                minHeight: "30px",
-                ml: 2,
-                mb: 2,
-              }}
-            >
-              Delete Review
-            </MDButton>
-          </>
-        )}
-
-        {hideButton && (
-          <MDButton
-            variant="gradient"
-            color="success"
-            onClick={async () => await submitReview()}
-            sx={{
-              maxWidth: "150px",
-              maxHeight: "30px",
-              minWidth: "5px",
-              minHeight: "30px",
-              ml: 2,
-              mb: 2,
-            }}
-          >
-            {addReviewActive ? "Add Review" : "Save Review"}
-          </MDButton>
-        )}
-
-        <Grid container spacing={2} mb={2}>
-          <Grid item xs={12} md={5}>
-            <Card>
-              <MDTypography ml={2} mt={2} variant="h9">
-                Title
-              </MDTypography>
-              <MDTypography ml={2} variant="body2">
-                {title}
-              </MDTypography>
-              <MDTypography ml={2} mt={2} variant="h9">
-                Abstract
-              </MDTypography>
-              <MDTypography ml={2} mb={2} mr={1} variant="body2">
-                {abstract}
-              </MDTypography>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} md={7}>
-            <ReviewsCard
-              reviewName={review.username}
-              reviewDate={review.reviewadddate}
-              review={review.reviewtext}
-              grade={review.reviewgrade}
-              read={review.read}
-              onReviewTextChange={(value) =>
-                handleReviewChange("reviewtext", value)
-              }
-              onReviewGradeChange={(value) =>
-                handleReviewChange("reviewgrade", value)
-              }
-            />
-          </Grid>
+          )}
+        </>
+      )}
+      <Grid container spacing={2} mb={2}>
+        <Grid item xs={12} md={5}>
+          <Card>
+            <MDTypography ml={2} mt={2} variant="h9">
+              Title
+            </MDTypography>
+            <MDTypography ml={2} variant="body2">
+              {title}
+            </MDTypography>
+            <MDTypography ml={2} mt={2} variant="h9">
+              Abstract
+            </MDTypography>
+            <MDTypography ml={2} mb={2} mr={1} variant="body2">
+              {abstract}
+            </MDTypography>
+          </Card>
         </Grid>
-      </Container>
+
+        <Grid item xs={12} md={7}>
+          <ReviewsCard
+            reviewName={review.username}
+            reviewDate={review.reviewadddate}
+            review={review.reviewtext}
+            grade={review.reviewgrade}
+            read={review.read}
+            onReviewTextChange={(value) =>
+              handleReviewChange("reviewtext", value)
+            }
+            onReviewGradeChange={(value) =>
+              handleReviewChange("reviewgrade", value)
+            }
+          />
+        </Grid>
+      </Grid>
     </>
   );
 }

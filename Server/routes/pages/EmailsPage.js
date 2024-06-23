@@ -18,14 +18,21 @@ router.post("/sendComposeEmail", auth.ensureAuthenticated, async (req, res) => {
         SELECT useremail
         FROM users
         JOIN userroles ON users.userid = userroles.userid
-        WHERE userroles.confID = ${confID} AND userroles.userrole IN ('Owner', 'Chair', 'Committee');
+        WHERE userroles.confID = $1 AND userroles.userrole IN ('Owner', 'Chair', 'Committee');
       `;
-    } else {
+    } else if(recipient === "chair") {
       queryText = `
         SELECT useremail
         FROM users
         JOIN userroles ON users.userid = userroles.userid
-        WHERE userroles.confID = ${confID} AND userroles.userrole IN ('Owner', 'Chair');
+        WHERE userroles.confID = $1 AND userroles.userrole IN ('Owner', 'Chair');
+      `;
+    } else if(recipient === "committee") {
+      queryText = `
+        SELECT useremail
+        FROM users
+        JOIN userroles ON users.userid = userroles.userid
+        WHERE userroles.confID = $1 AND userroles.userrole = 'Committee';
       `;
     }
 

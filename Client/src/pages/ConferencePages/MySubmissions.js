@@ -13,7 +13,7 @@ import ConferenceNavBar from "OurComponents/navBars/ConferenceNavBar";
 import CompleteTable from "OurComponents/Table/CompleteTable";
 import SubmissionsDetails from "OurComponents/Info/SubmissionDetails";
 import UpdateSubmission from "OurComponents/Info/updateSubmission";
-
+import ModalInfo from "OurComponents/Modal/ModalInfo";
 import { AuthContext } from "auth.context";
 import { ConferenceContext } from "conference.context";
 
@@ -36,70 +36,80 @@ export default function MySubmissionsPage() {
     async function fetchSubmissions() {
       setOpenLoading(true);
 
-      if (confID && user) {
-        try {
-          const update = await fetch(
-            `${process.env.REACT_APP_API_URL}/getUpdateInfo`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json; charset=UTF-8",
-              },
-              credentials: "include",
-              body: JSON.stringify({
-                confid: confID,
-              }),
-            }
-          );
-
-          const updateResponse = await update.json();
-
-          if (update.status === 200) {
-            setSubUpdate(updateResponse[0].update);
+      try {
+        const update = await fetch(
+          `${process.env.REACT_APP_API_URL}/getUpdateInfo`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json; charset=UTF-8",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              confid: confID,
+            }),
           }
+        );
 
-          const response = await fetch(
-            `${process.env.REACT_APP_API_URL}/mySubmissions`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json; charset=UTF-8",
-              },
-              credentials: "include",
-              body: JSON.stringify({
-                userID: user,
-                confID: confID,
-              }),
-            }
-          );
+        const updateResponse = await update.json();
 
-          const jsonResponse = await response.json();
-
-          if (response.ok) {
-            const transformedData = jsonResponse.map((submission) => ({
-              id: submission.id,
-              title: submission.title,
-              authors: submission.authors,
-              status: submission.status ? "Accepted" : "Pending",
-              addDate: submission.adddate,
-              abstract: submission.abstract,
-              fileUrl: submission.fileUrl,
-            }));
-            setRows(transformedData);
-          } else {
-            setError(<Alert severity="error">{jsonResponse.message}</Alert>);
-          }
-        } catch (error) {
-          setError(<Alert severity="error">Could not fetch submissions</Alert>);
+        if (update.status === 200) {
+          setSubUpdate(updateResponse[0].update);
         }
+
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/mySubmissions`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json; charset=UTF-8",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              userID: user,
+              confID: confID,
+            }),
+          }
+        );
+
+        const jsonResponse = await response.json();
+
+        if (response.ok) {
+          const transformedData = jsonResponse.map((submission) => ({
+            id: submission.id,
+            title: submission.title,
+            authors: submission.authors,
+            mainauthor: submission.mainauthor,
+            status: submission.status, // This will now be 'Accepted', 'Rejected', or 'Pending'
+            adddate: submission.adddate,
+            abstract: submission.abstract,
+            fileUrl: submission.fileUrl,
+          }));
+          setRows(transformedData);
+        } else {
+          setError(<Alert severity="error">{jsonResponse.message}</Alert>);
+        }
+      } catch (error) {
+        setError(<Alert severity="error">Could not fetch submissions</Alert>);
       }
+
       setOpenLoading(false);
     }
 
-    if (user && confID) {
+    if (user && confID && confPhase) {
       fetchSubmissions();
     }
-  }, [confID, user]);
+  }, [confID, user, confPhase]);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 6000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   const handleDelete = async () => {
     setError(null);
@@ -179,8 +189,8 @@ export default function MySubmissionsPage() {
   const columns = [
     { field: "title", headerName: "Title", width: 200 },
     { field: "status", headerName: "Status", width: 120 },
-    { field: "authors", headerName: "Authors", width: 200 },
-    { field: "addDate", headerName: "Submission Date", width: 120 },
+    { field: "mainauthor", headerName: "Main Author", width: 200 },
+    { field: "adddate", headerName: "Submission Date", width: 120 },
     {
       field: "edit",
       filterable: false,
@@ -191,7 +201,12 @@ export default function MySubmissionsPage() {
       resizable: false,
       width: 55,
       renderCell: (params) => {
-        if (confPhase !== "Submission" || !subUpdate) return null;
+        if (
+          confPhase !== "Submission" ||
+          !subUpdate ||
+          params.row.status !== "Pending"
+        )
+          return null;
 
         return (
           <div
@@ -309,7 +324,8 @@ export default function MySubmissionsPage() {
       resizable: false,
       width: 150,
       renderCell: (params) => {
-        if (confPhase !== "Submission") return null;
+        if (confPhase !== "Submission" || params.row.status !== "Pending")
+          return null;
 
         return (
           <div
@@ -358,46 +374,59 @@ export default function MySubmissionsPage() {
 
       <DashboardLayout>
         <ConferenceNavBar />
-        {!update ? (
-          <>
-            <Container maxWidth="sm">
-              <MDBox mt={10} mb={2} textAlign="left">
-                <Card>
-                  <MDTypography ml={2} variant="h6">
-                    My Submissions
-                  </MDTypography>
-                  <MDTypography ml={2} variant="body2">
-                    Here you can view and manage your submissions.
-                  </MDTypography>
-                </Card>
-
-                <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
-
-                <MDBox mb={3} textAlign="left">
+        <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          {!update ? (
+            <>
+              <Container maxWidth="sm">
+                <MDBox mt={10} mb={2} textAlign="left">
                   <Card>
-                    <CompleteTable
-                      columns={columns}
-                      rows={rows}
-                      numberOfRowsPerPage={100}
-                      height={200}
-                    />
+                    <MDTypography ml={2} variant="h6">
+                      My Submissions
+                    </MDTypography>
+                    <MDTypography ml={2} variant="body2">
+                      Here you can view and manage your submissions.<br></br>
+                      Note: You can only edit or delete your submissions if the
+                      current phase of the conference is the submission phase.
+                    </MDTypography>
                   </Card>
+
+                  <Card sx={{ mt: 2, mb: 2 }}>{error}</Card>
+
+                  <MDBox mb={3} textAlign="left">
+                    <Card>
+                      <CompleteTable
+                        columns={columns}
+                        rows={rows}
+                        numberOfRowsPerPage={10}
+                        height={200}
+                      />
+                    </Card>
+                  </MDBox>
                 </MDBox>
-              </MDBox>
-            </Container>
-            {!detailsOpen ? null : (
-              <SubmissionsDetails
-                submission={dataForDetails}
-                onClose={() => setDetailsOpen(false)}
+              </Container>
+              {!detailsOpen ? null : (
+                <ModalInfo
+                  onClose={() => setDetailsOpen(false)}
+                  height={{ xs: "90%", sm: "90%", md: "90%" }}
+                >
+                  <SubmissionsDetails
+                    submission={dataForDetails}
+                    onClose={() => setDetailsOpen(false)}
+                    userid={user}
+                    confid={confID}
+                  />
+                </ModalInfo>
+              )}
+            </>
+          ) : (
+            <ModalInfo onClose={() => setDetailsOpen(false)}>
+              <UpdateSubmission
+                submissionID={dataForUpdate}
+                onClose={() => setUpdate(false)}
               />
-            )}
-          </>
-        ) : (
-          <UpdateSubmission
-            submissionID={dataForUpdate}
-            onClose={() => setUpdate(false)}
-          />
-        )}
+            </ModalInfo>
+          )}
+        </MDBox>
         <Footer />
       </DashboardLayout>
     </>

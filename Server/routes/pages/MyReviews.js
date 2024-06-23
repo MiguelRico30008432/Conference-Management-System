@@ -15,7 +15,7 @@ router.post("/myReviews", auth.ensureAuthenticated, async (req, res) => {
             Concat(userfirstname, ' ', userlastname) AS username
         FROM ReviewsAssignments
         INNER JOIN submissions ON submissionid = assignmentsubmissionid
-        INNER JOIN users users ON submissionmainauthor = userid
+        INNER JOIN users ON submissionmainauthor = userid
         WHERE 
             assignmentuserid = ${req.body.userid}
         AND assignmentconfid = ${req.body.confid}
@@ -78,6 +78,12 @@ router.post("/saveReview", auth.ensureAuthenticated, async (req, res) => {
         INSERT INTO reviews (reviewassignmentid, reviewgrade, reviewtext)
         VALUES (${req.body.assignmentid}, ${req.body.reviewgrade}, '${req.body.reviewtext}')
         `);
+
+      db.createEvent(
+        req.body.confid,
+        req.body.responsibleUser,
+        `A new review has been submitted`
+      );
     } else {
       await db.fetchDataCst(`
         UPDATE reviews SET
@@ -86,6 +92,12 @@ router.post("/saveReview", auth.ensureAuthenticated, async (req, res) => {
         WHERE
           reviewassignmentid = ${req.body.assignmentid}
         `);
+
+      db.createEvent(
+        req.body.confid,
+        req.body.responsibleUser,
+        `A review has been updated`
+      );
     }
 
     return res.status(200).send({ msg: "" });
@@ -100,6 +112,12 @@ router.post("/deleteReview", auth.ensureAuthenticated, async (req, res) => {
     await db.fetchDataCst(`
         DELETE FROM reviews WHERE reviewassignmentid = ${req.body.assignmentid}
       `);
+
+    db.createEvent(
+      req.body.confid,
+      req.body.responsibleUser,
+      `A review has been deleted`
+    );
 
     return res.status(200).send({ msg: "" });
   } catch (error) {

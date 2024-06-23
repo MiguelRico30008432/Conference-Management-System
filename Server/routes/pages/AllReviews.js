@@ -14,7 +14,7 @@ router.post("/AllReviews", auth.ensureAuthenticated, async (req, res) => {
             Concat(userfirstname, ' ', userlastname) AS username
         FROM ReviewsAssignments
         INNER JOIN submissions ON submissionid = assignmentsubmissionid
-        INNER JOIN users users ON submissionmainauthor = userid
+        INNER JOIN users ON submissionmainauthor = userid
         WHERE 
            assignmentconfid = ${req.body.confid}
         GROUP BY
@@ -33,10 +33,9 @@ router.post("/multiReviews", auth.ensureAuthenticated, async (req, res) => {
     const abstract = await db.fetchDataCst(`
       SELECT
         submissionabstract
-      FROM ReviewsAssignments
-      INNER JOIN submissions on submissionid = assignmentsubmissionid
+      FROM submissions
       WHERE 
-        assignmentsubmissionid = ${req.body.submissionid}
+        submissionid = ${req.body.submissionid}
       `);
 
     const lines = await db.fetchDataCst(`

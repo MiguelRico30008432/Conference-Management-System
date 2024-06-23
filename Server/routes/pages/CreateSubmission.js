@@ -16,7 +16,9 @@ router.post("/createSubmission", auth.ensureAuthenticated, async (req, res) => {
 
     //insert submission
     await db.fetchDataCst(
-      `INSERT INTO submissions (submissionconfID, submissionMainAuthor, submissiontitle, submissionabstract) VALUES (${req.body.confID}, ${req.body.userid}, '${req.body.title}', '${req.body.abstract}')`
+      `INSERT INTO submissions (submissionconfID, submissionMainAuthor, submissiontitle, submissionabstract)
+      VALUES ($1, $2, $3, $4)`,
+      [req.body.confID, req.body.userid, req.body.title, req.body.abstract]
     );
 
     const submissionid = await db.fetchDataCst(

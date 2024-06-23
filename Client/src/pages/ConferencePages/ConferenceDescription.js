@@ -3,7 +3,6 @@ import ConfNavbar from "../../OurComponents/navBars/ConferenceNavBar";
 import { ConferenceContext } from "conference.context";
 import * as React from "react";
 import { useEffect, useState, useContext } from "react";
-import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import Container from "@mui/material/Container";
 import Footer from "OurComponents/footer/Footer";
@@ -42,26 +41,21 @@ export default function ConferenceDetails() {
         if (response.status === 200) {
           setDataForDetails({
             confname: jsonResponse[0].confname,
-            confcity: jsonResponse[0].confcity,
-            confcountry: jsonResponse[0].confcountry,
+            conflocation: jsonResponse[0].conflocation,
             confwebpage: jsonResponse[0].confwebpage,
             confowner: jsonResponse[0].confowner,
             confdescription: jsonResponse[0].confdescription,
-            confstartsubmission: formatDate(
-              jsonResponse[0].confstartsubmission
-            ),
-            confendsubmission: formatDate(jsonResponse[0].confendsubmission),
-            confstartreview: formatDate(jsonResponse[0].confstartreview),
-            confendreview: formatDate(jsonResponse[0].confendreview),
-            confstartbidding: formatDate(jsonResponse[0].confstartbidding),
-            confendbidding: formatDate(jsonResponse[0].confendbidding),
-            confstartdate: formatDate(jsonResponse[0].confstartdate),
-            confenddate: formatDate(jsonResponse[0].confenddate),
-            conftype: jsonResponse[0].conftype,
-            confareaid: jsonResponse[0].confareaid,
-            confmaxreviewers: jsonResponse[0].confmaxreviewers,
-            confminreviewers: jsonResponse[0].confminreviewers,
-            confadddate: formatDate(jsonResponse[0].confadddate),
+            confstartsubmission: jsonResponse[0].confstartsubmission,
+            confendsubmission: jsonResponse[0].confendsubmission,
+            confstartreview: jsonResponse[0].confstartreview,
+            confendreview: jsonResponse[0].confendreview,
+            confstartbidding: jsonResponse[0].confstartbidding,
+            confendbidding: jsonResponse[0].confendbidding,
+            confstartdate: jsonResponse[0].confstartdate,
+            confenddate: jsonResponse[0].confenddate,
+            conftypename: jsonResponse[0].conftypename,
+            confareaname: jsonResponse[0].confareaname,
+            confadddate: jsonResponse[0].confadddate,
             confcontact: jsonResponse[0].confcontact,
           });
         } else {
@@ -84,30 +78,35 @@ export default function ConferenceDetails() {
     }
   }, [confID]);
 
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-GB");
-  }
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage(null);
+      }, 6000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   return (
     <>
       {openLoading && <LoadingCircle />}
       <DashboardLayout>
         <ConfNavbar />
-        <Container maxWidth="sm">
-          <MDBox mt={10} textAlign="left">
-            <ConferenceProgressCard confID={confID} />
-          </MDBox>
-
-          <MDBox mt={2} mb={2} textAlign="left">
-            {message}
-            <MDBox mb={3} textAlign="left">
-              <Card>
-                <ConfereceDetails text={dataForDetails} />
-              </Card>
+        <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <Container maxWidth="sm">
+            <MDBox mt={10} textAlign="left">
+              <ConferenceProgressCard confID={confID} />
             </MDBox>
-          </MDBox>
-        </Container>
+
+            <MDBox mt={2} mb={2} textAlign="left">
+              {message}
+              <MDBox mb={3} textAlign="left">
+                <ConfereceDetails text={dataForDetails} />
+              </MDBox>
+            </MDBox>
+          </Container>
+        </MDBox>
         <Footer />
       </DashboardLayout>
     </>
