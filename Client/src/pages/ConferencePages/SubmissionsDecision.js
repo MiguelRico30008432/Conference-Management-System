@@ -73,6 +73,7 @@ export default function SubmissionsDecision() {
 
       // Filter submissions where submissiondecisionmade is false
       const filteredData = data.filter((item) => !item.submissiondecisionmade);
+      console.log("Fetched data:", filteredData); // Add a console log to inspect the data
       setRows(filteredData.map((item) => ({ ...item, id: uuidv4() })));
     } catch (error) {
       setError(<Alert severity="error">{error.message}</Alert>);
@@ -144,7 +145,7 @@ export default function SubmissionsDecision() {
 
   const columns = [
     { field: "submissiontitle", headerName: "Title", width: 200 },
-    { field: "authors", headerName: "Authors", width: 200 },
+    { field: "mainauthor", headerName: "Main Author", width: 200 }, // Added mainauthor column
     { field: "averagegrade", headerName: "Average Grade", width: 120 },
     {
       field: "details",

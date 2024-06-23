@@ -15,27 +15,32 @@ router.post(
     try {
       const queryText = `
       SELECT
-        submissions.submissionid,
-        submissions.submissiontitle,
-        STRING_AGG(DISTINCT authors.authorfirstname || ' ' || authors.authorlastname, ', ') AS authors,
-        TRIM(TO_CHAR(AVG(reviews.reviewgrade), '999D9'))::float AS averagegrade,
-        submissions.submissiondecisionmade,
-        submissions.submissionaccepted
-      FROM
+    submissions.submissionid,
+    submissions.submissiontitle,
+    CONCAT(users.userfirstname, ' ', users.userlastname) AS mainauthor,
+    TRIM(TO_CHAR(AVG(reviews.reviewgrade), '999D9'))::float AS averagegrade,
+    submissions.submissiondecisionmade,
+    submissions.submissionaccepted
+    FROM
         submissions
-      LEFT JOIN
+    LEFT JOIN
         reviewsassignments ON submissions.submissionid = reviewsassignments.assignmentsubmissionid
-      LEFT JOIN
+    LEFT JOIN
         reviews ON reviewsassignments.assignmentid = reviews.reviewassignmentid
-      LEFT JOIN
-        authors ON submissions.submissionid = authors.submissionid
-      WHERE
-        submissions.submissionconfid = $1 
+    INNER JOIN
+        users ON users.userid = submissions.submissionmainauthor
+    WHERE
+        submissions.submissionconfid = $1
         AND submissions.submissionaccepted = false
         AND submissions.submissiondecisionmade = false
-      GROUP BY
-        submissions.submissionid, submissions.submissiontitle
-      ORDER BY
+    GROUP BY
+        submissions.submissionid,
+        submissions.submissiontitle,
+        users.userfirstname,
+        users.userlastname,
+        submissions.submissiondecisionmade,
+        submissions.submissionaccepted
+    ORDER BY
         submissions.submissionid;
     `;
       const result = await db.pool.query(queryText, [confid]);
