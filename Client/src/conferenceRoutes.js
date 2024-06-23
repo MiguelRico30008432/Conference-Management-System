@@ -5,7 +5,6 @@ import CreateSubmission from "pages/ConferencePages/CreateSubmission";
 import MySubmissions from "pages/ConferencePages/MySubmissions";
 import AllSubmissions from "pages/ConferencePages/AllSubmissions";
 
-
 //Bidding
 import Bidding from "pages/ConferencePages/BiddingPage";
 import Conflicts from "pages/ConferencePages/Conflicts";
@@ -170,11 +169,11 @@ const ConfRoutes = [
   },
   {
     type: "collapse", //Done
-    name: "My Submission Reviews",
+    name: "Reviews of My Submissions",
     submenu: "Reviews",
     route: "/MyConferences/Conference/MySubmissionReviews",
     component: <MySubmissionReviews />,
-    permissions: ["Owner"],
+    permissions: ["Author"],
     icon: "dashboard",
   },
   {

@@ -40,7 +40,6 @@ export default function MySubmissionReviews() {
       );
 
       if (response) {
-        console.log(response)
         for (let line of response) {
           line.id = uuidv4();
           setRows((allExistingRows) => [...allExistingRows, line]);
@@ -162,13 +161,12 @@ export default function MySubmissionReviews() {
                 <MDBox mb={3} textAlign="left">
                   <Card>
                     <MDTypography ml={2} variant="h6">
-                      All Reviews
+                      My Submissions Reviews
                     </MDTypography>
                     <MDTypography ml={2} variant="body2">
-                    Here as a Owner you can browse and consult all reviews for your
-                      submissions. <br></br>Gain insights from detailed feedback provided
-                      by our reviewers. This resource ensures transparency and
-                      helps maintain the high standards of our conference.
+                      Here you can check the reviews of your submissions. Click
+                      the "Check Reviews" button to see the reviews and their
+                      respective grades. conference.
                     </MDTypography>
                   </Card>
                 </MDBox>
