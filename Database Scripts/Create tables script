@@ -54,11 +54,10 @@ CREATE TABLE conferences (
     FOREIGN KEY (confType) REFERENCES confTypes(confTypeID),
     confAreaID INT,
     FOREIGN KEY (confAreaID) REFERENCES confAreas(confAreaID),
-    confMaxReviewers INT,
-    confMinReviewers INT,
-    confMaxSubmissions INT,
-    confAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp,
-    confApproved INT DEFAULT 0
+    confApproved INT DEFAULT 0,
+    confContact VARCHAR(250),
+    confAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
+    
 )
 
 INSERT INTO conferences (confName, confCity, confCountry, confWebPage, confOwner, confDescription, confStartDate, confEndDate, confStartSubmission, confEndSubmission, confStartReview, confEndReview, confStartBidding, confEndBidding, confType, confAreaID, confMaxReviewers, confMinReviewers, confMaxSubmissions, confCode)
@@ -78,9 +77,10 @@ CREATE TABLE submissions(
     submissionconfID INT,FOREIGN KEY (confID) REFERENCES conferences(confID),
     submissionAccepted BOOLEAN DEFAULT false,
     submissionMainAuthor INT,FOREIGN KEY (userid) REFERENCES users(userid),
-    submissionabstract TEXT NOT NULL
-    submissiontitle VARCHAR(255) NOT NULL
-    submissionAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
+    submissionabstract TEXT NOT NULL,
+    submissiontitle VARCHAR(255) NOT NULL,
+    submissionAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp,
+    submissionDecisionMade BOOLEAN DEFAULT false,
 );
 
 ___________________________________________________________________________________________________________
@@ -104,16 +104,6 @@ CREATE TABLE reviews(
     reviewText TEXT,
     reviewAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
-___________________________________________________________________________________________________________
-Table Files
-
-CREATE TABLE files(
-    fileID SERIAL primary KEY,
-    fileName VARCHAR(200),
-    file VARCHAR,
-    submissionID INT, FOREIGN KEY (submissionID) REFERENCES submissions(submissionID),
-    fileAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
-);
 
 ___________________________________________________________________________________________________________
 Table Authors
@@ -122,7 +112,11 @@ CREATE TABLE authors(
     authorID SERIAL primary KEY,
     userID INT,FOREIGN KEY (userID) REFERENCES users(userID),
     submissionID INT,FOREIGN KEY (submissionID) REFERENCES submissions(submissionID),
-    authorAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
+    authorAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp,
+    authorFirstName VARCHAR(50) NOT NULL,
+    authorLastName VARCHAR(50) NOT NULL,
+    authorEmail VARCHAR(100) NOT NULL,
+    authoraffiliation VARCHAR(20) NOT NULL
 );
 ___________________________________________________________________________________________________________
 Table Invitations
@@ -132,7 +126,7 @@ CREATE TABLE invitations(
     confID INT,
     FOREIGN KEY (confID) REFERENCES conferences(confID),
     invitationEmail VARCHAR(200),
-    invitationCode VARCHAR(200),
+    invitationCode VARCHAR(10),
     invitationRole VARCHAR(50),
     invitationCodeUsed BOOLEAN DEFAULT false,
     invitationAddDate TIMESTAMP NOT NULL DEFAULT current_timestamp
@@ -156,7 +150,7 @@ CREATE TABLE conflicts (
     conflictconfid INT, FOREIGN KEY (conflictconfid) REFERENCES conferences(confid),
     conflictsubmissionid INT, FOREIGN KEY (conflictsubmissionid) REFERENCES submissions(submissionid),
     conflictreason VARCHAR,
-    conflictuseremail VARCHAR,
+    conflictuserid INT, FOREIGN KEY (conflictuserid) REFERENCES users(userid),
     conflictadddata TIMESTAMP NOT NULL DEFAULT current_timestamp
 )
 
@@ -180,3 +174,11 @@ CREATE TABLE ReviewsAssignments (
     assignmentuserid INT, FOREIGN KEY (assignmentuserid) REFERENCES users(userid),
     assignmentmanually BOOLEAN,
     assignmentadddate TIMESTAMP NOT NULL DEFAULT current_timestamp);
+__________________________________________________________________________________________________________
+
+Create Table Sessions (
+    sid SERIAL primary KEY,
+    sess VARCHAR,
+    expire TIMESTAMP,
+
+);
