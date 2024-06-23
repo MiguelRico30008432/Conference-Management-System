@@ -26,7 +26,7 @@ export default function CommitteeInfo({ memberName, memberInfoData, onClose }) {
       const response = await fetchAPI(
         "committeeDetailedInfo",
         "POST",
-        { userid: memberInfoData.userid },
+        { userid: memberInfoData.userid, confid: memberInfoData.confid },
         setError,
         setOpenLoading
       );

@@ -20,6 +20,12 @@ router.post(
         INNER JOIN users ON authors.userid = users.userid
         INNER JOIN ReviewsAssignments ON assignmentsubmissionid = submissions.submissionid
         WHERE users.userid = ${req.body.userid} AND assignmentconfid = ${req.body.confid}
+        GROUP BY
+          submissions.submissionid,
+          submissiontitle,
+          submissionadddate,
+          userfirstname,
+          userlastname
         `);
 
       return res.status(200).send(result);

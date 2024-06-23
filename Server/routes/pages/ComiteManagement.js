@@ -8,6 +8,7 @@ router.post("/comite", auth.ensureAuthenticated, async (req, res) => {
   try {
     const result = await db.fetchDataCst(`
    SELECT
+        ${req.body.confid} AS confid,
         users.userid,
         userfirstname,
         userlastname,
@@ -34,6 +35,7 @@ router.post(
   async (req, res) => {
     try {
       const userid = req.body.userid;
+      const confid = req.body.confid;
 
       const submissions = await db.fetchDataCst(`
         SELECT
@@ -42,6 +44,7 @@ router.post(
         INNER JOIN submissions on submissions.submissionid = authors.submissionid
         WHERE
           authors.userid = ${userid}
+        AND submissionconfid = ${confid}
         GROUP BY submissiontitle
       `);
 
@@ -52,6 +55,7 @@ router.post(
           INNER JOIN submissions on submissions.submissionid = conflictsubmissionid
           WHERE
            conflictuserid = ${userid}
+          AND conflictconfid = ${confid}
           GROUP BY submissiontitle
         `);
 
@@ -62,6 +66,7 @@ router.post(
         INNER JOIN submissions on submissions.submissionid = biddingsubmissionid
         WHERE
          biddinguserid = ${userid}
+        AND biddingconfid = ${confid}
         GROUP BY submissiontitle
       `);
       const reviews = await db.fetchDataCst(`
@@ -71,6 +76,7 @@ router.post(
           INNER JOIN submissions on submissions.submissionid = assignmentsubmissionid
           WHERE 
             assignmentuserid = ${userid}
+          AND submissionconfid = ${confid}
       `);
 
       return res.status(200).send({

@@ -14,7 +14,7 @@ router.post(
       return res.status(200).send({ msg: response });
     } catch (error) {
       log.addLog(error, "database", "Bidding -> /reviewsAssignmentsAlgorithm");
-      return res.status(500).send({ msg: response });
+      return res.status(500).send({ msg: error });
     }
   }
 );
