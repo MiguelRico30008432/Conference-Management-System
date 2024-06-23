@@ -90,26 +90,6 @@ router.post("/createConference", auth.ensureAuthenticated, async (req, res) => {
       ]
     );
 
-    await db.addData("conferences", {
-      confname: title,
-      confowner: user,
-      conftype: conftypeid,
-      confareaid: confareaid,
-      confstartdate: startDate,
-      confenddate: endDate,
-      confstartsubmission: submissionStartDate,
-      confendsubmission: submissionEndDate,
-      confstartreview: reviewStartDate,
-      confendreview: reviewEndDate,
-      confstartbidding: biddingStartDate,
-      confendbidding: biddingEndDate,
-      confdescription: description,
-      confcountry: country,
-      confcity: city,
-      confwebpage: confLink,
-      confcontact: contact,
-    });
-
     const query = `
       SELECT 
         confid
