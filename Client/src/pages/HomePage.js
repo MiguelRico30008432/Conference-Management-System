@@ -11,6 +11,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import UpperNavBar from "OurComponents/navBars/UpperNavBar";
 
 const ImageBox = styled(Box)(({ theme }) => ({
   position: "relative",
@@ -48,6 +49,7 @@ const HomePage = () => {
 
   return (
     <DashboardLayout>
+      <UpperNavBar whereIAm={""} />
       <MDBox sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
         <Container maxWidth="lg">
           <Box sx={{ textAlign: "center", my: 4 }}>

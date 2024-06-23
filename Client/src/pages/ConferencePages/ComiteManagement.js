@@ -22,7 +22,7 @@ import CommitteeInfo from "OurComponents/Info/CommitteeInfo";
 import { fetchAPI } from "OurFunctions/fetchAPI";
 
 export default function ComitteeManagementPage() {
-  const { confID, userRole } = useContext(ConferenceContext);
+  const { confID, userRole, confPhase } = useContext(ConferenceContext);
   const { user } = useContext(AuthContext);
 
   const [infoOpen, setInfoOpen] = useState(false);
@@ -173,7 +173,12 @@ export default function ComitteeManagementPage() {
       resizable: false,
       width: 110,
       renderCell: (params) => {
-        if (params.row.userid === user || params.row.userrole === "Owner")
+        if (
+          params.row.userid === user ||
+          params.row.userrole === "Owner" ||
+          confPhase !== "Submission" ||
+          confPhase !== "Configuration"
+        )
           return null;
 
         return (
