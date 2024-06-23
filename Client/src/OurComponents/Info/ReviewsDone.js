@@ -94,18 +94,19 @@ export default function ReviewsDone({
         if (response) {
           setError(
             <Alert severity="success">
-              Submission {addReviewActive ? "registered" : "updated"} with
-              success
+              Review {addReviewActive ? "registered" : "updated"} with success
             </Alert>
           );
+
+          // Update original values to reflect the updated state
+          setOriginReview(review.reviewtext);
+          setOriginGrade(review.reviewgrade);
+
+          disabledReviews();
+          setAddReviewActive(false);
+          setHideButton(false);
         }
       }
-
-      disabledReviews();
-      setAddReviewActive(false);
-      setHideButton(false);
-      setOriginReview(review.reviewtext);
-      setOriginGrade(review.reviewgrade);
     }
   }
 
@@ -169,21 +170,18 @@ export default function ReviewsDone({
   }
 
   function changeDetected() {
-    let text = review.reviewtext ?? null;
-    let grade = review.reviewgrade ?? null;
-    if (text === "") text = null;
-    if (grade === 1) grade = null;
+    const text = review.reviewtext ?? "";
+    const grade = review.reviewgrade ?? 1;
 
     if (text !== originReview || grade !== originGrade) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   function verifyRequiredFields() {
-    const text = review.reviewtext ?? null;
-    const grade = review.reviewgrade ?? null;
+    const text = review.reviewtext ?? "";
+    const grade = review.reviewgrade ?? 1;
 
     if (text === "" || text === null) {
       setError(<Alert severity="error">Your review cannot be empty</Alert>);
