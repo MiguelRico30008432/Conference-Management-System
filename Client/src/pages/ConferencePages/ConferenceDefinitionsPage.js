@@ -447,7 +447,7 @@ export default function DefinitionsPage() {
                   </MDTypography>
                   <MDTypography ml={2} variant="body2">
                     Here you can edit some settings for your conference,
-                    inclusive the dates to fowartd or backward some specific
+                    inclusive the dates to forward or backward some specific
                     phase for your conference.
                   </MDTypography>
                 </Card>

@@ -40,23 +40,6 @@ export default function ComitteeManagementPage() {
   const [memberInfoData, setMemberInfoData] = useState({});
 
   useEffect(() => {
-    async function getRows() {
-      const response = await fetchAPI(
-        "comite",
-        "POST",
-        { confid: confID },
-        setError,
-        setOpenLoading
-      );
-
-      if (response) {
-        for (let line of response) {
-          line.id = uuidv4();
-          setRow((allExistingRows) => [...allExistingRows, line]);
-        }
-      }
-    }
-
     if (confID > 0) getRows();
   }, [confID]);
 
@@ -212,6 +195,28 @@ export default function ComitteeManagementPage() {
     },
   ];
 
+  async function getRows() {
+    const response = await fetchAPI(
+      "comite",
+      "POST",
+      { confid: confID },
+      setError,
+      setOpenLoading
+    );
+
+    if (response) {
+      for (let line of response) {
+        line.id = uuidv4();
+        setRow((allExistingRows) => [...allExistingRows, line]);
+      }
+    }
+  }
+
+  async function resetTableValues() {
+    setRow([]);
+    await getRows();
+  }
+
   async function deleteMember() {
     setOpenLoading(true);
     try {
@@ -232,7 +237,8 @@ export default function ComitteeManagementPage() {
       );
 
       if (response.status === 200) {
-        window.location.reload();
+        await resetTableValues();
+        setError(<Alert severity="success">User deleted</Alert>);
       } else {
         const jsonResponse = await response.json();
         setError(<Alert severity="error">{jsonResponse.msg}</Alert>);
@@ -264,7 +270,8 @@ export default function ComitteeManagementPage() {
       );
 
       if (response.status === 200) {
-        window.location.reload();
+        await resetTableValues();
+        setError(<Alert severity="success">Role Updated</Alert>);
       } else {
         const jsonResponse = await response.json();
         setError(<Alert severity="error">{jsonResponse.msg}</Alert>);

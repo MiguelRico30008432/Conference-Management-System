@@ -139,8 +139,8 @@ export default function MyConferences() {
               <MDTypography ml={2} variant="body2">
                 On this page, you'll find a comprehensive list of all the
                 conferences you are participating in. Once inside, you'll have
-                access to a wealth of resources, sessions, and interactive
-                features tailored to enhance your conference experience.
+                access to several resources, sessions, and interactive features
+                tailored to enhance your conference experience.
               </MDTypography>
 
               <MDTypography ml={2} variant="body2">
