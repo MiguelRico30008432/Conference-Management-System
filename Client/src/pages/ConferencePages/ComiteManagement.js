@@ -173,11 +173,11 @@ export default function ComitteeManagementPage() {
       resizable: false,
       width: 110,
       renderCell: (params) => {
+        console.log(confPhase);
         if (
           params.row.userid === user ||
           params.row.userrole === "Owner" ||
-          confPhase !== "Submission" ||
-          confPhase !== "Configuration"
+          (confPhase !== "Submission" && confPhase !== "Configuration")
         )
           return null;
 

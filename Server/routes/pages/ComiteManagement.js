@@ -94,11 +94,31 @@ router.post(
 
 router.post("/removePCMember", auth.ensureAuthenticated, async (req, res) => {
   try {
-    await db.fetchDataCst(`
-      DELETE FROM userRoles
-      WHERE
+    const memberSubmissions = await db.fetchDataCst(`
+      SELECT
+        submissionid
+      FROM 
+        submissions
+      WHERE 
+        submissionconfid = ${req.body.confid}
+      AND submissionmainauthor = ${req.body.userid}
+    `);
+    if (memberSubmissions.length > 0) {
+      await db.fetchDataCst(`
+        DELETE FROM userRoles
+        WHERE
           confid = ${req.body.confid}
-      AND userid = ${req.body.userid}`);
+          AND userid = ${req.body.userid}
+          AND userrole IN ('Chair', 'Committee')
+    `);
+    } else {
+      await db.fetchDataCst(`
+        DELETE FROM userRoles
+        WHERE
+            confid = ${req.body.confid}
+        AND userid = ${req.body.userid}
+      `);
+    }
 
     const user = await db.fetchDataCst(
       `SELECT CONCAT(userfirstname, ' ',userlastname) as user FROM users WHERE userid = ${req.body.userid}`

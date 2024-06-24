@@ -193,6 +193,7 @@ export default function UpdateSubmission({ onClose, submissionID }) {
         setOriginalAuthors(JSON.parse(JSON.stringify(authors)));
 
         resetToDefaultValues();
+        onClose();
       } else {
         setMessage(`${jsonResponse.msg}`);
       }
