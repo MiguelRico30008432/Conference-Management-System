@@ -187,7 +187,13 @@ export default function UpdateSubmission({ onClose, submissionID }) {
       if (response.status === 200) {
         setMessage("Submission updated successfully");
 
+        // Update original values to reflect the updated state
+        setOriginalTitle(title.trim());
+        setOriginalAbstract(abstract.trim());
+        setOriginalAuthors(JSON.parse(JSON.stringify(authors)));
+
         resetToDefaultValues();
+        onClose();
       } else {
         setMessage(`${jsonResponse.msg}`);
       }
@@ -287,7 +293,6 @@ export default function UpdateSubmission({ onClose, submissionID }) {
           maxHeight: "30px",
           minWidth: "5px",
           minHeight: "30px",
-
           mb: 2,
         }}
       >
@@ -508,7 +513,6 @@ export default function UpdateSubmission({ onClose, submissionID }) {
           maxHeight: "30px",
           minWidth: "5px",
           minHeight: "30px",
-
           mt: 2,
           mb: 2,
         }}
