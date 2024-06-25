@@ -258,7 +258,7 @@ export default function SignUpPage() {
                       <TextField
                         fullWidth
                         id="code"
-                        label="Intivation Code"
+                        label="Invitation Code"
                         name="code"
                       />
                     </FieldInfo>
