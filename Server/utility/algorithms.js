@@ -138,8 +138,9 @@ async function ReviewsAssignmentAlgorihtm(confid) {
 
   //Variable used in the while loop (will be true when all submission have the minimun number of reviewers assigned)
   let MinReviews = false;
+  let loopsCompleted = 0;
 
-  while (MinReviews === false) {
+  while (MinReviews === false || loopsCompleted === 5) {
     for (const submission of submissions) {
       let membersToAddWorkload = [];
       //Create temporary list with committee members with no conflict with the current submission
@@ -310,6 +311,7 @@ async function ReviewsAssignmentAlgorihtm(confid) {
       confid,
       reviewersNeededPerReview
     );
+    loopsCompleted++;
   }
   return "Algorithm runned successfully";
 }
