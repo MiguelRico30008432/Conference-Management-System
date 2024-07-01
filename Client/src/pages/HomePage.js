@@ -4,6 +4,11 @@ import Footer from "OurComponents/footer/Footer";
 import imageroom from "../assets/images/imageroom.jpg";
 import imageroom1 from "../assets/images/imageroom1.jpg";
 import imageroom2 from "../assets/images/imageroom2.jpg";
+import conferenceManagement from "../assets/images/conferenceManagement.jpg";
+import submitPapers from "../assets/images/submitPapers.jpg";
+import review from "../assets/images/review.jpg";
+import dinamysm from "../assets/images/dynamism.jpg";
+import bidding from "../assets/images/bidding.jpg";
 import MDBox from "components/MDBox";
 import { Typography, Box, Container, Grid, Avatar } from "@mui/material";
 import { styled } from "@mui/system";
@@ -76,7 +81,9 @@ const HomePage = () => {
             </Typography>
             <Grid container spacing={4}>
               <Grid item xs={12} md={4}>
-                <ImageBox sx={{ backgroundImage: `url(${imageroom})` }} />
+                <ImageBox
+                  sx={{ backgroundImage: `url(${conferenceManagement})` }}
+                />
                 <Box sx={{ textAlign: "center", p: 2 }}>
                   <Typography variant="h6">Conference Management</Typography>
                   <Typography color="textSecondary">
@@ -86,7 +93,7 @@ const HomePage = () => {
                 </Box>
               </Grid>
               <Grid item xs={12} md={4}>
-                <ImageBox sx={{ backgroundImage: `url(${imageroom2})` }} />
+                <ImageBox sx={{ backgroundImage: `url(${submitPapers})` }} />
                 <Box sx={{ textAlign: "center", p: 2 }}>
                   <Typography variant="h6">Submit Papers</Typography>
                   <Typography color="textSecondary">
@@ -96,7 +103,7 @@ const HomePage = () => {
                 </Box>
               </Grid>
               <Grid item xs={12} md={4}>
-                <ImageBox sx={{ backgroundImage: `url(${imageroom1})` }} />
+                <ImageBox sx={{ backgroundImage: `url(${review})` }} />
                 <Box sx={{ textAlign: "center", p: 2 }}>
                   <Typography variant="h6">Review Process</Typography>
                   <Typography color="textSecondary">
@@ -113,7 +120,7 @@ const HomePage = () => {
             </Typography>
             <Grid container spacing={4}>
               <Grid item xs={12} md={6}>
-                <ImageBox sx={{ backgroundImage: `url(${imageroom})` }} />
+                <ImageBox sx={{ backgroundImage: `url(${bidding})` }} />
               </Grid>
               <Grid item xs={12} md={6}>
                 <Typography variant="body1" color="textSecondary" paragraph>
@@ -138,7 +145,7 @@ const HomePage = () => {
             </Typography>
             <Grid container spacing={4}>
               <Grid item xs={12} md={6}>
-                <ImageBox sx={{ backgroundImage: `url(${imageroom1})` }} />
+                <ImageBox sx={{ backgroundImage: `url(${dinamysm})` }} />
               </Grid>
               <Grid item xs={12} md={6}>
                 <Typography variant="body1" color="textSecondary" paragraph>
