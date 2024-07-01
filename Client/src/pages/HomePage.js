@@ -163,49 +163,6 @@ const HomePage = () => {
               </Grid>
             </Grid>
           </Box>
-          <Box sx={{ my: 4 }}>
-            <Typography variant="h4" gutterBottom>
-              Testimonials
-            </Typography>
-            <Grid container spacing={4}>
-              <Grid item xs={12} md={4}>
-                <Box sx={{ textAlign: "center", p: 2 }}>
-                  <Avatar sx={{ width: 80, height: 80, margin: "0 auto" }}>
-                    <PersonIcon sx={{ fontSize: 50 }} />
-                  </Avatar>
-                  <Typography variant="h6">John Doe</Typography>
-                  <Typography color="textSecondary">
-                    "The platform transformed how we organize our conference.
-                    Everything became simpler and more organized."
-                  </Typography>
-                </Box>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Box sx={{ textAlign: "center", p: 2 }}>
-                  <Avatar sx={{ width: 80, height: 80, margin: "0 auto" }}>
-                    <PersonIcon sx={{ fontSize: 50 }} />
-                  </Avatar>
-                  <Typography variant="h6">Jane Smith</Typography>
-                  <Typography color="textSecondary">
-                    "The submission and review process has never been easier.
-                    The reviewers loved the intuitive interface."
-                  </Typography>
-                </Box>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Box sx={{ textAlign: "center", p: 2 }}>
-                  <Avatar sx={{ width: 80, height: 80, margin: "0 auto" }}>
-                    <PersonIcon sx={{ fontSize: 50 }} />
-                  </Avatar>
-                  <Typography variant="h6">Carlos Santos</Typography>
-                  <Typography color="textSecondary">
-                    "Automatic reviewer assignment saved a lot of time and
-                    improved the quality of the reviews."
-                  </Typography>
-                </Box>
-              </Grid>
-            </Grid>
-          </Box>
         </Container>
       </MDBox>
       <Footer />
