@@ -78,7 +78,6 @@ export default function CommitteeInfo({ memberName, memberInfoData, onClose }) {
             <TextField
               name="First name"
               label="First name"
-              autoFocus
               disabled
               value={memberInfoData.userfirstname}
               sx={{
@@ -90,7 +89,6 @@ export default function CommitteeInfo({ memberName, memberInfoData, onClose }) {
             <TextField
               name="Last name"
               label="Last name"
-              autoFocus
               disabled
               value={memberInfoData.userlastname}
               sx={{
@@ -105,7 +103,6 @@ export default function CommitteeInfo({ memberName, memberInfoData, onClose }) {
             <TextField
               name="Email"
               label="Email"
-              autoFocus
               disabled
               value={memberInfoData.useremail}
               sx={{
@@ -117,7 +114,6 @@ export default function CommitteeInfo({ memberName, memberInfoData, onClose }) {
             <TextField
               name="Phone"
               label="Phone"
-              autoFocus
               disabled
               value={memberInfoData.userphone}
               sx={{
@@ -132,7 +128,6 @@ export default function CommitteeInfo({ memberName, memberInfoData, onClose }) {
             <TextField
               name="Affiliation"
               label="Affiliation"
-              autoFocus
               disabled
               value={memberInfoData.useraffiliation}
               sx={{
@@ -144,7 +139,6 @@ export default function CommitteeInfo({ memberName, memberInfoData, onClose }) {
             <TextField
               name="Role"
               label="Role"
-              autoFocus
               disabled
               value={memberInfoData.userrole}
               sx={{
@@ -156,7 +150,6 @@ export default function CommitteeInfo({ memberName, memberInfoData, onClose }) {
             <TextField
               name="Add Date"
               label="Add Date"
-              autoFocus
               disabled
               value={memberInfoData.useradddate}
               sx={{

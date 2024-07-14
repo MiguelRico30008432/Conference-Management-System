@@ -487,8 +487,7 @@ export default function CreateConference() {
                         autoComplete="given-name"
                         name="city"
                         id="city"
-                        label="City"
-                        autoFocus
+                        label="City"ZZ
                         inputProps={{ maxLength: 40 }}
                       />
                     </Grid>

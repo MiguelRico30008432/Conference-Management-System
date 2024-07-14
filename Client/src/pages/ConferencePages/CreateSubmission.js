@@ -252,7 +252,6 @@ export default function CreateSubmission() {
                             required
                             fullWidth
                             label="Last Name"
-                            autoFocus
                             value={author.lastName}
                             disabled={true}
                             sx={{ ml: 2, mb: 2, width: "30%" }}
@@ -264,7 +263,6 @@ export default function CreateSubmission() {
                             fullWidth
                             label="Email"
                             autoComplete="email"
-                            autoFocus
                             value={author.email}
                             disabled={true}
                             sx={{ ml: 2, mb: 2, width: "30%" }}
@@ -275,7 +273,6 @@ export default function CreateSubmission() {
                             required
                             fullWidth
                             label="Affiliation"
-                            autoFocus
                             value={author.affiliation}
                             disabled={true}
                             sx={{ ml: 2, mb: 2, width: "30%" }}
@@ -301,6 +298,7 @@ export default function CreateSubmission() {
                                 e.target.value
                               )
                             }
+                            inputProps={{ maxLength: 50 }}
                             sx={{ ml: 2, mb: 2, width: "30%" }}
                           />
 
@@ -309,7 +307,6 @@ export default function CreateSubmission() {
                             required
                             fullWidth
                             label="Last Name"
-                            autoFocus
                             value={author.lastName}
                             onChange={(e) =>
                               handleInputChange(
@@ -318,6 +315,7 @@ export default function CreateSubmission() {
                                 e.target.value
                               )
                             }
+                            inputProps={{ maxLength: 50 }}
                             sx={{ ml: 2, mb: 2, width: "30%" }}
                           />
 
@@ -327,10 +325,10 @@ export default function CreateSubmission() {
                             fullWidth
                             label="Email"
                             autoComplete="email"
-                            autoFocus
                             onChange={(e) =>
                               handleInputChange(index, "email", e.target.value)
                             }
+                            inputProps={{ maxLength: 100 }}
                             sx={{ ml: 2, mb: 2, width: "30%" }}
                           />
 
@@ -339,7 +337,6 @@ export default function CreateSubmission() {
                             required
                             fullWidth
                             label="Affiliation"
-                            autoFocus
                             onChange={(e) =>
                               handleInputChange(
                                 index,
@@ -347,6 +344,7 @@ export default function CreateSubmission() {
                                 e.target.value
                               )
                             }
+                            inputProps={{ maxLength: 20 }}
                             sx={{ ml: 2, mb: 2, width: "30%" }}
                           />
 
