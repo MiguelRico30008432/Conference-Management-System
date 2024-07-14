@@ -421,6 +421,7 @@ export default function CreateConference() {
                         id="title"
                         label="Title"
                         autoFocus
+                        inputProps={{ maxLength: 200 }} 
                         sx={{ mt: 3 }}
                       />
                     </Grid>
@@ -476,6 +477,7 @@ export default function CreateConference() {
                         label="Country"
                         type="text"
                         id="country"
+                        inputProps={{ maxLength: 40 }}
                       />
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -487,6 +489,7 @@ export default function CreateConference() {
                         id="city"
                         label="City"
                         autoFocus
+                        inputProps={{ maxLength: 40 }}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -548,6 +551,7 @@ export default function CreateConference() {
                         type="url"
                         id="confLink"
                         sx={{ marginBottom: "15px" }}
+                        inputProps={{ maxLength: 250 }}
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position="start">
@@ -565,6 +569,7 @@ export default function CreateConference() {
                         type="text"
                         id="contact"
                         sx={{ marginBottom: "15px" }}
+                        inputProps={{ maxLength: 250 }}
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position="start">

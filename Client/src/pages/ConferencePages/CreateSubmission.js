@@ -393,6 +393,7 @@ export default function CreateSubmission() {
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         sx={{ ml: 2, width: "80%" }}
+                        inputProps={{ maxLength: 255 }}
                       />
                       <MDBox
                         sx={{
