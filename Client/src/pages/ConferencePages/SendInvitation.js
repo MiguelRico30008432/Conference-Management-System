@@ -18,13 +18,13 @@ import FormControl from "@mui/material/FormControl";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import MDBox from "components/MDBox";
 import Alert from "@mui/material/Alert";
+import BlockPageForConfStatus from "OurComponents/errorHandling/BlockPageForConfStatus";
 
 // Email validation regex
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function SendInvitation() {
-  const { user } = useContext(AuthContext);
-  const { confID } = useContext(ConferenceContext);
+  const { confID, confPhase } = useContext(ConferenceContext);
   const [openLoading, setOpenLoading] = useState(false);
   const [role, setRole] = useState("");
   const [roleError, setRoleError] = useState("");
@@ -36,8 +36,14 @@ export default function SendInvitation() {
   const [deleteSuccessMessage, setDeleteSuccessMessage] = useState("");
   const [invitationEmailSuccess, setInvitationEmailSuccess] = useState("");
   const [alreadyInvitedEmails, setAlreadyInvitedEmails] = useState([]);
+  const { user, isLoggedIn } = useContext(AuthContext);
+  const [blockCrud, setBlockCrud] = useState(false);
 
   useEffect(() => {
+    if (isLoggedIn && confID && confPhase) {
+      if (confPhase === "Review" || confPhase === "Bidding") setBlockCrud(true);
+      else getData();
+    }
     if (emailError) {
       const timer = setTimeout(() => {
         setEmailError(null);
@@ -45,7 +51,7 @@ export default function SendInvitation() {
 
       return () => clearTimeout(timer);
     }
-  }, [emailError]);
+  }, [emailError, confID, isLoggedIn, confPhase]);
 
   const columns = [
     { field: "recipient", headerName: "Recipient", width: 200 },
@@ -250,6 +256,8 @@ export default function SendInvitation() {
       <DashboardLayout>
         <ConfNavbar />
         <Container maxWidth="sm">
+        {!blockCrud && (
+              <>
           <MDBox mt={10} textAlign="left">
             <Card>
               <MDTypography ml={2} variant="h6">
@@ -354,6 +362,17 @@ export default function SendInvitation() {
             </Card>
           </MDBox>
           <br></br>
+          </>
+            )}
+            {blockCrud && (
+              <>
+                <BlockPageForConfStatus
+                  text={
+                    "It seems that this conference is not in the configuration or submission phase."
+                  }
+                />
+              </>
+            )}
         </Container>
         <Footer />
       </DashboardLayout>

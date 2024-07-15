@@ -288,6 +288,7 @@ export default function MyProfilePage() {
                     autoFocus
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
+                    inputProps={{ maxLength: 50 }}
                     sx={{ ml: 2, mt: 2, width: "90%" }}
                   />
                 </Grid>
@@ -301,6 +302,7 @@ export default function MyProfilePage() {
                     autoComplete="family-name"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
+                    inputProps={{ maxLength: 50 }}
                     sx={{ ml: 2, mt: 2, width: "90%" }}
                   />
                 </Grid>
@@ -313,6 +315,7 @@ export default function MyProfilePage() {
                     name="affiliation"
                     value={affiliation}
                     onChange={(e) => setAffiliation(e.target.value)}
+                    inputProps={{ maxLength: 20 }}
                     sx={{ ml: 2, mt: 2, width: "90%" }}
                   />
                 </Grid>
@@ -328,6 +331,7 @@ export default function MyProfilePage() {
                     onChange={(e) => {
                       setEmail(e.target.value);
                     }}
+                    inputProps={{ maxLength: 100 }}
                     sx={{ ml: 2, mt: 2, width: "90%" }}
                   />
                 </Grid>
@@ -343,6 +347,7 @@ export default function MyProfilePage() {
                     onChange={(e) => {
                       setPhone(e.target.value);
                     }}
+                    inputProps={{ maxLength: 18 }}
                     sx={{ ml: 2, mt: 2, width: 150 }}
                   />
                 </Grid>
@@ -393,6 +398,7 @@ export default function MyProfilePage() {
                     onChange={(e) => {
                       setPasword(e.target.value);
                     }}
+                    inputProps={{ maxLength: 200 }}
                     sx={{ ml: 2, width: "90%" }}
                   />
 
@@ -406,6 +412,7 @@ export default function MyProfilePage() {
                     onChange={(e) => {
                       setRepeatPassword(e.target.value);
                     }}
+                    inputProps={{ maxLength: 200 }}
                     sx={{ mt: 2, ml: 2, width: "90%" }}
                   />
 
@@ -450,6 +457,7 @@ export default function MyProfilePage() {
                     onChange={(e) => {
                       setInviteCode(e.target.value);
                     }}
+                    inputProps={{ maxLength: 10 }}
                     sx={{ ml: 2, width: "90%" }}
                   />
 

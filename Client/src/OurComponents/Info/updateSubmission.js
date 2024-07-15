@@ -323,7 +323,6 @@ export default function UpdateSubmission({ onClose, submissionID }) {
               required
               fullWidth
               label="Last Name"
-              autoFocus
               value={author.lastName}
               disabled={true}
               sx={{ ml: 2, mb: 2, width: { xs: "90%", sm: "30%", md: "30%" } }}
@@ -335,7 +334,6 @@ export default function UpdateSubmission({ onClose, submissionID }) {
               fullWidth
               label="Email"
               autoComplete="email"
-              autoFocus
               value={author.email}
               disabled={true}
               sx={{ ml: 2, mb: 2, width: { xs: "90%", sm: "30%", md: "30%" } }}
@@ -346,7 +344,6 @@ export default function UpdateSubmission({ onClose, submissionID }) {
               required
               fullWidth
               label="Affiliation"
-              autoFocus
               value={author.affiliation}
               disabled={true}
               sx={{ ml: 2, mb: 2, width: { xs: "90%", sm: "30%", md: "30%" } }}
@@ -363,11 +360,11 @@ export default function UpdateSubmission({ onClose, submissionID }) {
               required
               fullWidth
               label="First Name"
-              autoFocus
               value={author.firstName}
               onChange={(e) =>
                 handleInputChange(index, "firstName", e.target.value)
               }
+              inputProps={{ maxLength: 50 }}
               sx={{ ml: 2, mb: 2, width: { xs: "90%", sm: "30%", md: "30%" } }}
             />
 
@@ -376,11 +373,11 @@ export default function UpdateSubmission({ onClose, submissionID }) {
               required
               fullWidth
               label="Last Name"
-              autoFocus
               value={author.lastName}
               onChange={(e) =>
                 handleInputChange(index, "lastName", e.target.value)
               }
+              inputProps={{ maxLength: 50 }}
               sx={{ ml: 2, mb: 2, width: { xs: "90%", sm: "30%", md: "30%" } }}
             />
 
@@ -390,11 +387,11 @@ export default function UpdateSubmission({ onClose, submissionID }) {
               fullWidth
               label="Email"
               autoComplete="email"
-              autoFocus
               value={author.email}
               onChange={(e) =>
                 handleInputChange(index, "email", e.target.value)
               }
+              inputProps={{ maxLength: 100 }}
               sx={{ ml: 2, mb: 2, width: { xs: "90%", sm: "30%", md: "30%" } }}
             />
 
@@ -403,11 +400,11 @@ export default function UpdateSubmission({ onClose, submissionID }) {
               required
               fullWidth
               label="Affiliation"
-              autoFocus
               value={author.affiliation}
               onChange={(e) =>
                 handleInputChange(index, "affiliation", e.target.value)
               }
+              inputProps={{ maxLength: 20 }}
               sx={{ ml: 2, mb: 2, width: { xs: "90%", sm: "30%", md: "30%" } }}
             />
 

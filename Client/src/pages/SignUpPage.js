@@ -192,6 +192,7 @@ export default function SignUpPage() {
                       id="firstName"
                       label="First Name"
                       autoFocus
+                      inputProps={{ maxLength: 50 }}
                     />
                     {firstNameAlert}
                   </Grid>
@@ -203,6 +204,7 @@ export default function SignUpPage() {
                       label="Last Name"
                       name="lastName"
                       autoComplete="family-name"
+                      inputProps={{ maxLength: 50 }}
                     />
                     {lastNameAlert}
                   </Grid>
@@ -214,6 +216,7 @@ export default function SignUpPage() {
                       label="Email Address"
                       name="email"
                       autoComplete="email"
+                      inputProps={{ maxLength: 100 }}
                     />
                     {emailAlert}
                   </Grid>
@@ -224,6 +227,7 @@ export default function SignUpPage() {
                       id="phone"
                       label="Phone Number"
                       name="phone"
+                      inputProps={{ maxLength: 18 }}
                     />
                     {phoneAlert}
                   </Grid>
@@ -236,6 +240,7 @@ export default function SignUpPage() {
                       type="password"
                       id="password"
                       autoComplete="new-password"
+                      inputProps={{ maxLength: 200 }}
                     />
                     {passwordAlert}
                   </Grid>
@@ -246,6 +251,7 @@ export default function SignUpPage() {
                       name="affiliation"
                       label="Affiliation"
                       id="affiliation"
+                      inputProps={{ maxLength: 20 }}
                     />
                     {affiliationAlert}
                   </Grid>
@@ -260,6 +266,7 @@ export default function SignUpPage() {
                         id="code"
                         label="Invitation Code"
                         name="code"
+                        inputProps={{ maxLength: 10 }}
                       />
                     </FieldInfo>
                   </Grid>
